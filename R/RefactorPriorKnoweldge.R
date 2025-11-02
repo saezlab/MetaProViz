@@ -548,7 +548,8 @@ path = NULL
             quantify_ambiguity = FALSE,
             qualify_ambiguity = TRUE,
             ambiguity_groups = NULL,  # Can not be set to FALSE!
-            ambiguity_summary = FALSE  # Checks within the groups, without it checks across groups
+            # Checks within the groups, without it checks across groups
+            ambiguity_summary = FALSE
         ) %>%
         select(
             all_of(intersect(names(.), names(data))), all_of(to)
@@ -724,11 +725,14 @@ path = NULL
                         # Split merged_column into individual IDs
                         as.character(
                             !!sym(
-                                metadata_info[["InputID"]]  # Split hmdb into individual IDs
+                                # Split hmdb into individual IDs
+                                metadata_info[["InputID"]]
                             )
                         )
                     ),
-                    collapse = ", "  # Combine the remaining IDs back into a comma-separated string
+                    # Combine the remaining IDs back into a comma-separated
+                    # string
+                    collapse = ", "
                 )
             ) %>%
             ungroup() %>%
@@ -1011,7 +1015,9 @@ path = NULL
         unnest(  # unlist the columns in case they are not expaned
                 cols = all_of(Comp[[comp]]$from)
             ) %>%
-            filter(  # Remove NA values, otherwise they are counted as column is character
+            # Remove NA values, otherwise they are counted as column is
+            # character
+            filter(
                 !is.na(
                     !!sym(Comp[[comp]]$from)
                 )
@@ -1901,7 +1907,8 @@ checkmatch_pk_to_data <- function(
             summary_df$original_count[i] <- 0
             summary_df$matches_count[i] <- 0
             summary_df$match_overlap_percentage[i] <- NA
-            summary_df$found_match_in_PK[i] <- NA  # could also set it to FALSE but making NA for now for plotting
+            # could also set it to FALSE but making NA for now for plotting
+            summary_df$found_match_in_PK[i] <- NA
             summary_df$matches[i] <- NA
         } else {
             # Split each cell into individual entries and trim whitespace
@@ -2469,7 +2476,7 @@ function(
 
     # add number of Genes_targeted_by_TF_detected_num
     mat <-
-        as.data.frame(mat) %>%# Are these the normalised counts?
+        as.data.frame(mat) %>%  # Are these the normalised counts?
         rownames_to_column("Symbol")
 
     Detected <-

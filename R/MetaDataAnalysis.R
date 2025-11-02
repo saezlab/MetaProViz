@@ -186,11 +186,16 @@ metadata_analysis <- function(
 
     for (meta_col in Metadata) {
         for (pc_col in colnames(PCA.res_Info)[grepl("^PC", colnames(PCA.res_Info))]) {
-            Formula <- as.formula(paste(pc_col, "~", meta_col, sep = ""))  # Create a formula for ANOVA --> When constructing the ANOVA formula, it's important to ensure that the response variable (dependent variable) is numeric.
+            # Create a formula for ANOVA --> When constructing the ANOVA
+            # formula, it's important to ensure that the response variable
+            # (dependent variable) is numeric.
+            Formula <- as.formula(paste(pc_col, "~", meta_col, sep = ""))
             # pairwiseFormula <- as.formula(paste("pairwise ~" , meta_col, sep=""))
 
-            anova_result <- stats::aov(Formula, data = PCA.res_Info)  # Perform ANOVA
-            anova_result_tidy <- tidy(anova_result)  # tidy --> convert statistics into table
+            # Perform ANOVA
+            anova_result <- stats::aov(Formula, data = PCA.res_Info)
+            # tidy --> convert statistics into table
+            anova_result_tidy <- tidy(anova_result)
             anova_row <-
                 filter(
                     anova_result_tidy,
@@ -198,7 +203,8 @@ metadata_analysis <- function(
                 )  # Exclude Residuals row
 
             tukey_result <- TukeyHSD(anova_result)  # Perform Tukey test
-            tukey_result_tidy <- tidy(tukey_result)  # tidy --> convert statistics into table
+            # tidy --> convert statistics into table
+            tukey_result_tidy <- tidy(tukey_result)
 
             # lm_result_p.val <- lsmeans((lm(Formula, data = PCA.res_Info)),  pairwiseFormula , adjust=NULL)# adjust=NULL leads to the p-value!
             # lm_result_p.adj <- lsmeans((lm(Formula, data = PCA.res_Info)), pairwiseFormula, adjust="FDR")
@@ -227,7 +233,10 @@ metadata_analysis <- function(
 
     # Add explained variance into the table:
     prop_var_ex <-
-        as.data.frame(((PCA.res[["sdev"]])^2 / sum((PCA.res[["sdev"]])^2)) * 100) %>%# to compute the proportion of variance explained by each component in percent, we divide the variance by sum of total variance and multiply by 100(variance=standard deviation ^2)
+        # to compute the proportion of variance explained by each component in
+        # percent, we divide the variance by sum of total variance and multiply
+        # by 100(variance=standard deviation ^2)
+        as.data.frame(((PCA.res[["sdev"]])^2 / sum((PCA.res[["sdev"]])^2)) * 100) %>%
         rownames_to_column("PC") %>%
         mutate(PC = paste("PC", PC, sep = "")) %>%
         rename("Explained_Variance" = 2)
@@ -302,22 +311,26 @@ metadata_analysis <- function(
         group_by(feature, term) %>%
         # Group by feature and term
         summarise(
-            PC = paste(unique(PC), collapse = ", "),  # Concatenate unique PC entries with commas
+            # Concatenate unique PC entries with commas
+            PC = paste(unique(PC), collapse = ", "),
             `Sum(Explained_Variance)` = sum(Explained_Variance, na.rm = TRUE)
-        ) %>%# Sum Explained_Variance
-        ungroup() %>%# Remove previous grouping
-        group_by(feature) %>%# Group by feature for MainDriver calculation
-        mutate(MainDriver = (`Sum(Explained_Variance)` == max(`Sum(Explained_Variance)`))) %>%# Mark TRUE for the highest value
+        ) %>%  # Sum Explained_Variance
+        ungroup() %>%  # Remove previous grouping
+        group_by(feature) %>%  # Group by feature for MainDriver calculation
+        # Mark TRUE for the highest value
+        mutate(MainDriver = (`Sum(Explained_Variance)` == max(`Sum(Explained_Variance)`))) %>%
         ungroup()  # Remove grouping
 
     Res_summary <-
         Res %>%
         group_by(feature) %>%
         summarise(
-            term = paste(term, collapse = ", "),  # Concatenate all terms separated by commas
-            `Sum(Explained_Variance)` = paste(`Sum(Explained_Variance)`, collapse = ", "),  # Concatenate all Sum(Explained_Variance) values
+            # Concatenate all terms separated by commas
+            term = paste(term, collapse = ", "),
+            # Concatenate all Sum(Explained_Variance) values
+            `Sum(Explained_Variance)` = paste(`Sum(Explained_Variance)`, collapse = ", "),
             MainDriver = paste(MainDriver, collapse = ", ")
-        ) %>%# Extract the term where MainDriver is TRUE
+        ) %>%  # Extract the term where MainDriver is TRUE
         ungroup() %>%
         rowwise() %>%
         mutate(  # Extract the term where MainDriver is TRUE
@@ -344,12 +357,13 @@ metadata_analysis <- function(
         Stat_results %>%
         filter(tukeyHSD_p.adjusted < cutoff_stat) %>%
         # Filter for significant results
-        filter(Explained_Variance > cutoff_variance) %>%# Exclude Residuals row
+        # Exclude Residuals row
+        filter(Explained_Variance > cutoff_variance) %>%
         distinct(
             term,
             PC,
             .keep_all = TRUE
-        ) %>%# only keep unique term~PC combinations AND STATS
+        ) %>%  # only keep unique term~PC combinations AND STATS
         select(term, PC, Explained_Variance) %>%
         pivot_wider(names_from = PC, values_from = Explained_Variance) %>%
         column_to_rownames("term") %>%

@@ -1273,7 +1273,8 @@ dma_stat_single <-
                 filter(
                     metadata_sample[[metadata_info[["Conditions"]]]] %in% comparisons[1, column]
                 ) %>%
-                select_if(is.numeric)  # only keep numeric columns with metabolite values
+                # only keep numeric columns with metabolite values
+                select_if(is.numeric)
             C2 <-
                 data %>%
                 # Denominator
@@ -1362,7 +1363,8 @@ dma_stat_single <-
         }
 
         # order for t.value
-        STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val, decreasing = TRUE), ]  # order the df based on the t-value
+        # order the df based on the t-value
+        STAT_C1vC2 <- STAT_C1vC2[order(STAT_C1vC2$t.val, decreasing = TRUE), ]
 
         # list
         results_list <- list()
@@ -1780,7 +1782,8 @@ mpv_kruskal <- function(
                 )
             )
         pres[[colnames(Dunndata)[col]]] <- c(posthoc.res$p.adj, posthoc.res$p.adj)
-        pres <- pres[pres$comparisons %in% Dunn_Pres$comparisons, ]  # take only the comparisons selected
+        # take only the comparisons selected
+        pres <- pres[pres$comparisons %in% Dunn_Pres$comparisons, ]
         Dunn_Pres <-
             merge(
                 Dunn_Pres,
@@ -1795,7 +1798,8 @@ mpv_kruskal <- function(
             )
         )
         tres[[colnames(Dunndata)[col]]] <- c(posthoc.res$statistic, -posthoc.res$statistic)
-        tres <- tres[tres$comparisons %in% Dunn_Pres$comparisons, ]  # take only the comparisons selected
+        # take only the comparisons selected
+        tres <- tres[tres$comparisons %in% Dunn_Pres$comparisons, ]
         Dunn_Tres <-
             merge(
                 Dunn_Tres,
@@ -1875,7 +1879,8 @@ mpv_kruskal <- function(
                         by = "Metabolite",
                         all = TRUE
                     )
-                merged_df <- merged_df[, c(1, 4, 2:3, 5:ncol(merged_df))]  # reorder the columns
+                # reorder the columns
+                merged_df <- merged_df[, c(1, 4, 2:3, 5:ncol(merged_df))]
                 merged_list[[name]] <- merged_df
             }
         }
@@ -2430,7 +2435,7 @@ dma_stat_limma <-
                 number = Inf,
                 sort.by = "n",
                 adjust.method = padj
-            ) %>%# coef= the comparison the test is done for!
+            ) %>%  # coef= the comparison the test is done for!
             rename(
                 "Log2FC" = 1,
                 "t.val" = 3,
@@ -2737,7 +2742,7 @@ mpv_shapiro <- function(
             data,
             is.na(data),
             0
-        ) %>%# shapiro test can not handle NAs!
+        ) %>%  # shapiro test can not handle NAs!
         filter(
             metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator | metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator
         ) %>%

@@ -139,8 +139,12 @@ viz_volcano <- function(
     # HelperFunction `check_param`
     if (plot_types == "PEA") {
     # Those relationships are checked in the viz_volcano_pea() function!
-        SettingsFile <- NULL # For PEA the metadata_feature is the prior knowledge file, and hence this will not have feature as row names.
-        Info <- NULL # If SettingsFileMetab = NULL, SetingsInfo has to be NULL to, otherwise we will get an error.
+        # For PEA the metadata_feature is the prior knowledge file, and hence
+        # this will not have feature as row names.
+        SettingsFile <- NULL
+        # If SettingsFileMetab = NULL, SetingsInfo has to be NULL to, otherwise
+        # we will get an error.
+        Info <- NULL
     } else {
         SettingsFile <- metadata_feature
         Info <- metadata_info
@@ -150,8 +154,8 @@ viz_volcano <- function(
         data = as.data.frame(t(data)),
         data_num = FALSE,
         metadata_sample = NULL,
-        metadata_feature = SettingsFile,# Set above
-        metadata_info = Info,# Set above
+        metadata_feature = SettingsFile,  # Set above
+        metadata_info = Info,  # Set above
         save_plot = save_plot,
         save_table = NULL,
         core = FALSE,
@@ -310,13 +314,13 @@ viz_volcano <- function(
     }
 
     # Rename the x and y lab if the information has been passed:
-    if (is.null(xlab)) { # use column name of x provided by user
+    if (is.null(xlab)) {  # use column name of x provided by user
         xlab <- bquote(.(as.symbol(x)))
     } else if (!is.null(xlab)) {
         xlab <- bquote(.(as.symbol(xlab)))
     }
 
-    if (is.null(ylab)) { # use column name of x provided by user
+    if (is.null(ylab)) {  # use column name of x provided by user
         ylab <- bquote(.(as.symbol(y)))
     } else if (!is.null(ylab)) {
         ylab <- bquote(.(as.symbol(ylab)))
@@ -368,7 +372,7 @@ viz_volcano <- function(
     ##########################################################################
     ## ----------- Make the  plot based on the chosen parameters ------------ ##
 
-    if (plot_types == "Standard") { # ## # #--- 1. Standard
+    if (plot_types == "Standard") {  # ## # #--- 1. Standard
         VolcanoRes <- viz_volcano_standard(
             data = Volcanodata,
             metadata_feature = metadata_feature,
@@ -392,7 +396,7 @@ viz_volcano <- function(
             folder = folder
         )
 
-    }else if (plot_types == "Compare") { # ## # #--- 2. Compare
+    }else if (plot_types == "Compare") {  # ## # #--- 2. Compare
     VolcanoRes <- viz_volcano_compare(
         data = Volcanodata,
         data2 = data2,
@@ -418,7 +422,7 @@ viz_volcano <- function(
         folder = folder
     )
 
-    } else if (plot_types == "PEA") { # ## # #--- 3. PEA
+    } else if (plot_types == "PEA") {  # ## # #--- 3. PEA
     VolcanoRes <- viz_volcano_pea(
         data = Volcanodata,
         data2 = data2,
@@ -505,8 +509,8 @@ viz_volcano_standard <- function(
     metadata_info,
     y = "p.adj",
     x = "Log2FC",
-    xlab = NULL,# "~Log[2]~FC"
-    ylab = NULL,# "~-Log[10]~p.adj"
+    xlab = NULL,  # "~Log[2]~FC"
+    ylab = NULL,  # "~-Log[10]~p.adj"
     cutoff_x = 0.5,
     cutoff_y = 0.05,
     connectors = FALSE,
@@ -534,8 +538,8 @@ viz_volcano_standard <- function(
     # Create the list of individual plots that should be made:
         IndividualPlots <- unique(data$individual)
 
-        PlotList <- list() # Empty list to store all the plots
-        PlotList_adaptedGrid <- list() # Empty list to store all the plots
+        PlotList <- list()  # Empty list to store all the plots
+        PlotList_adaptedGrid <- list()  # Empty list to store all the plots
 
         for (i in IndividualPlots) {
             InputVolcano <- subset(data, individual == paste(i))
@@ -589,7 +593,7 @@ viz_volcano_standard <- function(
                     xlab = xlab,
                     ylab = ylab,
                     pCutoff = cutoff_y,
-                    FCcutoff = cutoff_x,# Cut off Log2FC, automatically 2
+                    FCcutoff = cutoff_x,  # Cut off Log2FC, automatically 2
                     pointSize = 3,
                     labSize = 3,
                     axisLabSize = 10,
@@ -644,7 +648,7 @@ viz_volcano_standard <- function(
                         "[[:space:],/\\\\]",
                         "-",
                         i
-                    ) # removes empty spaces and replaces /,\ with -
+                    )  # removes empty spaces and replaces /,\ with -
                 PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
                 SaveList <- list()
@@ -666,8 +670,8 @@ viz_volcano_standard <- function(
             }
         }
     } else if (!("individual" %in% names(metadata_info))) {
-            PlotList <- list() # Empty list to store all the plots
-            PlotList_adaptedGrid <- list() # Empty list to store all the plots
+            PlotList <- list()  # Empty list to store all the plots
+            PlotList_adaptedGrid <- list()  # Empty list to store all the plots
 
             InputVolcano <- data
             if (nrow(InputVolcano)>=1) {
@@ -719,7 +723,7 @@ viz_volcano_standard <- function(
                 xlab = xlab,
                 ylab = ylab,
                 pCutoff = cutoff_y,
-                FCcutoff = cutoff_x,# Cut off Log2FC, automatically 2
+                FCcutoff = cutoff_x,  # Cut off Log2FC, automatically 2
                 pointSize = 3,
                 labSize = 3,
                 axisLabSize = 10,
@@ -942,8 +946,8 @@ viz_volcano_compare <- function(
     # Create the list of individual plots that should be made:
         IndividualPlots <- unique(InputCompare$individual)
 
-        PlotList <- list() # Empty list to store all the plots
-        PlotList_adaptedGrid <- list() # Empty list to store all the plots
+        PlotList <- list()  # Empty list to store all the plots
+        PlotList_adaptedGrid <- list()  # Empty list to store all the plots
 
         for (i in IndividualPlots) {
         InputVolcano <- subset(InputCompare, individual == paste(i))
@@ -959,7 +963,8 @@ viz_volcano_compare <- function(
                     names(col) <- InputVolcano$color[row]
                     keyvals <- c(keyvals, col)
                 }
-            } else { # here we will use the conditions if no other color is provided!
+            # here we will use the conditions if no other color is provided!
+            } else {
                 color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$comparison))]
 
                 keyvals <- c()
@@ -1017,7 +1022,7 @@ viz_volcano_compare <- function(
             xlab = xlab,
             ylab = ylab,
             pCutoff = cutoff_y,
-            FCcutoff = cutoff_x,# Cut off Log2FC, automatically 2
+            FCcutoff = cutoff_x,  # Cut off Log2FC, automatically 2
             pointSize = 3,
             labSize = 3,
             axisLabSize = 10,
@@ -1072,7 +1077,7 @@ viz_volcano_compare <- function(
                 "[[:space:],/\\\\]",
                 "-",
                 i
-            ) # removes empty spaces and replaces /,\ with -
+            )  # removes empty spaces and replaces /,\ with -
         PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
         SaveList <- list()
@@ -1095,8 +1100,8 @@ viz_volcano_compare <- function(
     }
 
     if (!("individual" %in% names(metadata_info))) {
-        PlotList <- list() # Empty list to store all the plots
-        PlotList_adaptedGrid <- list() # Empty list to store all the plots
+        PlotList <- list()  # Empty list to store all the plots
+        PlotList_adaptedGrid <- list()  # Empty list to store all the plots
 
         if (nrow(InputCompare)>=1) {
             InputVolcano <- InputCompare
@@ -1110,7 +1115,8 @@ viz_volcano_compare <- function(
                     names(col) <- InputVolcano$color[row]
                     keyvals <- c(keyvals, col)
                 }
-            } else { # here we will use the conditions if no other color is provided!
+            # here we will use the conditions if no other color is provided!
+            } else {
                 color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$comparison))]
 
                 keyvals <- c()
@@ -1168,7 +1174,7 @@ viz_volcano_compare <- function(
                 xlab = xlab,
                 ylab = ylab,
                 pCutoff = cutoff_y,
-                FCcutoff = cutoff_x,# Cut off Log2FC, automatically 2
+                FCcutoff = cutoff_x,  # Cut off Log2FC, automatically 2
                 pointSize = 3,
                 labSize = 3,
                 axisLabSize = 10,
@@ -1375,13 +1381,14 @@ viz_volcano_pea <- function(
     # Create the list of individual plots that should be made:
     IndividualPlots <- unique(data2$PEA_Pathway)
 
-    PlotList <- list() # Empty list to store all the plots
-    PlotList_adaptedGrid <- list() # Empty list to store all the plots
+    PlotList <- list()  # Empty list to store all the plots
+    PlotList_adaptedGrid <- list()  # Empty list to store all the plots
 
     for (i in IndividualPlots) {
 
         data2_Select <- data2 %>%
-        filter(PEA_Pathway == paste(i)) #Select pathway we plot and use the score and stats
+        # Select pathway we plot and use the score and stats
+        filter(PEA_Pathway == paste(i))
 
         metadata_feature_Select <- metadata_feature %>%
         filter(PEA_Pathway == paste(i))
@@ -1446,7 +1453,7 @@ viz_volcano_pea <- function(
                 xlab = xlab,
                 ylab = ylab,
                 pCutoff = cutoff_y,
-                FCcutoff = cutoff_x,# Cut off Log2FC, automatically 2
+                FCcutoff = cutoff_x,  # Cut off Log2FC, automatically 2
                 pointSize = 3,
                 labSize = 3,
                 axisLabSize = 10,
@@ -1502,7 +1509,7 @@ viz_volcano_pea <- function(
                     "[[:space:],/\\\\]",
                     "-",
                     i
-                ) # removes empty spaces and replaces /,\ with -
+                )  # removes empty spaces and replaces /,\ with -
             PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
             SaveList <- list()

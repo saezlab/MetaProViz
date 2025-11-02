@@ -147,8 +147,10 @@ cluster_ora <- function(
 
     # Load Pathways
     Pathway <- Pathways
-    Term2gene <- Pathway[, c("term", "gene")]# term and MetaboliteID (MetaboliteID = gene as syntax required for enricher)
-    Term2name <- Pathway[, c("term", "Description")]# term and description
+    # term and MetaboliteID (MetaboliteID = gene as syntax required for
+    # enricher)
+    Term2gene <- Pathway[, c("term", "gene")]
+    Term2name <- Pathway[, c("term", "Description")]  # term and description
 
     # Add the number of genes present in each pathway
     Pathway$Count <- 1
@@ -163,7 +165,7 @@ cluster_ora <- function(
     Pathway$Count <- NULL
 
     ## ------------ Run ----------- ##
-    df_list <- list()# Make an empty list to store the created DFs
+    df_list <- list()  # Make an empty list to store the created DFs
     clusterGo_list <- list()
     # Run ORA
     for (g in grps_labels) {
@@ -176,7 +178,8 @@ cluster_ora <- function(
         sep = ""
     )
 
-    clusterGo <- enricher_internal(# From DOSE:::enricher_internal, Author: Guangchuang Yu
+    # From DOSE:::enricher_internal, Author: Guangchuang Yu
+    clusterGo <- enricher_internal(
         gene = as.character(grpMetabolites$Metabolite),
         pvalueCutoff = 1L,
         pAdjustMethod = "BH",
@@ -339,7 +342,8 @@ standard_ora <- function(
     # check if the metabolites are significantly changed.
     value <- cutoff_percentage/100
 
-    allMetabolites_DF <- data[order(data[[metadata_info[["percentageColumn"]]]]), ]# rank by t.val
+    # rank by t.val
+    allMetabolites_DF <- data[order(data[[metadata_info[["percentageColumn"]]]]), ]
     selectMetabolites_DF <- allMetabolites_DF[c(seq_len(ceiling(value * nrow(allMetabolites_DF))), (nrow(allMetabolites_DF)-(ceiling(value * nrow(allMetabolites_DF)))):(nrow(allMetabolites_DF))), ]
     selectMetabolites_DF$`top/Bottom`<- "TRUE"
     selectMetabolites_DF <-
@@ -361,7 +365,8 @@ standard_ora <- function(
         Cluster_ChangedMetabolites = case_when(Significant & `top/Bottom_percentage` ~ 'TRUE',
         TRUE ~ 'FALSE')
     )
-    InputSelection$`top/Bottom` <- NULL #remove column as its not needed for output
+    # remove column as its not needed for output
+    InputSelection$`top/Bottom` <- NULL
 
     selectMetabolites <- InputSelection %>%
     subset(Cluster_ChangedMetabolites)
@@ -369,8 +374,10 @@ standard_ora <- function(
 
     # Load Pathways
     Pathway <- Pathways
-    Term2gene <- Pathway[, c("term", "gene")]# term and MetaboliteID (MetaboliteID = gene as syntax required for enricher)
-    Term2name <- Pathway[, c("term", "Description")]# term and description
+    # term and MetaboliteID (MetaboliteID = gene as syntax required for
+    # enricher)
+    Term2gene <- Pathway[, c("term", "gene")]
+    Term2name <- Pathway[, c("term", "Description")]  # term and description
 
     # Add the number of genes present in each pathway
     Pathway$Count <- 1
@@ -386,7 +393,8 @@ standard_ora <- function(
 
     ## ------------ Run ----------- ##
     # Run ORA
-    clusterGo <- enricher_internal(# From DOSE:::enricher_internal, Author: Guangchuang Yu
+    # From DOSE:::enricher_internal, Author: Guangchuang Yu
+    clusterGo <- enricher_internal(
         gene = selectMetabolites,
         pvalueCutoff = 1L,
         pAdjustMethod = "BH",

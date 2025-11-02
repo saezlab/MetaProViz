@@ -321,8 +321,10 @@ adjust_title <- function(
     if (titles %>% nchar() %>% as.logical() %>% any()) {
         log_trace("The plot has title, adjusting layout to accommodate it.")
 
-        gtbl %<>% set_height(c("title", "main"), "0.5cm")  # controls margins -->plot_name
-        gtbl %<>% set_height(c("subtitle", "main"), "0.5cm")  # controls margins -->plot_name
+        # controls margins -->plot_name
+        gtbl %<>% set_height(c("title", "main"), "0.5cm")
+        # controls margins -->plot_name
+        gtbl %<>% set_height(c("subtitle", "main"), "0.5cm")
 
 
         # Sum up total heights:
@@ -664,7 +666,8 @@ plot_grob_heatmap <- function(
 
     # Extract legend information and adjust:
     color_entries <- grep("^color", names(metadata_info), value = TRUE)
-    if (length(color_entries) > 0L) {  # We need to adapt the plot Hights and widths
+    # We need to adapt the plot Hights and widths
+    if (length(color_entries) > 0L) {
         if (sum(grepl("color_Sample", names(metadata_info))) > 0L) {
             names <- metadata_info[grepl("color_Sample", names(metadata_info))]
             colour_names <- NULL
@@ -695,11 +698,13 @@ plot_grob_heatmap <- function(
 
         legend_head <- c(legend_names, legend_names_M)
         longest_name <- legend_head[which.max(nchar(legend_head[[1]]))]
-        character_count_head <- nchar(longest_name) + 4  # This is the length of the legend title name
+        # This is the length of the legend title name
+        character_count_head <- nchar(longest_name) + 4
 
         legend_names <- c(unlist(colour_names), unlist(colour_names_M))
         longest_name <- legend_names[which.max(nchar(legend_names[[1]]))]
-        character_count <- nchar(longest_name)  # This is the length of the legend colour names
+        # This is the length of the legend colour names
+        character_count <- nchar(longest_name)
 
         legendWidth <-
             unit(

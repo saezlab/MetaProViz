@@ -146,7 +146,8 @@ viz_heatmap <- function(
     # what is this??
     data <- data
 
-    if (!is.null(metadata_feature)) {  # removes information about metabolites that are not included in the data
+    # removes information about metabolites that are not included in the data
+    if (!is.null(metadata_feature)) {
         metadata_feature <-
             merge(
                 x = metadata_feature,
@@ -158,7 +159,8 @@ viz_heatmap <- function(
         metadata_feature <- metadata_feature[, -c((ncol(metadata_feature) - nrow(data) + 1):ncol(metadata_feature))]
     }
 
-    if (!is.null(metadata_sample)) {  # removes information about samples that are not included in the data
+    # removes information about samples that are not included in the data
+    if (!is.null(metadata_sample)) {
         metadata_sample <-
             merge(x = metadata_sample, y = data, by = 0, all.y = TRUE) %>%
             column_to_rownames("Row.names")
@@ -188,7 +190,8 @@ viz_heatmap <- function(
                     )
                 log_trace(paste("Warning ", message, sep = ""))
                 warning(message)
-                unique_paths <- unique_paths[!unique_paths %in% i]  # Remove the pathway
+                # Remove the pathway
+                unique_paths <- unique_paths[!unique_paths %in% i]
             }
         }
 
@@ -380,7 +383,8 @@ viz_heatmap <- function(
                     )
                 log_trace(paste("Warning ", message, sep = ""))
                 warning(message)
-                unique_paths_Sample <- unique_paths_Sample[!unique_paths_Sample %in% i]  # Remove the pathway
+                # Remove the pathway
+                unique_paths_Sample <- unique_paths_Sample[!unique_paths_Sample %in% i]
             }
         }
 
@@ -585,7 +589,8 @@ viz_heatmap <- function(
                     )
                 log_trace(paste("Warning ", message, sep = ""))
                 warning(message)
-                unique_paths <- unique_paths[!unique_paths %in% i]  # Remove the pathway
+                # Remove the pathway
+                unique_paths <- unique_paths[!unique_paths %in% i]
             }
         }
 
@@ -608,7 +613,8 @@ viz_heatmap <- function(
                     )
                 log_trace(paste("Warning ", message, sep = ""))
                 warning(message)
-                unique_paths_Sample <- unique_paths_Sample[!unique_paths_Sample %in% i]  # Remove the pathway
+                # Remove the pathway
+                unique_paths_Sample <- unique_paths_Sample[!unique_paths_Sample %in% i]
             }
         }
 

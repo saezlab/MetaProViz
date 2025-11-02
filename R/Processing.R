@@ -190,7 +190,8 @@ processing <- function(
     ## ------------------ Prepare the data ------------------- ##
     # data files:
     data <- as.data.frame(data) %>%
-    mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)) # Make sure all 0 are changed to NAs
+    # Make sure all 0 are changed to NAs
+    mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
 
     data <- as.data.frame(mutate_all(as.data.frame(data), function(x) as.numeric(as.character(x))))
 
@@ -291,7 +292,8 @@ processing <- function(
         relocate(!!sym(metadata_info[["Conditions"]]), .before = 1L) %>%
         list(data_Rawdata = .)
 
-    if (!is.null(featurefilt)) {  # Add metabolites that where removed as part of the feature filtering
+    # Add metabolites that where removed as part of the feature filtering
+    if (!is.null(featurefilt)) {
 
         if (length(data_Filtered[["RemovedMetabolites"]]) == 0) {
 
@@ -549,8 +551,8 @@ replicate_sum <- function(
             c("Conditions", "Biological_Replicates"),
             sep = "_",
             remove = FALSE
-        ) %>%# Create a uniqueID
-        column_to_rownames("UniqueID")# set UniqueID to rownames
+        ) %>%  # Create a uniqueID
+        column_to_rownames("UniqueID")  # set UniqueID to rownames
 
     # --------------- return ------------------ # #
     save_res(
@@ -748,10 +750,12 @@ pool_estimation <- function(
     # data files:
     if (is.null(metadata_sample)) {
         Pooldata <- data %>%
-        mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)) # Make sure all 0 are changed to NAs
+        # Make sure all 0 are changed to NAs
+        mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
     } else {
         Pooldata <- data[metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["PoolSamples"]], ] %>%
-        mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)) # Make sure all 0 are changed to NAs
+        # Make sure all 0 are changed to NAs
+        mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
     }
 
     #####################################################################
@@ -771,7 +775,7 @@ pool_estimation <- function(
             Pooldata,
             2,
             function(x) {(sum(is.na(x))/length(x))*100 }
-        )# Calculate the NAs
+        )  # Calculate the NAs
 
     # Create Output DF
     result_df_final <- result_df %>%
@@ -879,7 +883,7 @@ pool_estimation <- function(
         point.padding = 0.5,
         # space around points
         max.overlaps = Inf
-        ) + # allow for many labels
+        ) +  # allow for many labels
         labs(
             title = "CV for metabolites of Pool samples",
             x = "Metabolites",
@@ -1036,9 +1040,10 @@ feature_filtering <- function(
 
     ## ------------------ Prepare the data ------------------- ##
     feat_filt_data <- as.data.frame(data) %>%
-    mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)) # Make sure all 0 are changed to NAs
+    # Make sure all 0 are changed to NAs
+    mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
 
-    if (core) { # remove core_media samples for feature filtering
+    if (core) {  # remove core_media samples for feature filtering
         feat_filt_data <- feat_filt_data %>% filter(!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]])
         Feature_Filtering <- paste0(featurefilt, "_core")
     }
@@ -1076,16 +1081,17 @@ feature_filtering <- function(
             split(
                 feat_filt_data,
                 feat_filt_Conditions
-            ) # split data frame into a list of dataframes by condition
+            )  # split data frame into a list of dataframes by condition
 
-        for (m in split_Input) { # Select metabolites to be filtered for different conditions
+        # Select metabolites to be filtered for different conditions
+        for (m in split_Input) {
             for (i in seq_len(ncol(m))) {
                 if (length(which(is.na(m[, i]))) > (1-cutoff_featurefilt)*nrow(m))
                     miss <- append(miss, i)
             }
         }
 
-        if (length(miss) == 0) { #remove metabolites if any are found
+        if (length(miss) == 0) {  # remove metabolites if any are found
             message("There where no metabolites exluded")
             filtered_matrix <- data
             feat_file_res <- "There where no metabolites exluded"
@@ -1114,12 +1120,13 @@ feature_filtering <- function(
         split_Input <- feat_filt_data
 
         miss <- c()
-        for (i in seq_len(ncol(split_Input))) { # Select metabolites to be filtered for one condition
+        # Select metabolites to be filtered for one condition
+        for (i in seq_len(ncol(split_Input))) {
             if (length(which(is.na(split_Input[, i]))) > (1-cutoff_featurefilt)*nrow(split_Input))
                 miss <- append(miss, i)
         }
 
-        if (length(miss) == 0) { #remove metabolites if any are found
+        if (length(miss) == 0) {  # remove metabolites if any are found
             message <- paste0("feature_filtering: There where no metabolites exluded")
             log_info(message)
             message(message)
@@ -1216,7 +1223,8 @@ mvi_imputation <- function(
     Conditions <- NULL
     ## ------------------ Prepare the data ------------------- ##
     filtered_matrix <- data %>%
-    mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)) # Make sure all 0 are changed to NAs
+    # Make sure all 0 are changed to NAs
+    mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
 
     ## ------------------ Perform mvi ------------------ ##
     # Do mvi for the samples
@@ -1224,7 +1232,7 @@ mvi_imputation <- function(
     log_info(message)
     message(message)
 
-    if (core) { # remove blank samples
+    if (core) {  # remove blank samples
         NA_removed_matrix <- filtered_matrix %>% filter(!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]])
 
     } else {
@@ -1232,12 +1240,15 @@ mvi_imputation <- function(
     }
 
     NA_removed_matrix %<>%
-        mutate(Conditions = if (core) { # If we have a CoRe experiment we need to remove the sample metainformation of the media blank samples!
+        # If we have a CoRe experiment we need to remove the sample
+        # metainformation of the media blank samples!
+        mutate(Conditions = if (core) {
             metadata_sample %>%
             filter(!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]]) %>%
             select(!!sym(metadata_info[["Conditions"]]))
         } else {
-            metadata_sample[[metadata_info[["Conditions"]]]]# If we have a standard experiments no samples need to be removed
+            # If we have a standard experiments no samples need to be removed
+            metadata_sample[[metadata_info[["Conditions"]]]]
         }) %>%
         group_by(Conditions) %>%
         mutate(
@@ -1406,14 +1417,16 @@ tic_norm <- function(
     median <- NULL
     ## ------------------ Prepare the data ------------------- ##
     NA_removed_matrix <- data
-    NA_removed_matrix[is.na(NA_removed_matrix)] <- 0 # replace NA with 0
+    NA_removed_matrix[is.na(NA_removed_matrix)] <- 0  # replace NA with 0
 
     ## ------------------ QC plot ------------------- ##
     # # # Before tic Normalization
     # # ## Log() transformation:
-    log_NA_removed_matrix <- log(NA_removed_matrix) %>% t() %>% as.data.frame() # log tranforms the data
-    nan_count <- sum(is.nan(as.matrix(log_NA_removed_matrix)))# Count NaN values (produced by log(0))
-    if (nan_count > 0) {# Issue a custom warning if NaNs are present
+    # log tranforms the data
+    log_NA_removed_matrix <- log(NA_removed_matrix) %>% t() %>% as.data.frame()
+    # Count NaN values (produced by log(0))
+    nan_count <- sum(is.nan(as.matrix(log_NA_removed_matrix)))
+    if (nan_count > 0) {  # Issue a custom warning if NaNs are present
         message <-
             paste(
                 "For the RLA plot before/after tic normalisation we have to perform log() transformation. This resulted in",
@@ -1424,8 +1437,9 @@ tic_norm <- function(
         warning(message)
     }
 
-    medians <- apply(log_NA_removed_matrix, 2, median) # get median
-    RLA_data_raw <- log_NA_removed_matrix - medians   # Subtract the medians from each column
+    medians <- apply(log_NA_removed_matrix, 2, median)  # get median
+    # Subtract the medians from each column
+    RLA_data_raw <- log_NA_removed_matrix - medians
     RLA_data_long <-
         pivot_longer(
             RLA_data_raw,
@@ -1436,7 +1450,7 @@ tic_norm <- function(
     RLA_data_long <- as.data.frame(RLA_data_long)
     RLA_data_long <- RLA_data_long
     metadata_sample <- metadata_sample
-    for (row in seq_len(nrow(RLA_data_long))) { # add conditions
+    for (row in seq_len(nrow(RLA_data_long))) {  # add conditions
         RLA_data_long[row, metadata_info[["Conditions"]]] <- metadata_sample[rownames(metadata_sample) %in%RLA_data_long[row, 1], metadata_info[["Conditions"]]]
     }
 
@@ -1462,21 +1476,24 @@ tic_norm <- function(
         message(message)
 
         RowSums <- rowSums(NA_removed_matrix)
-        Median_RowSums <- median(RowSums) #This will built the median
+        Median_RowSums <- median(RowSums)  # This will built the median
         data_tic_Pre <-
             apply(
                 NA_removed_matrix,
                 2,
                 function(i) i/RowSums
-            ) #This is dividing the ion intensity by the total ion count
-        data_tic <- data_tic_Pre*Median_RowSums #Multiplies with the median metabolite intensity
+            )  # This is dividing the ion intensity by the total ion count
+        # Multiplies with the median metabolite intensity
+        data_tic <- data_tic_Pre*Median_RowSums
         data_tic <- as.data.frame(data_tic)
 
         ## ------------------ QC plot ------------------- ##
         # # # After tic normalization
-        log_data_tic  <- log(data_tic) %>% t() %>% as.data.frame() # log tranforms the data
+        # log tranforms the data
+        log_data_tic  <- log(data_tic) %>% t() %>% as.data.frame()
         medians <- apply(log_data_tic, 2, median)
-        RLA_data_norm <- log_data_tic - medians   # Subtract the medians from each column
+        # Subtract the medians from each column
+        RLA_data_norm <- log_data_tic - medians
         RLA_data_long <-
             pivot_longer(
                 RLA_data_norm,
@@ -1484,7 +1501,7 @@ tic_norm <- function(
                 names_to = "Group"
             )
         names(RLA_data_long)<- c("Samples", "Intensity")
-        for (row in seq_len(nrow(RLA_data_long))) { # add conditions
+        for (row in seq_len(nrow(RLA_data_long))) {  # add conditions
             RLA_data_long[row, metadata_info[["Conditions"]]] <- metadata_sample[rownames(metadata_sample) %in%RLA_data_long[row, 1], metadata_info[["Conditions"]]]
         }
 
@@ -1709,7 +1726,7 @@ core_norm <- function(
             point.padding = 0.5,
             # space around points
             max.overlaps = Inf
-            ) + # allow for many labels
+            ) +  # allow for many labels
             labs(
                 title = "CV for metabolites of control media samples (no cells)",
                 x = "Metabolites",
@@ -1795,8 +1812,10 @@ core_norm <- function(
                 fisher_test_results[[sample]] <- fisher_test_result
 
                 # Calculate the sum of "TRUE" and "FALSE" for the current sample
-                large_contingency_table[1, i] <- sum(current_sample)  # Sum of "TRUE"
-                large_contingency_table[2, i] <- sum(!current_sample) # Sum of "FALSE"
+                # Sum of "TRUE"
+                large_contingency_table[1, i] <- sum(current_sample)
+                # Sum of "FALSE"
+                large_contingency_table[2, i] <- sum(!current_sample)
             }
 
             # Convert the matrix into a data_contframe for better readability
@@ -1866,7 +1885,8 @@ core_norm <- function(
     column_to_rownames("Row.names") %>%
     select(-seq_len(ncol(metadata_sample)))
 
-    data_tic_coreNorm_Media <- as.data.frame(t( apply(t(data_tic), 2, function(i) i-core_media_df$core_mediaMeans)))  #Subtract from each sample the core_media mean
+    # Subtract from each sample the core_media mean
+    data_tic_coreNorm_Media <- as.data.frame(t( apply(t(data_tic), 2, function(i) i-core_media_df$core_mediaMeans)))
     data_tic_coreNorm <- as.data.frame(apply(data_tic_coreNorm_Media, 2, function(i) i*core_norm_factor))
 
     # Remove core_media samples from the data
@@ -1974,7 +1994,7 @@ outlier_detection <- function(
     # Load the data:
     data_norm <- data %>%
     mutate_all(~ replace(., is.nan(.), 0))
-    data_norm[is.na(data_norm)] <- 0 #replace NA with 0
+    data_norm[is.na(data_norm)] <- 0  # replace NA with 0
 
     if (core) {
         Conditions <- metadata_sample[[metadata_info[["Conditions"]]]][!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]]]
@@ -1984,7 +2004,7 @@ outlier_detection <- function(
 
 
     # Prepare the lists to store the results:
-    Outlier_filtering_loop <- 10 #Here we do 10 rounds of hotelling filtering
+    Outlier_filtering_loop <- 10  # Here we do 10 rounds of hotelling filtering
     sample_outliers <- list()
     scree_plot_list <- list()
     outlier_plot_list <- list()
@@ -1996,17 +2016,23 @@ outlier_detection <- function(
     # # --------- Perform Outlier testing:
     for (loop in seq_len(Outlier_filtering_loop)) {
         # # --- Zero variance metabolites
-        metabolite_var <- as.data.frame(apply(data_norm, 2, var) %>% t()) # calculate each metabolites variance
-        metabolite_zero_var_list <- list(colnames(metabolite_var)[which(metabolite_var[1, ] == 0)]) # takes the names of metabolites with zero variance and puts them in list
+        # calculate each metabolites variance
+        metabolite_var <- as.data.frame(apply(data_norm, 2, var) %>% t())
+        # takes the names of metabolites with zero variance and puts them in
+        # list
+        metabolite_zero_var_list <- list(colnames(metabolite_var)[which(metabolite_var[1, ] == 0)])
 
         if (sum(metabolite_var[1, ] == 0) == 0) {
             metabolite_zero_var_total_list[loop] <- 0
         }else if (sum(metabolite_var[1, ] == 0)>0) {
             metabolite_zero_var_total_list[loop] <- metabolite_zero_var_list
-            zero_var_metab_warning <- TRUE # This is used later to print and save the zero variance metabolites if any are found.
+            # This is used later to print and save the zero variance metabolites
+            # if any are found.
+            zero_var_metab_warning <- TRUE
         }
 
-        for (metab in metabolite_zero_var_list) {  # Remove the metabolites with zero variance from the data to do PCA
+        # Remove the metabolites with zero variance from the data to do PCA
+        for (metab in metabolite_zero_var_list) {
             data_norm <- data_norm %>% select(-all_of(metab))
         }
 
@@ -2031,7 +2057,8 @@ outlier_detection <- function(
         dev.off()
 
         # # --- Scree plot
-        inflect_df <- as.data.frame(c(seq_along(PCA.res$sdev))) # get Scree plot values for inflection point calculation
+        # get Scree plot values for inflection point calculation
+        inflect_df <- as.data.frame(c(seq_along(PCA.res$sdev)))
         colnames(inflect_df) <- "x"
         inflect_df$y <- summary(PCA.res)$importance[2, ]
         inflect_df$Cumulative <- summary(PCA.res)$importance[3, ]
@@ -2039,13 +2066,15 @@ outlier_detection <- function(
             format(
                 round(inflect_df$Cumulative[seq_len(20)]*100, 1),
                 nsmall = 1
-            ) #make cumulative variation labels for plot
+            )  # make cumulative variation labels for plot
         knee <-
             uik(
                 inflect_df$x,
                 inflect_df$y
-            ) # Calculate the knee and select optimal number of components
-        npcs <- knee -1 #Note: we subtract 1 components from the knee cause the root of the knee is the PC that does not add something. npcs = 30
+            )  # Calculate the knee and select optimal number of components
+        # Note: we subtract 1 components from the knee cause the root of the
+        # knee is the PC that does not add something. npcs = 30
+        npcs <- knee -1
 
         # Make a scree plot with the selected component cut-off for HotellingT2 test
         screeplot <-
@@ -2077,7 +2106,8 @@ outlier_detection <- function(
         }
         dev.new()
 
-        outlier_plot_list[[paste("ScreePlot_round", loop, sep = "")]] <- screeplot # save plot
+        # save plot
+        outlier_plot_list[[paste("ScreePlot_round", loop, sep = "")]] <- screeplot
         dev.off()
 
         # # --- HotellingT2 test for outliers
@@ -2146,7 +2176,7 @@ outlier_detection <- function(
             theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))+
             ggtitle(paste("Hotelling ", hotelling_qcc$type, " test filtering round ", loop, ", with ", 100 * hotelling_qcc$confidence.level, "% Confidence"))+
             scale_linetype_discrete(name = LegendTitle, )+
-            theme(plot.title = element_text(size = 13))+ # , face = "bold")) +
+            theme(plot.title = element_text(size = 13))+  # , face = "bold")) +
             theme(axis.text = element_text(size = 7))
         # HotellingT2plot_Sized <- plotGrob_Processing(input_plot = HotellingT2plot,plot_name= paste("Hotelling ", hotelling_qcc$type ," test filtering round ",loop,", with ", 100 * hotelling_qcc$confidence.level,"% Confidence"), plot_type= "Hotellings")
 
@@ -2163,11 +2193,13 @@ outlier_detection <- function(
             a <- paste0(a, "_core")
         }
 
-        if (length(hotelling_qcc[["violations"]][["beyond.limits"]]) == 0) { # loop for outliers until no outlier is detected
+        # loop for outliers until no outlier is detected
+        if (length(hotelling_qcc[["violations"]][["beyond.limits"]]) == 0) {
             data_norm <- data_norm
             break
         }else if (length(hotelling_qcc[["violations"]][["beyond.limits"]]) == 1) {
-            data_norm <- data_norm[-hotelling_qcc[["violations"]][["beyond.limits"]], ]# filter the selected outliers from the data
+            # filter the selected outliers from the data
+            data_norm <- data_norm[-hotelling_qcc[["violations"]][["beyond.limits"]], ]
             Conditions <- Conditions[-hotelling_qcc[["violations"]][["beyond.limits"]]]
 
             # Change the names of outliers in mqcc . Instead of saving the order number it saves the name
@@ -2178,7 +2210,7 @@ outlier_detection <- function(
             Conditions <- Conditions[-hotelling_qcc[["violations"]][["beyond.limits"]]]
 
             # Change the names of outliers in mqcc . Instead of saving the order number it saves the name
-            sm_out <- c() # list of outliers samples
+            sm_out <- c()  # list of outliers samples
             for (i in seq_along(hotelling_qcc[["violations"]][["beyond.limits"]])) {
                 sm_out <-
                     append(
@@ -2192,10 +2224,10 @@ outlier_detection <- function(
 
     # # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## #
     # # -- Print Outlier detection results about samples and metabolites
-    if (length(sample_outliers) > 0) {   # Print outlier samples
+    if (length(sample_outliers) > 0) {  # Print outlier samples
         message <- paste("There are possible outlier samples in the data")
         log_info(message)
-        message(message) #This was a warning
+        message(message)  # This was a warning
         for (i in seq_along(sample_outliers)  ) {
             message <-
                 paste(
@@ -2244,8 +2276,9 @@ outlier_detection <- function(
 
     # # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## #
     # # ---- 1. Make Output DF
-    total_outliers <- hash() # make a dictionary
-    if (length(sample_outliers) > 0) { # Create columns with outliers to merge to output dataframe
+    total_outliers <- hash()  # make a dictionary
+    # Create columns with outliers to merge to output dataframe
+    if (length(sample_outliers) > 0) {
         for (i in seq_along(sample_outliers)  ) {
             total_outliers[[paste("Outlier_filtering_round_", i, sep = "")]] <- sample_outliers[i]
         }
@@ -2253,7 +2286,8 @@ outlier_detection <- function(
 
     data_norm_filtered_full <- as.data.frame(replace(data, data == 0, NA))
 
-    if (length(total_outliers) > 0) {  # add outlier information to the full output dataframe
+    # add outlier information to the full output dataframe
+    if (length(total_outliers) > 0) {
         data_norm_filtered_full$Outliers <- "no"
         for (i in seq_along(total_outliers)) {
             for (k in seq_along( values(total_outliers)[i] ) ) {
@@ -2265,11 +2299,12 @@ outlier_detection <- function(
     }
 
     data_norm_filtered_full <-
-        relocate(Outliers) %>%# Put Outlier columns in the front
+        relocate(Outliers) %>%  # Put Outlier columns in the front
         merge(
             metadata_sample,
             data_norm_filtered_full,
-            by = 0  # add the design in the output df (merge by rownames/sample names
+            # add the design in the output df (merge by rownames/sample names
+            by = 0
         )
     rownames(data_norm_filtered_full) <- data_norm_filtered_full$Row.names
     data_norm_filtered_full$Row.names <- c()

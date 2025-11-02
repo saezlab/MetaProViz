@@ -40,8 +40,9 @@ process_se <- function(se_obj) {
         stop("Provided object is not a SummarizedExperiment.")
     }
     assay_mat <- assay(se_obj)
-    assay_data <- as.data.frame(t(assay_mat))                # samples as rows, metabolites as columns
-    metadata_sample <- as.data.frame(colData(se_obj))   # sample metadata
+    # samples as rows, metabolites as columns
+    assay_data <- as.data.frame(t(assay_mat))
+    metadata_sample <- as.data.frame(colData(se_obj))  # sample metadata
     metadata_feature <- as.data.frame(rowData(se_obj))  # feature metadata
 
     # treat "no columns" as empty

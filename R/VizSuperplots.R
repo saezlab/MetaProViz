@@ -102,7 +102,7 @@ viz_superplot <- function(
     data,
     metadata_sample = NULL,
     metadata_info = c(Conditions = "Conditions", Superplot = NULL),
-    plot_type = "Box",# Bar, Box, Violin,
+    plot_type = "Box",  # Bar, Box, Violin,
     plot_name = "",
     plot_conditions = NULL,
     stat_comparison = NULL,
@@ -318,13 +318,13 @@ viz_superplot <- function(
     }
 
     # Rename the x and y lab if the information has been passed:
-    if (is.null(xlab)) { # use column name of x provided by user
+    if (is.null(xlab)) {  # use column name of x provided by user
         xlab <- bquote(.(as.symbol(metadata_info[["Conditions"]])))
     }else if (!is.null(xlab)) {
     xlab <- bquote(.(as.symbol(xlab)))
     }
 
-    if (is.null(ylab)) { # use column name of x provided by user
+    if (is.null(ylab)) {  # use column name of x provided by user
         ylab <- bquote(.(as.symbol("Intensity")))
     }else if (!is.null(ylab)) {
     ylab <- bquote(.(as.symbol(ylab)))
@@ -337,8 +337,8 @@ viz_superplot <- function(
 
     ## ------------ Create plots ----------- ##
     # make a list for plotting all plots together
-    PlotList <- list() # Empty list to store all the plots
-    PlotList_adaptedGrid <- list() # Empty list to store all the plots
+    PlotList <- list()  # Empty list to store all the plots
+    PlotList_adaptedGrid <- list()  # Empty list to store all the plots
 
     for (i in colnames(data)) {
     # Prepare the dfs:
@@ -370,7 +370,8 @@ viz_superplot <- function(
                         as.data.frame()
     }
     names(plotdata)[1] <- c("Intensity")
-    plotdata$Conditions <- factor(plotdata$Conditions)# Change conditions to factor
+    # Change conditions to factor
+    plotdata$Conditions <- factor(plotdata$Conditions)
 
     # Take only selected conditions
     if (!is.null(plot_conditions)) {
@@ -509,7 +510,8 @@ viz_superplot <- function(
                 ) %>%
             column_to_rownames("entry")
 
-            if (all(is.na(df_merge))) { # in case the reverse comparisons are needed
+            # in case the reverse comparisons are needed
+            if (all(is.na(df_merge))) {
                 df_merge <-
                     merge(
                         df_select,
@@ -528,15 +530,17 @@ viz_superplot <- function(
 
         # add stats to plot
         if (plot_type == "Bar") {
-            Plot <- Plot +stat_pvalue_manual(df_merge, hide.ns = FALSE, size = 3, tip.length = 0.01, step.increase = 0.05) # http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
+            # http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
+            Plot <- Plot +stat_pvalue_manual(df_merge, hide.ns = FALSE, size = 3, tip.length = 0.01, step.increase = 0.05)
         } else {
-            Plot <- Plot +stat_pvalue_manual(df_merge, hide.ns = FALSE, size = 3, tip.length = 0.01, step.increase = 0.01) # http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
+            # http://rpkgs.datanovia.com/ggpubr/reference/stat_pvalue_manual.html
+            Plot <- Plot +stat_pvalue_manual(df_merge, hide.ns = FALSE, size = 3, tip.length = 0.01, step.increase = 0.01)
         }
         Plot <- Plot +labs(caption = paste("p.adj using ", pval, "and", padj))
     }
 
     Plot <- Plot + theme+ labs(title = plot_name,
-        subtitle = i)# ggtitle(paste(i))
+        subtitle = i)  # ggtitle(paste(i))
     Plot <- Plot + theme(legend.position = "right", plot.title = element_text(size = 12, face = "bold"), axis.text.x = element_text(angle = 90, hjust = 1))+ xlab(xlab)+ ylab(ylab)
 
     ## Store the plot in the 'plots' list
@@ -565,7 +569,7 @@ viz_superplot <- function(
             "[[:space:],/\\\\:*?\"<> |]",
             "-",
             i
-        ) # removes empty spaces and replaces /,\ with -
+        )  # removes empty spaces and replaces /,\ with -
     PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
     SaveList <- list()

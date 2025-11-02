@@ -83,7 +83,7 @@ metsigdb_kegg <- function() {
         Metabolite = compound_name,
         MetaboliteID = compound,
         Description = pathway
-    ) #Update vignettes and remove rename
+    )  # Update vignettes and remove rename
 
 
     # Return into environment
@@ -144,13 +144,15 @@ metsigdb_chemicalclass <- function(
 
     ##########################################################################
     # Get the directory and filepath of cache results of R
-    directory <- user_cache_dir() # get chache directory
+    directory <- user_cache_dir()  # get chache directory
     File_path <- paste(directory, "/RaMP-ChemicalClass_Metabolite.rds", sep = "")
 
-    if (file.exists(File_path)) {# First we will check the users chache directory and weather there are rds files with KEGG_pathways already:
+    # First we will check the users chache directory and weather there are rds
+    # files with KEGG_pathways already:
+    if (file.exists(File_path)) {
         HMDB_ChemicalClass <- readRDS(File_path)
         message("Cached file loaded from: ", File_path)
-    } else {# load from OmniPath
+    } else {  # load from OmniPath
     # Get RaMP via OmnipathR and extract ClassyFire classes
     Structure <- ramp_table( "metabolite_class", version = version)
     Class <- ramp_table( "chem_props", version = version)
@@ -162,15 +164,16 @@ metsigdb_chemicalclass <- function(
             by = "ramp_id",
             all.x = TRUE
         ) %>%
-    filter(str_starts(class_source_id, "hmdb:")) %>%# Select HMDB only!
-    filter(str_starts(chem_source_id, "hmdb:")) %>%# Select HMDB only!
+    filter(str_starts(class_source_id, "hmdb:")) %>%  # Select HMDB only!
+    filter(str_starts(chem_source_id, "hmdb:")) %>%  # Select HMDB only!
     select(-c("chem_data_source", "chem_source_id")) %>%
     pivot_wider(
         names_from = class_level_name,
         # Use class_level_name as the new column names
         values_from = class_name,
         # Use class_name as the values for the new columns
-        values_fn = list(class_name = ~paste(unique(.), collapse = ", ")) # Combine duplicate values
+        # Combine duplicate values
+        values_fn = list(class_name = ~paste(unique(.), collapse = ", "))
     ) %>%
     group_by(across(-common_name)) %>%
     summarise(
@@ -178,14 +181,15 @@ metsigdb_chemicalclass <- function(
         # Combine all common names into one
         .groups = "drop"  # Ungroup after summarising
     ) %>%
-    mutate(class_source_id = str_remove(class_source_id, "^hmdb:")) %>%# Remove 'hmdb:' prefix
+    # Remove 'hmdb:' prefix
+    mutate(class_source_id = str_remove(class_source_id, "^hmdb:")) %>%
     select(
         class_source_id,
         common_name,
         ClassyFire_class,
         ClassyFire_super_class,
         ClassyFire_sub_class
-    ) # Reorder columns
+    )  # Reorder columns
 
     # Save the results as an RDS file in the Cache directory of R
     if (!dir.exists(directory)) {dir.create(directory)}
@@ -198,7 +202,8 @@ metsigdb_chemicalclass <- function(
 
     # # -------------- Save and return
     DF_List <- list("ChemicalClass_MetabSet" = HMDB_ChemicalClass)
-    save_res(inputlist_df = DF_List,# This needs to be a list, also for single comparisons
+    # This needs to be a list, also for single comparisons
+    save_res(inputlist_df = DF_List,
         inputlist_plot = NULL,
         save_table = save_table,
         save_plot = NULL,
@@ -308,8 +313,10 @@ make_gene_metab_set <- function(
     meta_network <- meta_network[which(meta_network$source != meta_network$target), ]
 
     # adapt to our needs extracting the metabolites:
-    meta_network_metabs <- meta_network[grepl("Metab__", meta_network$source) | grepl("Metab__HMDB", meta_network$target), -2] # extract entries with metabolites in source or Target
-    meta_network_metabs <- meta_network_metabs[grepl("Gene", meta_network_metabs$source) | grepl("Gene", meta_network_metabs$target), ] # extract entries with genes in source or Target
+    # extract entries with metabolites in source or Target
+    meta_network_metabs <- meta_network[grepl("Metab__", meta_network$source) | grepl("Metab__HMDB", meta_network$target), -2]
+    # extract entries with genes in source or Target
+    meta_network_metabs <- meta_network_metabs[grepl("Gene", meta_network_metabs$source) | grepl("Gene", meta_network_metabs$target), ]
 
     # Get reactant and product
     meta_network_metabs_reactant <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$source), ] %>% rename("metab" = 1, "gene" = 2)
@@ -347,7 +354,8 @@ make_gene_metab_set <- function(
         "GeneMetabSet" = GeneMetabSet,
         "MetabSet" = MetabSet
     )
-    save_res(inputlist_df = DF_List,# This needs to be a list, also for single comparisons
+    # This needs to be a list, also for single comparisons
+    save_res(inputlist_df = DF_List,
         inputlist_plot = NULL,
         save_table = save_table,
         save_plot = NULL,
@@ -476,7 +484,7 @@ metsigdb_metalinks <- function(
 
     # Close the connection
 
-    MetalinksDB <- TablesList[["edges"]] # extract the edges table
+    MetalinksDB <- TablesList[["edges"]]  # extract the edges table
     # ------------------------------------------------------------------
     # Answer questions about the database
     # if any parameter is ? then return the data
@@ -538,7 +546,8 @@ metsigdb_metalinks <- function(
     ## cell_location
     if (!is.null(cell_location)) {
         CellLocation <- TablesList[["cell_location"]]
-        CellLocation <- CellLocation[CellLocation$cell_location %in% cell_location, ] # Filter the cell location
+        # Filter the cell location
+        CellLocation <- CellLocation[CellLocation$cell_location %in% cell_location, ]
 
     # Get unique HMDB IDs
         CellLocation_HMDB <- unique(CellLocation$hmdb)
@@ -548,9 +557,10 @@ metsigdb_metalinks <- function(
     }
 
     ## tissue_location
-    if (!is.null(tissue_location)) {# "All Tissues"?
+    if (!is.null(tissue_location)) {  # "All Tissues"?
         TissueLocation <- TablesList[["tissue_location"]]
-        TissueLocation <- TissueLocation[TissueLocation$tissue_location %in% tissue_location, ] # Filter the tissue location
+        # Filter the tissue location
+        TissueLocation <- TissueLocation[TissueLocation$tissue_location %in% tissue_location, ]
 
     # Get unique HMDB IDs
         TissueLocation_HMDB <- unique(TissueLocation$hmdb)
@@ -562,7 +572,8 @@ metsigdb_metalinks <- function(
     ## biospecimen_location
     if (!is.null(biospecimen_location)) {
         BiospecimenLocation <- TablesList[["biospecimen_location"]]
-        BiospecimenLocation <- BiospecimenLocation[BiospecimenLocation$biospecimen_location %in% biospecimen_location, ] # Filter the biospecimen location
+        # Filter the biospecimen location
+        BiospecimenLocation <- BiospecimenLocation[BiospecimenLocation$biospecimen_location %in% biospecimen_location, ]
 
     # Get unique HMDB IDs
         BiospecimenLocation_HMDB <- unique(BiospecimenLocation$hmdb)
@@ -574,7 +585,7 @@ metsigdb_metalinks <- function(
     ## disease
     if (!is.null(disease)) {
         Disease <- TablesList[["disease"]]
-        Disease <- Disease[Disease$disease %in% disease, ] # Filter the disease
+        Disease <- Disease[Disease$disease %in% disease, ]  # Filter the disease
 
     # Get unique HMDB IDs
         Disease_HMDB <- unique(Disease$hmdb)
@@ -586,7 +597,7 @@ metsigdb_metalinks <- function(
     ## pathway
     if (!is.null(pathway)) {
         Pathway <- TablesList[["pathway"]]
-        Pathway <- Pathway[Pathway$pathway %in% pathway, ] # Filter the pathway
+        Pathway <- Pathway[Pathway$pathway %in% pathway, ]  # Filter the pathway
 
     # Get unique HMDB IDs
         Pathway_HMDB <- unique(Pathway$hmdb)
@@ -634,7 +645,8 @@ metsigdb_metalinks <- function(
         type = case_when(
         type == "lr" ~ "Ligand-Receptor",
         type == "pd" ~ "Production-Degradation",
-        TRUE ~ type  # this keeps the original value if it doesn't match any condition
+        # this keeps the original value if it doesn't match any condition
+        TRUE ~ type
     )
     ) %>%
     mutate(
@@ -642,7 +654,8 @@ metsigdb_metalinks <- function(
         mor == -1 ~ "Inhibiting",
         mor == 1 ~ "Activating",
         mor == 0 ~ "Binding",
-        TRUE ~ as.character(mor)  # this keeps the original value if it doesn't match any condition
+        # this keeps the original value if it doesn't match any condition
+        TRUE ~ as.character(mor)
     )
     )
     # --------------------------------------------------------
@@ -669,7 +682,8 @@ metsigdb_metalinks <- function(
     # ------------------------------------------------------------------
     # Save results in folder
     # # -------------- Save and return
-    save_res(inputlist_df = list(MetalinksDB),# This needs to be a list, also for single comparisons
+    # This needs to be a list, also for single comparisons
+    save_res(inputlist_df = list(MetalinksDB),
         inputlist_plot = NULL,
         save_table = save_table,
         save_plot = NULL,

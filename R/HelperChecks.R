@@ -431,7 +431,7 @@ check_param <- function(
             "txt",
             "csv",
             "xlsx",
-            "Rdata" # Rdata = SummarizedExperiment (?
+            "Rdata"  # Rdata = SummarizedExperiment (?
         )
     if (!is.null(save_table)) {
         if (!((save_table %in% save_table_options)) | (is.null(save_table))) {
@@ -541,12 +541,13 @@ check_param_processing <- function(
     if (is.vector(metadata_info)) {
         # -------------metadata_info
         # core
-        if (core) {   # parse core normalisation factor
+        if (core) {  # parse core normalisation factor
             message <- paste0("For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.")
             log_trace(paste("Message ", message, sep = ""))
             message(message)
             if ("core_media" %in% names(metadata_info)) {
-                if (length(grep(metadata_info[["core_media"]], metadata_sample[[metadata_info[["Conditions"]]]])) < 1) {     # Check for core_media samples
+                # Check for core_media samples
+                if (length(grep(metadata_info[["core_media"]], metadata_sample[[metadata_info[["Conditions"]]]])) < 1) {
                     message <- paste0("No core_media samples were provided in the 'Conditions' in the metadata_sample. For a core experiment control media samples without cells have to be measured and be added in the 'Conditions'
                                     column labeled as 'core_media' (see @param section). Please make sure that you used the correct labelling or whether you need core = FALSE for your analysis")
                     log_trace(paste("Error ", message, sep = ""))
@@ -771,9 +772,9 @@ check_param_dma <- function(
     }
 
     ## ------------ Sample Numbers ----------- ##
-    Num <- data %>%#Are sample numbers enough?
+    Num <- data %>%  # Are sample numbers enough?
     filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% numerator) %>%
-    select_if(is.numeric) # only keep numeric columns with metabolite values
+    select_if(is.numeric)  # only keep numeric columns with metabolite values
     Denom <- data %>%
     filter(metadata_sample[[metadata_info[["Conditions"]]]] %in% denominator) %>%
     select_if(is.numeric)
@@ -867,7 +868,7 @@ check_param_dma <- function(
                     " Those metabolite(s) might return p.val = NA, p.adj.= NA, t.val = NA. The Log2FC = Inf, if all replicates are 0/NA."
                 )
             log_info(message)
-            message(message)#
+            message(message)  # 
         }
     } else if (ncol(Num_Miss) > 0 & ncol(Denom_Miss) > 0) {
     Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))

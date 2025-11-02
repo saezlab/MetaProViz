@@ -186,27 +186,35 @@ mca_2cond <- function(data_c1,
     )
 
     #Apply Background filter (label genes that will be removed based on choosen background)
-    if(method_background == "C1|C2"){# C1|C2 = Cond2 OR Cond1
+    if(method_background == "C1|C2"){  # C1|C2 = Cond2 OR Cond1
     MergeDF <- MergeDF %>%
-    mutate(BG_method = case_when(Cond1_DF_Detected == "TRUE" & Cond2_DF_Detected == "TRUE" ~ 'TRUE',  #Cond1 & Cond2
-                                    Cond1_DF_Detected == "TRUE" & Cond2_DF_Detected == "FALSE" ~ 'TRUE',  # JustCond1
-                                    Cond1_DF_Detected == "FALSE" & Cond2_DF_Detected == "TRUE" ~ 'TRUE',  # Just Cond2
+    # Cond1 & Cond2
+    mutate(BG_method = case_when(Cond1_DF_Detected == "TRUE" & Cond2_DF_Detected == "TRUE" ~ 'TRUE',
+                                    # JustCond1
+                                    Cond1_DF_Detected == "TRUE" & Cond2_DF_Detected == "FALSE" ~ 'TRUE',
+                                    # Just Cond2
+                                    Cond1_DF_Detected == "FALSE" & Cond2_DF_Detected == "TRUE" ~ 'TRUE',
                                     TRUE ~ 'FALSE'))
-    }else if(method_background == "C1&C2"){ # Cond2 AND Cond1
+    }else if(method_background == "C1&C2"){  # Cond2 AND Cond1
     MergeDF <- MergeDF %>%
-    mutate(BG_method = case_when(Cond1_DF_Detected == "TRUE" & Cond2_DF_Detected == "TRUE" ~ 'TRUE',  #Cond1 & Cond2
+    # Cond1 & Cond2
+    mutate(BG_method = case_when(Cond1_DF_Detected == "TRUE" & Cond2_DF_Detected == "TRUE" ~ 'TRUE',
                                     TRUE ~ 'FALSE'))
-    }else if(method_background == "C2"){ # Cond2 has to be there
+    }else if(method_background == "C2"){  # Cond2 has to be there
     MergeDF <- MergeDF %>%
-    mutate(BG_method = case_when(Cond1_DF_Detected == "TRUE" & Cond2_DF_Detected == "TRUE" ~ 'TRUE',  #Cond1 & Cond2
-                                    Cond1_DF_Detected == "FALSE" & Cond2_DF_Detected == "TRUE" ~ 'TRUE',  # Just Cond2
+    # Cond1 & Cond2
+    mutate(BG_method = case_when(Cond1_DF_Detected == "TRUE" & Cond2_DF_Detected == "TRUE" ~ 'TRUE',
+                                    # Just Cond2
+                                    Cond1_DF_Detected == "FALSE" & Cond2_DF_Detected == "TRUE" ~ 'TRUE',
                                     TRUE ~ 'FALSE'))
-    }else if(method_background == "C1"){ #Cond1 has to be there
+    }else if(method_background == "C1"){  # Cond1 has to be there
     MergeDF <- MergeDF %>%
-    mutate(BG_method = case_when(Cond1_DF_Detected == "TRUE" & Cond2_DF_Detected == "TRUE" ~ 'TRUE',  #Cond1 & Cond2
-                                    Cond1_DF_Detected == "TRUE" & Cond2_DF_Detected == "FALSE" ~ 'TRUE',  # JustCond1
+    # Cond1 & Cond2
+    mutate(BG_method = case_when(Cond1_DF_Detected == "TRUE" & Cond2_DF_Detected == "TRUE" ~ 'TRUE',
+                                    # JustCond1
+                                    Cond1_DF_Detected == "TRUE" & Cond2_DF_Detected == "FALSE" ~ 'TRUE',
                                     TRUE ~ 'FALSE'))
-    }else if(method_background == "*"){ # Use all genes as the background
+    }else if(method_background == "*"){  # Use all genes as the background
     MergeDF$BG_method <- "TRUE"
     }else{
         stop("Please use one of the following method_backgrounds: C1|C2, C1&C2, C2, C1, *")
@@ -215,177 +223,321 @@ mca_2cond <- function(data_c1,
     #Assign SiRCle cluster names to the genes
     MergeDF <- MergeDF %>%
     mutate(RG1_Specific_Cond2 = case_when(BG_method == "FALSE"~ 'Background = FALSE',
-                                            Cond1_DF_Cutoff == "DOWN" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 DOWN + Cond2 DOWN',  #State 1
-                                            Cond1_DF_Cutoff == "DOWN" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 DOWN + Cond2 Not Detected',  #State 2
-                                            Cond1_DF_Cutoff == "DOWN" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 DOWN + Cond2 Not Significant',  #State 3
-                                            Cond1_DF_Cutoff == "DOWN" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 DOWN + Cond2 Significant Negative',  #State 4
-                                            Cond1_DF_Cutoff == "DOWN" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 DOWN + Cond2 Significant Positive',  #State 5
-                                            Cond1_DF_Cutoff == "DOWN" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 DOWN + Cond2 UP',  #State 6
+                                            # State 1
+                                            Cond1_DF_Cutoff == "DOWN" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 DOWN + Cond2 DOWN',
+                                            # State 2
+                                            Cond1_DF_Cutoff == "DOWN" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 DOWN + Cond2 Not Detected',
+                                            # State 3
+                                            Cond1_DF_Cutoff == "DOWN" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 DOWN + Cond2 Not Significant',
+                                            # State 4
+                                            Cond1_DF_Cutoff == "DOWN" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 DOWN + Cond2 Significant Negative',
+                                            # State 5
+                                            Cond1_DF_Cutoff == "DOWN" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 DOWN + Cond2 Significant Positive',
+                                            # State 6
+                                            Cond1_DF_Cutoff == "DOWN" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 DOWN + Cond2 UP',
 
-                                            Cond1_DF_Cutoff == "No Change" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 No Change + Cond2 DOWN',  #State 7
-                                            Cond1_DF_Cutoff == "No Change" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 No Change + Cond2 Not Detected',  #State 8
-                                            Cond1_DF_Cutoff == "No Change" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 No Change + Cond2 Not Significant',  #State 9
-                                            Cond1_DF_Cutoff == "No Change" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 No Change + Cond2 Significant Negative',  # State 10
-                                            Cond1_DF_Cutoff == "No Change" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 No Change + Cond2 Significant Positive',  # State 11
-                                            Cond1_DF_Cutoff == "No Change" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 No Change + Cond2 UP',#State 6
+                                            # State 7
+                                            Cond1_DF_Cutoff == "No Change" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 No Change + Cond2 DOWN',
+                                            # State 8
+                                            Cond1_DF_Cutoff == "No Change" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 No Change + Cond2 Not Detected',
+                                            # State 9
+                                            Cond1_DF_Cutoff == "No Change" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 No Change + Cond2 Not Significant',
+                                            # State 10
+                                            Cond1_DF_Cutoff == "No Change" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 No Change + Cond2 Significant Negative',
+                                            # State 11
+                                            Cond1_DF_Cutoff == "No Change" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 No Change + Cond2 Significant Positive',
+                                            # State 6
+                                            Cond1_DF_Cutoff == "No Change" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 No Change + Cond2 UP',
 
-                                            Cond1_DF_Cutoff == "UP" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 UP + Cond2 DOWN',#State 12
-                                            Cond1_DF_Cutoff == "UP" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 UP + Cond2 Not Detected',#State 13
-                                            Cond1_DF_Cutoff == "UP" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 UP + Cond2 Not Significant',#State 14
-                                            Cond1_DF_Cutoff == "UP" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 UP + Cond2 Significant Negative',#State 15
-                                            Cond1_DF_Cutoff == "UP" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 UP + Cond2 Significant Positive',#State 16
-                                            Cond1_DF_Cutoff == "UP" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 UP + Cond2 UP',#State 17
+                                            # State 12
+                                            Cond1_DF_Cutoff == "UP" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 UP + Cond2 DOWN',
+                                            # State 13
+                                            Cond1_DF_Cutoff == "UP" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 UP + Cond2 Not Detected',
+                                            # State 14
+                                            Cond1_DF_Cutoff == "UP" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 UP + Cond2 Not Significant',
+                                            # State 15
+                                            Cond1_DF_Cutoff == "UP" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 UP + Cond2 Significant Negative',
+                                            # State 16
+                                            Cond1_DF_Cutoff == "UP" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 UP + Cond2 Significant Positive',
+                                            # State 17
+                                            Cond1_DF_Cutoff == "UP" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 UP + Cond2 UP',
                                             TRUE ~ 'NA')) %>%
     mutate(RG1_Specific_Cond1 = case_when(BG_method == "FALSE"~ 'Background = FALSE',
-                                            Cond2_DF_Cutoff == "DOWN" & Cond1_DF_Cutoff_Specific == "DOWN" ~ 'Cond2 DOWN + Cond1 DOWN',#State 1
-                                            Cond2_DF_Cutoff == "DOWN" & Cond1_DF_Cutoff_Specific == "Not Detected" ~ 'Cond2 DOWN + Cond1 Not Detected',#State 2
-                                            Cond2_DF_Cutoff == "DOWN" & Cond1_DF_Cutoff_Specific == "Not Significant" ~ 'Cond2 DOWN + Cond1 Not Significant',#State 3
-                                            Cond2_DF_Cutoff == "DOWN" & Cond1_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond2 DOWN + Cond1 Significant Negative',#State 4
-                                            Cond2_DF_Cutoff == "DOWN" & Cond1_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond2 DOWN + Cond1 Significant Positive',#State 5
-                                            Cond2_DF_Cutoff == "DOWN" & Cond1_DF_Cutoff_Specific == "UP" ~ 'Cond2 DOWN + Cond1 UP',#State 6
+                                            # State 1
+                                            Cond2_DF_Cutoff == "DOWN" & Cond1_DF_Cutoff_Specific == "DOWN" ~ 'Cond2 DOWN + Cond1 DOWN',
+                                            # State 2
+                                            Cond2_DF_Cutoff == "DOWN" & Cond1_DF_Cutoff_Specific == "Not Detected" ~ 'Cond2 DOWN + Cond1 Not Detected',
+                                            # State 3
+                                            Cond2_DF_Cutoff == "DOWN" & Cond1_DF_Cutoff_Specific == "Not Significant" ~ 'Cond2 DOWN + Cond1 Not Significant',
+                                            # State 4
+                                            Cond2_DF_Cutoff == "DOWN" & Cond1_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond2 DOWN + Cond1 Significant Negative',
+                                            # State 5
+                                            Cond2_DF_Cutoff == "DOWN" & Cond1_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond2 DOWN + Cond1 Significant Positive',
+                                            # State 6
+                                            Cond2_DF_Cutoff == "DOWN" & Cond1_DF_Cutoff_Specific == "UP" ~ 'Cond2 DOWN + Cond1 UP',
 
-                                            Cond2_DF_Cutoff == "No Change" & Cond1_DF_Cutoff_Specific == "DOWN" ~ 'Cond2 No Change + Cond1 DOWN',#State 7
-                                            Cond2_DF_Cutoff == "No Change" & Cond1_DF_Cutoff_Specific == "Not Detected" ~ 'Cond2 No Change + Cond1 Not Detected',#State 8
-                                            Cond2_DF_Cutoff == "No Change" & Cond1_DF_Cutoff_Specific == "Not Significant" ~ 'Cond2 No Change + Cond1 Not Significant',#State 9
-                                            Cond2_DF_Cutoff == "No Change" & Cond1_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond2 No Change + Cond1 Significant Negative',#State 10
-                                            Cond2_DF_Cutoff == "No Change" & Cond1_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond2 No Change + Cond1 Significant Positive',#State 11
-                                            Cond2_DF_Cutoff == "No Change" & Cond1_DF_Cutoff_Specific == "UP" ~ 'Cond2 No Change + Cond1 UP',#State 6
+                                            # State 7
+                                            Cond2_DF_Cutoff == "No Change" & Cond1_DF_Cutoff_Specific == "DOWN" ~ 'Cond2 No Change + Cond1 DOWN',
+                                            # State 8
+                                            Cond2_DF_Cutoff == "No Change" & Cond1_DF_Cutoff_Specific == "Not Detected" ~ 'Cond2 No Change + Cond1 Not Detected',
+                                            # State 9
+                                            Cond2_DF_Cutoff == "No Change" & Cond1_DF_Cutoff_Specific == "Not Significant" ~ 'Cond2 No Change + Cond1 Not Significant',
+                                            # State 10
+                                            Cond2_DF_Cutoff == "No Change" & Cond1_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond2 No Change + Cond1 Significant Negative',
+                                            # State 11
+                                            Cond2_DF_Cutoff == "No Change" & Cond1_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond2 No Change + Cond1 Significant Positive',
+                                            # State 6
+                                            Cond2_DF_Cutoff == "No Change" & Cond1_DF_Cutoff_Specific == "UP" ~ 'Cond2 No Change + Cond1 UP',
 
-                                            Cond2_DF_Cutoff == "UP" & Cond1_DF_Cutoff_Specific == "DOWN" ~ 'Cond2 UP + Cond1 DOWN',#State 12
-                                            Cond2_DF_Cutoff == "UP" & Cond1_DF_Cutoff_Specific == "Not Detected" ~ 'Cond2 UP + Cond1 Not Detected',#State 13
-                                            Cond2_DF_Cutoff == "UP" & Cond1_DF_Cutoff_Specific == "Not Significant" ~ 'Cond2 UP + Cond1 Not Significant',#State 14
-                                            Cond2_DF_Cutoff == "UP" & Cond1_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond2 UP + Cond1 Significant Negative',#State 15
-                                            Cond2_DF_Cutoff == "UP" & Cond1_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond2 UP + Cond1 Significant Positive',#State 16
-                                            Cond2_DF_Cutoff == "UP" & Cond1_DF_Cutoff_Specific == "UP" ~ 'Cond2 UP + Cond1 UP',#State 17
+                                            # State 12
+                                            Cond2_DF_Cutoff == "UP" & Cond1_DF_Cutoff_Specific == "DOWN" ~ 'Cond2 UP + Cond1 DOWN',
+                                            # State 13
+                                            Cond2_DF_Cutoff == "UP" & Cond1_DF_Cutoff_Specific == "Not Detected" ~ 'Cond2 UP + Cond1 Not Detected',
+                                            # State 14
+                                            Cond2_DF_Cutoff == "UP" & Cond1_DF_Cutoff_Specific == "Not Significant" ~ 'Cond2 UP + Cond1 Not Significant',
+                                            # State 15
+                                            Cond2_DF_Cutoff == "UP" & Cond1_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond2 UP + Cond1 Significant Negative',
+                                            # State 16
+                                            Cond2_DF_Cutoff == "UP" & Cond1_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond2 UP + Cond1 Significant Positive',
+                                            # State 17
+                                            Cond2_DF_Cutoff == "UP" & Cond1_DF_Cutoff_Specific == "UP" ~ 'Cond2 UP + Cond1 UP',
                                             TRUE ~ 'NA')) %>%
     mutate(RG1_All = case_when(BG_method == "FALSE"~ 'Background = FALSE',
-                                Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 DOWN + Cond2 DOWN',#State 1
-                                Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 DOWN + Cond2 Not Detected',#State 2
-                                Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 DOWN + Cond2 Not Significant',#State 3
-                                Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 DOWN + Cond2 Significant Negative',#State 4
-                                Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 DOWN + Cond2 Significant Positive',#State 5
-                                Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 DOWN + Cond2 UP',#State 6
+                                # State 1
+                                Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 DOWN + Cond2 DOWN',
+                                # State 2
+                                Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 DOWN + Cond2 Not Detected',
+                                # State 3
+                                Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 DOWN + Cond2 Not Significant',
+                                # State 4
+                                Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 DOWN + Cond2 Significant Negative',
+                                # State 5
+                                Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 DOWN + Cond2 Significant Positive',
+                                # State 6
+                                Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 DOWN + Cond2 UP',
 
-                                Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 UP + Cond2 DOWN',#State 12
-                                Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 UP + Cond2 Not Detected',#State 13
-                                Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 UP + Cond2 Not Significant',#State 14
-                                Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 UP + Cond2 Significant Negative',#State 15
-                                Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 UP + Cond2 Significant Positive',#State 16
-                                Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 UP + Cond2 UP',#State 17
+                                # State 12
+                                Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 UP + Cond2 DOWN',
+                                # State 13
+                                Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 UP + Cond2 Not Detected',
+                                # State 14
+                                Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 UP + Cond2 Not Significant',
+                                # State 15
+                                Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 UP + Cond2 Significant Negative',
+                                # State 16
+                                Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 UP + Cond2 Significant Positive',
+                                # State 17
+                                Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 UP + Cond2 UP',
 
-                                Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 Not Detected + Cond2 DOWN',#State 12
-                                Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 Not Detected + Cond2 Not Detected',#State 13
-                                Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 Not Detected + Cond2 Not Significant',#State 14
-                                Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 Not Detected + Cond2 Significant Negative',#State 15
-                                Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 Not Detected + Cond2 Significant Positive',#State 16
-                                Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 Not Detected + Cond2 UP',#State 17
+                                # State 12
+                                Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 Not Detected + Cond2 DOWN',
+                                # State 13
+                                Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 Not Detected + Cond2 Not Detected',
+                                # State 14
+                                Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 Not Detected + Cond2 Not Significant',
+                                # State 15
+                                Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 Not Detected + Cond2 Significant Negative',
+                                # State 16
+                                Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 Not Detected + Cond2 Significant Positive',
+                                # State 17
+                                Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 Not Detected + Cond2 UP',
 
-                                Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 Significant Negative + Cond2 DOWN',#State 12
-                                Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 Significant Negative + Cond2 Not Detected',#State 13
-                                Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 Significant Negative + Cond2 Not Significant',#State 14
-                                Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 Significant Negative + Cond2 Significant Negative',#State 15
-                                Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 Significant Negative + Cond2 Significant Positive',#State 16
-                                Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 Significant Negative + Cond2 UP',#State 17
+                                # State 12
+                                Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 Significant Negative + Cond2 DOWN',
+                                # State 13
+                                Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 Significant Negative + Cond2 Not Detected',
+                                # State 14
+                                Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 Significant Negative + Cond2 Not Significant',
+                                # State 15
+                                Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 Significant Negative + Cond2 Significant Negative',
+                                # State 16
+                                Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 Significant Negative + Cond2 Significant Positive',
+                                # State 17
+                                Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 Significant Negative + Cond2 UP',
 
-                                Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 Significant Positive + Cond2 DOWN',#State 12
-                                Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 Significant Positive + Cond2 Not Detected',#State 13
-                                Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 Significant Positive + Cond2 Not Significant',#State 14
-                                Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 Significant Positive + Cond2 Significant Negative',#State 15
-                                Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 Significant Positive + Cond2 Significant Positive',#State 16
-                                Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 Significant Positive + Cond2 UP',#State 17
+                                # State 12
+                                Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 Significant Positive + Cond2 DOWN',
+                                # State 13
+                                Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 Significant Positive + Cond2 Not Detected',
+                                # State 14
+                                Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 Significant Positive + Cond2 Not Significant',
+                                # State 15
+                                Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 Significant Positive + Cond2 Significant Negative',
+                                # State 16
+                                Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 Significant Positive + Cond2 Significant Positive',
+                                # State 17
+                                Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 Significant Positive + Cond2 UP',
 
-                                Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 Not Significant + Cond2 DOWN',#State 12
-                                Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 Not Significant + Cond2 Not Detected',#State 13
-                                Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 Not Significant + Cond2 Not Significant',#State 14
-                                Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 Not Significant + Cond2 Significant Negative',#State 15
-                                Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 Not Significant + Cond2 Significant Positive',#State 16
-                                Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 Not Significant + Cond2 UP',#State 1
+                                # State 12
+                                Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond1 Not Significant + Cond2 DOWN',
+                                # State 13
+                                Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1 Not Significant + Cond2 Not Detected',
+                                # State 14
+                                Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1 Not Significant + Cond2 Not Significant',
+                                # State 15
+                                Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1 Not Significant + Cond2 Significant Negative',
+                                # State 16
+                                Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1 Not Significant + Cond2 Significant Positive',
+                                # State 1
+                                Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond1 Not Significant + Cond2 UP',
                                 TRUE ~ 'NA')) %>%
     mutate(RG2_Significant = case_when(BG_method == "FALSE"~ 'Background = FALSE',
-                                        Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'core_DOWN',#State 1
-                                        Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1_DOWN',#State 2
-                                        Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1_DOWN',#State 3
-                                        Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'core_DOWN',#State 4
-                                        Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Opposite',#State 5
-                                        Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Opposite',#State 6
+                                        # State 1
+                                        Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'core_DOWN',
+                                        # State 2
+                                        Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1_DOWN',
+                                        # State 3
+                                        Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1_DOWN',
+                                        # State 4
+                                        Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'core_DOWN',
+                                        # State 5
+                                        Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Opposite',
+                                        # State 6
+                                        Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Opposite',
 
-                                        Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Opposite',#State 12
-                                        Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1_UP',#State 13
-                                        Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1_UP',#State 14
-                                        Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Opposite',#State 15
-                                        Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'core_UP',#State 16
-                                        Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "UP" ~ 'core_UP',#State 17
+                                        # State 12
+                                        Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Opposite',
+                                        # State 13
+                                        Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1_UP',
+                                        # State 14
+                                        Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1_UP',
+                                        # State 15
+                                        Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Opposite',
+                                        # State 16
+                                        Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'core_UP',
+                                        # State 17
+                                        Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "UP" ~ 'core_UP',
 
-                                        Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',#State 12
-                                        Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',#State 13
-                                        Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',#State 14
-                                        Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',#State 15
-                                        Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',#State 16
-                                        Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',#State 17
+                                        # State 12
+                                        Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',
+                                        # State 13
+                                        Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',
+                                        # State 14
+                                        Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',
+                                        # State 15
+                                        Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',
+                                        # State 16
+                                        Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',
+                                        # State 17
+                                        Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',
 
-                                        Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'core_DOWN',#State 12
-                                        Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',#State 13
-                                        Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',#State 14
-                                        Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',#State 15
-                                        Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',#State 16
-                                        Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Opposite',#State 17
+                                        # State 12
+                                        Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'core_DOWN',
+                                        # State 13
+                                        Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',
+                                        # State 14
+                                        Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',
+                                        # State 15
+                                        Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',
+                                        # State 16
+                                        Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',
+                                        # State 17
+                                        Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Opposite',
 
-                                        Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Opposite',#State 12
-                                        Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',#State 13
-                                        Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',#State 14
-                                        Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',#State 15
-                                        Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',#State 16
-                                        Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "UP" ~ 'core_UP',#State 17
+                                        # State 12
+                                        Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Opposite',
+                                        # State 13
+                                        Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',
+                                        # State 14
+                                        Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',
+                                        # State 15
+                                        Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',
+                                        # State 16
+                                        Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',
+                                        # State 17
+                                        Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "UP" ~ 'core_UP',
 
-                                        Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',#State 12
-                                        Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',#State 13
-                                        Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',#State 14
-                                        Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',#State 15
-                                        Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',#State 16
-                                        Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',#State 1
+                                        # State 12
+                                        Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',
+                                        # State 13
+                                        Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',
+                                        # State 14
+                                        Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',
+                                        # State 15
+                                        Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',
+                                        # State 16
+                                        Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',
+                                        # State 1
+                                        Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',
                                         TRUE ~ 'NA')) %>%
     mutate(RG3_SignificantChange = case_when(BG_method == "FALSE"~ 'Background = FALSE',
-                                            Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'core_DOWN',#State 1
-                                            Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1_DOWN',#State 2
-                                            Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1_DOWN',#State 3
-                                            Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1_DOWN',#State 4
-                                            Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1_DOWN',#State 5
-                                            Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Opposite',#State 6
+                                            # State 1
+                                            Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'core_DOWN',
+                                            # State 2
+                                            Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1_DOWN',
+                                            # State 3
+                                            Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1_DOWN',
+                                            # State 4
+                                            Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1_DOWN',
+                                            # State 5
+                                            Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1_DOWN',
+                                            # State 6
+                                            Cond1_DF_Cutoff_Specific == "DOWN" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Opposite',
 
-                                            Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Opposite',#State 12
-                                            Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1_UP',#State 13
-                                            Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1_UP',#State 14
-                                            Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1_UP',#State 15
-                                            Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1_UP',#State 16
-                                            Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "UP" ~ 'core_UP',#State 17
+                                            # State 12
+                                            Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Opposite',
+                                            # State 13
+                                            Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'Cond1_UP',
+                                            # State 14
+                                            Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'Cond1_UP',
+                                            # State 15
+                                            Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'Cond1_UP',
+                                            # State 16
+                                            Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'Cond1_UP',
+                                            # State 17
+                                            Cond1_DF_Cutoff_Specific == "UP" & Cond2_DF_Cutoff_Specific == "UP" ~ 'core_UP',
 
-                                            Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',#State 12
-                                            Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',#State 13
-                                            Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',#State 14
-                                            Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',#State 15
-                                            Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',#State 16
-                                            Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',#State 17
+                                            # State 12
+                                            Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',
+                                            # State 13
+                                            Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',
+                                            # State 14
+                                            Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',
+                                            # State 15
+                                            Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',
+                                            # State 16
+                                            Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',
+                                            # State 17
+                                            Cond1_DF_Cutoff_Specific == "Not Detected" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',
 
-                                            Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',#State 12
-                                            Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',#State 13
-                                            Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',#State 14
-                                            Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',#State 15
-                                            Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',#State 16
-                                            Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',#State 17
+                                            # State 12
+                                            Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',
+                                            # State 13
+                                            Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',
+                                            # State 14
+                                            Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',
+                                            # State 15
+                                            Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',
+                                            # State 16
+                                            Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',
+                                            # State 17
+                                            Cond1_DF_Cutoff_Specific == "Significant Negative" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',
 
-                                            Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',#State 12
-                                            Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',#State 13
-                                            Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',#State 14
-                                            Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',#State 15
-                                            Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',#State 16
-                                            Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',#State 17
+                                            # State 12
+                                            Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',
+                                            # State 13
+                                            Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',
+                                            # State 14
+                                            Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',
+                                            # State 15
+                                            Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',
+                                            # State 16
+                                            Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',
+                                            # State 17
+                                            Cond1_DF_Cutoff_Specific == "Significant Positive" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',
 
-                                            Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',#State 12
-                                            Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',#State 13
-                                            Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',#State 14
-                                            Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',#State 15
-                                            Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',#State 16
-                                            Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',#State 1
+                                            # State 12
+                                            Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "DOWN" ~ 'Cond2_DOWN',
+                                            # State 13
+                                            Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Not Detected" ~ 'None',
+                                            # State 14
+                                            Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Not Significant" ~ 'None',
+                                            # State 15
+                                            Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Significant Negative" ~ 'None',
+                                            # State 16
+                                            Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "Significant Positive" ~ 'None',
+                                            # State 1
+                                            Cond1_DF_Cutoff_Specific == "Not Significant" & Cond2_DF_Cutoff_Specific == "UP" ~ 'Cond2_UP',
                                             TRUE ~ 'NA'))
 
     #Safe the DF and return the groupings
@@ -667,30 +819,39 @@ mca_core <- function(data_intra,
     mutate_at(c("core_DF_core_Direction"), ~replace_na(., "Not Detected"))
 
     #Apply Background filter (label metabolites that will be removed based on chosen background)
-    if(method_background == "Intra|core"){# C1|C2 = core OR Intra
+    if(method_background == "Intra|core"){  # C1|C2 = core OR Intra
     MergeDF <- MergeDF %>%
-    mutate(BG_method = case_when(Intra_DF_Detected == "TRUE" & core_DF_Detected == "TRUE" ~ 'TRUE',#Intra & core
-                                    Intra_DF_Detected == "TRUE" & core_DF_Detected == "FALSE" ~ 'TRUE',# JustIntra
-                                    Intra_DF_Detected == "FALSE" & core_DF_Detected == "TRUE" ~ 'TRUE',# Just core
+    # Intra & core
+    mutate(BG_method = case_when(Intra_DF_Detected == "TRUE" & core_DF_Detected == "TRUE" ~ 'TRUE',
+                                    # JustIntra
+                                    Intra_DF_Detected == "TRUE" & core_DF_Detected == "FALSE" ~ 'TRUE',
+                                    # Just core
+                                    Intra_DF_Detected == "FALSE" & core_DF_Detected == "TRUE" ~ 'TRUE',
                                     TRUE ~ 'FALSE'))
-    }else if(method_background == "Intra&core"){ # core AND Intra
+    }else if(method_background == "Intra&core"){  # core AND Intra
     MergeDF <- MergeDF %>%
-    mutate(BG_method = case_when(Intra_DF_Detected == "TRUE" & core_DF_Detected == "TRUE" ~ 'TRUE',#Intra & core
+    # Intra & core
+    mutate(BG_method = case_when(Intra_DF_Detected == "TRUE" & core_DF_Detected == "TRUE" ~ 'TRUE',
                                     TRUE ~ 'FALSE'))
-    }else if(method_background == "core"){ # core has to be there
+    }else if(method_background == "core"){  # core has to be there
     MergeDF <- MergeDF %>%
-    mutate(BG_method = case_when(Intra_DF_Detected == "TRUE" & core_DF_Detected == "TRUE" ~ 'TRUE',#Intra & core
-                                    Intra_DF_Detected == "FALSE" & core_DF_Detected == "TRUE" ~ 'TRUE',# Just core
+    # Intra & core
+    mutate(BG_method = case_when(Intra_DF_Detected == "TRUE" & core_DF_Detected == "TRUE" ~ 'TRUE',
+                                    # Just core
+                                    Intra_DF_Detected == "FALSE" & core_DF_Detected == "TRUE" ~ 'TRUE',
                                     TRUE ~ 'FALSE'))
-    }else if(method_background == "Intra"){ #Intra has to be there
+    }else if(method_background == "Intra"){  # Intra has to be there
     MergeDF <- MergeDF %>%
-    mutate(BG_method = case_when(Intra_DF_Detected == "TRUE" & core_DF_Detected == "TRUE" ~ 'TRUE',#Intra & core
-                                    Intra_DF_Detected == "TRUE" & core_DF_Detected == "FALSE" ~ 'TRUE',# JustIntra
+    # Intra & core
+    mutate(BG_method = case_when(Intra_DF_Detected == "TRUE" & core_DF_Detected == "TRUE" ~ 'TRUE',
+                                    # JustIntra
+                                    Intra_DF_Detected == "TRUE" & core_DF_Detected == "FALSE" ~ 'TRUE',
                                     TRUE ~ 'FALSE'))
-    }else if(method_background == "*"){ # Use all metabolites as the background
+    }else if(method_background == "*"){  # Use all metabolites as the background
     MergeDF$BG_method <- "TRUE"
     }else{
-    stop("Please use one of the following method_backgrounds: Intra|core, Intra&core, core, Intra, *")#error message
+    # error message
+    stop("Please use one of the following method_backgrounds: Intra|core, Intra&core, core, Intra, *")
     }
 
     #Assign Metabolite cluster names to the metabolites
