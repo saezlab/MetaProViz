@@ -1154,10 +1154,7 @@ log2fc <- function(
                 rownames_to_column("Metabolite")
             temp_3a4 <- merge(temp3, temp4, by = "Metabolite", all = TRUE)
             Log2FC_C1vC2 <- merge(
-                Mean_Merge[
-                    ,
-                    c(1, 8)
-                ],
+                Mean_Merge[, c(1, 8)],
                 temp_3a4,
                 by = "Metabolite",
                 all.x = TRUE

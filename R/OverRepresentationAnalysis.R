@@ -147,8 +147,8 @@ cluster_ora <- function(
 
     # Load Pathways
     Pathway <- Pathways
-    Term2gene <- Pathway[,c("term", "gene")]# term and MetaboliteID (MetaboliteID = gene as syntax required for enricher)
-    Term2name <- Pathway[,c("term", "Description")]# term and description
+    Term2gene <- Pathway[, c("term", "gene")]# term and MetaboliteID (MetaboliteID = gene as syntax required for enricher)
+    Term2name <- Pathway[, c("term", "Description")]# term and description
 
     # Add the number of genes present in each pathway
     Pathway$Count <- 1
@@ -159,7 +159,7 @@ cluster_ora <- function(
             FUN = sum
         )
     names(Pathway_Mean)[names(Pathway_Mean) == "x"] <- "Metabolites_in_Pathway"
-    Pathway <- merge(x = Pathway, y = Pathway_Mean,by = "term", all.x = TRUE)
+    Pathway <- merge(x = Pathway, y = Pathway_Mean, by = "term", all.x = TRUE)
     Pathway$Count <- NULL
 
     ## ------------ Run ----------- ##
@@ -201,9 +201,9 @@ cluster_ora <- function(
                 all = TRUE
             )
         clusterGosummary$Count[is.na(clusterGosummary$Count)] <- 0
-        clusterGosummary$percentage_of_Pathway_detected <- round(((clusterGosummary$Count/clusterGosummary$Metabolites_in_Pathway)*100),digits = 2)
-        clusterGosummary <- clusterGosummary[!duplicated(clusterGosummary$ID),]
-        clusterGosummary <- clusterGosummary[order(clusterGosummary$p.adjust),]
+        clusterGosummary$percentage_of_Pathway_detected <- round(((clusterGosummary$Count/clusterGosummary$Metabolites_in_Pathway)*100), digits = 2)
+        clusterGosummary <- clusterGosummary[!duplicated(clusterGosummary$ID), ]
+        clusterGosummary <- clusterGosummary[order(clusterGosummary$p.adjust), ]
         clusterGosummary <- clusterGosummary %>%
         rename("Metabolites_in_pathway" = "geneID")
 
@@ -223,7 +223,7 @@ cluster_ora <- function(
         save_table = save_table,
         save_plot = NULL,
         path = folder,
-        file_name = paste("ClusterGosummary",pathway_name, sep = "_"),
+        file_name = paste("ClusterGosummary", pathway_name, sep = "_"),
         core = FALSE,
         print_plot = FALSE
     )
@@ -339,13 +339,13 @@ standard_ora <- function(
     # check if the metabolites are significantly changed.
     value <- cutoff_percentage/100
 
-    allMetabolites_DF <- data[order(data[[metadata_info[["percentageColumn"]]]]),]# rank by t.val
-    selectMetabolites_DF <- allMetabolites_DF[c(seq_len(ceiling(value * nrow(allMetabolites_DF))),(nrow(allMetabolites_DF)-(ceiling(value * nrow(allMetabolites_DF)))):(nrow(allMetabolites_DF))),]
+    allMetabolites_DF <- data[order(data[[metadata_info[["percentageColumn"]]]]), ]# rank by t.val
+    selectMetabolites_DF <- allMetabolites_DF[c(seq_len(ceiling(value * nrow(allMetabolites_DF))), (nrow(allMetabolites_DF)-(ceiling(value * nrow(allMetabolites_DF)))):(nrow(allMetabolites_DF))), ]
     selectMetabolites_DF$`top/Bottom`<- "TRUE"
     selectMetabolites_DF <-
         merge(
             allMetabolites_DF,
-            selectMetabolites_DF[,c("Metabolite", "top/Bottom")],
+            selectMetabolites_DF[, c("Metabolite", "top/Bottom")],
             by = "Metabolite",
             all.x = TRUE
         )
@@ -369,8 +369,8 @@ standard_ora <- function(
 
     # Load Pathways
     Pathway <- Pathways
-    Term2gene <- Pathway[,c("term", "gene")]# term and MetaboliteID (MetaboliteID = gene as syntax required for enricher)
-    Term2name <- Pathway[,c("term", "Description")]# term and description
+    Term2gene <- Pathway[, c("term", "gene")]# term and MetaboliteID (MetaboliteID = gene as syntax required for enricher)
+    Term2name <- Pathway[, c("term", "Description")]# term and description
 
     # Add the number of genes present in each pathway
     Pathway$Count <- 1
@@ -381,7 +381,7 @@ standard_ora <- function(
             FUN = sum
         )
     names(Pathway_Mean)[names(Pathway_Mean) == "x"] <- "Metabolites_in_Pathway"
-    Pathway <- merge(x = Pathway, y = Pathway_Mean,by = "term", all.x = TRUE)
+    Pathway <- merge(x = Pathway, y = Pathway_Mean, by = "term", all.x = TRUE)
     Pathway$Count <- NULL
 
     ## ------------ Run ----------- ##
@@ -411,9 +411,9 @@ standard_ora <- function(
                 all = TRUE
             )
         clusterGosummary$Count[is.na(clusterGosummary$Count)] <- 0
-        clusterGosummary$percentage_of_Pathway_detected <- round(((clusterGosummary$Count/clusterGosummary$Metabolites_in_Pathway)*100),digits = 2)
-        clusterGosummary <- clusterGosummary[!duplicated(clusterGosummary$ID),]
-        clusterGosummary <- clusterGosummary[order(clusterGosummary$p.adjust),]
+        clusterGosummary$percentage_of_Pathway_detected <- round(((clusterGosummary$Count/clusterGosummary$Metabolites_in_Pathway)*100), digits = 2)
+        clusterGosummary <- clusterGosummary[!duplicated(clusterGosummary$ID), ]
+        clusterGosummary <- clusterGosummary[order(clusterGosummary$p.adjust), ]
         clusterGosummary <- clusterGosummary %>%
         rename("Metabolites_in_pathway" = "geneID")
     } else {

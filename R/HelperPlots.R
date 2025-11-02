@@ -735,7 +735,7 @@ plot_grob_heatmap <- function(
 #' @param input_plot This is the ggplot object generated within the viz_volcano function.
 #' @param metadata_info Passed to viz_volcano
 #' @param plot_name Passed to viz_volcano
-#' @param subtitle 
+#' @param subtitle
 #'
 #' @noRd
 plot_grob_volcano <- function(
@@ -886,7 +886,8 @@ plot_grob_superplot <- function(
         adjust_title(c(plot_name, subtitle)) %>%
         adjust_legend(
             input_plot,
-            sections = c("Superplot"),  # here we do not have colour and shape, but other parameters
+            # here we do not have colour and shape, but other parameters
+            sections = c("Superplot"),
             metadata_info = metadata_info
         )
 

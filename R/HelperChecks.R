@@ -412,13 +412,13 @@ check_param <- function(
     }
 
     # -------------SaveAs
-    Save_as_Plot_options <- c("svg","pdf", "png")
+    Save_as_Plot_options <- c("svg", "pdf", "png")
     if (!is.null(save_plot)) {
         if (!(save_plot %in% Save_as_Plot_options)) {
         message <-
             paste0(
                 "Check input. The selected save_plot option is not valid. Please select one of the folowwing: ",
-                paste(Save_as_Plot_options,collapse = ", "),
+                paste(Save_as_Plot_options, collapse = ", "),
                 " or set to NULL if no plots should be saved."
             )
         log_trace(paste("Error ", message, sep = ""))
@@ -438,7 +438,7 @@ check_param <- function(
             message <-
                 paste0(
                     "Check input. The selected save_table option is not valid. Please select one of the folowwing: ",
-                    paste(save_table_options,collapse = ", "),
+                    paste(save_table_options, collapse = ", "),
                     " or set to NULL if no tables should be saved."
                 )
             log_trace(paste("Error ", message, sep = ""))
@@ -563,12 +563,12 @@ check_param_processing <- function(
     }
 
     # -------------General parameters
-    Feature_Filtering_options <- c("Standard","Modified")
+    Feature_Filtering_options <- c("Standard", "Modified")
     if (!(!(featurefilt %in% Feature_Filtering_options) & is.null(featurefilt))) {
         message <-
             paste0(
                 "Check input. The selected featurefilt option is not valid. Please set to NULL or select one of the folowwing: ",
-                paste(Feature_Filtering_options,collapse = ", "),
+                paste(Feature_Filtering_options, collapse = ", "),
                 "."
             )
         log_trace(paste("Error ", message, sep = ""))
@@ -728,19 +728,19 @@ check_param_dma <- function(
             message <-
                 paste0(
                     "Check input. The selected pval option for Hypothesis testing is not valid for multiple comparison (one-vs-all or all-vs-all). Please select one of the following: ",
-                    paste(STAT_pval_options,collapse = ", "),
+                    paste(STAT_pval_options, collapse = ", "),
                     " or specify numerator and denumerator."
                 )
             log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     } else {
-        STAT_pval_options <- c("aov", "kruskal.test", "welch" ,"lmFit")
+        STAT_pval_options <- c("aov", "kruskal.test", "welch", "lmFit")
         if (!(pval %in% STAT_pval_options)) {
             message <-
                 paste0(
                     "Check input. The selected pval option for Hypothesis testing is not valid for one-vs-one comparsion. Multiple comparison is selected. Please select one of the following: ",
-                    paste(STAT_pval_options,collapse = ", "),
+                    paste(STAT_pval_options, collapse = ", "),
                     " or change numerator and denumerator."
                 )
             log_trace(paste("Error ", message, sep = ""))
@@ -763,7 +763,7 @@ check_param_dma <- function(
         message <-
             paste0(
                 "Check input. The selected padj option for multiple Hypothesis testing correction is not valid. Please select one of the folowing: ",
-                paste(STAT_padj_options,collapse = ", "),
+                paste(STAT_padj_options, collapse = ", "),
                 "."
             )
         log_trace(paste("Error ", message, sep = ""))
@@ -987,7 +987,7 @@ check_param_ora <- function(
         message <-
             paste0(
                 "data should be a data.frame. It's currently a ",
-                paste(class(data), ".",sep = "")
+                paste(class(data), ".", sep = "")
             )
         log_trace(paste("Error ", message, sep = ""))
         stop(message)
@@ -1140,13 +1140,13 @@ check_param_ora <- function(
         stop(message)
     }
 
-    save_table_options <- c("txt","csv", "xlsx")
+    save_table_options <- c("txt", "csv", "xlsx")
     if (!is.null(save_table)) {
         if (!((save_table %in% save_table_options)) | (is.null(save_table))) {
             message <-
                 paste0(
                     "Check input. The selected save_table option is not valid. Please select one of the folowing: ",
-                    paste(save_table_options,collapse = ", "),
+                    paste(save_table_options, collapse = ", "),
                     "."
                 )
             log_trace(paste("Error ", message, sep = ""))
@@ -1567,24 +1567,24 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
 
     # ------------- method_background
     if (!is.null(metadata_info_c1)) {
-        options <- c("C1 | C2", "C1&C2", "C2", "C1" , "*")
+        options <- c("C1 | C2", "C1&C2", "C2", "C1", "*")
         if (!(any(options %in% method_background))) {
             message <-
                 paste0(
                     "Check input. The selected method_background option is not valid. Please select one of the folowwing: ",
-                    paste(options,collapse = ", "),
+                    paste(options, collapse = ", "),
                     "."
                 )
             log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     } else {
-        options <- c("Intra | core", "Intra&core", "core", "Intra" , "*")
+        options <- c("Intra | core", "Intra&core", "core", "Intra", "*")
         if (!(any(options %in% method_background))) {
             message <-
                 paste0(
                     "Check input. The selected method_background option is not valid. Please select one of the folowwing: ",
-                    paste(options,collapse = ", "),
+                    paste(options, collapse = ", "),
                     "."
                 )
             log_trace(paste("Error ", message, sep = ""))
@@ -1593,13 +1593,13 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
     }
 
     # ------------- SaveAs
-    save_table_options <- c("txt","csv", "xlsx")
+    save_table_options <- c("txt", "csv", "xlsx")
     if (!is.null(save_table)) {
         if (!((save_table %in% save_table_options)) | (is.null(save_table))) {
             message <-
                 paste0(
                     "Check input. The selected save_table option is not valid. Please select one of the folowwing: ",
-                    paste(save_table_options,collapse = ", "),
+                    paste(save_table_options, collapse = ", "),
                     "."
                 )
             log_trace(paste("Error ", message, sep = ""))

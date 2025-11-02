@@ -158,12 +158,11 @@ enricher_internal <- function(
     # # n <- rep(length(gene), length(M)) ## those genes that have no annotation should drop.
     n <- rep(length(qExtID2TermID), length(M))
     args.df <- data.frame(
-        numWdrawn = k - 1,  # # White balls drawn
-        numW = M,  # # White balls
-        numB = N - M,  # # Black balls
-        numDrawn = n
-    )  # # balls drawn
-
+        numWdrawn = k - 1,  # White balls drawn
+        numW = M,  # White balls
+        numB = N - M,  # Black balls
+        numDrawn = n  # balls drawn
+    )
 
     # # calcute pvalues based on hypergeometric model
     pvalues <- apply(args.df, 1, function(n) {

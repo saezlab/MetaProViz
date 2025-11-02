@@ -49,9 +49,9 @@ metsigdb_kegg <- function() {
     to_remove <-
     list(
         # # # 1. Ions should be removed
-        Remove_Ions = c("Calcium cation","Potassium cation","Sodium cation","H+","Cl-", "Fatty acid", "Superoxide","H2O", "CO2", "Copper", "Fe2+", "Magnesium cation", "Fe3+",  "Zinc cation", "Nickel", "NH4+"),
+        Remove_Ions = c("Calcium cation", "Potassium cation", "Sodium cation", "H+", "Cl-", "Fatty acid", "Superoxide", "H2O", "CO2", "Copper", "Fe2+", "Magnesium cation", "Fe3+", "Zinc cation", "Nickel", "NH4+"),
         # # # 2. Unspecific small molecules
-        Remove_Small = c("Nitric oxide","Hydrogen peroxide", "Superoxide","H2O", "CO2", "Hydroxyl radical", "Ammonia", "HCO3-",  "Oxygen", "Diphosphate", "Reactive oxygen species", "Nitrite", "Nitrate", "Hydrogen", "RX", "Hg")
+        Remove_Small = c("Nitric oxide", "Hydrogen peroxide", "Superoxide", "H2O", "CO2", "Hydroxyl radical", "Ammonia", "HCO3-", "Oxygen", "Diphosphate", "Reactive oxygen species", "Nitrite", "Nitrate", "Hydrogen", "RX", "Hg")
     ) %>%
     unlist()
 
@@ -152,13 +152,13 @@ metsigdb_chemicalclass <- function(
         message("Cached file loaded from: ", File_path)
     } else {# load from OmniPath
     # Get RaMP via OmnipathR and extract ClassyFire classes
-    Structure <- ramp_table( "metabolite_class" , version = version)
-    Class <- ramp_table( "chem_props" , version = version)
+    Structure <- ramp_table( "metabolite_class", version = version)
+    Class <- ramp_table( "chem_props", version = version)
 
     HMDB_ChemicalClass <-
         merge(
             Structure,
-            Class[,c(seq_len(3),10)],
+            Class[, c(seq_len(3), 10)],
             by = "ramp_id",
             all.x = TRUE
         ) %>%
@@ -198,7 +198,7 @@ metsigdb_chemicalclass <- function(
 
     # # -------------- Save and return
     DF_List <- list("ChemicalClass_MetabSet" = HMDB_ChemicalClass)
-    save_res(inputlist_df = DF_List, # This needs to be a list, also for single comparisons
+    save_res(inputlist_df = DF_List,# This needs to be a list, also for single comparisons
         inputlist_plot = NULL,
         save_table = save_table,
         save_plot = NULL,
@@ -305,20 +305,20 @@ make_gene_metab_set <- function(
     # load the network from cosmos
     data("meta_network", package = "cosmosR", envir = environment())
     meta_network <- get("meta_network", envir = environment())
-    meta_network <- meta_network[which(meta_network$source != meta_network$target),]
+    meta_network <- meta_network[which(meta_network$source != meta_network$target), ]
 
     # adapt to our needs extracting the metabolites:
-    meta_network_metabs <- meta_network[grepl("Metab__", meta_network$source) | grepl("Metab__HMDB", meta_network$target),-2] # extract entries with metabolites in source or Target
-    meta_network_metabs <- meta_network_metabs[grepl("Gene", meta_network_metabs$source) | grepl("Gene", meta_network_metabs$target),] # extract entries with genes in source or Target
+    meta_network_metabs <- meta_network[grepl("Metab__", meta_network$source) | grepl("Metab__HMDB", meta_network$target), -2] # extract entries with metabolites in source or Target
+    meta_network_metabs <- meta_network_metabs[grepl("Gene", meta_network_metabs$source) | grepl("Gene", meta_network_metabs$target), ] # extract entries with genes in source or Target
 
     # Get reactant and product
-    meta_network_metabs_reactant <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$source),] %>% rename("metab" = 1, "gene" = 2)
-    meta_network_metabs_products <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$target),] %>% rename("gene" = 1, "metab" = 2)
+    meta_network_metabs_reactant <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$source), ] %>% rename("metab" = 1, "gene" = 2)
+    meta_network_metabs_products <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$target), ] %>% rename("gene" = 1, "metab" = 2)
 
     meta_network_metabs <- as.data.frame(rbind(meta_network_metabs_reactant, meta_network_metabs_products))
-    meta_network_metabs$gene <- gsub("Gene.*__","",meta_network_metabs$gene)
-    meta_network_metabs$metab <- gsub("_[a-z]$","",meta_network_metabs$metab)
-    meta_network_metabs$metab <- gsub("Metab__","",meta_network_metabs$metab)
+    meta_network_metabs$gene <- gsub("Gene.*__", "", meta_network_metabs$gene)
+    meta_network_metabs$metab <- gsub("_[a-z]$", "", meta_network_metabs$metab)
+    meta_network_metabs$metab <- gsub("Metab__", "", meta_network_metabs$metab)
 
     # # --------------metalinks transporters
     # Add metalinks transporters to Cosmos PKN
@@ -334,7 +334,7 @@ make_gene_metab_set <- function(
         )
 
     # combine with pathways --> File that can be used for combined pathway analysis (metabolites and gene t.vals)
-    GeneMetabSet <- unique(as.data.frame(rbind(input_pk %>% dplyr::rename("feature" = metadata_info[["Target"]]), MetabSet[,-1] %>% dplyr::rename("feature" = 1))))
+    GeneMetabSet <- unique(as.data.frame(rbind(input_pk %>% dplyr::rename("feature" = metadata_info[["Target"]]), MetabSet[, -1] %>% dplyr::rename("feature" = 1))))
 
 
     # # ------------ Select metabolites only
@@ -347,7 +347,7 @@ make_gene_metab_set <- function(
         "GeneMetabSet" = GeneMetabSet,
         "MetabSet" = MetabSet
     )
-    save_res(inputlist_df = DF_List, # This needs to be a list, also for single comparisons
+    save_res(inputlist_df = DF_List,# This needs to be a list, also for single comparisons
         inputlist_plot = NULL,
         save_table = save_table,
         save_plot = NULL,
@@ -532,79 +532,79 @@ metsigdb_metalinks <- function(
     # Extract specific connections based on parameter settings. If any parameter is not NULL, filter the data:
     ## types
     if (!is.null(types)) {
-        MetalinksDB <- MetalinksDB[MetalinksDB$type %in% types,]
+        MetalinksDB <- MetalinksDB[MetalinksDB$type %in% types, ]
     }
 
     ## cell_location
     if (!is.null(cell_location)) {
         CellLocation <- TablesList[["cell_location"]]
-        CellLocation <- CellLocation[CellLocation$cell_location %in% cell_location,] # Filter the cell location
+        CellLocation <- CellLocation[CellLocation$cell_location %in% cell_location, ] # Filter the cell location
 
     # Get unique HMDB IDs
         CellLocation_HMDB <- unique(CellLocation$hmdb)
 
     # Only keep selected HMDB IDs
-        MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  CellLocation_HMDB,]
+        MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  CellLocation_HMDB, ]
     }
 
     ## tissue_location
     if (!is.null(tissue_location)) {# "All Tissues"?
         TissueLocation <- TablesList[["tissue_location"]]
-        TissueLocation <- TissueLocation[TissueLocation$tissue_location %in% tissue_location,] # Filter the tissue location
+        TissueLocation <- TissueLocation[TissueLocation$tissue_location %in% tissue_location, ] # Filter the tissue location
 
     # Get unique HMDB IDs
         TissueLocation_HMDB <- unique(TissueLocation$hmdb)
 
     # Only keep selected HMDB IDs
-        MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  TissueLocation_HMDB,]
+        MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  TissueLocation_HMDB, ]
     }
 
     ## biospecimen_location
     if (!is.null(biospecimen_location)) {
         BiospecimenLocation <- TablesList[["biospecimen_location"]]
-        BiospecimenLocation <- BiospecimenLocation[BiospecimenLocation$biospecimen_location %in% biospecimen_location,] # Filter the biospecimen location
+        BiospecimenLocation <- BiospecimenLocation[BiospecimenLocation$biospecimen_location %in% biospecimen_location, ] # Filter the biospecimen location
 
     # Get unique HMDB IDs
         BiospecimenLocation_HMDB <- unique(BiospecimenLocation$hmdb)
 
     # Only keep selected HMDB IDs
-        MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  BiospecimenLocation_HMDB,]
+        MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  BiospecimenLocation_HMDB, ]
     }
 
     ## disease
     if (!is.null(disease)) {
         Disease <- TablesList[["disease"]]
-        Disease <- Disease[Disease$disease %in% disease,] # Filter the disease
+        Disease <- Disease[Disease$disease %in% disease, ] # Filter the disease
 
     # Get unique HMDB IDs
         Disease_HMDB <- unique(Disease$hmdb)
 
     # Only keep selected HMDB IDs
-        MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  Disease_HMDB,]
+        MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  Disease_HMDB, ]
     }
 
     ## pathway
     if (!is.null(pathway)) {
         Pathway <- TablesList[["pathway"]]
-        Pathway <- Pathway[Pathway$pathway %in% pathway,] # Filter the pathway
+        Pathway <- Pathway[Pathway$pathway %in% pathway, ] # Filter the pathway
 
     # Get unique HMDB IDs
         Pathway_HMDB <- unique(Pathway$hmdb)
 
     # Only keep selected HMDB IDs
-        MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  Pathway_HMDB,]
+        MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  Pathway_HMDB, ]
     }
 
     ## hmdb_ids
     if (!is.null(hmdb_ids)) {
     # Only keep selected HMDB IDs
-        MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  hmdb_ids,]
+        MetalinksDB <- MetalinksDB[MetalinksDB$hmdb %in%  hmdb_ids, ]
     }
 
     ## uniprot_ids
     if (!is.null(uniprot_ids)) {
     # Only keep selected UniProt IDs
-        MetalinksDB <- MetalinksDB[MetalinksDB$uniprot %in%  uniprot_ids,]
+        MetalinksDB <- MetalinksDB[MetalinksDB$uniprot %in%  uniprot_ids, ]
     }
 
     # ------------------------------------------------------------------
@@ -629,7 +629,7 @@ metsigdb_metalinks <- function(
 
 
     ## Rearrange columns:
-    MetalinksDB <- MetalinksDB[,c(2,10:12, 1, 13:14, 3:9)] %>%
+    MetalinksDB <- MetalinksDB[, c(2, 10:12, 1, 13:14, 3:9)] %>%
     mutate(
         type = case_when(
         type == "lr" ~ "Ligand-Receptor",
@@ -669,7 +669,7 @@ metsigdb_metalinks <- function(
     # ------------------------------------------------------------------
     # Save results in folder
     # # -------------- Save and return
-    save_res(inputlist_df = list(MetalinksDB), # This needs to be a list, also for single comparisons
+    save_res(inputlist_df = list(MetalinksDB),# This needs to be a list, also for single comparisons
         inputlist_plot = NULL,
         save_table = save_table,
         save_plot = NULL,

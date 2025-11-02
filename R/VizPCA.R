@@ -338,7 +338,7 @@ viz_pca <- function(
         label = TRUE,
         label.size = 2.5,
         label.repel = TRUE,
-        loadings = as.logical(show_loadings),  # draws Eigenvectors
+        loadings = as.logical(show_loadings),# draws Eigenvectors
         loadings.label = as.logical(show_loadings),
         loadings.label.vjust = 1.2,
         loadings.label.size = 2.5,

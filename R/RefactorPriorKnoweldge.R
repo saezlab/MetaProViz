@@ -213,7 +213,8 @@ translate_id <- function(
             expand = FALSE,
             quantify_ambiguity = TRUE,
             qualify_ambiguity = TRUE,
-            ambiguity_groups = metadata_info[["grouping_variable"]],  # Checks within the groups, without it checks across groups
+            # Checks within the groups, without it checks across groups
+            ambiguity_groups = metadata_info[["grouping_variable"]],
             ambiguity_summary = TRUE
         )
     # TranslatedDF %>% attributes %>% names
@@ -606,7 +607,8 @@ path = NULL
             quantify_ambiguity = FALSE,
             qualify_ambiguity = TRUE,
             ambiguity_groups = NULL,  # Can not be set to FALSE!
-            ambiguity_summary = FALSE  # Checks within the groups, without it checks across groups
+            # Checks within the groups, without it checks across groups
+            ambiguity_summary = FALSE
         ) %>%
         select(
             "InputID", !!sym(to), !!sym(from)
@@ -1312,7 +1314,7 @@ path = NULL
                         sep = ""
                     )
                 ]][
-                    ,
+,
                     c(
                         "UniqueID",
                         paste0(from, "_to_", to),
@@ -1333,7 +1335,7 @@ path = NULL
                         sep = ""
                     )
                 ]][
-                    ,
+,
                     c(
                         "UniqueID",
                         paste0(to, "_to_", from),

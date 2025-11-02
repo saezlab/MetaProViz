@@ -270,7 +270,7 @@ metadata_analysis <- function(
         topBottom_Features %>%
         group_by(PC) %>%
         summarise(across(everything(), ~ paste(unique(gsub(", ", "_", .)), collapse = ", "))) %>%
-        ungroup(),         by = "PC",
+        ungroup(), by = "PC",
         all.x = TRUE
     )
 

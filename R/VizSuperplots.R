@@ -102,7 +102,7 @@ viz_superplot <- function(
     data,
     metadata_sample = NULL,
     metadata_info = c(Conditions = "Conditions", Superplot = NULL),
-    plot_type = "Box",  # Bar, Box, Violin,
+    plot_type = "Box",# Bar, Box, Violin,
     plot_name = "",
     plot_conditions = NULL,
     stat_comparison = NULL,
@@ -277,7 +277,7 @@ viz_superplot <- function(
             message <-
                 paste0(
                     "Check input. The selected padj option for multiple Hypothesis testing correction is not valid. Please select NULL or one of the folowing: ",
-                    paste(STAT_padj_options,collapse = ", "),
+                    paste(STAT_padj_options, collapse = ", "),
                     "."
                 )
             log_trace(paste("Error ", message, sep = ""))
@@ -307,13 +307,13 @@ viz_superplot <- function(
 
         data_merge <-
             merge(
-                metadata_sample[c("Conditions","Superplot")],
+                metadata_sample[c("Conditions", "Superplot")],
                 data,
                 by = 0L
             )
         data_merge <- column_to_rownames(data_merge, "Row.names")
     } else {
-        data_merge <- merge(metadata_sample[c("Conditions")] ,data, by = 0)
+        data_merge <- merge(metadata_sample[c("Conditions")], data, by = 0)
         data_merge <- column_to_rownames(data_merge, "Row.names")
     }
 
@@ -360,12 +360,12 @@ viz_superplot <- function(
 
     if ("Superplot" %in% names(metadata_info)) {
         plotdata <- data_merge %>%
-                        select(i,Conditions, Superplot) %>%
+                        select(i, Conditions, Superplot) %>%
                         group_by(Conditions) %>%
                         as.data.frame()
     } else {
         plotdata <- data_merge %>%
-                        select(i,Conditions) %>%
+                        select(i, Conditions) %>%
                         group_by(Conditions) %>%
                         as.data.frame()
     }
@@ -389,7 +389,7 @@ viz_superplot <- function(
         m <- mean(x)
         ymin <- m-sd(x)
         ymax <- m+sd(x)
-        return(c(y = m,ymin = ymin,ymax = ymax))
+        return(c(y = m, ymin = ymin, ymax = ymax))
     }
 
     if (plot_type == "Bar") {
@@ -399,27 +399,27 @@ viz_superplot <- function(
         Plot <- Plot+ geom_violin(fill = color_palette)+ stat_summary(fun.data = data_summary,
             geom = "errorbar", color = "black", width = 0.2)
     } else if (plot_type == "Box") {
-        Plot <- Plot +  geom_boxplot(fill = color_palette,  width = 0.5, position = position_dodge(width = 0.5))
+        Plot <- Plot +  geom_boxplot(fill = color_palette, width = 0.5, position = position_dodge(width = 0.5))
     }
 
     # Add Superplot
     if ("Superplot" %in% names(metadata_info)) {
         if (!is.null(color_palette_dot)) {
-            Plot <- Plot+ geom_beeswarm(aes(x = Conditions,y = Intensity,color = as.factor(Superplot)),size = 3)+
+            Plot <- Plot+ geom_beeswarm(aes(x = Conditions, y = Intensity, color = as.factor(Superplot)), size = 3)+
             labs(
                 color = metadata_info[["Superplot"]],
                 fill = metadata_info[["Superplot"]]
             )+
             scale_color_manual(values = color_palette_dot)
         } else {
-        Plot <- Plot+ geom_beeswarm(aes(x = Conditions,y = Intensity,color = as.factor(Superplot)),size = 3)+
+        Plot <- Plot+ geom_beeswarm(aes(x = Conditions, y = Intensity, color = as.factor(Superplot)), size = 3)+
             labs(
                 color = metadata_info[["Superplot"]],
                 fill = metadata_info[["Superplot"]]
             )
         }
     } else {
-        Plot <- Plot+ geom_beeswarm(aes(x = Conditions,y = Intensity),size = 2)
+        Plot <- Plot+ geom_beeswarm(aes(x = Conditions, y = Intensity), size = 2)
     }
 
     # # ##---- Add stats:
@@ -431,7 +431,7 @@ viz_superplot <- function(
             position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
         } else {
         comparison <- unique(plotdata$Conditions)
-        Plot <- Plot+ stat_compare_means(comparisons = comparison ,
+        Plot <- Plot+ stat_compare_means(comparisons = comparison,
             label = "p.format", method = pval, hide.ns = TRUE,
             position = position_dodge(0.9), vjust = 0.25, show.legend = FALSE)
 
@@ -446,12 +446,12 @@ viz_superplot <- function(
 
         # Prepare Stat results using dma STAT helper functions
         if (pval =="aov") {
-            STAT_C1vC2 <- mpv_aov(data = data.frame("Intensity" = plotdata[,-c(2:3)]),
+            STAT_C1vC2 <- mpv_aov(data = data.frame("Intensity" = plotdata[, -c(2:3)]),
                             metadata_info = c(Conditions = "Conditions", Numerator = unique(metadata_sample$Conditions), Denominator = unique(metadata_sample$Conditions)),
                             metadata_sample = metadata_sample,
                             log2fc_table = NULL)
         }else if (pval =="kruskal.test") {
-            STAT_C1vC2 <- mpv_kruskal(data = data.frame("Intensity" = plotdata[,-c(2:3)]),
+            STAT_C1vC2 <- mpv_kruskal(data = data.frame("Intensity" = plotdata[, -c(2:3)]),
                                             metadata_info = c(Conditions = "Conditions", Numerator = unique(metadata_sample$Conditions), Denominator = unique(metadata_sample$Conditions)),
                                             metadata_sample = metadata_sample,
                                             log2fc_table = NULL)
@@ -479,7 +479,7 @@ viz_superplot <- function(
 
         # Add the 'res' column by repeating 'position' to match the number of rows
         position <- c(max(dataMeans$Intensity + 2*dataMeans$sd),
-                        max(dataMeans$Intensity + 2*dataMeans$sd)+0.04* max(dataMeans$Intensity + 2*dataMeans$sd) ,
+                        max(dataMeans$Intensity + 2*dataMeans$sd)+0.04* max(dataMeans$Intensity + 2*dataMeans$sd),
                         max(dataMeans$Intensity + 2*dataMeans$sd)+0.08* max(dataMeans$Intensity + 2*dataMeans$sd))
 
         df <- df %>%
@@ -521,7 +521,7 @@ viz_superplot <- function(
                 column_to_rownames("entry")
             }
         } else {
-            df_merge <- df[,-2] %>%
+            df_merge <- df[, -2] %>%
             column_to_rownames("comparisons")
             }
 
@@ -537,7 +537,7 @@ viz_superplot <- function(
 
     Plot <- Plot + theme+ labs(title = plot_name,
         subtitle = i)# ggtitle(paste(i))
-    Plot <- Plot + theme(legend.position = "right",plot.title = element_text(size = 12, face = "bold"), axis.text.x = element_text(angle = 90, hjust = 1))+ xlab(xlab)+ ylab(ylab)
+    Plot <- Plot + theme(legend.position = "right", plot.title = element_text(size = 12, face = "bold"), axis.text.x = element_text(angle = 90, hjust = 1))+ xlab(xlab)+ ylab(ylab)
 
     ## Store the plot in the 'plots' list
     PlotList[[i]] <- Plot
@@ -576,7 +576,7 @@ viz_superplot <- function(
         save_table = NULL,
         save_plot = save_plot,
         path = folder,
-        file_name = paste(plot_type, "Plots_",plot_name, sep = ""),
+        file_name = paste(plot_type, "Plots_", plot_name, sep = ""),
         core = FALSE,
         print_plot = print_plot,
         plot_height = plot_height,
@@ -584,6 +584,6 @@ viz_superplot <- function(
         plot_unit = "cm"
     )
     }
-    return(invisible(list("Plot" = PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
+    return(invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid)))
 }
 
