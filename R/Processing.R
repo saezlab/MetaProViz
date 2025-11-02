@@ -1044,7 +1044,7 @@ feature_filtering <- function(
     }
 
     ## ------------------ Perform filtering ------------------ ##
-    if (featurefilt ==  "Modified") {
+    if (featurefilt == "Modified") {
         message <-
             paste0(
                 "feature_filtering: Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values (REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004). ",
@@ -1065,7 +1065,7 @@ feature_filtering <- function(
             log_trace(message)
             stop(message)
         }
-        if (length(unique(feat_filt_Conditions)) ==  1) {
+        if (length(unique(feat_filt_Conditions)) == 1) {
             message("to perform the Modified feature filtering there have to be at least 2 different Conditions in the `Condition` column in the Experimental design. Consider using the Standard feature filtering option.")
             log_trace(message)
             stop(message)
@@ -1085,7 +1085,7 @@ feature_filtering <- function(
             }
         }
 
-        if (length(miss) ==  0) { #remove metabolites if any are found
+        if (length(miss) == 0) { #remove metabolites if any are found
             message("There where no metabolites exluded")
             filtered_matrix <- data
             feat_file_res <- "There where no metabolites exluded"
@@ -1101,7 +1101,7 @@ feature_filtering <- function(
             message(msg)
             filtered_matrix <- data[, -miss]
         }
-    }else if (featurefilt ==  "Standard") {
+    }else if (featurefilt == "Standard") {
         message <-
             paste0(
                 "feature_filtering: Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples (REF: Smilde et. al. (2005), Anal. Chem. 77, 6729-6736., doi:10.1021/ac051080y). ",
@@ -1119,7 +1119,7 @@ feature_filtering <- function(
                 miss <- append(miss, i)
         }
 
-        if (length(miss) ==  0) { #remove metabolites if any are found
+        if (length(miss) == 0) { #remove metabolites if any are found
             message <- paste0("feature_filtering: There where no metabolites exluded")
             log_info(message)
             message(message)
@@ -1851,7 +1851,7 @@ core_norm <- function(
     # # -- Check core_norm_factor
     if (("core_norm_factor" %in% names(metadata_info))) {
         core_norm_factor <-   metadata_sample %>% filter(!!as.name(metadata_info[["Conditions"]]) !=metadata_info[["core_media"]]) %>% select(metadata_info[["core_norm_factor"]]) %>% dplyr::pull()
-        if (var(core_norm_factor) ==  0) {
+        if (var(core_norm_factor) == 0) {
             message <- paste("The growth rate or growth factor for normalising the core result, is the same for all samples")
             log_trace("Warning: ", message, sep = "")
             warning(message)

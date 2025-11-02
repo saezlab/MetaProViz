@@ -437,7 +437,7 @@ metsigdb_metalinks <- function(
 
 
     # ------------------------------------------------------------------
-    if (!(any(c(types, cell_location, tissue_location, biospecimen_location, disease, pathway, hmdb_ids, uniprot_ids) =="?"))) {
+    if (!(any(c(types, cell_location, tissue_location, biospecimen_location, disease, pathway, hmdb_ids, uniprot_ids) == "?"))) {
     # Check Input parameters
 
 
@@ -480,8 +480,8 @@ metsigdb_metalinks <- function(
     # ------------------------------------------------------------------
     # Answer questions about the database
     # if any parameter is ? then return the data
-    if (any(c(types, cell_location, tissue_location, biospecimen_location, disease, pathway, hmdb_ids, uniprot_ids) =="?")) {
-        Questions <- which(c(types, cell_location, tissue_location, biospecimen_location, disease, pathway, hmdb_ids, uniprot_ids) =="?")
+    if (any(c(types, cell_location, tissue_location, biospecimen_location, disease, pathway, hmdb_ids, uniprot_ids) == "?")) {
+        Questions <- which(c(types, cell_location, tissue_location, biospecimen_location, disease, pathway, hmdb_ids, uniprot_ids) == "?")
     # Check tables where the user has questions
     if (length(Questions)>0) {
         for (i in Questions) {

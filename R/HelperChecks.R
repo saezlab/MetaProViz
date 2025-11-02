@@ -115,7 +115,7 @@ check_param <- function(
                 by = "row.names",
                 all = FALSE
             )
-    if (nrow(Test_match) ==  0) {
+    if (nrow(Test_match) == 0) {
         message <- paste0("row.names data need to match row.names metadata_sample.")
         log_trace(paste("Error ", message, sep = ""))
         stop(message)
@@ -130,7 +130,7 @@ check_param <- function(
                 by = "row.names",
                 all = FALSE
             )
-    if (nrow(Test_match) ==  0) {
+    if (nrow(Test_match) == 0) {
         stop("col.names data need to match row.names metadata_feature.")
     }
     }

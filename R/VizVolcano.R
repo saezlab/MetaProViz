@@ -137,7 +137,7 @@ viz_volcano <- function(
 
     ## ------------ Check Input files ----------- ##
     # HelperFunction `check_param`
-    if (plot_types =="PEA") {
+    if (plot_types == "PEA") {
     # Those relationships are checked in the viz_volcano_pea() function!
         SettingsFile <- NULL # For PEA the metadata_feature is the prior knowledge file, and hence this will not have feature as row names.
         Info <- NULL # If SettingsFileMetab = NULL, SetingsInfo has to be NULL to, otherwise we will get an error.
@@ -277,7 +277,7 @@ viz_volcano <- function(
                 )
         }
 
-        if (plot_types =="PEA") {
+        if (plot_types == "PEA") {
             Volcanodata <-
                 merge(
                     x = metadata_feature,
@@ -368,7 +368,7 @@ viz_volcano <- function(
     ##########################################################################
     ## ----------- Make the  plot based on the chosen parameters ------------ ##
 
-    if (plot_types =="Standard") { # ## # #--- 1. Standard
+    if (plot_types == "Standard") { # ## # #--- 1. Standard
         VolcanoRes <- viz_volcano_standard(
             data = Volcanodata,
             metadata_feature = metadata_feature,
@@ -392,7 +392,7 @@ viz_volcano <- function(
             folder = folder
         )
 
-    }else if (plot_types =="Compare") { # ## # #--- 2. Compare
+    }else if (plot_types == "Compare") { # ## # #--- 2. Compare
     VolcanoRes <- viz_volcano_compare(
         data = Volcanodata,
         data2 = data2,
@@ -418,7 +418,7 @@ viz_volcano <- function(
         folder = folder
     )
 
-    } else if (plot_types =="PEA") { # ## # #--- 3. PEA
+    } else if (plot_types == "PEA") { # ## # #--- 3. PEA
     VolcanoRes <- viz_volcano_pea(
         data = Volcanodata,
         data2 = data2,

@@ -230,7 +230,7 @@ viz_superplot <- function(
     }
 
     if (!is.null(pval)) {
-        if (MultipleComparison & (pval =="t.test" | pval =="wilcox.test")) {
+        if (MultipleComparison & (pval == "t.test" | pval == "wilcox.test")) {
         message <-
             paste0(
                 "Check input. The selected pval option for Hypothesis testing,",
@@ -240,7 +240,7 @@ viz_superplot <- function(
         log_trace(paste("Warning ", message, sep = ""))
         warning(message)
         pval <- "aov"
-    }else if (!MultipleComparison & (pval =="aov" | pval =="kruskal.test")) {
+    }else if (!MultipleComparison & (pval == "aov" | pval == "kruskal.test")) {
         message <-
             paste0(
                 "Check input. The selected pval option for Hypothesis testing,",
@@ -423,7 +423,7 @@ viz_superplot <- function(
     }
 
     # # ##---- Add stats:
-    if (pval =="t.test" | pval =="wilcox.test") {
+    if (pval == "t.test" | pval == "wilcox.test") {
         # One vs. One comparison: t-test
         if (!is.null(stat_comparison)) {
             Plot <- Plot+ stat_compare_means(comparisons = stat_comparison,
@@ -445,12 +445,12 @@ viz_superplot <- function(
         comparisons <- combn(unique(conditions), 2) %>% as.matrix()
 
         # Prepare Stat results using dma STAT helper functions
-        if (pval =="aov") {
+        if (pval == "aov") {
             STAT_C1vC2 <- mpv_aov(data = data.frame("Intensity" = plotdata[, -c(2:3)]),
                             metadata_info = c(Conditions = "Conditions", Numerator = unique(metadata_sample$Conditions), Denominator = unique(metadata_sample$Conditions)),
                             metadata_sample = metadata_sample,
                             log2fc_table = NULL)
-        }else if (pval =="kruskal.test") {
+        }else if (pval == "kruskal.test") {
             STAT_C1vC2 <- mpv_kruskal(data = data.frame("Intensity" = plotdata[, -c(2:3)]),
                                             metadata_info = c(Conditions = "Conditions", Numerator = unique(metadata_sample$Conditions), Denominator = unique(metadata_sample$Conditions)),
                                             metadata_sample = metadata_sample,
