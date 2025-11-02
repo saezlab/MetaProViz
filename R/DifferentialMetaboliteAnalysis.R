@@ -651,7 +651,7 @@ dma <- function(
 #' @return List of DFs named after comparison (e.g. Tumour versus Normal) with
 #'     Log2FC or Log2(Distance) column and column with feature names
 #'
-#' @importFrom magrittr %>%
+#' @importFrom magrittr %>% is_in not
 #' @importFrom dplyr filter mutate rename select_if summarise_all
 #' @importFrom gtools foldchange2logratio
 #' @importFrom tibble rownames_to_column
@@ -674,7 +674,11 @@ log2fc <- function(
     metaproviz_init()
 
     # ------------ Assignments ----------- ##
-if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metadata_info))) {
+
+    meta_vars <- names(metadata_info)
+    denom_num <- c("Denominator", "Numerator")
+
+    if (denom_num %>% is_in(meta_vars) %>% any %>% not) {
         # all-vs-all: Generate all pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- unique(metadata_sample[[metadata_info[["Conditions"]]]])
@@ -684,7 +688,7 @@ if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metada
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info))) {
+    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE) %>% all) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
@@ -696,7 +700,7 @@ if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- FALSE
-    } else if ("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info)) {
+    } else if (denom_num %>% is_in(meta_vars) %>% all) {
         # one-vs-one: Generate the comparisons
         denominator <- metadata_info[["Denominator"]]
         numerator <- metadata_info[["Numerator"]]
@@ -727,11 +731,11 @@ if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_
     ## ------------ Denominator/numerator ----------- ##
     # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or
     # all_vs_all.
-if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metadata_info))) {
+    if (denom_num %>% is_in(meta_vars) %>% any %>% not) {
         MultipleComparison <- TRUE
-if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info))) {
+    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE) %>% all) {
         MultipleComparison <- TRUE
-    } else if ("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info)) {
+    } else if (denom_num %>% is_in(meta_vars) %>% all) {
         MultipleComparison <- FALSE
     }
 
@@ -1424,7 +1428,11 @@ mpv_aov <- function(
 
     ## ------------ Denominator/numerator ----------- ##
     # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metadata_info))) {
+
+    denom_num <- c("Denominator", "Numerator")
+    meta_vars <- names(metadata_sample)
+
+    if (denom_num %>% is_in(meta_vars) %>% any %>% not) {
         # all-vs-all: Generate all pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- unique(
@@ -1441,7 +1449,7 @@ if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metada
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info))) {
+    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE) %>% all) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
@@ -1668,7 +1676,11 @@ mpv_kruskal <- function(
 
     ## ------------ Denominator/numerator ----------- ##
     # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metadata_info))) {
+
+    denom_num <- c("Denominator", "Numerator")
+    meta_vars <- names(metadata_info)
+
+    if (denom_num %>% is_in(meta_vars) %>% any %>% not) {
         # all-vs-all: Generate all pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- unique(
@@ -1684,7 +1696,7 @@ if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metada
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info))) {
+    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE) %>% all) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
@@ -1905,7 +1917,7 @@ if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_
 #'
 #' @importFrom rstatix games_howell_test
 #' @importFrom dplyr rename
-#' @importFrom magrittr %>%
+#' @importFrom magrittr %>% is_in not
 #' @importFrom tibble rownames_to_column
 #' @importFrom utils combn
 #' @noRd
@@ -1924,7 +1936,11 @@ mpv_welch <- function(
 
     ## ------------ Denominator/numerator ----------- ##
     # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metadata_info))) {
+
+    denom_num <- c("Denominator", "Numerator")
+    meta_vars <- names(metadata_info)
+
+    if (denom_num %>% is_in(meta_vars) %>% any %>% not) {
         # all-vs-all: Generate all pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- unique(
@@ -1942,7 +1958,7 @@ if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metada
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info))) {
+    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE)) %>% all) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
@@ -2167,391 +2183,394 @@ dma_stat_limma <-
         core = FALSE,
         transform = TRUE
     ) {
-        # NSE vs. R CMD check workaround:
-        New <- NULL
+    # NSE vs. R CMD check workaround:
+    New <- NULL
 
-        ## ------------ Create log file ----------- ##
-        metaproviz_init()
+    ## ------------ Create log file ----------- ##
+    metaproviz_init()
 
-        ## ------------ Denominator/numerator ----------- ##
-        # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metadata_info))) {
-            MultipleComparison <- TRUE
-            all_vs_all <- TRUE
-if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info))) {
-            MultipleComparison <- TRUE
-            all_vs_all <- FALSE
-        } else if ("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info)) {
-            MultipleComparison <- FALSE
-            all_vs_all <- FALSE
-        }
+    ## ------------ Denominator/numerator ----------- ##
+    # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
+    meta_vars <- names(metadata_info)
+    denom_num <- c("Denominator", "Numerator")
 
-        # ### ------ Ensure that Input_data is ordered by conditions and sample
-        # ### ------ names are the same as in Input_metadata_sample:
-        targets <-
-            metadata_sample %>%
-            rownames_to_column("sample")
-        targets <- targets[, c("sample", metadata_info[["Conditions"]])] %>%
-        rename("condition" = 2) %>%
+    if (denom_num %>% is_in(meta_vars) %>% any %>% not) {
+        MultipleComparison <- TRUE
+        all_vs_all <- TRUE
+    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE)) %>% all) {
+        MultipleComparison <- TRUE
+        all_vs_all <- FALSE
+    } else if (denom_num %>% is_in(meta_vars) %>% all) {
+        MultipleComparison <- FALSE
+        all_vs_all <- FALSE
+    }
+
+    # ### ------ Ensure that Input_data is ordered by conditions and sample
+    # ### ------ names are the same as in Input_metadata_sample:
+    targets <-
+        metadata_sample %>%
+        rownames_to_column("sample")
+    targets <- targets[, c("sample", metadata_info[["Conditions"]])] %>%
+    rename("condition" = 2) %>%
+    arrange(sample)  # Order the column "sample" alphabetically
+    # make appropriate condition names accepted by limma
+    targets$condition_limma_compatible <- make.names(targets$condition)
+
+    if (!MultipleComparison) {
+        # subset the data:
+        targets <- targets %>%
+        subset(condition == metadata_info[["Numerator"]] | condition == metadata_info[["Denominator"]]) %>%
         arrange(sample)  # Order the column "sample" alphabetically
-        # make appropriate condition names accepted by limma
-        targets$condition_limma_compatible <- make.names(targets$condition)
 
-        if (!MultipleComparison) {
-            # subset the data:
-            targets <- targets %>%
-            subset(condition == metadata_info[["Numerator"]] | condition == metadata_info[["Denominator"]]) %>%
-            arrange(sample)  # Order the column "sample" alphabetically
-
-            Limma_input <-
-                data %>%
-                tibble::rownames_to_column("sample")
-            Limma_input <- merge(
-                targets[, seq_len(2L)],
-                Limma_input,
-                by = "sample",
-                all.x = TRUE
-            )
-            Limma_input <-
-                Limma_input[, -2] %>%
-                arrange(sample)  # Order the column "sample" alphabetically
-        } else if (MultipleComparison) {
-            Limma_input <-
-                data %>%
-                tibble::rownames_to_column("sample") %>%
-                arrange(sample)  # Order the column "sample" alphabetically
-        }
-
-        # Check if the order of the "sample" column is the same in both data frames
-        if (!identical(targets$sample, Limma_input$sample)) {
-            stop(
-                "The order of the 'sample' column is different in both data ",
-                "frames. Please make sure that Input_metadata_sample and ",
-                "Input_data contain the same rownames and sample numbers."
-            )
-        }
-
-        targets_limma <- targets[, -2] %>%
-        rename("condition" = "condition_limma_compatible")
-
-        # We need to transpose the df to run limma. Also, if the data is not log2
-        # transformed, we will not calculate the Log2FC as limma just substracts
-        # one condition from the other
         Limma_input <-
+            data %>%
+            tibble::rownames_to_column("sample")
+        Limma_input <- merge(
+            targets[, seq_len(2L)],
+            Limma_input,
+            by = "sample",
+            all.x = TRUE
+        )
+        Limma_input <-
+            Limma_input[, -2] %>%
+            arrange(sample)  # Order the column "sample" alphabetically
+    } else if (MultipleComparison) {
+        Limma_input <-
+            data %>%
+            tibble::rownames_to_column("sample") %>%
+            arrange(sample)  # Order the column "sample" alphabetically
+    }
+
+    # Check if the order of the "sample" column is the same in both data frames
+    if (!identical(targets$sample, Limma_input$sample)) {
+        stop(
+            "The order of the 'sample' column is different in both data ",
+            "frames. Please make sure that Input_metadata_sample and ",
+            "Input_data contain the same rownames and sample numbers."
+        )
+    }
+
+    targets_limma <- targets[, -2] %>%
+    rename("condition" = "condition_limma_compatible")
+
+    # We need to transpose the df to run limma. Also, if the data is not log2
+    # transformed, we will not calculate the Log2FC as limma just substracts
+    # one condition from the other
+    Limma_input <-
+        as.data.frame(
+            t(
+                Limma_input %>% tibble::column_to_rownames("sample")
+            )
+        )
+
+    if (transform) {
+        # communicate the log2 transformation --> how does limma deals with
+        # NA when calculating the change?
+        Limma_input <- log2(Limma_input)
+    }
+
+    # ### ------Run limma:
+    # ###  Make design matrix:
+    fcond <- as.factor(targets_limma$condition)  # all versus all
+
+    # Create the design matrix
+    design <- model.matrix(~ 0 + fcond)
+
+    # Give meaningful column names to the design matrix
+    colnames(design) <- levels(fcond)
+
+    # ### Fit the linear model
+    fit <- limma::lmFit(Limma_input, design)
+
+    # ###  Make contrast matrix:
+    if (all_vs_all & MultipleComparison) {
+        unique_conditions <- levels(fcond)  # Get unique conditions
+
+        # Create an empty contrast matrix
+        num_conditions <- length(unique_conditions)
+        num_comparisons <- num_conditions * (num_conditions - 1) / 2
+        cont.matrix <-
+            matrix(
+                0,
+                nrow = num_comparisons,
+                ncol = num_conditions
+            )
+
+        # Initialize an index for the column in the contrast matrix
+        i <- 1
+
+        # Initialize column and row names
+        colnames(cont.matrix) <- unique_conditions
+        rownames(cont.matrix) <- character(num_comparisons)
+
+        # Loop through all pairwise combinations of unique conditions
+        for (condition1 in seq_len(num_conditions - 1)) {
+            for (condition2 in (condition1 + 1):num_conditions) {
+                # Create the pairwise comparison vector
+                comparison <- rep(0, num_conditions)
+
+                comparison[condition2] <- -1
+                comparison[condition1] <- 1
+                # Add the comparison vector to the contrast matrix
+                cont.matrix[i, ] <- comparison
+                # Set row name
+                rownames(cont.matrix)[i] <-
+                    paste(
+                        unique_conditions[condition1],
+                        "_vs_",
+                        unique_conditions[condition2],
+                        sep = ""
+                    )
+                i <- i + 1
+            }
+        }
+        cont.matrix <- t(cont.matrix)
+    } else if (!all_vs_all & MultipleComparison) {
+        unique_conditions <- levels(fcond)  # Get unique conditions
+        denominator <- make.names(metadata_info[["Denominator"]])
+
+        # Create an empty contrast matrix
+        num_conditions <- length(unique_conditions)
+        num_comparisons <- num_conditions - 1
+        cont.matrix <-
+            matrix(
+                0,
+                nrow = num_comparisons,
+                ncol = num_conditions
+            )
+
+
+        # Initialize an index for the column in the contrast matrix
+        i <- 1
+
+        # Initialize column and row names
+        colnames(cont.matrix) <- unique_conditions
+        rownames(cont.matrix) <- character(num_comparisons)
+
+        # Loop through all pairwise combinations of unique conditions
+        for (condition in 2:num_conditions) {
+            # Create the pairwise comparison vector
+            comparison <- rep(0, num_conditions)
+            if (unique_conditions[1] == make.names(metadata_info[["Denominator"]])) {
+                comparison[1] <- -1
+                comparison[condition] <- 1
+                # Add the comparison vector to the contrast matrix
+                cont.matrix[i, ] <- comparison
+                # Set row name
+                rownames(cont.matrix)[i] <-
+                    paste(
+                        unique_conditions[condition],
+                        "_vs_",
+                        unique_conditions[1],
+                        sep = ""
+                    )
+            } else {
+                comparison[1] <- 1
+                comparison[condition] <- -1
+                # Add the comparison vector to the contrast matrix
+                cont.matrix[i, ] <- comparison
+                # Set row name
+                rownames(cont.matrix)[i] <-
+                    paste(
+                        unique_conditions[1],
+                        "_vs_",
+                        unique_conditions[condition],
+                        sep = ""
+                    )
+            }
+            i <- i + 1
+        }
+        cont.matrix <- t(cont.matrix)
+    } else if (!all_vs_all & !MultipleComparison) {
+        Name_Comp <- paste(
+            make.names(metadata_info[["Numerator"]]),
+            "-",
+            make.names(metadata_info[["Denominator"]]),
+            sep = ""
+        )
+        cont.matrix <-
+            as.data.frame(
+                makeContrasts(
+                    contrasts = Name_Comp,
+                    levels = colnames(design)
+                )
+            ) %>%
+            rename(
+                !!paste(
+                    make.names(metadata_info[["Numerator"]]),
+                    "_vs_",
+                    make.names(metadata_info[["Denominator"]]),
+                    sep = ""
+                ) := 1
+            )
+        cont.matrix <- as.matrix(cont.matrix)
+    }
+
+    # Fit the linear model with contrasts
+    # fit2 <- contrasts.fit(fit, cont.matrix)
+    fit2 <- contrasts.fit(fit, cont.matrix)
+    fit2 <- eBayes(fit2)  # Perform empirical Bayes moderation
+
+    # ### ------Extract results:
+    contrast_names <- colnames(fit2$coefficients)  # Get all contrast names
+
+    results_list <- list()  # Create an empty list to store results data frames
+    for (contrast_name in contrast_names) {
+        # Extract results for the current contrast
+        res.t <-
+            topTable(
+                fit2,
+                coef = contrast_name,
+                number = Inf,
+                sort.by = "n",
+                adjust.method = padj
+            ) %>%  # coef= the comparison the test is done for!
+            rename(
+                "Log2FC" = 1,
+                "t.val" = 3,
+                "p.val" = 4,
+                "p.adj" = 5
+            )
+
+        res.t <- res.t %>%
+        rownames_to_column("Metabolite")
+
+        # Store the data frame in the results list, named after the contrast
+        results_list[[contrast_name]] <- res.t
+    }
+
+    # Make the name_match_df
+    name_match_df <-
+        as.data.frame(names(results_list)) %>%
+        separate(
+            "names(results_list)",
+            into = c("a", "b"),
+            sep = "_vs_",
+            remove = FALSE
+        )
+
+    name_match_df <-
+        merge(
+            name_match_df,
+            targets[, -c(1)],
+            by.x = "a",
+            by.y = "condition_limma_compatible",
+            all.x = TRUE
+        ) %>%
+        rename("Condition1" = 4)
+
+    name_match_df <-
+        merge(
+            name_match_df,
+            targets[, -c(1)],
+            by.x = "b",
+            by.y = "condition_limma_compatible",
+            all.x = TRUE
+        ) %>%
+        rename("Condition2" = 5) %>%
+        unite(
+            "New",
+            "Condition1",
+            "Condition2",
+            sep = "_vs_",
+            remove = FALSE
+        )
+
+    name_match_df <-
+        name_match_df[, c(3, 4)] %>%
+        distinct(New, .keep_all = TRUE)
+
+    results_list_new <- list()
+    # Match the lists using name_match_df
+    for (i in seq_len(nrow(name_match_df))) {
+        old_name <- name_match_df$`names(results_list)`[i]
+        new_name <- name_match_df$New[i]
+        results_list_new[[new_name]] <- results_list[[old_name]]
+    }
+
+    if (!is.null(log2fc_table)) {
+        if (core) {
+            # If core=TRUE, we need to exchange the Log2FC with the Distance
+            # and we need to combine the lists
+            # Merge the data frames in list1 and list2 based on the "Metabolite" column
+            merged_list <- list()
+            for (i in seq_len(nrow(name_match_df))) {
+                list_dfs <- name_match_df$New[i]
+
+                # Check if the data frames exist in both lists
+                if (list_dfs %in% names(results_list_new) && list_dfs %in% names(log2fc_table)) {
+                    merged_df <-
+                        merge(
+                            results_list_new[[list_dfs]],
+                            log2fc_table[[list_dfs]],
+                            by = "Metabolite",
+                            all = TRUE
+                        )
+                    merged_list[[list_dfs]] <- merged_df
+                }
+            }
+            STAT_C1vC2 <- merged_list
+        } else {
+            STAT_C1vC2 <- results_list_new
+        }
+    }
+
+    # Add input data
+    Cond <- metadata_sample %>%
+    rownames_to_column("Code")
+
+    InputReturn <-
+        merge(
+            Cond[, c("Code", metadata_info[["Conditions"]])],
+            as.data.frame(t(Limma_input)),
+            by.x = "Code",
+            by.y = 0,
+            all.y = TRUE
+        )
+
+    for (DFs in names(STAT_C1vC2)) {
+        parts <- unlist(strsplit(DFs, "_vs_"))
+        C1 <- parts[1]
+        C2 <-
+            parts[2]
+        InputReturn_Filt <-
+            InputReturn %>%
+            filter(
+                get(metadata_info[["Conditions"]]) == C1 | get(metadata_info[["Conditions"]]) == C2
+            ) %>%
+            column_to_rownames("Code")
+        InputReturn_Filt <-
             as.data.frame(
                 t(
-                    Limma_input %>% tibble::column_to_rownames("sample")
+                    InputReturn_Filt[, -c(1)]
                 )
             )
 
         if (transform) {
-            # communicate the log2 transformation --> how does limma deals with
-            # NA when calculating the change?
-            Limma_input <- log2(Limma_input)
+            # Add prefix & suffix to each column since the data have
+            # been log2 transformed!
+            colnames(InputReturn_Filt) <-
+                paste0(
+                    "log2(",
+                    colnames(InputReturn_Filt),
+                    ")"
+                )
         }
 
-        # ### ------Run limma:
-        # ###  Make design matrix:
-        fcond <- as.factor(targets_limma$condition)  # all versus all
-
-        # Create the design matrix
-        design <- model.matrix(~ 0 + fcond)
-
-        # Give meaningful column names to the design matrix
-        colnames(design) <- levels(fcond)
-
-        # ### Fit the linear model
-        fit <- limma::lmFit(Limma_input, design)
-
-        # ###  Make contrast matrix:
-        if (all_vs_all & MultipleComparison) {
-            unique_conditions <- levels(fcond)  # Get unique conditions
-
-            # Create an empty contrast matrix
-            num_conditions <- length(unique_conditions)
-            num_comparisons <- num_conditions * (num_conditions - 1) / 2
-            cont.matrix <-
-                matrix(
-                    0,
-                    nrow = num_comparisons,
-                    ncol = num_conditions
-                )
-
-            # Initialize an index for the column in the contrast matrix
-            i <- 1
-
-            # Initialize column and row names
-            colnames(cont.matrix) <- unique_conditions
-            rownames(cont.matrix) <- character(num_comparisons)
-
-            # Loop through all pairwise combinations of unique conditions
-            for (condition1 in seq_len(num_conditions - 1)) {
-                for (condition2 in (condition1 + 1):num_conditions) {
-                    # Create the pairwise comparison vector
-                    comparison <- rep(0, num_conditions)
-
-                    comparison[condition2] <- -1
-                    comparison[condition1] <- 1
-                    # Add the comparison vector to the contrast matrix
-                    cont.matrix[i, ] <- comparison
-                    # Set row name
-                    rownames(cont.matrix)[i] <-
-                        paste(
-                            unique_conditions[condition1],
-                            "_vs_",
-                            unique_conditions[condition2],
-                            sep = ""
-                        )
-                    i <- i + 1
-                }
-            }
-            cont.matrix <- t(cont.matrix)
-        } else if (!all_vs_all & MultipleComparison) {
-            unique_conditions <- levels(fcond)  # Get unique conditions
-            denominator <- make.names(metadata_info[["Denominator"]])
-
-            # Create an empty contrast matrix
-            num_conditions <- length(unique_conditions)
-            num_comparisons <- num_conditions - 1
-            cont.matrix <-
-                matrix(
-                    0,
-                    nrow = num_comparisons,
-                    ncol = num_conditions
-                )
-
-
-            # Initialize an index for the column in the contrast matrix
-            i <- 1
-
-            # Initialize column and row names
-            colnames(cont.matrix) <- unique_conditions
-            rownames(cont.matrix) <- character(num_comparisons)
-
-            # Loop through all pairwise combinations of unique conditions
-            for (condition in 2:num_conditions) {
-                # Create the pairwise comparison vector
-                comparison <- rep(0, num_conditions)
-                if (unique_conditions[1] == make.names(metadata_info[["Denominator"]])) {
-                    comparison[1] <- -1
-                    comparison[condition] <- 1
-                    # Add the comparison vector to the contrast matrix
-                    cont.matrix[i, ] <- comparison
-                    # Set row name
-                    rownames(cont.matrix)[i] <-
-                        paste(
-                            unique_conditions[condition],
-                            "_vs_",
-                            unique_conditions[1],
-                            sep = ""
-                        )
-                } else {
-                    comparison[1] <- 1
-                    comparison[condition] <- -1
-                    # Add the comparison vector to the contrast matrix
-                    cont.matrix[i, ] <- comparison
-                    # Set row name
-                    rownames(cont.matrix)[i] <-
-                        paste(
-                            unique_conditions[1],
-                            "_vs_",
-                            unique_conditions[condition],
-                            sep = ""
-                        )
-                }
-                i <- i + 1
-            }
-            cont.matrix <- t(cont.matrix)
-        } else if (!all_vs_all & !MultipleComparison) {
-            Name_Comp <- paste(
-                make.names(metadata_info[["Numerator"]]),
-                "-",
-                make.names(metadata_info[["Denominator"]]),
-                sep = ""
-            )
-            cont.matrix <-
-                as.data.frame(
-                    makeContrasts(
-                        contrasts = Name_Comp,
-                        levels = colnames(design)
-                    )
-                ) %>%
-                rename(
-                    !!paste(
-                        make.names(metadata_info[["Numerator"]]),
-                        "_vs_",
-                        make.names(metadata_info[["Denominator"]]),
-                        sep = ""
-                    ) := 1
-                )
-            cont.matrix <- as.matrix(cont.matrix)
-        }
-
-        # Fit the linear model with contrasts
-        # fit2 <- contrasts.fit(fit, cont.matrix)
-        fit2 <- contrasts.fit(fit, cont.matrix)
-        fit2 <- eBayes(fit2)  # Perform empirical Bayes moderation
-
-        # ### ------Extract results:
-        contrast_names <- colnames(fit2$coefficients)  # Get all contrast names
-
-        results_list <- list()  # Create an empty list to store results data frames
-        for (contrast_name in contrast_names) {
-            # Extract results for the current contrast
-            res.t <-
-                topTable(
-                    fit2,
-                    coef = contrast_name,
-                    number = Inf,
-                    sort.by = "n",
-                    adjust.method = padj
-                ) %>%  # coef= the comparison the test is done for!
-                rename(
-                    "Log2FC" = 1,
-                    "t.val" = 3,
-                    "p.val" = 4,
-                    "p.adj" = 5
-                )
-
-            res.t <- res.t %>%
-            rownames_to_column("Metabolite")
-
-            # Store the data frame in the results list, named after the contrast
-            results_list[[contrast_name]] <- res.t
-        }
-
-        # Make the name_match_df
-        name_match_df <-
-            as.data.frame(names(results_list)) %>%
-            separate(
-                "names(results_list)",
-                into = c("a", "b"),
-                sep = "_vs_",
-                remove = FALSE
-            )
-
-        name_match_df <-
+        InputReturn_Merge <-
             merge(
-                name_match_df,
-                targets[, -c(1)],
-                by.x = "a",
-                by.y = "condition_limma_compatible",
-                all.x = TRUE
-            ) %>%
-            rename("Condition1" = 4)
-
-        name_match_df <-
-            merge(
-                name_match_df,
-                targets[, -c(1)],
-                by.x = "b",
-                by.y = "condition_limma_compatible",
-                all.x = TRUE
-            ) %>%
-            rename("Condition2" = 5) %>%
-            unite(
-                "New",
-                "Condition1",
-                "Condition2",
-                sep = "_vs_",
-                remove = FALSE
-            )
-
-        name_match_df <-
-            name_match_df[, c(3, 4)] %>%
-            distinct(New, .keep_all = TRUE)
-
-        results_list_new <- list()
-        # Match the lists using name_match_df
-        for (i in seq_len(nrow(name_match_df))) {
-            old_name <- name_match_df$`names(results_list)`[i]
-            new_name <- name_match_df$New[i]
-            results_list_new[[new_name]] <- results_list[[old_name]]
-        }
-
-        if (!is.null(log2fc_table)) {
-            if (core) {
-                # If core=TRUE, we need to exchange the Log2FC with the Distance
-                # and we need to combine the lists
-                # Merge the data frames in list1 and list2 based on the "Metabolite" column
-                merged_list <- list()
-                for (i in seq_len(nrow(name_match_df))) {
-                    list_dfs <- name_match_df$New[i]
-
-                    # Check if the data frames exist in both lists
-                    if (list_dfs %in% names(results_list_new) && list_dfs %in% names(log2fc_table)) {
-                        merged_df <-
-                            merge(
-                                results_list_new[[list_dfs]],
-                                log2fc_table[[list_dfs]],
-                                by = "Metabolite",
-                                all = TRUE
-                            )
-                        merged_list[[list_dfs]] <- merged_df
-                    }
-                }
-                STAT_C1vC2 <- merged_list
-            } else {
-                STAT_C1vC2 <- results_list_new
-            }
-        }
-
-        # Add input data
-        Cond <- metadata_sample %>%
-        rownames_to_column("Code")
-
-        InputReturn <-
-            merge(
-                Cond[, c("Code", metadata_info[["Conditions"]])],
-                as.data.frame(t(Limma_input)),
-                by.x = "Code",
+                STAT_C1vC2[[DFs]],
+                InputReturn_Filt,
+                by.x = "Metabolite",
                 by.y = 0,
-                all.y = TRUE
+                all.x = TRUE
             )
 
-        for (DFs in names(STAT_C1vC2)) {
-            parts <- unlist(strsplit(DFs, "_vs_"))
-            C1 <- parts[1]
-            C2 <-
-                parts[2]
-            InputReturn_Filt <-
-                InputReturn %>%
-                filter(
-                    get(metadata_info[["Conditions"]]) == C1 | get(metadata_info[["Conditions"]]) == C2
-                ) %>%
-                column_to_rownames("Code")
-            InputReturn_Filt <-
-                as.data.frame(
-                    t(
-                        InputReturn_Filt[, -c(1)]
-                    )
-                )
-
-            if (transform) {
-                # Add prefix & suffix to each column since the data have
-                # been log2 transformed!
-                colnames(InputReturn_Filt) <-
-                    paste0(
-                        "log2(",
-                        colnames(InputReturn_Filt),
-                        ")"
-                    )
-            }
-
-            InputReturn_Merge <-
-                merge(
-                    STAT_C1vC2[[DFs]],
-                    InputReturn_Filt,
-                    by.x = "Metabolite",
-                    by.y = 0,
-                    all.x = TRUE
-                )
-
-            STAT_C1vC2[[DFs]] <- InputReturn_Merge
-        }
-
-        return(invisible(STAT_C1vC2))
+        STAT_C1vC2[[DFs]] <- InputReturn_Merge
     }
+
+    return(invisible(STAT_C1vC2))
+}
 
 
 #
@@ -2639,7 +2658,10 @@ mpv_shapiro <- function(
 
     ## ------------ Denominator/numerator ----------- ##
     # Denominator and numerator: Define if we compare one_vs_one, one_vs_all or all_vs_all.
-if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metadata_info))) {
+    meta_vars <- names(metadata_info)
+    denom_num <- c("Denominator", "Numerator")
+
+    if (denom_num %>% is_in(meta_vars) %>% any %>% not) {
         # all-vs-all: Generate all pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- unique(
@@ -2657,7 +2679,7 @@ if (!(!("Denominator" %in% names(metadata_info)) & "Numerator" %in% names(metada
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info))) {
+    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE)) %>% all) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
@@ -2675,7 +2697,7 @@ if (!("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- FALSE
-    } else if ("Denominator" %in% names(metadata_info) & "Numerator" %in% names(metadata_info)) {
+    } else if (denom_num %>% is_in(meta_vars) %>% all) {
         # one-vs-one: Generate the comparisons
         denominator <- metadata_info[["Denominator"]]
         numerator <- metadata_info[["Numerator"]]
