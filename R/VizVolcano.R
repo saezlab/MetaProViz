@@ -106,31 +106,31 @@
 #' @importFrom tidyselect all_of
 #' @export
 viz_volcano <- function(
-    plot_types="Standard",
+    plot_types = "Standard",
     data,
-    metadata_info= NULL,
-    metadata_feature=NULL,
-    data2= NULL,
-    y= "p.adj",
-    x= "Log2FC",
-    xlab= NULL,
+    metadata_info = NULL,
+    metadata_feature = NULL,
+    data2 = NULL,
+    y = "p.adj",
+    x = "Log2FC",
+    xlab = NULL,
     # "~Log[2]~FC"
-                        ylab= NULL,
+                        ylab = NULL,
     # "~-Log[10]~p.adj"
-                        cutoff_x= 0.5,
-    cutoff_y= 0.05,
-    connectors=  FALSE,
-    select_label= "",
-    plot_name= "",
-    subtitle= "",
-    name_comparison= c(data="Cond1", data2= "Cond2"),
-    color_palette= NULL,
-    shape_palette=NULL,
-    theme= NULL,
-    save_plot= "svg",
+                        cutoff_x = 0.5,
+    cutoff_y = 0.05,
+    connectors = FALSE,
+    select_label = "",
+    plot_name = "",
+    subtitle = "",
+    name_comparison = c(data = "Cond1", data2 = "Cond2"),
+    color_palette = NULL,
+    shape_palette = NULL,
+    theme = NULL,
+    save_plot = "svg",
     path = NULL,
-    feature="Metabolites",
-    print_plot=TRUE
+    feature = "Metabolites",
+    print_plot = TRUE
 ) {
     ## ------------ Create log file ----------- ##
     metaproviz_init()
@@ -156,41 +156,41 @@ viz_volcano <- function(
         save_table = NULL,
         core = FALSE,
         print_plot = print_plot,
-        plot_types ="Feature"
+        plot_types = "Feature"
     )
 
     # check_param` Specific:
     if (!is.numeric(cutoff_y) | cutoff_y > 1 | cutoff_y < 0) {
         message <- paste0("Check input. The selected cutoff_y value should be numeric and between 0 and 1.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
     if (!is.numeric(cutoff_x)  | cutoff_x < 0) {
         message <- paste0("Check input. The selected cutoff_x value should be numeric and between 0 and +oo.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
     if (!(paste(x) %in% colnames(data)) | !(paste(y) %in% colnames(data))) {
         message <- paste0("Check your input. The column name of x and/ore y does not exist in Input_data.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
     if (!is.null(select_label) & !is.vector(select_label)) {
         message <- paste0("Check input. select_label must be either NULL or a vector.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
     if (!is.logical(connectors)) {
         message <- paste0("Check input. The connectors value should be either = TRUE if connectors from names to points are to be added to the plot or = FALSE if not.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
     if (!is.null(plot_name) & !is.vector(plot_name)) {
         message <- paste0("Check input.plot_name must be either NULL or a vector.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
@@ -202,7 +202,7 @@ viz_volcano <- function(
                 paste(Plot_options, collapse = ", "),
                 "."
             )
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
@@ -226,12 +226,12 @@ viz_volcano <- function(
             if ((metadata_info[["shape"]] == metadata_info[["color"]])) {
                 metadata_feature$shape <- metadata_feature[,paste(metadata_info[["color"]])]
                 metadata_feature <- metadata_feature %>%
-                rename("color"= paste(metadata_info[["color"]]))
+                rename("color" = paste(metadata_info[["color"]]))
             } else {
                 metadata_feature <- metadata_feature %>%
                     rename(
-                        "color"= paste(metadata_info[["color"]]),
-                        "shape"= paste(metadata_info[["shape"]])
+                        "color" = paste(metadata_info[["color"]]),
+                        "shape" = paste(metadata_info[["shape"]])
                     )
             }
         } else if (
@@ -240,15 +240,15 @@ viz_volcano <- function(
         ) {
             metadata_feature <-
                 metadata_feature %>%
-                rename("color"= paste(metadata_info[["color"]]))
+                rename("color" = paste(metadata_info[["color"]]))
         } else if (!("color" %in% names(metadata_info) & "shape" %in% names(metadata_info))) {
             metadata_feature <-
                 metadata_feature %>%
-                rename("shape"= paste(metadata_info[["shape"]]))
+                rename("shape" = paste(metadata_info[["shape"]]))
         }
         if ("individual" %in% names(metadata_info)) {
             metadata_feature <- metadata_feature %>%
-                rename("individual"= paste(metadata_info[["individual"]]))
+                rename("individual" = paste(metadata_info[["individual"]]))
         }
 
 
@@ -503,20 +503,20 @@ viz_volcano_standard <- function(
     data,
     metadata_feature,
     metadata_info,
-    y= "p.adj",
-    x= "Log2FC",
-    xlab= NULL,  # "~Log[2]~FC"
-    ylab= NULL,  # "~-Log[10]~p.adj"
-    cutoff_x= 0.5,
-    cutoff_y= 0.05,
-    connectors=  FALSE,
-    select_label= "",
-    plot_name= "",
-    subtitle= "",
+    y = "p.adj",
+    x = "Log2FC",
+    xlab = NULL,  # "~Log[2]~FC"
+    ylab = NULL,  # "~-Log[10]~p.adj"
+    cutoff_x = 0.5,
+    cutoff_y = 0.05,
+    connectors = FALSE,
+    select_label = "",
+    plot_name = "",
+    subtitle = "",
     color_palette,
     shape_palette,
-    theme= NULL,
-    feature="Metabolites",
+    theme = NULL,
+    feature = "Metabolites",
     save_plot,
     print_plot,
     folder
@@ -586,7 +586,7 @@ viz_volcano_standard <- function(
                     selectLab = select_label,
                     x = paste(x),
                     y = paste(y),
-                    xlab  = xlab,
+                    xlab = xlab,
                     ylab = ylab,
                     pCutoff = cutoff_y,
                     FCcutoff = cutoff_x,  # Cut off Log2FC, automatically 2
@@ -603,7 +603,7 @@ viz_volcano_standard <- function(
                     title = paste(plot_name, ": ", i, sep = ""),
                     subtitle = subtitle,
                     caption = paste0("total = ", nrow(InputVolcano), " ", feature),
-                    xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )]) - 0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])]) + 1.2),
+                    xlim = c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )]) - 0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])]) + 1.2),
                     ylim = c(0, (ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                     cutoffLineType = "dashed",
                     cutoffLineCol = "black",
@@ -625,7 +625,7 @@ viz_volcano_standard <- function(
                 PlotList[[i]] <- Plot
 
                 # Set the total heights and widths
-                PlotTitle <- paste(plot_name, ": ", i, sep ="")
+                PlotTitle <- paste(plot_name, ": ", i, sep = "")
                 Plot_Sized <-
                     plot_grob_volcano(
                         input_plot = Plot,
@@ -656,7 +656,7 @@ viz_volcano_standard <- function(
                     save_table = NULL,
                     save_plot = save_plot,
                     path = folder,
-                    file_name = paste("Volcano_",plot_name, sep=""),
+                    file_name = paste("Volcano_",plot_name, sep = ""),
                     core = FALSE,
                     print_plot = print_plot,
                     plot_height = plot_height,
@@ -716,7 +716,7 @@ viz_volcano_standard <- function(
                 selectLab = select_label,
                 x = paste(x),
                 y = paste(y),
-                xlab  = xlab,
+                xlab = xlab,
                 ylab = ylab,
                 pCutoff = cutoff_y,
                 FCcutoff = cutoff_x,  # Cut off Log2FC, automatically 2
@@ -733,7 +733,7 @@ viz_volcano_standard <- function(
                 title = paste(plot_name),
                 subtitle = subtitle,
                 caption = paste0("total = ", nrow(InputVolcano), " ", feature),
-                xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )]) - 0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])]) + 1.2),
+                xlim = c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )]) - 0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])]) + 1.2),
                 ylim = c(0, (ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                 cutoffLineType = "dashed",
                 cutoffLineCol = "black",
@@ -772,11 +772,11 @@ viz_volcano_standard <- function(
 
             # ----- Save
             save_res(inputlist_df = NULL,
-                inputlist_plot = list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
+                inputlist_plot = list("Plot_Sized" = PlotList_adaptedGrid[["Plot_Sized"]]),
                 save_table = NULL,
                 save_plot = save_plot,
                 path = folder,
-                file_name = paste("Volcano_",plot_name, sep=""),
+                file_name = paste("Volcano_",plot_name, sep = ""),
                 core = FALSE,
                 print_plot = print_plot,
                 plot_height = plot_height,
@@ -785,7 +785,7 @@ viz_volcano_standard <- function(
             )
         }
     }
-    return(invisible(list("Plot"= PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
+    return(invisible(list("Plot" = PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
 }
 
 
@@ -851,22 +851,22 @@ viz_volcano_compare <- function(
     data2,
     metadata_feature,
     metadata_info,
-    y= "p.adj",
-    x= "Log2FC",
-    xlab= NULL,
+    y = "p.adj",
+    x = "Log2FC",
+    xlab = NULL,
     # "~Log[2]~FC"
-                                ylab= NULL,
+                                ylab = NULL,
     # "~-Log[10]~p.adj"
-                                cutoff_x= 0.5,
-    cutoff_y= 0.05,
-    connectors=  FALSE,
-    select_label= "",
-    plot_name= "",
-    subtitle= "",
+                                cutoff_x = 0.5,
+    cutoff_y = 0.05,
+    connectors = FALSE,
+    select_label = "",
+    plot_name = "",
+    subtitle = "",
     color_palette,
     shape_palette,
-    theme= NULL,
-    feature="Metabolites",
+    theme = NULL,
+    feature = "Metabolites",
     name_comparison,
     save_plot,
     print_plot,
@@ -891,14 +891,14 @@ viz_volcano_compare <- function(
                     y,
                     " does not exist in data2."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
 
     if (any(duplicated(row.names(data2)))) {
         message <- paste("Duplicated row.names of data2, whilst row.names must be unique")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
@@ -912,7 +912,7 @@ viz_volcano_compare <- function(
             merge(
                 x = metadata_feature %>% tibble::rownames_to_column("FeatureNames"),
                 y = data2[, c(x, y)] %>% tibble::rownames_to_column("FeatureNames"),
-                by ="FeatureNames",
+                by = "FeatureNames",
                 all.y = TRUE
             ) %>%
         filter(!is.na(x) | !is.na(x))
@@ -1014,7 +1014,7 @@ viz_volcano_compare <- function(
             selectLab = select_label,
             x = paste(x),
             y = paste(y),
-            xlab  = xlab,
+            xlab = xlab,
             ylab = ylab,
             pCutoff = cutoff_y,
             FCcutoff = cutoff_x,  # Cut off Log2FC, automatically 2
@@ -1028,10 +1028,10 @@ viz_volcano_compare <- function(
             colCustom = keyvals,
             shapeCustom = keyvalsshape,
             colAlpha = 1,
-            title = paste(plot_name, ": ", i, sep =""),
+            title = paste(plot_name, ": ", i, sep = ""),
             subtitle = subtitle,
             caption = paste0("total = ", (nrow(InputVolcano)/2), " ", feature),
-            xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
+            xlim = c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
             ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
             cutoffLineType = "dashed",
             cutoffLineCol = "black",
@@ -1053,7 +1053,7 @@ viz_volcano_compare <- function(
         PlotList[[i]] <- Plot
 
         # Set the total heights and widths
-        PlotTitle <- paste(plot_name, ": ", i, sep ="")
+        PlotTitle <- paste(plot_name, ": ", i, sep = "")
         Plot_Sized <-
             plot_grob_volcano(
                 input_plot = Plot,
@@ -1084,7 +1084,7 @@ viz_volcano_compare <- function(
             save_table = NULL,
             save_plot = save_plot,
             path = folder,
-            file_name = paste("Volcano_",plot_name, sep=""),
+            file_name = paste("Volcano_",plot_name, sep = ""),
             core = FALSE,
             print_plot = print_plot,
             plot_height = plot_height,
@@ -1165,7 +1165,7 @@ viz_volcano_compare <- function(
                 selectLab = select_label,
                 x = paste(x),
                 y = paste(y),
-                xlab  = xlab,
+                xlab = xlab,
                 ylab = ylab,
                 pCutoff = cutoff_y,
                 FCcutoff = cutoff_x,  # Cut off Log2FC, automatically 2
@@ -1182,7 +1182,7 @@ viz_volcano_compare <- function(
                 title = paste(plot_name),
                 subtitle = subtitle,
                 caption = paste0("total = ", (nrow(InputVolcano)/2)," ", feature),
-                xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
+                xlim = c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
                 ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                 cutoffLineType = "dashed",
                 cutoffLineCol = "black",
@@ -1220,11 +1220,11 @@ viz_volcano_compare <- function(
 
             # ----- Save
             save_res(inputlist_df = NULL,
-                inputlist_plot = list("Plot_Sized"= PlotList_adaptedGrid[["Plot_Sized"]]),
+                inputlist_plot = list("Plot_Sized" = PlotList_adaptedGrid[["Plot_Sized"]]),
                 save_table = NULL,
                 save_plot = save_plot,
                 path = folder,
-                file_name = paste("Volcano_",plot_name, sep=""),
+                file_name = paste("Volcano_",plot_name, sep = ""),
                 core = FALSE,
                 print_plot = print_plot,
                 plot_height = plot_height,
@@ -1235,7 +1235,7 @@ viz_volcano_compare <- function(
         }
     }
 
-    return(invisible(list("Plot"= PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
+    return(invisible(list("Plot" = PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
 
 }
 
@@ -1299,22 +1299,22 @@ viz_volcano_pea <- function(
     data2,
     metadata_feature,
     metadata_info,
-    y= "p.adj",
-    x= "Log2FC",
-    xlab= NULL,
+    y = "p.adj",
+    x = "Log2FC",
+    xlab = NULL,
     # "~Log[2]~FC"
-                            ylab= NULL,
+                            ylab = NULL,
     # "~-Log[10]~p.adj"
-                            cutoff_x= 0.5,
-    cutoff_y= 0.05,
-    connectors=  FALSE,
-    select_label= "",
-    plot_name= "",
-    subtitle= "",
+                            cutoff_x = 0.5,
+    cutoff_y = 0.05,
+    connectors = FALSE,
+    select_label = "",
+    plot_name = "",
+    subtitle = "",
     color_palette,
     shape_palette,
-    theme= NULL,
-    feature="Metabolites",
+    theme = NULL,
+    feature = "Metabolites",
     save_plot,
     print_plot,
     folder
@@ -1329,7 +1329,7 @@ viz_volcano_pea <- function(
             "You have chosen Settings =`PEA` that requires you to ",
             "provide a vector for metadata_info."
         )
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
     if (is.null(metadata_feature)) {
@@ -1337,13 +1337,13 @@ viz_volcano_pea <- function(
             "You have chosen Settings =`PEA` that requires you to provide a DF ",
             "metadata_feature including the pathways used for the enrichment analysis."
         )
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
     if (!is.null(metadata_feature) & !is.null(metadata_feature)) {
         if (c("PEA_Feature", "PEA_score", "PEA_Pathway") %>% is_in(names(metadata_info)) %>% all %>% not) {
             message <- paste0("You have chosen Settings =`PEA` that requires you to provide a vector for metadata_info including `PEA_Feature`, `PEA_Pathway`, `PEA_stat` and `PEA_score`.")
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -1354,20 +1354,20 @@ viz_volcano_pea <- function(
 
     # Prepare data:
     data <- data %>%
-    rename("PEA_Feature"= !!metadata_info[["PEA_Feature"]])
+    rename("PEA_Feature" = !!metadata_info[["PEA_Feature"]])
 
 
     data2 <- data2 %>%
     rename(
-        "PEA_score"= !!metadata_info[["PEA_score"]],
-        "PEA_stat"= !!metadata_info[["PEA_stat"]],
-        "PEA_Pathway"= !!metadata_info[["PEA_Pathway"]]
+        "PEA_score" = !!metadata_info[["PEA_score"]],
+        "PEA_stat" = !!metadata_info[["PEA_stat"]],
+        "PEA_Pathway" = !!metadata_info[["PEA_Pathway"]]
     )
 
     metadata_feature <- metadata_feature %>%
     rename(
-        "PEA_Pathway"= !!metadata_info[["PEA_Pathway"]],
-        "PEA_Feature"= !!metadata_info[["PEA_Feature"]]
+        "PEA_Pathway" = !!metadata_info[["PEA_Pathway"]],
+        "PEA_Feature" = !!metadata_info[["PEA_Feature"]]
     )
 
     # # ## # ## # ## # ## # ###
@@ -1390,7 +1390,7 @@ viz_volcano_pea <- function(
             merge(
                 metadata_feature_Select,
                 data,
-                by ="PEA_Feature",
+                by = "PEA_Feature",
                 all.x = TRUE
             ) %>%
             distinct(PEA_Feature, .keep_all = TRUE) %>%
@@ -1443,7 +1443,7 @@ viz_volcano_pea <- function(
                 selectLab = select_label,
                 x = paste(x),
                 y = paste(y),
-                xlab  = xlab,
+                xlab = xlab,
                 ylab = ylab,
                 pCutoff = cutoff_y,
                 FCcutoff = cutoff_x,  # Cut off Log2FC, automatically 2
@@ -1457,10 +1457,10 @@ viz_volcano_pea <- function(
                 colCustom = keyvals,
                 shapeCustom = keyvalsshape,
                 colAlpha = 1,
-                title = paste(plot_name, ": ", i, sep =""),
-                subtitle = paste(metadata_info[["PEA_score"]],"= ", data2_Select$PEA_score, ", ",metadata_info[["PEA_stat"]] , "= ", data2_Select$PEA_stat, sep =""),
+                title = paste(plot_name, ": ", i, sep = ""),
+                subtitle = paste(metadata_info[["PEA_score"]],"= ", data2_Select$PEA_score, ", ",metadata_info[["PEA_stat"]] , "= ", data2_Select$PEA_stat, sep = ""),
                 caption = paste0("total = ", nrow(InputVolcano), " of ", nrow(metadata_feature_Select), " ", feature, " in pathway"),
-                xlim =  c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
+                xlim = c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
                 ylim = c(0,(ceiling(-log10(Reduce(min,InputVolcano[[y]]))))),
                 cutoffLineType = "dashed",
                 cutoffLineCol = "black",
@@ -1482,7 +1482,7 @@ viz_volcano_pea <- function(
             PlotList[[i]] <- Plot
 
             # Set the total heights and widths
-            PlotTitle <- paste(plot_name, ": ", i, sep ="")
+            PlotTitle <- paste(plot_name, ": ", i, sep = "")
             Plot_Sized <-
                 plot_grob_volcano(
                     input_plot = Plot,

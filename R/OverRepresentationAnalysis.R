@@ -85,13 +85,13 @@
 #' @export
 cluster_ora <- function(
     data,
-    metadata_info=c(ClusterColumn="RG2_Significant", BackgroundColumn="BG_method", PathwayTerm= "term", PathwayFeature= "Metabolite"),
-    remove_background=TRUE,
+    metadata_info = c(ClusterColumn = "RG2_Significant", BackgroundColumn = "BG_method", PathwayTerm = "term", PathwayFeature = "Metabolite"),
+    remove_background = TRUE,
     input_pathway,
-    pathway_name="",
-    min_gssize=10,
-    max_gssize=1000,
-    save_table= "csv",
+    pathway_name = "",
+    min_gssize = 10,
+    max_gssize = 1000,
+    save_table = "csv",
     path = NULL
 ) {
 
@@ -159,7 +159,7 @@ cluster_ora <- function(
             FUN = sum
         )
     names(Pathway_Mean)[names(Pathway_Mean) == "x"] <- "Metabolites_in_Pathway"
-    Pathway <- merge(x = Pathway, y = Pathway_Mean,by ="term", all.x = TRUE)
+    Pathway <- merge(x = Pathway, y = Pathway_Mean,by = "term", all.x = TRUE)
     Pathway$Count <- NULL
 
     ## ------------ Run ----------- ##
@@ -173,7 +173,7 @@ cluster_ora <- function(
         g,
         "`: ",
         nrow(grpMetabolites),
-        sep =""
+        sep = ""
     )
 
     clusterGo <- enricher_internal(# From DOSE:::enricher_internal, Author: Guangchuang Yu
@@ -196,8 +196,8 @@ cluster_ora <- function(
             merge(
                 x = clusterGosummary %>% select(-Description),
                 y = Pathway %>% select(term, Metabolites_in_Pathway),
-                by.x ="ID",
-                by.y ="term",
+                by.x = "ID",
+                by.y = "term",
                 all = TRUE
             )
         clusterGosummary$Count[is.na(clusterGosummary$Count)] <- 0
@@ -205,7 +205,7 @@ cluster_ora <- function(
         clusterGosummary <- clusterGosummary[!duplicated(clusterGosummary$ID),]
         clusterGosummary <- clusterGosummary[order(clusterGosummary$p.adjust),]
         clusterGosummary <- clusterGosummary %>%
-        rename("Metabolites_in_pathway"="geneID")
+        rename("Metabolites_in_pathway" = "geneID")
 
         g_save <- gsub("/", "-", g)
         df_list[[g_save]] <- clusterGosummary
@@ -223,13 +223,13 @@ cluster_ora <- function(
         save_table = save_table,
         save_plot = NULL,
         path = folder,
-        file_name = paste("ClusterGosummary",pathway_name, sep="_"),
+        file_name = paste("ClusterGosummary",pathway_name, sep = "_"),
         core = FALSE,
         print_plot = FALSE
     )
 
     # return <- clusterGosummary
-    ORA_Output <- list("DF"= df_list, "ClusterGo"= clusterGo_list)
+    ORA_Output <- list("DF" = df_list, "ClusterGo" = clusterGo_list)
 
     invisible(return(ORA_Output))
 }
@@ -289,14 +289,14 @@ cluster_ora <- function(
 #' @export
 standard_ora <- function(
     data,
-    metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
-    cutoff_stat=0.05,
-    cutoff_percentage=10,
+    metadata_info = c(pvalColumn = "p.adj", percentageColumn = "t.val", PathwayTerm = "term", PathwayFeature = "Metabolite"),
+    cutoff_stat = 0.05,
+    cutoff_percentage = 10,
     input_pathway,
-    pathway_name="",
-    min_gssize=10,
-    max_gssize=1000,
-    save_table="csv",
+    pathway_name = "",
+    min_gssize = 10,
+    max_gssize = 1000,
+    save_table = "csv",
     path = NULL
 ) {
 
@@ -346,7 +346,7 @@ standard_ora <- function(
         merge(
             allMetabolites_DF,
             selectMetabolites_DF[,c("Metabolite", "top/Bottom")],
-            by ="Metabolite",
+            by = "Metabolite",
             all.x = TRUE
         )
 
@@ -381,7 +381,7 @@ standard_ora <- function(
             FUN = sum
         )
     names(Pathway_Mean)[names(Pathway_Mean) == "x"] <- "Metabolites_in_Pathway"
-    Pathway <- merge(x = Pathway, y = Pathway_Mean,by ="term", all.x = TRUE)
+    Pathway <- merge(x = Pathway, y = Pathway_Mean,by = "term", all.x = TRUE)
     Pathway$Count <- NULL
 
     ## ------------ Run ----------- ##
@@ -406,8 +406,8 @@ standard_ora <- function(
             merge(
                 x = clusterGosummary %>% select(-Description),
                 y = Pathway %>% select(term, Metabolites_in_Pathway),
-                by.x ="ID",
-                by.y ="term",
+                by.x = "ID",
+                by.y = "term",
                 all = TRUE
             )
         clusterGosummary$Count[is.na(clusterGosummary$Count)] <- 0
@@ -415,7 +415,7 @@ standard_ora <- function(
         clusterGosummary <- clusterGosummary[!duplicated(clusterGosummary$ID),]
         clusterGosummary <- clusterGosummary[order(clusterGosummary$p.adjust),]
         clusterGosummary <- clusterGosummary %>%
-        rename("Metabolites_in_pathway"="geneID")
+        rename("Metabolites_in_pathway" = "geneID")
     } else {
     stop("None of the Input_data Metabolites were present in any terms of the input_pathway. Hence the ClusterGosummary ouput will be empty. Please check that the metabolite IDs match the pathway IDs.")
     }
@@ -439,7 +439,7 @@ standard_ora <- function(
     )
 
     # Return
-    ORA_output_list <- c( ORA_output_list, list("ClusterGo"= clusterGo))
+    ORA_output_list <- c( ORA_output_list, list("ClusterGo" = clusterGo))
 
     invisible(return(ORA_output_list))
     }

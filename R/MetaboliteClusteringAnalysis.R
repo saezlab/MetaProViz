@@ -82,12 +82,12 @@
 #' @export
 mca_2cond <- function(data_c1,
                         data_c2,
-                        metadata_info_c1=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
-                        metadata_info_c2=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
+                        metadata_info_c1 = c(ValueCol = "Log2FC",StatCol = "p.adj", cutoff_stat = 0.05, ValueCutoff = 1),
+                        metadata_info_c2 = c(ValueCol = "Log2FC",StatCol = "p.adj", cutoff_stat = 0.05, ValueCutoff = 1),
                         feature = "Metabolite",
                         save_table = "csv",
-                        method_background="C1&C2",
-                        path=NULL
+                        method_background = "C1&C2",
+                        path = NULL
                         ){
 
     # NSE vs. R CMD check workaround
@@ -95,37 +95,37 @@ mca_2cond <- function(data_c1,
 
     ################################################################################################################################################################################################
     ## ------------ Check Input files ----------- ##
-    check_param_mca(data_c1=data_c1,
-                                data_c2=data_c2,
-                                data_core=NULL,
-                                data_intra=NULL,
-                                metadata_info_c1=metadata_info_c1,
-                                metadata_info_c2=metadata_info_c2,
-                                metadata_info_core=NULL,
-                                metadata_info_intra=NULL,
-                                method_background=method_background,
-                                feature=feature,
-                                save_table=save_table)
+    check_param_mca(data_c1 = data_c1,
+                                data_c2 = data_c2,
+                                data_core = NULL,
+                                data_intra = NULL,
+                                metadata_info_c1 = metadata_info_c1,
+                                metadata_info_c2 = metadata_info_c2,
+                                metadata_info_core = NULL,
+                                metadata_info_intra = NULL,
+                                method_background = method_background,
+                                feature = feature,
+                                save_table = save_table)
 
     ## ------------ Create Results output folder ----------- ##
     if(!is.null(save_table)){
-    folder <- save_path(folder_name= "MCA2Cond",
-                                    path=path)
+    folder <- save_path(folder_name = "MCA2Cond",
+                                    path = path)
     }
 
     ################################################################################################################################################################################################
     ## ------------ Prepare the Input -------- ##
     #Import the data and check columns (here the user will get an error if the column can not be renamed as it does not exists.)
     Cond1_DF <- as.data.frame(data_c1)%>%
-    rename("MetaboliteID"=paste(feature),
-                    "ValueCol"=metadata_info_c1[["ValueCol"]],
-                    "PadjCol"=metadata_info_c1[["StatCol"]])
+    rename("MetaboliteID" = paste(feature),
+                    "ValueCol" = metadata_info_c1[["ValueCol"]],
+                    "PadjCol" = metadata_info_c1[["StatCol"]])
     Cond1_DF <- Cond1_DF[complete.cases(Cond1_DF$ValueCol, Cond1_DF$PadjCol), ]
 
     Cond2_DF<- as.data.frame(data_c2)%>%
-    rename("MetaboliteID"=paste(feature),
-                    "ValueCol"=metadata_info_c2[["ValueCol"]],
-                    "PadjCol"=metadata_info_c2[["StatCol"]])
+    rename("MetaboliteID" = paste(feature),
+                    "ValueCol" = metadata_info_c2[["ValueCol"]],
+                    "PadjCol" = metadata_info_c2[["StatCol"]])
     Cond2_DF <- Cond2_DF[complete.cases(Cond2_DF$ValueCol, Cond2_DF$PadjCol), ]
 
     #Tag genes that are detected in each data layer
@@ -165,10 +165,10 @@ mca_2cond <- function(data_c1,
 
     colnames(Cond1_DF) <- paste0("Cond1_DF_", colnames(Cond1_DF))
     Cond1_DF <-Cond1_DF%>%
-    rename("MetaboliteID"="Cond1_DF_MetaboliteID")
+    rename("MetaboliteID" = "Cond1_DF_MetaboliteID")
 
     ##Merge
-    MergeDF <- merge(Cond1_DF, Cond2_DF, by="MetaboliteID", all=TRUE)
+    MergeDF <- merge(Cond1_DF, Cond2_DF, by = "MetaboliteID", all = TRUE)
 
     ##Mark the undetected genes in each data layer
     MergeDF<-MergeDF %>%
@@ -413,25 +413,25 @@ mca_2cond <- function(data_c1,
         merge(
             MergeDF_Select1,
             MergeDF_Select2,
-            by="MetaboliteID"
+            by = "MetaboliteID"
         )
     MergeDF_Rearrange <-MergeDF_Rearrange%>%
-    rename("Metabolite"="MetaboliteID")
+    rename("Metabolite" = "MetaboliteID")
 
     ##summary SiRCle clusters (number of genes assigned to each SiRCle cluster in each grouping)
     Clustersummary_RG1 <- MergeDF_Rearrange[,c("Metabolite", "RG1_All")]%>%
-    count(RG1_All, name="Number of Features")%>%
-    rename("SiRCle cluster Name"= "RG1_All")
+    count(RG1_All, name = "Number of Features")%>%
+    rename("SiRCle cluster Name" = "RG1_All")
     Clustersummary_RG1$`Regulation Grouping` <- "RG1_All"
 
     Clustersummary_RG2 <- MergeDF_Rearrange[,c("Metabolite", "RG2_Significant")]%>%
-    count(RG2_Significant, name="Number of Features")%>%
-    rename("SiRCle cluster Name"= "RG2_Significant")
+    count(RG2_Significant, name = "Number of Features")%>%
+    rename("SiRCle cluster Name" = "RG2_Significant")
     Clustersummary_RG2$`Regulation Grouping` <- "RG2_Significant"
 
     Clustersummary_RG3 <- MergeDF_Rearrange[,c("Metabolite", "RG3_SignificantChange")]%>%
-    count(RG3_SignificantChange, name="Number of Features")%>%
-    rename("SiRCle cluster Name"= "RG3_SignificantChange")
+    count(RG3_SignificantChange, name = "Number of Features")%>%
+    rename("SiRCle cluster Name" = "RG3_SignificantChange")
     Clustersummary_RG3$`Regulation Grouping` <- "RG3_SignificantChange"
 
     Clustersummary <-
@@ -451,8 +451,8 @@ mca_2cond <- function(data_c1,
     #Here we make a list in which we will save the outputs:
     DF_List <-
         list(
-            "MCA_2Cond_summary"=Clustersummary,
-            "MCA_2Cond_Results"=MergeDF_Rearrange
+            "MCA_2Cond_summary" = Clustersummary,
+            "MCA_2Cond_Results" = MergeDF_Rearrange
         )
 
     save_res(inputlist_df = DF_List,
@@ -556,12 +556,12 @@ mca_2cond <- function(data_c1,
 #' @export
 mca_core <- function(data_intra,
                     data_core,
-                    metadata_info_intra=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
-                    metadata_info_core=c(DirectionCol="core", ValueCol="Log2(Distance)",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=1),
-                    feature= "Metabolite",
+                    metadata_info_intra = c(ValueCol = "Log2FC",StatCol = "p.adj", cutoff_stat = 0.05, ValueCutoff = 1),
+                    metadata_info_core = c(DirectionCol = "core", ValueCol = "Log2(Distance)",StatCol = "p.adj", cutoff_stat = 0.05, ValueCutoff = 1),
+                    feature = "Metabolite",
                     save_table = "csv",
-                    method_background="Intra&core",
-                    path=NULL
+                    method_background = "Intra&core",
+                    path = NULL
                     ){
 
     # NSE vs. R CMD check workaround
@@ -573,24 +573,24 @@ mca_core <- function(data_intra,
     ################################################################################################################################################################################################
     ## ------------ Check Input files ----------- ##
     check_param_mca(
-        data_c1=NULL,
-        data_c2=NULL,
-        data_core= data_core,
-        data_intra= data_intra,
-        metadata_info_c1=NULL,
-        metadata_info_c2=NULL,
-        metadata_info_core=metadata_info_core,
-        metadata_info_intra=metadata_info_intra,
-        method_background=method_background,
-        feature=feature,
-        save_table=save_table
+        data_c1 = NULL,
+        data_c2 = NULL,
+        data_core = data_core,
+        data_intra = data_intra,
+        metadata_info_c1 = NULL,
+        metadata_info_c2 = NULL,
+        metadata_info_core = metadata_info_core,
+        metadata_info_intra = metadata_info_intra,
+        method_background = method_background,
+        feature = feature,
+        save_table = save_table
     )
 
 
     ## ------------ Create Results output folder ----------- ##
     if(!is.null(save_table)){
-    folder <- save_path(folder_name= "MCAcore",
-                                    path=path)
+    folder <- save_path(folder_name = "MCAcore",
+                                    path = path)
     }
 
 
@@ -598,16 +598,16 @@ mca_core <- function(data_intra,
     ## ------------ Prepare the Input -------- ##
     #Import the data and check columns (here the user will get an error if the column can not be renamed as it does not exists.)
     core_DF <-  as.data.frame(data_core)%>%
-    rename("MetaboliteID"=paste(feature),
-                    "ValueCol"=metadata_info_core[["ValueCol"]],
-                    "PadjCol"=metadata_info_core[["StatCol"]],
-                    "core_Direction"=metadata_info_core[["DirectionCol"]])
+    rename("MetaboliteID" = paste(feature),
+                    "ValueCol" = metadata_info_core[["ValueCol"]],
+                    "PadjCol" = metadata_info_core[["StatCol"]],
+                    "core_Direction" = metadata_info_core[["DirectionCol"]])
     core_DF <- core_DF[complete.cases(core_DF$ValueCol, core_DF$PadjCol), ]
 
     Intra_DF<- as.data.frame(data_intra)%>%
-    rename("MetaboliteID"=paste(feature),
-                    "ValueCol"=metadata_info_intra[["ValueCol"]],
-                    "PadjCol"=metadata_info_intra[["StatCol"]])
+    rename("MetaboliteID" = paste(feature),
+                    "ValueCol" = metadata_info_intra[["ValueCol"]],
+                    "PadjCol" = metadata_info_intra[["StatCol"]])
     Intra_DF <- Intra_DF[complete.cases(Intra_DF$ValueCol, Intra_DF$PadjCol), ]
 
     #Tag genes that are detected in each data layer
@@ -645,10 +645,10 @@ mca_core <- function(data_intra,
 
     colnames(Intra_DF) <- paste0("Intra_DF_", colnames(Intra_DF))
     Intra_DF <-Intra_DF%>%
-    rename("MetaboliteID"="Intra_DF_MetaboliteID")
+    rename("MetaboliteID" = "Intra_DF_MetaboliteID")
 
     ##Merge
-    MergeDF <- merge(Intra_DF, core_DF, by="MetaboliteID", all=TRUE)
+    MergeDF <- merge(Intra_DF, core_DF, by = "MetaboliteID", all = TRUE)
 
     ##Mark the undetected genes in each data layer
     MergeDF<-MergeDF %>%
@@ -1108,10 +1108,10 @@ mca_core <- function(data_intra,
         merge(
             MergeDF_Select1,
             MergeDF_Select2,
-            by="MetaboliteID"
+            by = "MetaboliteID"
         )
     MergeDF_Rearrange <-MergeDF_Rearrange%>%
-    rename("Metabolite"="MetaboliteID")
+    rename("Metabolite" = "MetaboliteID")
 
 
     ##summary SiRCle clusters (number of genes assigned to each SiRCle cluster in each grouping)
@@ -1127,7 +1127,7 @@ mca_core <- function(data_intra,
     group_by(RG2_Significant) %>%
     mutate("Number of Features" = n()) %>%
     distinct(RG2_Significant, .keep_all = TRUE) %>%
-    rename("SiRCle cluster Name"= "RG2_Significant")
+    rename("SiRCle cluster Name" = "RG2_Significant")
     Clustersummary_RG2$`Regulation Grouping` <- "RG2_Significant"
     Clustersummary_RG2 <- Clustersummary_RG2[-c(1)]
 
@@ -1135,7 +1135,7 @@ mca_core <- function(data_intra,
     group_by(RG3_Change) %>%
     mutate("Number of Features" = n()) %>%
     distinct(RG3_Change, .keep_all = TRUE) %>%
-    rename("SiRCle cluster Name"= "RG3_Change")
+    rename("SiRCle cluster Name" = "RG3_Change")
     Clustersummary_RG3$`Regulation Grouping` <- "RG3_Change"
     Clustersummary_RG3 <- Clustersummary_RG3[-c(1)]
 
@@ -1156,8 +1156,8 @@ mca_core <- function(data_intra,
     #Here we make a list in which we will save the outputs:
     DF_List <-
         list(
-            "MCA_core_summary"=Clustersummary,
-            "MCA_core_Results"=MergeDF_Rearrange
+            "MCA_core_summary" = Clustersummary,
+            "MCA_core_Results" = MergeDF_Rearrange
         )
 
     save_res(inputlist_df = DF_List,

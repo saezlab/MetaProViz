@@ -118,8 +118,8 @@ metsigdb_kegg <- function() {
 #' @export
 metsigdb_chemicalclass <- function(
     version = "2.5.4",
-    save_table="csv",
-    path=NULL
+    save_table = "csv",
+    path = NULL
 ) {
 
     # NSE vs. R CMD check workaround
@@ -145,7 +145,7 @@ metsigdb_chemicalclass <- function(
     ##########################################################################
     # Get the directory and filepath of cache results of R
     directory <- user_cache_dir() # get chache directory
-    File_path <- paste(directory, "/RaMP-ChemicalClass_Metabolite.rds", sep ="")
+    File_path <- paste(directory, "/RaMP-ChemicalClass_Metabolite.rds", sep = "")
 
     if (file.exists(File_path)) {# First we will check the users chache directory and weather there are rds files with KEGG_pathways already:
         HMDB_ChemicalClass <- readRDS(File_path)
@@ -159,7 +159,7 @@ metsigdb_chemicalclass <- function(
         merge(
             Structure,
             Class[,c(seq_len(3),10)],
-            by ="ramp_id",
+            by = "ramp_id",
             all.x = TRUE
         ) %>%
     filter(str_starts(class_source_id, "hmdb:")) %>% # Select HMDB only!
@@ -191,13 +191,13 @@ metsigdb_chemicalclass <- function(
     if (!dir.exists(directory)) {dir.create(directory)}
         saveRDS(
             HMDB_ChemicalClass,
-            file = paste(directory, "/RaMP-ChemicalClass_Metabolite.rds", sep ="")
+            file = paste(directory, "/RaMP-ChemicalClass_Metabolite.rds", sep = "")
         )
 
     }
 
     # # -------------- Save and return
-    DF_List <- list("ChemicalClass_MetabSet"= HMDB_ChemicalClass)
+    DF_List <- list("ChemicalClass_MetabSet" = HMDB_ChemicalClass)
     save_res(inputlist_df = DF_List, # This needs to be a list, also for single comparisons
         inputlist_plot = NULL,
         save_table = save_table,
@@ -245,8 +245,8 @@ metsigdb_chemicalclass <- function(
 #' @export
 make_gene_metab_set <- function(
     input_pk,
-    metadata_info=c(Target="gene"),
-    pk_name= NULL,
+    metadata_info = c(Target = "gene"),
+    pk_name = NULL,
     save_table = "csv",
     path = NULL
 ) {
@@ -312,8 +312,8 @@ make_gene_metab_set <- function(
     meta_network_metabs <- meta_network_metabs[grepl("Gene", meta_network_metabs$source) | grepl("Gene", meta_network_metabs$target),] # extract entries with genes in source or Target
 
     # Get reactant and product
-    meta_network_metabs_reactant <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$source),] %>% rename("metab"= 1, "gene"= 2)
-    meta_network_metabs_products <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$target),] %>% rename("gene"= 1, "metab"= 2)
+    meta_network_metabs_reactant <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$source),] %>% rename("metab" = 1, "gene" = 2)
+    meta_network_metabs_products <-  meta_network_metabs[grepl("Metab__HMDB", meta_network_metabs$target),] %>% rename("gene" = 1, "metab" = 2)
 
     meta_network_metabs <- as.data.frame(rbind(meta_network_metabs_reactant, meta_network_metabs_products))
     meta_network_metabs$gene <- gsub("Gene.*__","",meta_network_metabs$gene)
@@ -329,12 +329,12 @@ make_gene_metab_set <- function(
         merge(
             meta_network_metabs,
             input_pk,
-            by.x ="gene",
+            by.x = "gene",
             by.y = metadata_info[["Target"]]
         )
 
     # combine with pathways --> File that can be used for combined pathway analysis (metabolites and gene t.vals)
-    GeneMetabSet <- unique(as.data.frame(rbind(input_pk %>% dplyr::rename("feature"= metadata_info[["Target"]]), MetabSet[,-1] %>% dplyr::rename("feature"= 1))))
+    GeneMetabSet <- unique(as.data.frame(rbind(input_pk %>% dplyr::rename("feature" = metadata_info[["Target"]]), MetabSet[,-1] %>% dplyr::rename("feature" = 1))))
 
 
     # # ------------ Select metabolites only
@@ -344,8 +344,8 @@ make_gene_metab_set <- function(
 
     # # -------------- Save and return
     DF_List <- list(
-        "GeneMetabSet"= GeneMetabSet,
-        "MetabSet"= MetabSet
+        "GeneMetabSet" = GeneMetabSet,
+        "MetabSet" = MetabSet
     )
     save_res(inputlist_df = DF_List, # This needs to be a list, also for single comparisons
         inputlist_plot = NULL,
@@ -424,8 +424,8 @@ metsigdb_metalinks <- function(
     pathway = NULL,
     hmdb_ids = NULL,
     uniprot_ids = NULL,
-    save_table="csv",
-    path=NULL
+    save_table = "csv",
+    path = NULL
 ) {
 
     # NSE vs. R CMD check workaround
@@ -614,7 +614,7 @@ metsigdb_metalinks <- function(
         merge(
             MetalinksDB,
             TablesList[["metabolites"]],
-            by ="hmdb",
+            by = "hmdb",
             all.x = TRUE
         )
 
@@ -623,7 +623,7 @@ metsigdb_metalinks <- function(
         merge(
             MetalinksDB,
             TablesList[["proteins"]],
-            by ="uniprot",
+            by = "uniprot",
             all.x = TRUE
         )
 

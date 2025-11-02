@@ -125,12 +125,12 @@
 processing <- function(
         data,
         metadata_sample = NULL,
-        metadata_info= c(Conditions="Conditions"),
+        metadata_info = c(Conditions = "Conditions"),
         featurefilt = "Modified",
         cutoff_featurefilt = 0.8,
         tic = TRUE,
-        mvi= TRUE,
-        mvi_percentage=50,
+        mvi = TRUE,
+        mvi_percentage = 50,
         hotellins_confidence = 0.99,
         core = FALSE,
         save_plot = "svg",
@@ -324,12 +324,12 @@ processing <- function(
 
     if (core) {
         if (is.null(data_coreNorm[["DF"]][["Contigency_table_core_blank"]])) {
-            DFList_core <- list( "CV_core_blank"= data_coreNorm[["DF"]][["CV_core_blank"]])
+            DFList_core <- list( "CV_core_blank" = data_coreNorm[["DF"]][["CV_core_blank"]])
         } else {
             DFList_core <-
                 list(
-                    "CV_core_blank"= data_coreNorm[["DF"]][["CV_core_blank"]],
-                    "Variation_ContigencyTable_core_blank"= data_coreNorm[["DF"]][["Contigency_table_core_blank"]]
+                    "CV_core_blank" = data_coreNorm[["DF"]][["CV_core_blank"]],
+                    "Variation_ContigencyTable_core_blank" = data_coreNorm[["DF"]][["Contigency_table_core_blank"]]
                 )
         }
         DFList <- c(DFList, DFList_core)
@@ -346,12 +346,12 @@ processing <- function(
         PlotList <- c(PlotList , data_coreNorm[["Plot"]])
     }
 
-    Res_List <- list("DF"= DFList ,"Plot" = PlotList)
+    Res_List <- list("DF" = DFList ,"Plot" = PlotList)
 
     # Save Plots and DFs
     # As row names are not saved we need to make row.names to column for the DFs that needs this:
-    DFList[["data_Rawdata"]] <- DFList[["data_Rawdata"]] %>% tibble::rownames_to_column("Code")
-    DFList[["Preprocessing_output"]] <- DFList[["Preprocessing_output"]] %>% tibble::rownames_to_column("Code")
+    DFList[["data_Rawdata"]] %<>% rownames_to_column("Code")
+    DFList[["Preprocessing_output"]] %<>% rownames_to_column("Code")
 
     save_res(inputlist_df = DFList,
         inputlist_plot = PlotList,
@@ -386,14 +386,14 @@ processing <- function(
         #Make list of se files:
         Se_list <-
             list(
-                "data_Rawdata"= input_data,
+                "data_Rawdata" = input_data,
                 "Preprocessing_output" = se_new
             )
         Res_List <-
             list(
-                "SE"= Se_list,
-                "DF"=Res_List[["DF"]],
-                "Plot"= Res_List[["Plot"]]
+                "SE" = Se_list,
+                "DF" = Res_List[["DF"]],
+                "Plot" = Res_List[["Plot"]]
             )
         #Return
         invisible(return(Res_List))
@@ -454,7 +454,7 @@ processing <- function(
 replicate_sum <- function(
         data,
         metadata_sample = NULL,
-        metadata_info = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"),
+        metadata_info = c(Conditions = "Conditions", Biological_Replicates = "Biological_Replicates", Analytical_Replicates = "Analytical_Replicates"),
         save_table = "csv",
         path = NULL
 ) {
@@ -517,12 +517,12 @@ replicate_sum <- function(
     ## ------------  Load data and process  ----------- ##
     Input <- merge(x = metadata_sample %>% select(!!metadata_info[["Conditions"]], !!metadata_info[["Biological_Replicates"]], !!metadata_info[["Analytical_Replicates"]]),
     y = data,
-    by ="row.names") %>%
+    by = "row.names") %>%
     column_to_rownames("Row.names") %>%
     rename(
-            "Conditions"= metadata_info[["Conditions"]],
-            "Biological_Replicates"= metadata_info[["Biological_Replicates"]],
-            "Analytical_Replicates"= metadata_info[["Analytical_Replicates"]]
+            "Conditions" = metadata_info[["Conditions"]],
+            "Biological_Replicates" = metadata_info[["Biological_Replicates"]],
+            "Analytical_Replicates" = metadata_info[["Analytical_Replicates"]]
         )
 
     # Make the replicate Sums
@@ -536,7 +536,7 @@ replicate_sum <- function(
     summarise_all("max") %>%
     ungroup() %>%
     select(Analytical_Replicates, Biological_Replicates, Conditions) %>%
-    rename("n_AnalyticalReplicates_Summed"= "Analytical_Replicates")
+    rename("n_AnalyticalReplicates_Summed" = "Analytical_Replicates")
 
     Input_data_numeric_summed <-
         merge(
@@ -547,7 +547,7 @@ replicate_sum <- function(
         unite(
             UniqueID,
             c("Conditions","Biological_Replicates"),
-            sep ="_",
+            sep = "_",
             remove = FALSE
         ) %>% # Create a uniqueID
         column_to_rownames("UniqueID")# set UniqueID to rownames
@@ -663,7 +663,7 @@ pool_estimation <- function(
         cutoff_cv = 30,
         save_plot = "svg",
         save_table = "csv",
-        print_plot=TRUE,
+        print_plot = TRUE,
         path = NULL
 ) {
 
@@ -809,7 +809,7 @@ pool_estimation <- function(
         pca_QC_pool <- invisible(
             viz_pca(data = pca_data,
                     plot_name = "QC Pool samples",
-                    save_plot =  NULL)
+                    save_plot = NULL)
         )
     } else {
         pca_data <-
@@ -825,10 +825,10 @@ pool_estimation <- function(
             )
 
         pca_QC_pool <- invisible(viz_pca(data = pca_data %>% select(-all_of(metadata_info[["Conditions"]]), -Sample_type),
-        metadata_info = c(color ="Sample_type"),
+        metadata_info = c(color = "Sample_type"),
         metadata_sample = pca_data,
         plot_name = "QC Pool samples",
-        save_plot =  NULL))
+        save_plot = NULL))
     }
     dev.off()
     PlotList [["PCAPlot_PoolSamples"]] <- pca_QC_pool[["Plot_Sized"]][["Plot_Sized"]]
@@ -839,22 +839,22 @@ pool_estimation <- function(
     HistCV <- invisible(ggplot(result_df_final_out, aes(CV)) +
                             geom_histogram(
                                 aes(y = after_stat(density)),
-                                color ="black",
-                                fill ="white"
+                                color = "black",
+                                fill = "white"
                             )+
                             geom_vline(aes(xintercept = cutoff_cv),
-                            color ="darkred", linetype ="dashed", size = 1)+
-                            geom_density(alpha =.2, fill ="#FF6666") +
+                            color = "darkred", linetype = "dashed", size = 1)+
+                            geom_density(alpha = .2, fill = "#FF6666") +
                             labs(
-                                title ="CV for metabolites of Pool samples",
-                                x ="Coefficient of variation (CV%)",
+                                title = "CV for metabolites of Pool samples",
+                                x = "Coefficient of variation (CV%)",
                                 y = "Frequency"
                             )+
                             theme_classic())
 
     HistCV_Sized <-
         plotGrob_Processing(
-            input_plot =  HistCV,
+            input_plot = HistCV,
             plot_name = "CV for metabolites of Pool samples",
             plot_type = "Hist"
         )
@@ -864,10 +864,10 @@ pool_estimation <- function(
     log_trace('CV violin plot.')
     # Make Violin of CVs
     Plot_cv_result_df <- result_df_final_out %>%
-    mutate(HighVar = ifelse((CV > cutoff_cv), paste("> CV", cutoff_cv, sep =""), paste("< CV", cutoff_cv, sep ="")))
+    mutate(HighVar = ifelse((CV > cutoff_cv), paste("> CV", cutoff_cv, sep = ""), paste("< CV", cutoff_cv, sep = "")))
 
     ViolinCV <- invisible(ggplot( Plot_cv_result_df, aes(y = CV, x = HighVar, label = Plot_cv_result_df$Metabolite))+
-    geom_violin(alpha = 0.5 , fill ="#FF6666")+
+    geom_violin(alpha = 0.5 , fill = "#FF6666")+
     geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
     geom_text_repel(
         aes(label = ifelse(Plot_cv_result_df$CV > cutoff_cv,
@@ -881,8 +881,8 @@ pool_estimation <- function(
         max.overlaps = Inf
         ) + # allow for many labels
         labs(
-            title ="CV for metabolites of Pool samples",
-            x ="Metabolites",
+            title = "CV for metabolites of Pool samples",
+            x = "Metabolites",
             y = "Coefficient of variation (CV%)"
         )+
         theme_classic())
@@ -910,7 +910,7 @@ pool_estimation <- function(
     } else {
         DF_list <- list("data" = data, "CV" = result_df_final_out)
     }
-    ResList <- list("DF"= DF_list,"Plot"= PlotList)
+    ResList <- list("DF" = DF_list,"Plot" = PlotList)
 
     # Save
     DF_list[["data"]]<-  DF_list[["data"]] %>% tibble::rownames_to_column("Code")
@@ -950,9 +950,9 @@ pool_estimation <- function(
         #Add to ResList:
         ResList <-
             list(
-                "SE"= se_new,
-                "DF"= ResList[["DF"]],
-                "Plot"=  ResList[["Plot"]]
+                "SE" = se_new,
+                "DF" = ResList[["DF"]],
+                "Plot" = ResList[["Plot"]]
             )
 
         #Return
@@ -1027,9 +1027,9 @@ feature_filtering <- function(
         data,
         metadata_sample,
         metadata_info,
-        core=FALSE,
-        featurefilt="Modified",
-        cutoff_featurefilt=0.8
+        core = FALSE,
+        featurefilt = "Modified",
+        cutoff_featurefilt = 0.8
 ) {
     ## ------------ Create log file ----------- ##
     metaproviz_init()
@@ -1050,7 +1050,7 @@ feature_filtering <- function(
                 "feature_filtering: Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values (REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004). ",
                 "Filtering value selected: ",
                 cutoff_featurefilt,
-                sep =""
+                sep = ""
             )
         log_info(message)
         message(message)
@@ -1146,7 +1146,7 @@ feature_filtering <- function(
 
     Filtered_results <-
         list(
-            "DF"= filtered_matrix,
+            "DF" = filtered_matrix,
             "RemovedMetabolites" = features_filtered
         )
     invisible(return(Filtered_results))
@@ -1208,8 +1208,8 @@ mvi_imputation <- function(
         data,
         metadata_sample,
         metadata_info,
-        core=FALSE,
-        mvi_percentage=50
+        core = FALSE,
+        mvi_percentage = 50
 ) {
 
     # NSE vs. R CMD check workaround
@@ -1399,7 +1399,7 @@ tic_norm <- function(
         data,
         metadata_sample,
         metadata_info,
-        tic=TRUE
+        tic = TRUE
 ) {
 
     # NSE vs. R CMD check workaround
@@ -1420,7 +1420,7 @@ tic_norm <- function(
                 nan_count,
                 "NaN values due to 0s in the data."
             )
-        log_trace("Warning: ", message, sep ="")
+        log_trace("Warning: ", message, sep = "")
         warning(message)
     }
 
@@ -1515,13 +1515,13 @@ tic_norm <- function(
         ## ------------------ Return ------------------ ##
         Output_list <-
             list(
-                "DF" = list("data_tic"= as.data.frame(data_tic)),
-                "Plot"= list( "norm_plots"= norm_plots, "RLA_AfterticNorm"= RLA_data_norm,  "RLA_BeforeticNorm" = RLA_data_raw )
+                "DF" = list("data_tic" = as.data.frame(data_tic)),
+                "Plot" = list( "norm_plots" = norm_plots, "RLA_AfterticNorm" = RLA_data_norm,  "RLA_BeforeticNorm" = RLA_data_raw )
             )
         invisible(return(Output_list))
     } else {
         ## ------------------ Return ------------------ ##
-        Output_list <- list("Plot"= list("RLA_BeforeticNorm" = RLA_data_raw))
+        Output_list <- list("Plot" = list("RLA_BeforeticNorm" = RLA_data_raw))
         invisible(return(Output_list))
     }
 }
@@ -1594,7 +1594,7 @@ core_norm <- function(
 
     if (dim(core_medias)[1] == 1) {
         message <- paste0("Only 1 core_media sample was found. Thus, the consistency of the core_media samples cannot be checked. It is assumed that the core_media samples are already summed.")
-        log_trace(paste("Warning: ", message, sep =""))
+        log_trace(paste("Warning: ", message, sep = ""))
         warning(message)
 
         core_media_df <- core_medias %>% t() %>% as.data.frame()
@@ -1620,10 +1620,10 @@ core_norm <- function(
 
         dev.new()
         pca_QC_media <- invisible(viz_pca(data = media_pca_data %>% dplyr::select(-metadata_info[["Conditions"]], -Sample_type),
-        metadata_info = c(color ="Sample_type"),
+        metadata_info = c(color = "Sample_type"),
         metadata_sample = media_pca_data,
         plot_name = "QC Media_samples",
-        save_plot =  NULL))
+        save_plot = NULL))
         dev.off()
 
         PlotList[["PCA_coreMediaSamples"]] <- pca_QC_media[["Plot_Sized"]][["QC Media_samples"]]
@@ -1670,15 +1670,15 @@ core_norm <- function(
         HistCV <- invisible(ggplot(cv_result_df, aes(CV)) +
                                 geom_histogram(
                                     aes(y = after_stat(density)),
-                                    color ="black",
-                                    fill ="white"
+                                    color = "black",
+                                    fill = "white"
                                 )+
                                 geom_vline(aes(xintercept = cutoff_cv),
-                                color ="darkred", linetype ="dashed", linewidth = 1)+
-                                geom_density(alpha =.2, fill ="#FF6666") +
+                                color = "darkred", linetype = "dashed", linewidth = 1)+
+                                geom_density(alpha = .2, fill = "#FF6666") +
                                 labs(
-                                    title ="CV for metabolites of control media samples (no cells)",
-                                    x ="Coefficient of variation (CV)",
+                                    title = "CV for metabolites of control media samples (no cells)",
+                                    x = "Coefficient of variation (CV)",
                                     y = "Frequency"
                                 )+
                                 theme_classic())
@@ -1697,7 +1697,7 @@ core_norm <- function(
         mutate(HighVar = ifelse(HighVar, "> CV 30", "< CV 30"))
 
         ViolinCV <- invisible(ggplot(Plot_cv_result_df, aes(y = CV, x = HighVar, label = row.names(cv_result_df)))+
-        geom_violin(alpha = 0.5 , fill ="#FF6666")+
+        geom_violin(alpha = 0.5 , fill = "#FF6666")+
         geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
         geom_text_repel(
             aes(label = ifelse(Plot_cv_result_df$CV > cutoff_cv,
@@ -1711,8 +1711,8 @@ core_norm <- function(
             max.overlaps = Inf
             ) + # allow for many labels
             labs(
-                title ="CV for metabolites of control media samples (no cells)",
-                x ="Metabolites",
+                title = "CV for metabolites of control media samples (no cells)",
+                x = "Metabolites",
                 y = "Coefficient of variation (CV)"
             )+
             theme_classic())
@@ -1826,7 +1826,7 @@ core_norm <- function(
                         paste(different_samples, collapse = ", "),
                         " were found to be different from the rest. They will not be included in the sum of the core_media samples."
                     )
-                log_trace("Warning: " , message, sep ="")
+                log_trace("Warning: " , message, sep = "")
                 warning(message)
             }
             # Filter the core_media samples
@@ -1837,7 +1837,7 @@ core_norm <- function(
             message(message)
 
         }
-        core_media_df <- as.data.frame(data.frame("core_mediaMeans"=  colMeans(core_medias, na.rm = TRUE)))
+        core_media_df <- as.data.frame(data.frame("core_mediaMeans" = colMeans(core_medias, na.rm = TRUE)))
     }
 
     cv_result_df <- rownames_to_column(cv_result_df, "Metabolite")
@@ -1853,7 +1853,7 @@ core_norm <- function(
         core_norm_factor <-   metadata_sample %>% filter(!!as.name(metadata_info[["Conditions"]]) !=metadata_info[["core_media"]]) %>% select(metadata_info[["core_norm_factor"]]) %>% dplyr::pull()
         if (var(core_norm_factor) ==  0) {
             message <- paste("The growth rate or growth factor for normalising the core result, is the same for all samples")
-            log_trace("Warning: " , message, sep ="")
+            log_trace("Warning: " , message, sep = "")
             warning(message)
         }
     } else {
@@ -1861,7 +1861,7 @@ core_norm <- function(
     }
 
     # Remove core_media samples from the data
-    data_tic <- merge(metadata_sample, data_tic, by ="row.names") %>%
+    data_tic <- merge(metadata_sample, data_tic, by = "row.names") %>%
     filter(!!as.name(metadata_info[["Conditions"]]) !=metadata_info[["core_media"]]) %>%
     column_to_rownames("Row.names") %>%
     select(-seq_len(ncol(metadata_sample)))
@@ -1891,7 +1891,7 @@ core_norm <- function(
     }
 
     # Return
-    Output_list <- list("DF"= DF_list,"Plot"= PlotList)
+    Output_list <- list("DF" = DF_list,"Plot" = PlotList)
     invisible(return(Output_list))
 }
 
@@ -1959,8 +1959,8 @@ outlier_detection <- function(
         data,
         metadata_sample,
         metadata_info,
-        core=FALSE,
-        hotellins_confidence=0.99
+        core = FALSE,
+        hotellins_confidence = 0.99
 ) {
 
     # NSE vs. R CMD check workaround
@@ -2011,7 +2011,7 @@ outlier_detection <- function(
         }
 
         # # ---  PCA
-        PCA.res <- prcomp(data_norm, center =  TRUE, scale. =  TRUE)
+        PCA.res <- prcomp(data_norm, center = TRUE, scale. = TRUE)
         outlier_PCA_data <- data_norm
         outlier_PCA_data[[metadata_info[["Conditions"]]]] <- Conditions
 
@@ -2021,13 +2021,13 @@ outlier_detection <- function(
                     metadata_info = c(color = metadata_info[["Conditions"]]),
                     metadata_sample = outlier_PCA_data,
                     plot_name = paste("PCA outlier test filtering round ",loop),
-                    save_plot =  NULL)
+                    save_plot = NULL)
         )
 
         if (loop == 1) {
             pca_outlierloop1 <- pca_outlier[["Plot_Sized"]][[1]]
         }
-        outlier_plot_list[[paste("PCA_round",loop,sep ="")]] <- pca_outlier[["Plot_Sized"]][[1]]
+        outlier_plot_list[[paste("PCA_round",loop,sep = "")]] <- pca_outlier[["Plot_Sized"]][[1]]
         dev.off()
 
         # # --- Scree plot
@@ -2077,7 +2077,7 @@ outlier_detection <- function(
         }
         dev.new()
 
-        outlier_plot_list[[paste("ScreePlot_round",loop,sep ="")]] <- screeplot # save plot
+        outlier_plot_list[[paste("ScreePlot_round",loop,sep = "")]] <- screeplot # save plot
         dev.off()
 
         # # --- HotellingT2 test for outliers
@@ -2155,7 +2155,7 @@ outlier_detection <- function(
         }
         dev.new()
         # plot(HotellingT2plot)
-        outlier_plot_list[[paste("HotellingsPlot_round",loop,sep ="")]] <- HotellingT2plot
+        outlier_plot_list[[paste("HotellingsPlot_round",loop,sep = "")]] <- HotellingT2plot
         dev.off()
 
         a <- loop
@@ -2219,7 +2219,7 @@ outlier_detection <- function(
 
     if (zero_var_metab_warning) {
         message <- paste("Metabolites with zero variance have been identified in the data. As scaling in PCA cannot be applied when features have zero variace, these metabolites are not taken into account for the outlier detection and the PCA plots.")
-        log_trace("Warning: " , message, sep ="")
+        log_trace("Warning: " , message, sep = "")
         warning(message)
     }
 
@@ -2284,7 +2284,7 @@ outlier_detection <- function(
             Outliers == "Outlier_filtering_round_4" ~ ' Outlier_filtering_round = 4',
             TRUE ~ 'Outlier_filtering_round = or > 5')
         )
-    Metadata_Sample$Outliers <- relevel(as.factor(Metadata_Sample$Outliers), ref ="no")
+    Metadata_Sample$Outliers <- relevel(as.factor(Metadata_Sample$Outliers), ref = "no")
 
     # 1. Shape Outliers
     if (length(sample_outliers)>0) {
@@ -2293,7 +2293,7 @@ outlier_detection <- function(
                                     metadata_info = c(color = metadata_info[["Conditions"]], shape = "Outliers"),
                                     metadata_sample = Metadata_Sample ,
                                     plot_name = "Quality Control PCA Condition clustering and outlier check",
-                                    save_plot =  NULL))
+                                    save_plot = NULL))
         dev.off()
         outlier_plot_list[["QC_PCA_and_Outliers"]] <- pca_QC[["Plot_Sized"]][[1]]
     }
@@ -2304,8 +2304,8 @@ outlier_detection <- function(
         pca_QC_repl <- invisible(viz_pca(data = as.data.frame(data) %>% dplyr::select(-zero_var_metab_export_df$Metabolite),
         metadata_info = c(color = metadata_info[["Conditions"]], shape = metadata_info[["Biological_Replicates"]]),
         metadata_sample = Metadata_Sample,
-        plot_name =  "Quality Control PCA replicate spread check",
-        save_plot =  NULL))
+        plot_name = "Quality Control PCA replicate spread check",
+        save_plot = NULL))
         dev.off()
 
         outlier_plot_list[["QC_PCA_Replicates"]] <- pca_QC_repl[["Plot_Sized"]][[1]]
@@ -2321,6 +2321,6 @@ outlier_detection <- function(
         )
 
     # Return
-    Output_list <- list("DF"= DF_list,"Plot"= outlier_plot_list)
+    Output_list <- list("DF" = DF_list,"Plot" = outlier_plot_list)
     invisible(return(Output_list))
 }

@@ -60,16 +60,16 @@
 #' @noRd
 check_param <- function(
     data,
-    data_num=TRUE,
-    metadata_sample=NULL,
-    metadata_feature=NULL,
-    metadata_info=NULL,
-    save_plot=NULL,
-    save_table=NULL,
-    core=FALSE,
-    print_plot=FALSE,
-    theme=NULL,
-    plot_types=NULL
+    data_num = TRUE,
+    metadata_sample = NULL,
+    metadata_feature = NULL,
+    metadata_info = NULL,
+    save_plot = NULL,
+    save_table = NULL,
+    core = FALSE,
+    print_plot = FALSE,
+    theme = NULL,
+    plot_types = NULL
 ) {
     # # ## # ## # ## # ### Parameters valid for multiple MetaProViz functions
 
@@ -82,12 +82,12 @@ check_param <- function(
                 ".",
                 sep = ""
             )
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
     if (any(duplicated(row.names(data)))) {
         message <- paste0("Duplicated row.names of data, whilst row.names must be unique")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
@@ -95,14 +95,14 @@ check_param <- function(
         Test_num <- apply(data, 2, function(x) is.numeric(x))
     if ((!any(Test_num))) {
         message <- paste0("data needs to be of class numeric")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
         }
     }
 
     if (sum(duplicated(colnames(data))) > 0) {
         message <- paste0("data contained duplicates column names, whilst col.names must be unique.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
@@ -113,11 +113,11 @@ check_param <- function(
                 metadata_sample,
                 data,
                 by = "row.names",
-                all =  FALSE
+                all = FALSE
             )
     if (nrow(Test_match) ==  0) {
         message <- paste0("row.names data need to match row.names metadata_sample.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
         }
     }
@@ -128,7 +128,7 @@ check_param <- function(
                 metadata_feature,
                 as.data.frame(t(data)),
                 by = "row.names",
-                all =  FALSE
+                all = FALSE
             )
     if (nrow(Test_match) ==  0) {
         stop("col.names data need to match row.names metadata_feature.")
@@ -142,7 +142,7 @@ check_param <- function(
                 "metadata_info should be NULL or a vector. It's currently a ",
                 paste(class(metadata_info), ".", sep = "")
             )
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
@@ -156,7 +156,7 @@ check_param <- function(
                     metadata_info[["Conditions"]],
                     " column selected as Conditions in metadata_info was not found in SettingsFile. Please check your input."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -170,7 +170,7 @@ check_param <- function(
                     metadata_info[["Biological_Replicates"]],
                     " column selected as Biological_Replicates in metadata_info was not found in metadata_sample. Please check your input."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -184,7 +184,7 @@ check_param <- function(
                     metadata_info[["Numerator"]],
                     " column selected as numerator in metadata_info was not found in metadata_sample. Please check your input."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -198,7 +198,7 @@ check_param <- function(
                     metadata_info[["Denominator"]],
                     " column selected as denominator in metadata_info was not found in metadata_sample. Please check your input."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -214,7 +214,7 @@ check_param <- function(
                 paste(metadata_info[["Numerator"]]),
                 " has been selected as a numerator. Please add a denominator for 1-vs-1 comparison or remove the numerator for all-vs-all comparison."
             )
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
@@ -227,7 +227,7 @@ check_param <- function(
                     metadata_info[["Superplot"]],
                     " column selected as Superplot column in metadata_info was not found in metadata_sample. Please check your input."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -243,7 +243,7 @@ check_param <- function(
                         metadata_info[["color"]],
                         " column selected as color in metadata_info was not found in metadata_sample. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -257,7 +257,7 @@ check_param <- function(
                         metadata_info[["shape"]],
                         " column selected as shape in metadata_info was not found in metadata_sample. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -271,7 +271,7 @@ check_param <- function(
                         metadata_info[["individual"]],
                         " column selected as individual in metadata_info was not found in metadata_sample. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -284,7 +284,7 @@ check_param <- function(
                         metadata_info[["color"]],
                         " column selected as color in metadata_info was not found in metadata_feature. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -298,7 +298,7 @@ check_param <- function(
                         metadata_info[["shape"]],
                         " column selected as shape in metadata_info was not found in metadata_feature. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -312,7 +312,7 @@ check_param <- function(
                         metadata_info[["individual"]],
                         " column selected as individual in metadata_info was not found in metadata_feature. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -326,7 +326,7 @@ check_param <- function(
                         metadata_info[["color_Sample"]],
                         " column selected as color_Sample in metadata_info was not found in metadata_sample. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -340,12 +340,12 @@ check_param <- function(
                         metadata_info[["color_Metab"]],
                         " column selected as color_Metab in metadata_info was not found in metadata_feature. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
             if (sum(colnames(data) %in% metadata_feature$Metabolite) < length(data)  ) {
                 message <- paste0("The data contains metabolites not found in metadata_feature.")
-                log_trace(paste("Warning ", message, sep =""))
+                log_trace(paste("Warning ", message, sep = ""))
                 warning(message)
             }
         }
@@ -359,7 +359,7 @@ check_param <- function(
                         metadata_info[["shape_Metab"]],
                         " column selected as shape_Metab in metadata_info was not found in metadata_feature. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -373,7 +373,7 @@ check_param <- function(
                         metadata_info[["shape_Sample"]],
                         " column selected as shape_Metab in metadata_info was not found in metadata_sample. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -387,7 +387,7 @@ check_param <- function(
                         metadata_info[["individual_Metab"]],
                         " column selected as individual_Metab in metadata_info was not found in metadata_feature. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -401,7 +401,7 @@ check_param <- function(
                         metadata_info[["individual_Sample"]],
                         " column selected as individual_Sample in metadata_info was not found in metadata_sample. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -421,7 +421,7 @@ check_param <- function(
                 paste(Save_as_Plot_options,collapse = ", "),
                 " or set to NULL if no plots should be saved."
             )
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
     }
@@ -441,7 +441,7 @@ check_param <- function(
                     paste(save_table_options,collapse = ", "),
                     " or set to NULL if no tables should be saved."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -449,7 +449,7 @@ check_param <- function(
     # -------------core
     if (!is.logical(core)) {
         message <- paste0("Check input. The core value should be either = TRUE for preprocessing of Consuption/Release experiment or = FALSE if not.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
@@ -475,14 +475,14 @@ check_param <- function(
                     paste(theme_options, collapse = ", "),
                     "."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
     # ------------- general
     if (!is.logical(print_plot)) {
         message <- paste0("Check input. print_plot should be either = TRUE or = FALSE.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 }
@@ -529,12 +529,12 @@ check_param <- function(
 check_param_processing <- function(
     metadata_sample,
     metadata_info,
-    core=FALSE,
+    core = FALSE,
     featurefilt = "Modified",
     cutoff_featurefilt = 0.8,
     tic = TRUE,
-    mvi= TRUE,
-    mvi_percentage=50,
+    mvi = TRUE,
+    mvi_percentage = 50,
     hotellins_confidence = 0.99
 ) {
 
@@ -543,20 +543,20 @@ check_param_processing <- function(
         # core
         if (core) {   # parse core normalisation factor
             message <- paste0("For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.")
-            log_trace(paste("Message ", message, sep =""))
+            log_trace(paste("Message ", message, sep = ""))
             message(message)
             if ("core_media" %in% names(metadata_info)) {
                 if (length(grep(metadata_info[["core_media"]], metadata_sample[[metadata_info[["Conditions"]]]])) < 1) {     # Check for core_media samples
                     message <- paste0("No core_media samples were provided in the 'Conditions' in the metadata_sample. For a core experiment control media samples without cells have to be measured and be added in the 'Conditions'
                                     column labeled as 'core_media' (see @param section). Please make sure that you used the correct labelling or whether you need core = FALSE for your analysis")
-                    log_trace(paste("Error ", message, sep =""))
+                    log_trace(paste("Error ", message, sep = ""))
                     stop(message)
                 }
             }
 
             if (!("core_norm_factor" %in% names(metadata_info))) {
                 message <- paste0("No growth rate or growth factor provided for normalising the core result, hence core_norm_factor set to 1 for each sample")
-                log_trace(paste("Warning ", message, sep =""))
+                log_trace(paste("Warning ", message, sep = ""))
                 warning(message)
             }
         }
@@ -571,7 +571,7 @@ check_param_processing <- function(
                 paste(Feature_Filtering_options,collapse = ", "),
                 "."
             )
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
     if (
@@ -580,17 +580,17 @@ check_param_processing <- function(
         cutoff_featurefilt < 0
     ) {
         message <- paste0("Check input. The selected cutoff_featurefilt should be numeric and between 0 and 1.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
     if (!is.logical(tic)) {
         message <- paste0("Check input. The tic value should be either `TRUE` if tic normalization is to be performed or `FALSE` if no data normalization is to be applied.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
     if (!is.logical(mvi)) {
         message <- paste0("Check input. The mvi value should be either `TRUE` if mising value imputation should be performed or `FALSE` if not.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
     if (
@@ -599,7 +599,7 @@ check_param_processing <- function(
         hotellins_confidence < 0
     ) {
         message <- paste0("Check input. The selected mvi_percentage value should be numeric and between 0 and 100.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
     if (
@@ -608,7 +608,7 @@ check_param_processing <- function(
         hotellins_confidence < 0
     ) {
         message <- paste0("Check input. The selected hotellins_confidence value should be numeric and between 0 and 1.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 }
@@ -663,19 +663,19 @@ check_param_processing <- function(
 check_param_dma <- function(
     data,
     metadata_sample,
-    metadata_info= c(Conditions="Conditions", Numerator = NULL, Denominator  = NULL),
-    pval ="lmFit",
-    padj="fdr",
-    vst=FALSE,
-    shapiro =TRUE,
-    bartlett =TRUE,
-    transform=TRUE
+    metadata_info = c(Conditions = "Conditions", Numerator = NULL, Denominator = NULL),
+    pval = "lmFit",
+    padj = "fdr",
+    vst = FALSE,
+    shapiro = TRUE,
+    bartlett = TRUE,
+    transform = TRUE
 ) {
 
     # -------------metadata_info
     if (is.null(metadata_info)) {
         message <- paste0("You have to provide metadata_info's for Conditions.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
@@ -731,7 +731,7 @@ check_param_dma <- function(
                     paste(STAT_pval_options,collapse = ", "),
                     " or specify numerator and denumerator."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     } else {
@@ -743,7 +743,7 @@ check_param_dma <- function(
                     paste(STAT_pval_options,collapse = ", "),
                     " or change numerator and denumerator."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -766,7 +766,7 @@ check_param_dma <- function(
                 paste(STAT_padj_options,collapse = ", "),
                 "."
             )
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
@@ -785,7 +785,7 @@ check_param_dma <- function(
                 numerator,
                 ", so no statistical test can be performed."
             )
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     } else if (nrow(Denom) == 1) {
     message <-
@@ -794,15 +794,15 @@ check_param_dma <- function(
             denominator,
             ", so no statistical test can be performed."
         )
-    log_trace(paste("Error ", message, sep =""))
+    log_trace(paste("Error ", message, sep = ""))
     stop(message)
     }else if (nrow(Num) == 0) {
     message <- paste0("There is no sample available for ", numerator, ".")
-    log_trace(paste("Error ", message, sep =""))
+    log_trace(paste("Error ", message, sep = ""))
     stop(message)
     }else if (nrow(Denom) == 0) {
     message <- paste0("There is no sample available for ", denominator, ".")
-    log_trace(paste("Error ", message, sep =""))
+    log_trace(paste("Error ", message, sep = ""))
     stop(message)
     }
 
@@ -902,34 +902,34 @@ check_param_dma <- function(
     # -------------General parameters
     if (!is.logical(vst)) {
         message <- paste0("Check input. The vst value should be either = TRUE or = FALSE.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
     if (!is.logical(shapiro)) {
         message <- paste0("Check input. The shapiro value should be either = TRUE or = FALSE.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
     if (!is.logical(bartlett)) {
         message <- paste0("Check input. The bartlett value should be either = TRUE or = FALSE.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
     if (!is.logical(transform)) {
         message <- paste0("Check input. `transform` should be either = TRUE or = FALSE.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
     Settings <-
         list(
-            "comparisons"= comparisons,
-            "MultipleComparison"= MultipleComparison,
-            "all_vs_all"= all_vs_all,
-            "Metabolites_Miss"= Metabolites_Miss,
-            "denominator"= denominator,
-            "numerator"= numerator
+            "comparisons" = comparisons,
+            "MultipleComparison" = MultipleComparison,
+            "all_vs_all" = all_vs_all,
+            "Metabolites_Miss" = Metabolites_Miss,
+            "denominator" = denominator,
+            "numerator" = numerator
         )
     return(invisible(Settings))
 }
@@ -972,14 +972,14 @@ check_param_dma <- function(
 #' @noRd
 check_param_ora <- function(
     data,
-    metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
-    cutoff_stat=0.05,
-    cutoff_percentage=10,
+    metadata_info = c(pvalColumn = "p.adj", percentageColumn = "t.val", PathwayTerm = "term", PathwayFeature = "Metabolite"),
+    cutoff_stat = 0.05,
+    cutoff_percentage = 10,
     input_pathway,
-    pathway_name="",
-    min_gssize=10,
-    max_gssize=1000,
-    save_table="csv",
+    pathway_name = "",
+    min_gssize = 10,
+    max_gssize = 1000,
+    save_table = "csv",
     remove_background
 ) {
     # 1. The input data:
@@ -989,12 +989,12 @@ check_param_ora <- function(
                 "data should be a data.frame. It's currently a ",
                 paste(class(data), ".",sep = "")
             )
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
     if (any(duplicated(row.names(data)))) {
         message <- paste0("Duplicated row.names of data, whilst row.names must be unique")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
@@ -1005,7 +1005,7 @@ check_param_ora <- function(
                 "metadata_info should be NULL or a vector. It's currently a ",
                 paste(class(metadata_info), ".", sep = "")
             )
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
@@ -1019,7 +1019,7 @@ check_param_ora <- function(
                         metadata_info[["ClusterColumn"]],
                         " column selected as ClusterColumn in metadata_info was not found in data. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -1033,7 +1033,7 @@ check_param_ora <- function(
                         metadata_info[["BackgroundColumn"]],
                         " column selected as BackgroundColumn in metadata_info was not found in data. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -1047,7 +1047,7 @@ check_param_ora <- function(
                         metadata_info[["pvalColumn"]],
                         " column selected as pvalColumn in metadata_info was not found in data. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -1061,7 +1061,7 @@ check_param_ora <- function(
                         metadata_info[["percentageColumn"]],
                         " column selected as percentageColumn in metadata_info was not found in data. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -1075,16 +1075,16 @@ check_param_ora <- function(
                         metadata_info[["PathwayTerm"]],
                         " column selected as PathwayTerm in metadata_info was not found in input_pathway. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             } else {
                 input_pathway <- input_pathway %>%
-                rename("term"= metadata_info[["PathwayTerm"]])
+                rename("term" = metadata_info[["PathwayTerm"]])
                 input_pathway$Description <- input_pathway$term
             }
         } else {
             message <- paste0("metadata_info must provide the column name for PathwayTerm in input_pathway")
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
 
@@ -1097,46 +1097,46 @@ check_param_ora <- function(
                         metadata_info[["PathwayFeature"]],
                         " column selected as PathwayFeature in metadata_info was not found in input_pathway. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             } else {
                 input_pathway <- input_pathway %>%
-                rename("gene"= metadata_info[["PathwayFeature"]])
+                rename("gene" = metadata_info[["PathwayFeature"]])
             }
         } else {
             message <- paste0("metadata_info must provide the column name for PathwayFeature in input_pathway")
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
 
     } else {
         message <- paste0("You must provide metadata_info.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
     # 3. General Settings
     if (!is.character(pathway_name)) {
         message <- paste0("Check input. pathway_name must be a character of syntax 'example'.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
     if (!is.logical(remove_background)) {
         message <- paste0("Check input. remove_background value should be either = TRUE or = FALSE.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
     if (!is.numeric(min_gssize)) {
         message <- paste0("Check input. The selected min_gssize value should be numeric.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
     if (!is.numeric(max_gssize)) {
         message <- paste0("Check input. The selected max_gssize value should be numeric.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
@@ -1149,7 +1149,7 @@ check_param_ora <- function(
                     paste(save_table_options,collapse = ", "),
                     "."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -1157,7 +1157,7 @@ check_param_ora <- function(
     if (!is.null(cutoff_stat)) {
         if (!is.numeric(cutoff_stat) | cutoff_stat > 1 |  cutoff_stat < 0) {
             message <- paste0("Check input. The selected cutoff_stat value should be numeric and between 0 and 1.")
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -1169,7 +1169,7 @@ check_param_ora <- function(
             cutoff_percentage < 0
         ) {
             message <- paste0("Check input. The selected cutoff_percentage value should be numeric and between 0 and 100.")
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -1240,8 +1240,8 @@ check_param_mca <- function(
     metadata_info_c2,
     metadata_info_core,
     metadata_info_intra,
-    feature= "Metabolite",
-    method_background="Intra&core",
+    feature = "Metabolite",
+    method_background = "Intra&core",
     save_table = "csv"
 ) {
     ## ------------ Create log file ----------- ##
@@ -1261,17 +1261,17 @@ check_param_mca <- function(
                     ".",
                     sep = ""
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
         if (length(data_c1[duplicated(data_c1[[feature]]), feature]) > 0) {
             message <- paste0("Duplicated features of data_c1, whilst features must be unique")
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
         if (length(data_c2[duplicated(data_c2[[feature]]), feature]) > 0) {
             message <- paste0("Duplicated features of data_c2, whilst features must be unique")
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
 
@@ -1289,17 +1289,17 @@ check_param_mca <- function(
                     ".",
                     sep = ""
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
         if (length(data_intra[duplicated(data_intra[[feature]]), feature]) > 0) {
             message <- paste0("Duplicated features of data_intra, whilst features must be unique")
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
         if (length(data_core[duplicated(data_core[[feature]]), feature]) > 0) {
             message <- paste0("Duplicated features of data_core, whilst features must be unique")
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -1316,7 +1316,7 @@ check_param_mca <- function(
                         metadata_info_c1[["ValueCol"]],
                         " column selected as ValueCol in metadata_info_c1 was not found in data_c1. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -1329,7 +1329,7 @@ check_param_mca <- function(
                         metadata_info_c1[["StatCol"]],
                         " column selected as StatCol in metadata_info_c1 was not found in data_c1. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -1344,7 +1344,7 @@ check_param_mca <- function(
                         metadata_info_c2[["ValueCol"]],
                         " column selected as ValueCol in metadata_info_c2 was not found in data_c2. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -1357,7 +1357,7 @@ check_param_mca <- function(
                         metadata_info_c2[["StatCol"]],
                         " column selected as StatCol in metadata_info_c2 was not found in data_c2. Please check your input."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -1372,7 +1372,7 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
                     metadata_info_intra[["ValueCol"]],
                     " column selected as ValueCol in metadata_info_intra was not found in data_intra. Please check your input."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -1385,7 +1385,7 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
                     metadata_info_intra[["StatCol"]],
                     " column selected as StatCol in metadata_info_intra was not found in data_intra. Please check your input."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -1400,7 +1400,7 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
                     metadata_info_core[["ValueCol"]],
                     " column selected as ValueCol in metadata_info_core was not found in data_core. Please check your input."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -1413,7 +1413,7 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
                     metadata_info_core[["StatCol"]],
                     " column selected as StatCol in metadata_info_core was not found in data_core. Please check your input."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -1427,7 +1427,7 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
                     metadata_info_core[["DirectionCol"]],
                     " column selected as DirectionCol in metadata_info_core was not found in data_core. Please check your input."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -1442,7 +1442,7 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
             as.numeric(metadata_info_c1[["cutoff_stat"]]) < 0
         ) {
         message <- paste0("Check input. The selected cutoff_stat in metadata_info_c1 should be numeric and between 0 and 1.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
@@ -1452,19 +1452,19 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
         as.numeric(metadata_info_c2[["cutoff_stat"]]) < 0
     ) {
         message <- paste0("Check input. The selected cutoff_stat in metadata_info_c2 should be numeric and between 0 and 1.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
     if (is.na(as.numeric(metadata_info_c1[["ValueCutoff"]]))) {
         message <- paste0("Check input. The selected ValueCutoff in metadata_info_c1 should be numeric and between 0 and 1.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
     if (is.na(as.numeric(metadata_info_c2[["ValueCutoff"]]))) {
         message <- paste0("Check input. The selected ValueCutoff in metadata_info_c2 should be numeric and between 0 and 1.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
@@ -1475,7 +1475,7 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
         as.numeric(metadata_info_intra[["cutoff_stat"]]) < 0
     ) {
         message <- paste0("Check input. The selected cutoff_stat in metadata_info_intra should be numeric and between 0 and 1.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
@@ -1485,19 +1485,19 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
         as.numeric(metadata_info_core[["cutoff_stat"]]) < 0
     ) {
         message <- paste0("Check input. The selected cutoff_stat in metadata_info_core should be numeric and between 0 and 1.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
     if (is.na(as.numeric(metadata_info_intra[["ValueCutoff"]]))) {
         message <- paste0("Check input. The selected ValueCutoff in metadata_info_intra should be numeric and between 0 and 1.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
     if (is.na(as.numeric(metadata_info_core[["ValueCutoff"]]))) {
         message <- paste0("Check input. The selected ValueCutoff in metadata_info_core should be numeric and between 0 and 1.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
     }
@@ -1515,7 +1515,7 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
                 nrow(data_c1)- nrow(data_c1[complete.cases(data_c1[[metadata_info_c1[["ValueCol"]]]], data_c1[[metadata_info_c1[["StatCol"]]]]), ]),
                 " metabolites containing NAs are removed."
             )
-        log_trace(paste("Warning ", message, sep =""))
+        log_trace(paste("Warning ", message, sep = ""))
         warning(message)
     }
 
@@ -1530,7 +1530,7 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
                 nrow(data_c2)- nrow(data_c2[complete.cases(data_c2[[metadata_info_c2[["ValueCol"]]]], data_c2[[metadata_info_c2[["StatCol"]]]]), ]),
                 " metabolites containing NAs are removed."
             )
-        log_trace(paste("Warning ", message, sep =""))
+        log_trace(paste("Warning ", message, sep = ""))
         warning(message)
     }
     } else {
@@ -1545,7 +1545,7 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
                 nrow(data_intra)- nrow(data_intra[complete.cases(data_intra[[metadata_info_intra[["ValueCol"]]]], data_intra[[metadata_info_intra[["StatCol"]]]]), ]),
                 " metabolites containing NAs are removed."
             )
-        log_trace(paste("Warning ", message, sep =""))
+        log_trace(paste("Warning ", message, sep = ""))
         warning(message)
     }
 
@@ -1575,7 +1575,7 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
                     paste(options,collapse = ", "),
                     "."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     } else {
@@ -1587,7 +1587,7 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
                     paste(options,collapse = ", "),
                     "."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -1602,7 +1602,7 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
                     paste(save_table_options,collapse = ", "),
                     "."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(  message)
         }
     }

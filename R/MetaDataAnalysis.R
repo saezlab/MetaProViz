@@ -79,7 +79,7 @@
 #' @export
 metadata_analysis <- function(
     data,
-    metadata_sample=NULL,
+    metadata_sample = NULL,
     # by = NULL,
     # Join specification between `data` and `metadata_sample`. See the docs of \code{left_join} for details. \strong{Default = NULL}
     scaling = TRUE,

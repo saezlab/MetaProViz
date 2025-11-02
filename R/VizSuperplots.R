@@ -101,20 +101,20 @@
 viz_superplot <- function(
     data,
     metadata_sample = NULL,
-    metadata_info = c(Conditions="Conditions", Superplot = NULL),
+    metadata_info = c(Conditions = "Conditions", Superplot = NULL),
     plot_type = "Box",  # Bar, Box, Violin,
     plot_name = "",
     plot_conditions = NULL,
     stat_comparison = NULL,
-    pval =NULL,
-    padj=NULL,
-    xlab= NULL,
-    ylab= NULL,
+    pval = NULL,
+    padj = NULL,
+    xlab = NULL,
+    ylab = NULL,
     theme = NULL,
     color_palette = NULL,
-    color_palette_dot =NULL,
+    color_palette_dot = NULL,
     save_plot = "svg",
-    print_plot=TRUE,
+    print_plot = TRUE,
     path = NULL
 ) {
 
@@ -151,13 +151,13 @@ viz_superplot <- function(
     # check_param` Specific
     if (is.null(metadata_info)) {
         message <- paste0("You must provide the column name for Conditions via metadata_info = c(Conditions = ColumnName) in order to plot the x-axis conditions.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
     if (!(plot_type %in% c("Box", "Bar", "Violin"))) {
         message <- paste0("plot_type must be either Box, Bar or Violin.")
-        log_trace(paste("Error ", message, sep =""))
+        log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
 
@@ -170,7 +170,7 @@ viz_superplot <- function(
                         Condition,
                         " were not found in the Conditions Column."
                     )
-                log_trace(paste("Error ", message, sep =""))
+                log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             }
         }
@@ -188,7 +188,7 @@ viz_superplot <- function(
                             Comp[1],
                             " is not found in the Conditions Column of the metadata_sample."
                         )
-                    log_trace(paste("Error ", message, sep =""))
+                    log_trace(paste("Error ", message, sep = ""))
                     stop(message)
                 }
                 if (!(plot_conditions[Comp[2]] %in% metadata_sample[[metadata_info[["Conditions"]]]])) {
@@ -198,7 +198,7 @@ viz_superplot <- function(
                             Comp[2],
                             " is not found in the Conditions Column of the metadata_sample."
                         )
-                    log_trace(paste("Error ", message, sep =""))
+                    log_trace(paste("Error ", message, sep = ""))
                     stop(message)
                 }
             }
@@ -237,7 +237,7 @@ viz_superplot <- function(
                 pval,
                 " is for multiple comparison, but you have only 2 conditions. Hence aov is performed."
             )
-        log_trace(paste("Warning ", message, sep =""))
+        log_trace(paste("Warning ", message, sep = ""))
         warning(message)
         pval <- "aov"
     }else if (!MultipleComparison & (pval =="aov" | pval =="kruskal.test")) {
@@ -247,7 +247,7 @@ viz_superplot <- function(
                 pval,
                 " is for multiple comparison, but you have only 2 conditions. Hence t.test is performed."
             )
-        log_trace(paste("Warning ", message, sep =""))
+        log_trace(paste("Warning ", message, sep = ""))
         warning(message)
         pval <- "t.test"
         }
@@ -280,7 +280,7 @@ viz_superplot <- function(
                     paste(STAT_padj_options,collapse = ", "),
                     "."
                 )
-            log_trace(paste("Error ", message, sep =""))
+            log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
     }
@@ -291,7 +291,7 @@ viz_superplot <- function(
 
     ## ------------ Create Results output folder ----------- ##
     if (!is.null(save_plot)) {
-        folder <- save_path(folder_name =  paste(plot_type, "Plots", sep =""),
+        folder <- save_path(folder_name = paste(plot_type, "Plots", sep = ""),
                                     path = path)
     }
     log_info("viz_superplot results saved at ", folder)
@@ -299,11 +299,11 @@ viz_superplot <- function(
     ##########################################################################
     ## ------------ Prepare Input ----------- ##
     metadata_sample <- metadata_sample %>%
-    rename("Conditions"= paste(metadata_info[["Conditions"]]) )
+    rename("Conditions" = paste(metadata_info[["Conditions"]]) )
 
     if ("Superplot" %in% names(metadata_info)) {
         metadata_sample <- metadata_sample %>%
-        rename("Superplot"= paste(metadata_info[["Superplot"]]) )
+        rename("Superplot" = paste(metadata_info[["Superplot"]]) )
 
         data_merge <-
             merge(
@@ -394,10 +394,10 @@ viz_superplot <- function(
 
     if (plot_type == "Bar") {
         Plot <- Plot+  geom_bar(stat = "summary", fun = "mean", fill = color_palette)+ stat_summary(fun.data = data_summary,
-            geom ="errorbar", color ="black", width = 0.2)
+            geom = "errorbar", color = "black", width = 0.2)
     } else if (plot_type == "Violin") {
         Plot <- Plot+ geom_violin(fill = color_palette)+ stat_summary(fun.data = data_summary,
-            geom ="errorbar", color ="black", width = 0.2)
+            geom = "errorbar", color = "black", width = 0.2)
     } else if (plot_type == "Box") {
         Plot <- Plot +  geom_boxplot(fill = color_palette,  width = 0.5, position = position_dodge(width = 0.5))
     }
@@ -447,12 +447,12 @@ viz_superplot <- function(
         # Prepare Stat results using dma STAT helper functions
         if (pval =="aov") {
             STAT_C1vC2 <- mpv_aov(data = data.frame("Intensity" = plotdata[,-c(2:3)]),
-                            metadata_info = c(Conditions ="Conditions", Numerator = unique(metadata_sample$Conditions), Denominator  = unique(metadata_sample$Conditions)),
+                            metadata_info = c(Conditions = "Conditions", Numerator = unique(metadata_sample$Conditions), Denominator = unique(metadata_sample$Conditions)),
                             metadata_sample = metadata_sample,
                             log2fc_table = NULL)
         }else if (pval =="kruskal.test") {
             STAT_C1vC2 <- mpv_kruskal(data = data.frame("Intensity" = plotdata[,-c(2:3)]),
-                                            metadata_info = c(Conditions ="Conditions", Numerator = unique(metadata_sample$Conditions), Denominator  = unique(metadata_sample$Conditions)),
+                                            metadata_info = c(Conditions = "Conditions", Numerator = unique(metadata_sample$Conditions), Denominator = unique(metadata_sample$Conditions)),
                                             metadata_sample = metadata_sample,
                                             log2fc_table = NULL)
         }
@@ -466,13 +466,13 @@ viz_superplot <- function(
             separate(
                 comparisons,
                 into = c("group1", "group2"),
-                sep ="_vs_",
+                sep = "_vs_",
                 remove = FALSE
             ) %>%
             unite(
                 comparisons_rev,
                 c("group2", "group1"),
-                sep ="_vs_",
+                sep = "_vs_",
                 remove = FALSE
             )
         df$p.adj <- round(map_dbl(STAT_C1vC2, ~ .x$p.adj), 5)
@@ -503,8 +503,8 @@ viz_superplot <- function(
                 merge(
                     df_select,
                     df,
-                    by.x ="entry",
-                    by.y ="comparisons",
+                    by.x = "entry",
+                    by.y = "comparisons",
                     all.x = TRUE
                 ) %>%
             column_to_rownames("entry")
@@ -514,8 +514,8 @@ viz_superplot <- function(
                     merge(
                         df_select,
                         df,
-                        by.x ="entry",
-                        by.y ="comparisons_rev",
+                        by.x = "entry",
+                        by.y = "comparisons_rev",
                         all.x = TRUE
                     ) %>%
                 column_to_rownames("entry")
@@ -576,7 +576,7 @@ viz_superplot <- function(
         save_table = NULL,
         save_plot = save_plot,
         path = folder,
-        file_name = paste(plot_type, "Plots_",plot_name, sep=""),
+        file_name = paste(plot_type, "Plots_",plot_name, sep = ""),
         core = FALSE,
         print_plot = print_plot,
         plot_height = plot_height,
@@ -584,6 +584,6 @@ viz_superplot <- function(
         plot_unit = "cm"
     )
     }
-    return(invisible(list("Plot"= PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
+    return(invisible(list("Plot" = PlotList,"Plot_Sized" = PlotList_adaptedGrid)))
 }
 
