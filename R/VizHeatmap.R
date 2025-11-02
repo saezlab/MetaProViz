@@ -166,7 +166,10 @@ viz_heatmap <- function(
     }
 
     # # -------------- Plot --------------- ##
-    if (!("individual_Metab" %in% names(metadata_info)) & "individual_Sample" %in% names(metadata_info)) {
+    if (
+        !("individual_Metab" %in% names(metadata_info)) &
+        "individual_Sample" %in% names(metadata_info)
+    ) {
         # Ensure that groups that are assigned NAs do not cause problems:
         metadata_feature[[metadata_info[["individual_Metab"]]]] <- ifelse(is.na(metadata_feature[[metadata_info[["individual_Metab"]]]]), "NA", metadata_feature[[metadata_info[["individual_Metab"]]]])
         unique_paths <- unique(metadata_feature[[metadata_info[["individual_Metab"]]]])
@@ -349,7 +352,10 @@ viz_heatmap <- function(
         # Return if assigned:
         return(invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid)))
 
-    } else if (!("individual_Metab" %in% names(metadata_info)) & "individual_Sample" %in% names(metadata_info)) {
+    } else if (
+        !("individual_Metab" %in% names(metadata_info)) &
+        "individual_Sample" %in% names(metadata_info)
+    ) {
 
         # Ensure that groups that are assigned NAs do not cause problems:
         metadata_sample[[metadata_info[["individual_Sample"]]]] <- ifelse(
@@ -556,7 +562,10 @@ viz_heatmap <- function(
         # Return if assigned:
         return(invisible(list("Plot" = PlotList, "Plot_Sized" = PlotList_adaptedGrid)))
 
-    } else if ("individual_Metab" %in% names(metadata_info) & "individual_Sample" %in% names(metadata_info)) {
+    } else if (
+        "individual_Metab" %in% names(metadata_info) &
+        "individual_Sample" %in% names(metadata_info)
+    ) {
         # Ensure that groups that are assigned NAs do not cause problems:
         metadata_feature[[metadata_info[["individual_Metab"]]]] <- ifelse(is.na(metadata_feature[[metadata_info[["individual_Metab"]]]]), "NA", metadata_feature[[metadata_info[["individual_Metab"]]]])
 

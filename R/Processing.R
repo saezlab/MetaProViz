@@ -2276,7 +2276,7 @@ outlier_detection <- function(
 
     # # -- 2.  Quality Control (QC) PCA
     Metadata_Sample <- data_norm_filtered_full %>%
-    mutate(
+        mutate(
             Outliers = case_when(Outliers == "no" ~ 'no',
             Outliers == "Outlier_filtering_round_1" ~ ' Outlier_filtering_round = 1',
             Outliers == "Outlier_filtering_round_2" ~ ' Outlier_filtering_round = 2',

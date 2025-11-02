@@ -219,7 +219,10 @@ viz_pca <- function(
                     "shape" = paste(metadata_info[["shape"]])
                 )
         }
-    } else if ("color" %in% names(metadata_info) & !("shape" %in% names(metadata_info))) {
+    } else if (
+        "color" %in% names(metadata_info) &
+        !("shape" %in% names(metadata_info))
+    ) {
         if ("color" %in% names(metadata_info)) {
             metadata_sample <-
                 metadata_sample %>%

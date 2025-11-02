@@ -204,7 +204,10 @@ check_param <- function(
     }
 
     # Denominator & Numerator
-    if (!("Denominator" %in% names(metadata_info))  & "Numerator" %in% names(metadata_info)) {
+    if (
+        !("Denominator" %in% names(metadata_info))  &
+        "Numerator" %in% names(metadata_info)
+    ) {
         message <-
             paste0(
                 "Check input. The selected denominator option is empty while ",
@@ -571,7 +574,11 @@ check_param_processing <- function(
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
-    if (!is.numeric(cutoff_featurefilt) | cutoff_featurefilt > 1 | cutoff_featurefilt < 0) {
+    if (
+        !is.numeric(cutoff_featurefilt) |
+        cutoff_featurefilt > 1 |
+        cutoff_featurefilt < 0
+    ) {
         message <- paste0("Check input. The selected cutoff_featurefilt should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
@@ -586,12 +593,20 @@ check_param_processing <- function(
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
-    if (!is.numeric(mvi_percentage) | hotellins_confidence > 100 | hotellins_confidence < 0) {
+    if (
+        !is.numeric(mvi_percentage) |
+        hotellins_confidence > 100 |
+        hotellins_confidence < 0
+    ) {
         message <- paste0("Check input. The selected mvi_percentage value should be numeric and between 0 and 100.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
-    if ( !is.numeric(hotellins_confidence) | hotellins_confidence > 1 | hotellins_confidence < 0) {
+    if (
+        !is.numeric(hotellins_confidence) |
+        hotellins_confidence > 1 |
+        hotellins_confidence < 0
+    ) {
         message <- paste0("Check input. The selected hotellins_confidence value should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
@@ -1148,7 +1163,11 @@ check_param_ora <- function(
     }
 
     if (!is.null(cutoff_percentage)) {
-        if ( !is.numeric(cutoff_percentage)  | cutoff_percentage > 100 | cutoff_percentage < 0) {
+        if (
+            !is.numeric(cutoff_percentage)  |
+            cutoff_percentage > 100 |
+            cutoff_percentage < 0
+        ) {
             message <- paste0("Check input. The selected cutoff_percentage value should be numeric and between 0 and 100.")
             log_trace(paste("Error ", message, sep =""))
             stop(message)
@@ -1230,7 +1249,10 @@ check_param_mca <- function(
 
     # ------------- data
     if (!is.null(data_c1)) {
-        if (!inherits(data_c1, "data.frame") | !inherits(data_c2, "data.frame")) {
+        if (
+            !inherits(data_c1, "data.frame") |
+            !inherits(data_c2, "data.frame")
+        ) {
             message <-
                 paste0(
                     "data_c1 and data_c2 should be a data.frame. It's currently a ",
@@ -1255,7 +1277,10 @@ check_param_mca <- function(
 
     } else {
 
-        if (!inherits(data_intra, "data.frame") | !inherits(data_core, "data.frame")) {
+        if (
+            !inherits(data_intra, "data.frame") |
+            !inherits(data_core, "data.frame")
+        ) {
             message <-
                 paste0(
                     "data_intra and data_core should be a data.frame. It's currently a ",
@@ -1411,13 +1436,21 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
 
     # ------------- metadata_info Cutoffs:
     if (!is.null(metadata_info_c1)) {
-        if (is.na(as.numeric(metadata_info_c1[["cutoff_stat"]])) | as.numeric(metadata_info_c1[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_c1[["cutoff_stat"]]) < 0) {
+        if (
+            is.na(as.numeric(metadata_info_c1[["cutoff_stat"]])) |
+            as.numeric(metadata_info_c1[["cutoff_stat"]]) > 1 |
+            as.numeric(metadata_info_c1[["cutoff_stat"]]) < 0
+        ) {
         message <- paste0("Check input. The selected cutoff_stat in metadata_info_c1 should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (is.na(as.numeric(metadata_info_c2[["cutoff_stat"]])) | as.numeric(metadata_info_c2[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_c2[["cutoff_stat"]]) < 0) {
+    if (
+        is.na(as.numeric(metadata_info_c2[["cutoff_stat"]])) |
+        as.numeric(metadata_info_c2[["cutoff_stat"]]) > 1 |
+        as.numeric(metadata_info_c2[["cutoff_stat"]]) < 0
+    ) {
         message <- paste0("Check input. The selected cutoff_stat in metadata_info_c2 should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
@@ -1436,13 +1469,21 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
     }
 
     } else {
-    if (is.na(as.numeric(metadata_info_intra[["cutoff_stat"]])) | as.numeric(metadata_info_intra[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_intra[["cutoff_stat"]]) < 0) {
+    if (
+        is.na(as.numeric(metadata_info_intra[["cutoff_stat"]])) |
+        as.numeric(metadata_info_intra[["cutoff_stat"]]) > 1 |
+        as.numeric(metadata_info_intra[["cutoff_stat"]]) < 0
+    ) {
         message <- paste0("Check input. The selected cutoff_stat in metadata_info_intra should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
 
-    if (is.na(as.numeric(metadata_info_core[["cutoff_stat"]])) | as.numeric(metadata_info_core[["cutoff_stat"]]) > 1 | as.numeric(metadata_info_core[["cutoff_stat"]]) < 0) {
+    if (
+        is.na(as.numeric(metadata_info_core[["cutoff_stat"]])) |
+        as.numeric(metadata_info_core[["cutoff_stat"]]) > 1 |
+        as.numeric(metadata_info_core[["cutoff_stat"]]) < 0
+    ) {
         message <- paste0("Check input. The selected cutoff_stat in metadata_info_core should be numeric and between 0 and 1.")
         log_trace(paste("Error ", message, sep =""))
         stop(message)

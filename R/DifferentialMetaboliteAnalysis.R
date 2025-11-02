@@ -1584,7 +1584,10 @@ mpv_aov <- function(
         merged_list <- list()
         for (name in list_names) {
             # Check if the data frames exist in both lists
-            if (name %in% names(results_list) && name %in% names(log2fc_table)) {
+            if (
+                name %in% names(results_list) &&
+                name %in% names(log2fc_table)
+            ) {
                 merged_df <- merge(
                     results_list[[name]],
                     log2fc_table[[name]],
@@ -1864,7 +1867,10 @@ mpv_kruskal <- function(
         merged_list <- list()
         for (name in common_col_names) {
             # Check if the data frames exist in both lists
-            if (name %in% names(results_list) && name %in% names(log2fc_table)) {
+            if (
+                name %in% names(results_list) &&
+                name %in% names(log2fc_table)
+            ) {
                 merged_df <-
                     merge(
                         results_list[[name]],
@@ -2098,7 +2104,10 @@ mpv_welch <- function(
         merged_list <- list()
         for (name in list_names) {
             # Check if the data frames exist in both lists
-            if (name %in% names(results_list) && name %in% names(log2fc_table)) {
+            if (
+                name %in% names(results_list) &&
+                name %in% names(log2fc_table)
+            ) {
                 merged_df <-
                     merge(
                         results_list[[name]],
@@ -2498,7 +2507,10 @@ dma_stat_limma <-
                 list_dfs <- name_match_df$New[i]
 
                 # Check if the data frames exist in both lists
-                if (list_dfs %in% names(results_list_new) && list_dfs %in% names(log2fc_table)) {
+                if (
+                    list_dfs %in% names(results_list_new) &&
+                    list_dfs %in% names(log2fc_table)
+                ) {
                     merged_df <-
                         merge(
                             results_list_new[[list_dfs]],

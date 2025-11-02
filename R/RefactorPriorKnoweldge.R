@@ -2873,7 +2873,10 @@ compare_pk <- function(
         for (res in names(data)) {
             resource_val <- data[[res]]
             resource_id <- tolower(res)
-            if (is.null(metadata_info[[res]]) && resource_id %in% names(default_cols)) {
+            if (
+                is.null(metadata_info[[res]]) &&
+                resource_id %in% names(default_cols)
+            ) {
                 metadata_info[[res]] <-
                     default_cols[[resource_id]]
             } else if (is.null(metadata_info[[res]])) {

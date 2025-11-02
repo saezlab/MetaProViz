@@ -219,7 +219,10 @@ viz_volcano <- function(
     # Extract required columns and merge with SettingsFile
     if (!is.null(metadata_feature)) {
         # # --- Prepare the color scheme:
-        if ("color" %in% names(metadata_info) & "shape" %in% names(metadata_info)) {
+        if (
+            "color" %in% names(metadata_info) &
+            "shape" %in% names(metadata_info)
+        ) {
             if ((metadata_info[["shape"]] == metadata_info[["color"]])) {
                 metadata_feature$shape <- metadata_feature[,paste(metadata_info[["color"]])]
                 metadata_feature <- metadata_feature %>%
@@ -231,7 +234,10 @@ viz_volcano <- function(
                         "shape"= paste(metadata_info[["shape"]])
                     )
             }
-        } else if ("color" %in% names(metadata_info) & !("shape" %in% names(metadata_info))) {
+        } else if (
+            "color" %in% names(metadata_info) &
+            !("shape" %in% names(metadata_info))
+        ) {
             metadata_feature <-
                 metadata_feature %>%
                 rename("color"= paste(metadata_info[["color"]]))
@@ -565,7 +571,10 @@ viz_volcano_standard <- function(
                     keyvalsshape <- NULL
                 }
 
-                if (!("color" %in% names(metadata_info)) & !("shape" %in% names(metadata_info))) {
+                if (
+                    !("color" %in% names(metadata_info)) &
+                    !("shape" %in% names(metadata_info))
+                ) {
                     LegendPos <- "none"
                 }
 
@@ -692,7 +701,10 @@ viz_volcano_standard <- function(
                     keyvalsshape <- NULL
             }
 
-            if (!("color" %in% names(metadata_info)) & !("shape" %in% names(metadata_info))) {
+            if (
+                !("color" %in% names(metadata_info)) &
+                !("shape" %in% names(metadata_info))
+            ) {
                 LegendPos <- "none"
             }
 
@@ -867,7 +879,10 @@ viz_volcano_compare <- function(
     # # ## # ## # ## # ## # ## # ## # #
     # # --- Check data
     if (!is.data.frame(data2)) {
-        if (!(paste(x) %in% colnames(data2)) | !(paste(y) %in% colnames(data2))) {
+        if (
+            !(paste(x) %in% colnames(data2)) |
+            !(paste(y) %in% colnames(data2))
+        ) {
             message <-
                 paste(
                     "Check your data2. The column name of ",
@@ -955,7 +970,10 @@ viz_volcano_compare <- function(
                 }
             }
             # Prepare the shape scheme:
-        } else if ("shape" %in% names(metadata_info) & !("color" %in% names(metadata_info))) {
+        } else if (
+            "shape" %in% names(metadata_info) &
+            !("color" %in% names(metadata_info))
+        ) {
             shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$shape))]
 
             keyvalsshape <- c()
@@ -964,7 +982,10 @@ viz_volcano_compare <- function(
             names(sha) <- InputVolcano$shape[row]
             keyvalsshape <- c(keyvalsshape, sha)
             }
-        } else if ("shape" %in% names(metadata_info) & "color" %in% names(metadata_info)) {
+        } else if (
+            "shape" %in% names(metadata_info) &
+            "color" %in% names(metadata_info)
+        ) {
             # Here we have already used color from metadata_info and we need to use shape for the conditions
             message("For Plot_setting = `Consitions`we can only use colour or shape from metadata_feature. We ignore shape and use it to label the Comparison_name.")
             shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
@@ -1100,7 +1121,10 @@ viz_volcano_compare <- function(
                 }
             }
             # Prepare the shape scheme:
-            if ("shape" %in% names(metadata_info) & !("color" %in% names(metadata_info))) {
+            if (
+                "shape" %in% names(metadata_info) &
+                !("color" %in% names(metadata_info))
+            ) {
                 shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$shape))]
 
                 keyvalsshape <- c()
@@ -1109,7 +1133,10 @@ viz_volcano_compare <- function(
                     names(sha) <- InputVolcano$shape[row]
                     keyvalsshape <- c(keyvalsshape, sha)
                 }
-            } else if ("shape" %in% names(metadata_info) & "color" %in% names(metadata_info)) {
+            } else if (
+                "shape" %in% names(metadata_info) &
+                "color" %in% names(metadata_info)
+            ) {
                 # Here we have already used color from metadata_info and we need to use shape for the conditions
                 message("For plot_types Comparison we can only use colour or shape from metadata_feature. Hence, we ignore shape and use it to label the name_comparison.")
                 shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
@@ -1401,7 +1428,10 @@ viz_volcano_pea <- function(
                 keyvalsshape <- NULL
             }
 
-            if (!("color" %in% names(metadata_info)) & !("shape" %in% names(metadata_info))) {
+            if (
+                !("color" %in% names(metadata_info)) &
+                !("shape" %in% names(metadata_info))
+            ) {
                 LegendPos <- "none"
             }
 
