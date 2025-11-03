@@ -143,7 +143,7 @@ processing <- function(
 
     ## ------------- Check SummarizedExperiment file ---------- ##
     input_data <- data
-    if (inherits(data, "SummarizedExperiment"))  {
+    if (inherits(data, "SummarizedExperiment")) {
         log_info('Processing input SummarizedExperiment object.')
         se_list <- process_se(data)
         data <- se_list$data
@@ -368,7 +368,7 @@ processing <- function(
 
     # Return
     # If the input was an se file, we also want to return a se file:
-    if (inherits(input_data, "SummarizedExperiment"))  {
+    if (inherits(input_data, "SummarizedExperiment")) {
         PreRes <- Res_List[["DF"]][["Preprocessing_output"]]
 
         # find the "Outliers" column and split
@@ -399,7 +399,7 @@ processing <- function(
             )
         #Return
         invisible(return(Res_List))
-    }else{
+    } else {
         invisible(return(Res_List))
     }
 }
@@ -469,7 +469,7 @@ replicate_sum <- function(
 
     ## ------------- Check SummarizedExperiment file ---------- ##
     input_data <- data
-    if (inherits(data, "SummarizedExperiment"))  {
+    if (inherits(data, "SummarizedExperiment")) {
         log_info('Processing input SummarizedExperiment object.')
         se_list <- process_se(data)
         data <- se_list$data
@@ -679,7 +679,7 @@ pool_estimation <- function(
 
     ## ------------- Check SummarizedExperiment file ---------- ##
     input_data <- data
-    if (inherits(data, "SummarizedExperiment"))  {
+    if (inherits(data, "SummarizedExperiment")) {
         log_info('Processing input SummarizedExperiment object.')
         se_list <- process_se(data)
         data <- se_list$data
@@ -938,7 +938,7 @@ pool_estimation <- function(
 
     log_info('Finished pool estimation.')
 
-    if (inherits(input_data, "SummarizedExperiment"))  {
+    if (inherits(input_data, "SummarizedExperiment")) {
         assay_mat <- as.matrix(t(as.data.frame(ResList[["DF"]][["data"]])))
 
         coldata_df <- as.data.frame(colData(input_data))
@@ -1107,7 +1107,7 @@ feature_filtering <- function(
             message(msg)
             filtered_matrix <- data[, -miss]
         }
-    }else if (featurefilt == "Standard") {
+    } else if (featurefilt == "Standard") {
         message <-
             paste0(
                 "feature_filtering: Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples (REF: Smilde et. al. (2005), Anal. Chem. 77, 6729-6736., doi:10.1021/ac051080y). ",
@@ -2024,7 +2024,7 @@ outlier_detection <- function(
 
         if (sum(metabolite_var[1, ] == 0) == 0) {
             metabolite_zero_var_total_list[loop] <- 0
-        }else if (sum(metabolite_var[1, ] == 0)>0) {
+        } else if (sum(metabolite_var[1, ] == 0)>0) {
             metabolite_zero_var_total_list[loop] <- metabolite_zero_var_list
             # This is used later to print and save the zero variance metabolites
             # if any are found.
@@ -2197,7 +2197,7 @@ outlier_detection <- function(
         if (length(hotelling_qcc[["violations"]][["beyond.limits"]]) == 0) {
             data_norm <- data_norm
             break
-        }else if (length(hotelling_qcc[["violations"]][["beyond.limits"]]) == 1) {
+        } else if (length(hotelling_qcc[["violations"]][["beyond.limits"]]) == 1) {
             # filter the selected outliers from the data
             data_norm <- data_norm[-hotelling_qcc[["violations"]][["beyond.limits"]], ]
             Conditions <- Conditions[-hotelling_qcc[["violations"]][["beyond.limits"]]]

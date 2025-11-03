@@ -128,7 +128,7 @@ viz_superplot <- function(
 
     ## ------------- Check SummarizedExperiment file ---------- ##
     input_data <- data
-    if (inherits(data, "SummarizedExperiment"))  {
+    if (inherits(data, "SummarizedExperiment")) {
         log_info('Processing input SummarizedExperiment object.')
         se_list <- process_se(data)
         data <- se_list$data
@@ -218,9 +218,9 @@ viz_superplot <- function(
     } else {
         MultipleComparison <- TRUE
     }
-    }else if (length(plot_conditions)>2) {
+    } else if (length(plot_conditions)>2) {
     MultipleComparison <- TRUE
-    }else if (length(plot_conditions)<=2) {
+    } else if (length(plot_conditions)<=2) {
     Number_Cond <- length(unique(tolower(metadata_sample[["Conditions"]])))
     if (Number_Cond<=2) {
         MultipleComparison <- FALSE
@@ -240,7 +240,7 @@ viz_superplot <- function(
         log_trace(paste("Warning ", message, sep = ""))
         warning(message)
         pval <- "aov"
-    }else if (!MultipleComparison & (pval == "aov" | pval == "kruskal.test")) {
+    } else if (!MultipleComparison & (pval == "aov" | pval == "kruskal.test")) {
         message <-
             paste0(
                 "Check input. The selected pval option for Hypothesis testing,",
@@ -320,13 +320,13 @@ viz_superplot <- function(
     # Rename the x and y lab if the information has been passed:
     if (is.null(xlab)) {  # use column name of x provided by user
         xlab <- bquote(.(as.symbol(metadata_info[["Conditions"]])))
-    }else if (!is.null(xlab)) {
+    } else if (!is.null(xlab)) {
     xlab <- bquote(.(as.symbol(xlab)))
     }
 
     if (is.null(ylab)) {  # use column name of x provided by user
         ylab <- bquote(.(as.symbol("Intensity")))
-    }else if (!is.null(ylab)) {
+    } else if (!is.null(ylab)) {
     ylab <- bquote(.(as.symbol(ylab)))
     }
 
@@ -451,7 +451,7 @@ viz_superplot <- function(
                             metadata_info = c(Conditions = "Conditions", Numerator = unique(metadata_sample$Conditions), Denominator = unique(metadata_sample$Conditions)),
                             metadata_sample = metadata_sample,
                             log2fc_table = NULL)
-        }else if (pval == "kruskal.test") {
+        } else if (pval == "kruskal.test") {
             STAT_C1vC2 <- mpv_kruskal(data = data.frame("Intensity" = plotdata[, -c(2:3)]),
                                             metadata_info = c(Conditions = "Conditions", Numerator = unique(metadata_sample$Conditions), Denominator = unique(metadata_sample$Conditions)),
                                             metadata_sample = metadata_sample,

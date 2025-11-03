@@ -138,7 +138,7 @@ dma <- function(
 
     ## ------------- Check SummarizedExperiment file ---------- ##
     input_data <- data
-    if (inherits(data, "SummarizedExperiment"))  {
+    if (inherits(data, "SummarizedExperiment")) {
         log_info('Processing input SummarizedExperiment object.')
         se_list <- process_se(data)
         data <- se_list$data

@@ -399,7 +399,7 @@ viz_volcano <- function(
             folder = folder
         )
 
-    }else if (plot_types == "Compare") {  # ## # #--- 2. Compare
+    } else if (plot_types == "Compare") {  # ## # #--- 2. Compare
         VolcanoRes <- viz_volcano_compare(
             data = Volcanodata,
             data2 = data2,

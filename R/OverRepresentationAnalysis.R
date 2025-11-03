@@ -427,7 +427,7 @@ standard_ora <- function(
         clusterGosummary <- clusterGosummary[order(clusterGosummary$p.adjust), ]
         clusterGosummary %<>% rename("Metabolites_in_pathway" = "geneID")
     } else {
-    stop("None of the Input_data Metabolites were present in any terms of the input_pathway. Hence the ClusterGosummary ouput will be empty. Please check that the metabolite IDs match the pathway IDs.")
+        stop("None of the Input_data Metabolites were present in any terms of the input_pathway. Hence the ClusterGosummary ouput will be empty. Please check that the metabolite IDs match the pathway IDs.")
     }
 
     # Return and save list of DFs

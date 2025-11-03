@@ -36,7 +36,7 @@ process_se <- function(se_obj) {
     if (!requireNamespace("SummarizedExperiment", quietly = TRUE)) {
         stop("SummarizedExperiment package is required.")
     }
-    if (!inherits(se_obj, "SummarizedExperiment"))  {
+    if (!inherits(se_obj, "SummarizedExperiment")) {
         stop("Provided object is not a SummarizedExperiment.")
     }
     assay_mat <- assay(se_obj)

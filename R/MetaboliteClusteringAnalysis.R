@@ -108,7 +108,7 @@ mca_2cond <- function(data_c1,
                                 save_table = save_table)
 
     ## ------------ Create Results output folder ----------- ##
-    if(!is.null(save_table)){
+    if (!is.null(save_table)) {
     folder <- save_path(folder_name = "MCA2Cond",
                                     path = path)
     }
@@ -233,7 +233,7 @@ mca_2cond <- function(data_c1,
         )
 
     #Apply Background filter (label genes that will be removed based on choosen background)
-    if(method_background == "C1|C2"){  # C1|C2 = Cond2 OR Cond1
+    if (method_background == "C1|C2") {  # C1|C2 = Cond2 OR Cond1
         MergeDF %<>%
             # Cond1 & Cond2
             mutate(
@@ -251,7 +251,7 @@ mca_2cond <- function(data_c1,
                         ~'FALSE'
                 )
             )
-    }else if(method_background == "C1&C2"){  # Cond2 AND Cond1
+    } else if (method_background == "C1&C2") {  # Cond2 AND Cond1
         MergeDF %<>%
             # Cond1 & Cond2
             mutate(
@@ -263,7 +263,7 @@ mca_2cond <- function(data_c1,
                         ~'FALSE'
                 )
             )
-    }else if(method_background == "C2"){  # Cond2 has to be there
+    } else if (method_background == "C2") {  # Cond2 has to be there
         MergeDF %<>%
             # Cond1 & Cond2
             mutate(
@@ -278,7 +278,7 @@ mca_2cond <- function(data_c1,
                         ~'FALSE'
                 )
             )
-    }else if(method_background == "C1"){  # Cond1 has to be there
+    } else if (method_background == "C1") {  # Cond1 has to be there
         MergeDF %<>%
             # Cond1 & Cond2
             mutate(
@@ -293,9 +293,9 @@ mca_2cond <- function(data_c1,
                         ~'FALSE'
                 )
             )
-    }else if(method_background == "*"){  # Use all genes as the background
+    } else if (method_background == "*") {  # Use all genes as the background
         MergeDF$BG_method <- "TRUE"
-    }else{
+    } else {
         stop("Please use one of the following method_backgrounds: C1|C2, C1&C2, C2, C1, *")
     }
 
@@ -974,7 +974,7 @@ mca_core <- function(data_intra,
 
 
     ## ------------ Create Results output folder ----------- ##
-    if(!is.null(save_table)){
+    if (!is.null(save_table)) {
     folder <- save_path(folder_name = "MCAcore",
                                     path = path)
     }
@@ -1101,7 +1101,7 @@ mca_core <- function(data_intra,
     mutate_at(c("core_DF_core_Direction"), ~replace_na(., "Not Detected"))
 
     #Apply Background filter (label metabolites that will be removed based on chosen background)
-    if(method_background == "Intra|core"){  # C1|C2 = core OR Intra
+    if (method_background == "Intra|core") {  # C1|C2 = core OR Intra
     MergeDF %<>%
     # Intra & core
     mutate(
@@ -1119,7 +1119,7 @@ mca_core <- function(data_intra,
                 ~'FALSE'
         )
     )
-    }else if(method_background == "Intra&core"){  # core AND Intra
+    } else if (method_background == "Intra&core") {  # core AND Intra
     MergeDF %<>%
     # Intra & core
     mutate(
@@ -1131,7 +1131,7 @@ mca_core <- function(data_intra,
                 ~'FALSE'
         )
     )
-    }else if(method_background == "core"){  # core has to be there
+    } else if (method_background == "core") {  # core has to be there
     MergeDF %<>%
     # Intra & core
     mutate(
@@ -1146,7 +1146,7 @@ mca_core <- function(data_intra,
                 ~'FALSE'
         )
     )
-    }else if(method_background == "Intra"){  # Intra has to be there
+    } else if (method_background == "Intra") {  # Intra has to be there
     MergeDF %<>%
     # Intra & core
     mutate(
@@ -1161,9 +1161,9 @@ mca_core <- function(data_intra,
                 ~'FALSE'
         )
     )
-    }else if(method_background == "*"){  # Use all metabolites as the background
+    } else if (method_background == "*") {  # Use all metabolites as the background
     MergeDF$BG_method <- "TRUE"
-    }else{
+    } else {
     # error message
     stop("Please use one of the following method_backgrounds: Intra|core, Intra&core, core, Intra, *")
     }

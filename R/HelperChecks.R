@@ -800,11 +800,11 @@ check_param_dma <- function(
         )
     log_trace(paste("Error ", message, sep = ""))
     stop(message)
-    }else if (nrow(Num) == 0) {
+    } else if (nrow(Num) == 0) {
     message <- paste0("There is no sample available for ", numerator, ".")
     log_trace(paste("Error ", message, sep = ""))
     stop(message)
-    }else if (nrow(Denom) == 0) {
+    } else if (nrow(Denom) == 0) {
     message <- paste0("There is no sample available for ", denominator, ".")
     log_trace(paste("Error ", message, sep = ""))
     stop(message)
