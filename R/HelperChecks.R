@@ -875,7 +875,7 @@ check_param_dma <- function(
         }
     } else if (ncol(Num_Miss) > 0 & ncol(Denom_Miss) > 0) {
     Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
-    Metabolites_Miss <- unique(Metabolites_Miss)
+    Metabolites_Miss %<>% unique()
 
     message <-
         paste0(
@@ -900,7 +900,7 @@ check_param_dma <- function(
         message(message)
 
         Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
-        Metabolites_Miss <- unique(Metabolites_Miss)
+        Metabolites_Miss %<>% unique()
     }
 
     # -------------General parameters
@@ -1082,7 +1082,7 @@ check_param_ora <- function(
                 log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             } else {
-                input_pathway <- input_pathway %>%
+                input_pathway %<>%
                 rename("term" = metadata_info[["PathwayTerm"]])
                 input_pathway$Description <- input_pathway$term
             }
@@ -1104,7 +1104,7 @@ check_param_ora <- function(
                 log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             } else {
-                input_pathway <- input_pathway %>%
+                input_pathway %<>%
                 rename("gene" = metadata_info[["PathwayFeature"]])
             }
         } else {

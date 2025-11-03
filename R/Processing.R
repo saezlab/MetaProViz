@@ -189,7 +189,7 @@ processing <- function(
 
     ## ------------------ Prepare the data ------------------- ##
     # data files:
-    data <- as.data.frame(data) %>%
+    data %<>% as.data.frame()
     # Make sure all 0 are changed to NAs
     mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
 
@@ -334,7 +334,7 @@ processing <- function(
                     "Variation_ContigencyTable_core_blank" = data_coreNorm[["DF"]][["Contigency_table_core_blank"]]
                 )
         }
-        DFList <- c(DFList, DFList_core)
+        DFList %<>% c(DFList_core)
     }
 
     ## ---- Plots
@@ -345,7 +345,7 @@ processing <- function(
     }
 
     if (core) {
-        PlotList <- c(PlotList, data_coreNorm[["Plot"]])
+        PlotList %<>% c(data_coreNorm[["Plot"]])
     }
 
     Res_List <- list("DF" = DFList, "Plot" = PlotList)
@@ -1044,7 +1044,7 @@ feature_filtering <- function(
     mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
 
     if (core) {  # remove core_media samples for feature filtering
-        feat_filt_data <- feat_filt_data %>% filter(!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]])
+        feat_filt_data %<>% filter(!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]])
         Feature_Filtering <- paste0(featurefilt, "_core")
     }
 
@@ -1087,7 +1087,7 @@ feature_filtering <- function(
         for (m in split_Input) {
             for (i in seq_len(ncol(m))) {
                 if (length(which(is.na(m[, i]))) > (1-cutoff_featurefilt)*nrow(m))
-                    miss <- append(miss, i)
+                    miss %<>% append(i)
             }
         }
 
@@ -1123,7 +1123,7 @@ feature_filtering <- function(
         # Select metabolites to be filtered for one condition
         for (i in seq_len(ncol(split_Input))) {
             if (length(which(is.na(split_Input[, i]))) > (1-cutoff_featurefilt)*nrow(split_Input))
-                miss <- append(miss, i)
+                miss %<>% append(i)
         }
 
         if (length(miss) == 0) {  # remove metabolites if any are found
@@ -1447,7 +1447,7 @@ tic_norm <- function(
             names_to = "Group"
         )
     names(RLA_data_long) <- c("Samples", "Intensity")
-    RLA_data_long <- as.data.frame(RLA_data_long)
+    RLA_data_long %<>% as.data.frame()
     RLA_data_long <- RLA_data_long
     metadata_sample <- metadata_sample
     for (row in seq_len(nrow(RLA_data_long))) {  # add conditions
@@ -1485,7 +1485,7 @@ tic_norm <- function(
             )  # This is dividing the ion intensity by the total ion count
         # Multiplies with the median metabolite intensity
         data_tic <- data_tic_Pre*Median_RowSums
-        data_tic <- as.data.frame(data_tic)
+        data_tic %<>% as.data.frame()
 
         ## ------------------ QC plot ------------------- ##
         # # # After tic normalization
@@ -1657,7 +1657,7 @@ core_norm <- function(
         rownames(result_df)[1] <- "CV"
 
         cutoff_cv <- 30
-        result_df <- result_df %>% t() %>% as.data.frame() %>% rowwise() %>%
+        result_df %<>% t() %>% as.data.frame() %>% rowwise() %>%
         mutate(HighVar = CV > cutoff_cv) %>% as.data.frame()
         rownames(result_df) <- colnames(core_medias)
 
@@ -1746,7 +1746,7 @@ core_norm <- function(
         ## ------------------ Outlier testing
         if (dim(core_medias)[1]>=3) {
             Outlier_data <- core_medias
-            Outlier_data <- Outlier_data %>% mutate_all(.funs = ~ FALSE)
+            Outlier_data %<>% mutate_all(.funs = ~ FALSE)
 
             while (HighVar_metabs>0) {
                 # remove the furthest value from the mean
@@ -1779,7 +1779,7 @@ core_norm <- function(
                 result_df[1, is.na(result_df[1, ])] <- 0
                 rownames(result_df)[1] <- "CV"
 
-                result_df <- result_df %>% t() %>% as.data.frame() %>% rowwise() %>%
+                result_df %<>% t() %>% as.data.frame() %>% rowwise() %>%
                 mutate(HighVar = CV > cutoff_cv) %>% as.data.frame()
                 rownames(result_df) <- colnames(core_medias)
 
@@ -1823,7 +1823,7 @@ core_norm <- function(
             colnames(contingency_data_contframe) <- colnames(data_cont)
             rownames(contingency_data_contframe) <- c("HighVar", "Low_var")
 
-            contingency_data_contframe <- contingency_data_contframe %>% mutate(total = rowSums(contingency_data_contframe))
+            contingency_data_contframe %<>% mutate(total = rowSums(contingency_data_contframe))
             contingency_data_contframe <-
                 rbind(
                     contingency_data_contframe,
@@ -1834,7 +1834,7 @@ core_norm <- function(
             for (sample in colnames(data_cont)) {
                 p_value <- fisher_test_results[[sample]]$p.value
                 if (p_value < 0.05) {  # Adjust the significance level as needed
-                    different_samples <- c(different_samples, sample)
+                    different_samples %<>% c(sample)
                 }
             }
 
@@ -1849,7 +1849,7 @@ core_norm <- function(
                 warning(message)
             }
             # Filter the core_media samples
-            core_medias <- core_medias %>% filter(!rownames(core_medias) %in% different_samples)
+            core_medias %<>% filter(!rownames(core_medias) %in% different_samples)
         } else {
             message <- paste0("Only >=2 blank samples available. Thus,we can not perform outlier testing for the blank samples.")
             log_trace(message)
@@ -1859,7 +1859,7 @@ core_norm <- function(
         core_media_df <- as.data.frame(data.frame("core_mediaMeans" = colMeans(core_medias, na.rm = TRUE)))
     }
 
-    cv_result_df <- rownames_to_column(cv_result_df, "Metabolite")
+    cv_result_df %<>% rownames_to_column("Metabolite")
 
     ##########################################################################
     # # ------------------------ Substract mean (media control) from samples
@@ -2033,7 +2033,7 @@ outlier_detection <- function(
 
         # Remove the metabolites with zero variance from the data to do PCA
         for (metab in metabolite_zero_var_list) {
-            data_norm <- data_norm %>% select(-all_of(metab))
+            data_norm %<>% select(-all_of(metab))
         }
 
         # # ---  PCA
@@ -2190,7 +2190,7 @@ outlier_detection <- function(
 
         a <- loop
         if (core) {
-            a <- paste0(a, "_core")
+            a %<>% paste0("_core")
         }
 
         # loop for outliers until no outlier is detected

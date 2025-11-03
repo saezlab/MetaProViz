@@ -44,7 +44,7 @@ save_path <- function(
     # Check if path exist
     if (is.null(path)) {
         path <- getwd()
-        path <- file.path(path, "MetaProViz_Results")
+        path %<>% file.path("MetaProViz_Results")
         if (!dir.exists(path)) {
             dir.create(path)
         }

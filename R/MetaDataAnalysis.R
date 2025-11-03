@@ -229,7 +229,7 @@ metadata_analysis <- function(
     }
 
     # Add into one DF
-    Stat_results <- bind_rows(Stat_results)
+    Stat_results %<>% bind_rows()
 
     # Add explained variance into the table:
     prop_var_ex <-
@@ -241,7 +241,7 @@ metadata_analysis <- function(
         mutate(PC = paste("PC", PC, sep = "")) %>%
         rename("Explained_Variance" = 2)
 
-    Stat_results <- merge(Stat_results, prop_var_ex, by = "PC", all.x = TRUE)
+    Stat_results %<>% merge(prop_var_ex, by = "PC", all.x = TRUE)
 
     # ##############################################################################################################################################################################################################
     # # ---------- top/Bottom ------------##

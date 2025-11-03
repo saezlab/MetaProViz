@@ -229,10 +229,10 @@ viz_volcano <- function(
         ) {
             if ((metadata_info[["shape"]] == metadata_info[["color"]])) {
                 metadata_feature$shape <- metadata_feature[, paste(metadata_info[["color"]])]
-                metadata_feature <- metadata_feature %>%
+                metadata_feature %<>%
                 rename("color" = paste(metadata_info[["color"]]))
             } else {
-                metadata_feature <- metadata_feature %>%
+                metadata_feature %<>%
                     rename(
                         "color" = paste(metadata_info[["color"]]),
                         "shape" = paste(metadata_info[["shape"]])
@@ -254,7 +254,7 @@ viz_volcano <- function(
                 rename("shape" = paste(metadata_info[["shape"]]))
         }
         if ("individual" %in% names(metadata_info)) {
-            metadata_feature <- metadata_feature %>%
+            metadata_feature %<>%
                 rename("individual" = paste(metadata_info[["individual"]]))
         }
 
@@ -555,7 +555,7 @@ viz_volcano_standard <- function(
                     for (row in seq_len(nrow(InputVolcano))) {
                         col <- color_select[unique(InputVolcano$color) %in% InputVolcano[row, "color"]]
                         names(col) <- InputVolcano$color[row]
-                        keyvals <- c(keyvals, col)
+                        keyvals %<>% c(col)
                     }
 
                     LegendPos <- "right"
@@ -570,7 +570,7 @@ viz_volcano_standard <- function(
                     for (row in seq_len(nrow(InputVolcano))) {
                         sha <- shape_select[unique(InputVolcano$shape) %in% InputVolcano[row, "shape"]]
                         names(sha) <- InputVolcano$shape[row]
-                        keyvalsshape <- c(keyvalsshape, sha)
+                        keyvalsshape %<>% c(sha)
                     }
 
                     LegendPos <- "right"
@@ -685,7 +685,7 @@ viz_volcano_standard <- function(
                     for (row in seq_len(nrow(InputVolcano))) {
                     col <- color_select[unique(InputVolcano$color) %in% InputVolcano[row, "color"]]
                     names(col) <- InputVolcano$color[row]
-                    keyvals <- c(keyvals, col)
+                    keyvals %<>% c(col)
                 }
 
                 LegendPos <- "right"
@@ -700,7 +700,7 @@ viz_volcano_standard <- function(
                         for (row in seq_len(nrow(InputVolcano))) {
                         sha <- shape_select[unique(InputVolcano$shape) %in% InputVolcano[row, "shape"]]
                         names(sha) <- InputVolcano$shape[row]
-                        keyvalsshape <- c(keyvalsshape, sha)
+                        keyvalsshape %<>% c(sha)
                     }
 
                     LegendPos <- "right"
@@ -964,7 +964,7 @@ viz_volcano_compare <- function(
                 for (row in seq_len(nrow(InputVolcano))) {
                     col <- color_select[unique(InputVolcano$color) %in% InputVolcano[row, "color"]]
                     names(col) <- InputVolcano$color[row]
-                    keyvals <- c(keyvals, col)
+                    keyvals %<>% c(col)
                 }
             # here we will use the conditions if no other color is provided!
             } else {
@@ -974,7 +974,7 @@ viz_volcano_compare <- function(
                 for (row in seq_len(nrow(InputVolcano))) {
                     col <- color_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
                     names(col) <- InputVolcano$comparison[row]
-                    keyvals <- c(keyvals, col)
+                    keyvals %<>% c(col)
                 }
             }
             # Prepare the shape scheme:
@@ -988,7 +988,7 @@ viz_volcano_compare <- function(
             for (row in seq_len(nrow(InputVolcano))) {
             sha <- shape_select[unique(InputVolcano$shape) %in% InputVolcano[row, "shape"]]
             names(sha) <- InputVolcano$shape[row]
-            keyvalsshape <- c(keyvalsshape, sha)
+            keyvalsshape %<>% c(sha)
             }
         } else if (
             "shape" %in% names(metadata_info) &
@@ -1002,7 +1002,7 @@ viz_volcano_compare <- function(
             for (row in seq_len(nrow(InputVolcano))) {
                 sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
                 names(sha) <- InputVolcano$comparison[row]
-                keyvalsshape <- c(keyvalsshape, sha)
+                keyvalsshape %<>% c(sha)
             }
         } else if (!("shape" %in% names(metadata_info))) {
             shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
@@ -1011,7 +1011,7 @@ viz_volcano_compare <- function(
             for (row in seq_len(nrow(InputVolcano))) {
                 sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
                 names(sha) <- InputVolcano$comparison[row]
-                keyvalsshape <- c(keyvalsshape, sha)
+                keyvalsshape %<>% c(sha)
             }
         }
         # Prepare the Plot:
@@ -1116,7 +1116,7 @@ viz_volcano_compare <- function(
                 for (row in seq_len(nrow(InputVolcano))) {
                     col <- color_select[unique(InputVolcano$color) %in% InputVolcano[row, "color"]]
                     names(col) <- InputVolcano$color[row]
-                    keyvals <- c(keyvals, col)
+                    keyvals %<>% c(col)
                 }
             # here we will use the conditions if no other color is provided!
             } else {
@@ -1126,7 +1126,7 @@ viz_volcano_compare <- function(
                 for (row in seq_len(nrow(InputVolcano))) {
                     col <- color_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
                     names(col) <- InputVolcano$comparison[row]
-                    keyvals <- c(keyvals, col)
+                    keyvals %<>% c(col)
                 }
             }
             # Prepare the shape scheme:
@@ -1140,7 +1140,7 @@ viz_volcano_compare <- function(
                 for (row in seq_len(nrow(InputVolcano))) {
                     sha <- shape_select[unique(InputVolcano$shape) %in% InputVolcano[row, "shape"]]
                     names(sha) <- InputVolcano$shape[row]
-                    keyvalsshape <- c(keyvalsshape, sha)
+                    keyvalsshape %<>% c(sha)
                 }
             } else if (
                 "shape" %in% names(metadata_info) &
@@ -1154,7 +1154,7 @@ viz_volcano_compare <- function(
                 for (row in seq_len(nrow(InputVolcano))) {
                     sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
                     names(sha) <- InputVolcano$comparison[row]
-                    keyvalsshape <- c(keyvalsshape, sha)
+                    keyvalsshape %<>% c(sha)
                 }
             } else if (!("shape" %in% names(metadata_info))) {
                 shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
@@ -1163,7 +1163,7 @@ viz_volcano_compare <- function(
                 for (row in seq_len(nrow(InputVolcano))) {
                     sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
                     names(sha) <- InputVolcano$comparison[row]
-                    keyvalsshape <- c(keyvalsshape, sha)
+                    keyvalsshape %<>% c(sha)
                 }
             }
             # Prepare the Plot:
@@ -1362,18 +1362,18 @@ viz_volcano_pea <- function(
     safe_shape_palette <- shape_palette
 
     # Prepare data:
-    data <- data %>%
+    data %<>%
     rename("PEA_Feature" = !!metadata_info[["PEA_Feature"]])
 
 
-    data2 <- data2 %>%
+    data2 %<>%
     rename(
         "PEA_score" = !!metadata_info[["PEA_score"]],
         "PEA_stat" = !!metadata_info[["PEA_stat"]],
         "PEA_Pathway" = !!metadata_info[["PEA_Pathway"]]
     )
 
-    metadata_feature <- metadata_feature %>%
+    metadata_feature %<>%
     rename(
         "PEA_Pathway" = !!metadata_info[["PEA_Pathway"]],
         "PEA_Feature" = !!metadata_info[["PEA_Feature"]]
@@ -1415,7 +1415,7 @@ viz_volcano_pea <- function(
                 for (row in seq_len(nrow(InputVolcano))) {
                     col <- color_select[unique(InputVolcano$color) %in% InputVolcano[row, "color"]]
                     names(col) <- InputVolcano$color[row]
-                    keyvals <- c(keyvals, col)
+                    keyvals %<>% c(col)
                 }
 
                 LegendPos <- "right"
@@ -1430,7 +1430,7 @@ viz_volcano_pea <- function(
                 for (row in seq_len(nrow(InputVolcano))) {
                     sha <- shape_select[unique(InputVolcano$shape) %in% InputVolcano[row, "shape"]]
                     names(sha) <- InputVolcano$shape[row]
-                    keyvalsshape <- c(keyvalsshape, sha)
+                    keyvalsshape %<>% c(sha)
                 }
 
                 LegendPos <- "right"

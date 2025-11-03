@@ -72,7 +72,7 @@ enricher_internal <- function(
         } else {
             sg <- unique(USER_DATA@gsid2gene$gene[seq_len(100L)])
         }
-        sg <- sample(sg, min(length(sg), 6))
+        sg %<>% sample(min(length(sg), 6))
         msg <-
             sprintf(
                 "--> Expected input gene ID: %s",
@@ -92,7 +92,7 @@ enricher_internal <- function(
         ),
         termID = qTermID
     )
-    qExtID2TermID.df <- unique(qExtID2TermID.df)
+    qExtID2TermID.df %<>% unique()
 
     qTermID2ExtID <- with(
         qExtID2TermID.df,
@@ -109,7 +109,7 @@ enricher_internal <- function(
             if (force_universe) {
                 extID <- universe
             } else {
-                extID <- intersect(extID, universe)
+                extID %<>% intersect(universe)
             }
         } else {
             # # https://github.com/YuLab-SMU/clusterProfiler/issues/217
@@ -117,14 +117,14 @@ enricher_internal <- function(
         }
     }
 
-    qTermID2ExtID <- lapply(qTermID2ExtID, intersect, extID)
+    qTermID2ExtID %<>% lapply(intersect, extID)
 
     # # Term ID annotate query external ID
     qTermID <- unique(names(qTermID2ExtID))
 
 
     termID2ExtID <- TERMID2EXTID(qTermID, USER_DATA)
-    termID2ExtID <- lapply(termID2ExtID, intersect, extID)
+    termID2ExtID %<>% lapply(intersect, extID)
 
     gene_sets <- termID2ExtID
 
@@ -425,10 +425,10 @@ build_Anno <- function(
         )
     }
 
-    path2gene <- as.data.frame(path2gene)
+    path2gene %<>% as.data.frame()
     path2gene <- path2gene[!is.na(path2gene[, 1]), ]
     path2gene <- path2gene[!is.na(path2gene[, 2]), ]
-    path2gene <- unique(path2gene)
+    path2gene %<>% unique()
 
     PATHID2EXTID <-
         split(
@@ -447,10 +447,10 @@ build_Anno <- function(
     if (missing(path2name) || is.null(path2name) || all(is.na(path2name))) {
         assign("PATHID2NAME", NULL, envir = Anno_clusterProfiler_Env)
     } else {
-        path2name <- as.data.frame(path2name)
+        path2name %<>% as.data.frame()
         path2name <- path2name[!is.na(path2name[, 1]), ]
         path2name <- path2name[!is.na(path2name[, 2]), ]
-        path2name <- unique(path2name)
+        path2name %<>% unique()
         PATH2NAME <- as.character(path2name[, 2])
         names(PATH2NAME) <- as.character(path2name[, 1])
         assign("PATHID2NAME", PATH2NAME, envir = Anno_clusterProfiler_Env)

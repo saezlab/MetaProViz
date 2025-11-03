@@ -570,7 +570,7 @@ dma <- function(
         )
 
 
-        DMA_Output_List <- c(DMA_Output_List, list("vstres" = Bartlett_output))
+        DMA_Output_List %<>% c(list("vstres" = Bartlett_output))
     }
 
     if (core) {
@@ -805,45 +805,45 @@ log2fc <- function(
                 (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C1 == 0L) |
                 (Mean_Merge$`NA/0` == FALSE & Mean_Merge$C2 == 0L)
             )) {
-                Mean_Merge <- Mean_Merge %>%
-                mutate(
-                    C1 = case_when(
-                        C2 == 0L &
-                        `NA/0`
-                            ~paste(C1),
-                        C1 == 0L &
-                        `NA/0`
-                            ~paste(C1),
-                        C2 == 0L &
-                        `NA/0` == FALSE
-                            ~paste(C1 + 1),
-                        C1 == 0L &
-                        `NA/0` == FALSE
-                            ~paste(C1 + 1),
-                        TRUE
-                            ~paste(C1)
-                    )
-                ) %>%
-                mutate(
-                    C2 = case_when(
-                        C1 == 0L &
-                        `NA/0`
-                            ~paste(C2),
-                        C2 == 0L &
-                        `NA/0`
-                            ~paste(C2),
-                        C1 == 0L &
-                        `NA/0` == FALSE
-                            ~paste(C2 + 1),
-                        C2 == 0L &
-                        `NA/0` == FALSE
-                            ~paste(C2 + 1),
-                        TRUE
-                            ~paste(C2)
-                    )
-                ) %>%
-                mutate(C1 = as.numeric(C1)) %>%
-                mutate(C2 = as.numeric(C2))
+                Mean_Merge %<>%
+                    mutate(
+                        C1 = case_when(
+                            C2 == 0L &
+                            `NA/0`
+                                ~paste(C1),
+                            C1 == 0L &
+                            `NA/0`
+                                ~paste(C1),
+                            C2 == 0L &
+                            `NA/0` == FALSE
+                                ~paste(C1 + 1),
+                            C1 == 0L &
+                            `NA/0` == FALSE
+                                ~paste(C1 + 1),
+                            TRUE
+                                ~paste(C1)
+                        )
+                    ) %>%
+                    mutate(
+                        C2 = case_when(
+                            C1 == 0L &
+                            `NA/0`
+                                ~paste(C2),
+                            C2 == 0L &
+                            `NA/0`
+                                ~paste(C2),
+                            C1 == 0L &
+                            `NA/0` == FALSE
+                                ~paste(C2 + 1),
+                            C2 == 0L &
+                            `NA/0` == FALSE
+                                ~paste(C2 + 1),
+                            TRUE
+                                ~paste(C2)
+                        )
+                    ) %>%
+                    mutate(C1 = as.numeric(C1)) %>%
+                    mutate(C2 = as.numeric(C2))
 
                 X <-
                     Mean_Merge %>%
@@ -868,19 +868,19 @@ log2fc <- function(
                 log2(abs(Mean_Merge$C1 - Mean_Merge$C2))
 
             # Now we can adapt the values to take into account the distance
-            Mean_Merge <- Mean_Merge %>%
-            mutate(
-                `Log2(Distance)` = case_when(
-                    # If C1>C2 the distance stays positive to reflect
-                    # that C1 > C2
-                    C1 > C2 ~ paste(`Log2(Distance)` * +1),
-                    # If C1<C2 the distance gets a negative sign to reflect
-                    # that C1 < C2
-                    C1 < C2 ~ paste(`Log2(Distance)` * -1),
-                    TRUE ~ "NA"
-                )
-            ) %>%
-            mutate(`Log2(Distance)` = as.numeric(`Log2(Distance)`))
+            Mean_Merge %<>%
+                mutate(
+                    `Log2(Distance)` = case_when(
+                        # If C1>C2 the distance stays positive to reflect
+                        # that C1 > C2
+                        C1 > C2 ~ paste(`Log2(Distance)` * +1),
+                        # If C1<C2 the distance gets a negative sign to reflect
+                        # that C1 < C2
+                        C1 < C2 ~ paste(`Log2(Distance)` * -1),
+                        TRUE ~ "NA"
+                    )
+                ) %>%
+                mutate(`Log2(Distance)` = as.numeric(`Log2(Distance)`))
 
             # Add additional information:
             temp1 <- Mean_C1
@@ -1074,7 +1074,7 @@ log2fc <- function(
             # values (NA/0) and not by coincidence
             Mean_Merge$`NA/0` <- Mean_Merge$Metabolite %in% Metabolites_Miss
 
-            Mean_Merge <- Mean_Merge %>%
+            Mean_Merge %<>%
                 mutate(
                     C1_Adapted = case_when(
                         C2 == 0L &
@@ -1362,7 +1362,7 @@ dma_stat_single <-
         # Add Metabolites that have p.val=NA back into the DF for completeness.
         if (nrow(PVal_NA) > 0L) {
             PVal_NA$p.adj <- NA
-            STAT_C1vC2 <- rbind(STAT_C1vC2, PVal_NA)
+            STAT_C1vC2 %<>% rbind(PVal_NA)
         }
 
         # Add Log2FC
@@ -2242,12 +2242,12 @@ dma_stat_limma <-
 
     if (!MultipleComparison) {
         # subset the data:
-        targets <- targets %>%
-        subset(
-            condition == metadata_info[["Numerator"]] |
-            condition == metadata_info[["Denominator"]]
-        ) %>%
-        arrange(sample)  # Order the column "sample" alphabetically
+        targets %<>%
+            subset(
+                condition == metadata_info[["Numerator"]] |
+                condition == metadata_info[["Denominator"]]
+            ) %>%
+            arrange(sample)  # Order the column "sample" alphabetically
 
         Limma_input <-
             data %>%
@@ -2293,7 +2293,7 @@ dma_stat_limma <-
     if (transform) {
         # communicate the log2 transformation --> how does limma deals with
         # NA when calculating the change?
-        Limma_input <- log2(Limma_input)
+        Limma_input %<>% log2()
     }
 
     # ### ------Run limma:
@@ -2351,7 +2351,7 @@ dma_stat_limma <-
                 i <- i + 1
             }
         }
-        cont.matrix <- t(cont.matrix)
+        cont.matrix %<>% t()
     } else if (!all_vs_all & MultipleComparison) {
         unique_conditions <- levels(fcond)  # Get unique conditions
         denominator <- make.names(metadata_info[["Denominator"]])
@@ -2407,7 +2407,7 @@ dma_stat_limma <-
             }
             i <- i + 1
         }
-        cont.matrix <- t(cont.matrix)
+        cont.matrix %<>% t()
     } else if (!all_vs_all & !MultipleComparison) {
         Name_Comp <- paste(
             make.names(metadata_info[["Numerator"]]),
@@ -2430,13 +2430,14 @@ dma_stat_limma <-
                     sep = ""
                 ) := 1
             )
-        cont.matrix <- as.matrix(cont.matrix)
+        cont.matrix %<>% as.matrix()
     }
 
     # Fit the linear model with contrasts
     # fit2 <- contrasts.fit(fit, cont.matrix)
     fit2 <- contrasts.fit(fit, cont.matrix)
-    fit2 <- eBayes(fit2)  # Perform empirical Bayes moderation
+    fit2 %<>% eBayes()  # Perform empirical Bayes moderation
+
 
     # ### ------Extract results:
     contrast_names <- colnames(fit2$coefficients)  # Get all contrast names
@@ -2459,8 +2460,7 @@ dma_stat_limma <-
                 "p.adj" = 5
             )
 
-        res.t <- res.t %>%
-        rownames_to_column("Metabolite")
+        res.t %<>% rownames_to_column("Metabolite")
 
         # Store the data frame in the results list, named after the contrast
         results_list[[contrast_name]] <- res.t

@@ -207,8 +207,7 @@ cluster_ora <- function(
         clusterGosummary$percentage_of_Pathway_detected <- round(((clusterGosummary$Count/clusterGosummary$Metabolites_in_Pathway)*100), digits = 2)
         clusterGosummary <- clusterGosummary[!duplicated(clusterGosummary$ID), ]
         clusterGosummary <- clusterGosummary[order(clusterGosummary$p.adjust), ]
-        clusterGosummary <- clusterGosummary %>%
-        rename("Metabolites_in_pathway" = "geneID")
+        clusterGosummary %<>% rename("Metabolites_in_pathway" = "geneID")
 
         g_save <- gsub("/", "-", g)
         df_list[[g_save]] <- clusterGosummary
@@ -332,8 +331,7 @@ standard_ora <- function(
 
     ##########################################################################
     ## ------------ Load the data and check ----------- ##
-    data <- data %>%
-    rownames_to_column("Metabolite")
+    data %<>% rownames_to_column("Metabolite")
 
     # Select universe
     allMetabolites <- as.character(data$Metabolite)
@@ -427,8 +425,7 @@ standard_ora <- function(
         clusterGosummary$percentage_of_Pathway_detected <- round(((clusterGosummary$Count/clusterGosummary$Metabolites_in_Pathway)*100), digits = 2)
         clusterGosummary <- clusterGosummary[!duplicated(clusterGosummary$ID), ]
         clusterGosummary <- clusterGosummary[order(clusterGosummary$p.adjust), ]
-        clusterGosummary <- clusterGosummary %>%
-        rename("Metabolites_in_pathway" = "geneID")
+        clusterGosummary %<>% rename("Metabolites_in_pathway" = "geneID")
     } else {
     stop("None of the Input_data Metabolites were present in any terms of the input_pathway. Hence the ClusterGosummary ouput will be empty. Please check that the metabolite IDs match the pathway IDs.")
     }
@@ -452,7 +449,7 @@ standard_ora <- function(
     )
 
     # Return
-    ORA_output_list <- c( ORA_output_list, list("ClusterGo" = clusterGo))
+    ORA_output_list %<>% c(list("ClusterGo" = clusterGo))
 
     invisible(return(ORA_output_list))
     }

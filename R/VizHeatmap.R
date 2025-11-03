@@ -219,7 +219,7 @@ viz_heatmap <- function(
                     as.data.frame()
                     names(col_annot)[x] <- annot_sel
                 }
-                col_annot <- as.data.frame(col_annot)
+                col_annot %<>% as.data.frame()
                 rownames(col_annot) <- rownames(data_path)
             }
 
@@ -236,7 +236,7 @@ viz_heatmap <- function(
                         as.data.frame()
                     names(row_annot)[y] <- annot_sel
                 }
-                row_annot <- as.data.frame(row_annot)
+                row_annot %<>% as.data.frame()
                 rownames(row_annot) <- rownames(metadata_feature)
             }
 
@@ -408,7 +408,7 @@ viz_heatmap <- function(
                     by = "UniqueID",
                     all.x = TRUE
                 )
-            data_path <- data_path %>%
+            data_path %<>%
             column_to_rownames("UniqueID")
 
             # Column annotation
@@ -431,7 +431,7 @@ viz_heatmap <- function(
                     as.data.frame()
                     names(col_annot)[x] <- annot_sel
                 }
-                col_annot <- as.data.frame(col_annot)
+                col_annot %<>% as.data.frame()
                 rownames(col_annot) <- rownames(data_path)
             }
 
@@ -448,7 +448,7 @@ viz_heatmap <- function(
                         as.data.frame()
                     names(row_annot)[y] <- annot_sel
                 }
-                row_annot <- as.data.frame(row_annot)
+                row_annot %<>% as.data.frame()
                 rownames(row_annot) <- rownames(metadata_feature)
             }
 
@@ -645,7 +645,7 @@ viz_heatmap <- function(
                         as.data.frame()
                     names(row_annot)[y] <- annot_sel
                 }
-                row_annot <- as.data.frame(row_annot)
+                row_annot %<>% as.data.frame()
                 rownames(row_annot) <- rownames(metadata_feature)
             }
 
@@ -688,7 +688,7 @@ viz_heatmap <- function(
                         as.data.frame()
                         names(col_annot)[x] <- annot_sel
                     }
-                    col_annot <- as.data.frame(col_annot)
+                    col_annot %<>% as.data.frame()
                     rownames(col_annot) <- rownames(data_path)
                 }
 
@@ -829,7 +829,7 @@ viz_heatmap <- function(
                 as.data.frame()
                 names(col_annot)[i] <- annot_sel
             }
-            col_annot <- as.data.frame(col_annot)
+            col_annot %<>% as.data.frame()
             rownames(col_annot) <- rownames(data)
         }
 
@@ -846,7 +846,7 @@ viz_heatmap <- function(
                     as.data.frame()
                 names(row_annot)[i] <- annot_sel
             }
-            row_annot <- as.data.frame(row_annot)
+            row_annot %<>% as.data.frame()
             rownames(row_annot) <- rownames(metadata_feature)
         }
 

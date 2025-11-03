@@ -298,11 +298,11 @@ viz_superplot <- function(
 
     ##########################################################################
     ## ------------ Prepare Input ----------- ##
-    metadata_sample <- metadata_sample %>%
+    metadata_sample %<>%
     rename("Conditions" = paste(metadata_info[["Conditions"]]) )
 
     if ("Superplot" %in% names(metadata_info)) {
-        metadata_sample <- metadata_sample %>%
+        metadata_sample %<>%
         rename("Superplot" = paste(metadata_info[["Superplot"]]) )
 
         data_merge <-
@@ -311,10 +311,10 @@ viz_superplot <- function(
                 data,
                 by = 0L
             )
-        data_merge <- column_to_rownames(data_merge, "Row.names")
+        data_merge %<>% column_to_rownames("Row.names")
     } else {
         data_merge <- merge(metadata_sample[c("Conditions")], data, by = 0)
-        data_merge <- column_to_rownames(data_merge, "Row.names")
+        data_merge %<>% column_to_rownames("Row.names")
     }
 
     # Rename the x and y lab if the information has been passed:
@@ -375,8 +375,8 @@ viz_superplot <- function(
 
     # Take only selected conditions
     if (!is.null(plot_conditions)) {
-        dataMeans <- dataMeans %>% filter(Conditions %in% plot_conditions)
-        plotdata <- plotdata %>% filter(Conditions %in% plot_conditions)
+        dataMeans %<>% filter(Conditions %in% plot_conditions)
+        plotdata %<>% filter(Conditions %in% plot_conditions)
         plotdata$Conditions <- factor(plotdata$Conditions, levels = plot_conditions)
     }
 
@@ -483,7 +483,7 @@ viz_superplot <- function(
                         max(dataMeans$Intensity + 2*dataMeans$sd)+0.04* max(dataMeans$Intensity + 2*dataMeans$sd),
                         max(dataMeans$Intensity + 2*dataMeans$sd)+0.08* max(dataMeans$Intensity + 2*dataMeans$sd))
 
-        df <- df %>%
+        df %<>%
         mutate(y.position = rep(position, length.out = n()))
 
         # select stats based on comparison_table
@@ -497,7 +497,7 @@ viz_superplot <- function(
                     "_vs_",
                     plot_conditions[comp[2]]
                 )
-            df_select <- rbind(df_select, data.frame(entry))
+            df_select %<>% rbind(data.frame(entry))
             }
 
             df_merge <-
