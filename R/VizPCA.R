@@ -284,7 +284,12 @@ viz_pca <- function(
                 # Overwrite color_scale
                 scale_color <- "discrete"
                 log_info("Warning: scale_color=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
-                warning("scale_color=continuous, but is.numeric or is.integer is FALSE, hence colour scale is set to discrete.")
+                msg <- paste0(
+                    "scale_color=continuous, but is.numeric or is.integer is FALSE, hence ",
+                    "colour scale is set to discrete."
+                )
+                log_warn(msg)
+                warning(msg)
             }
         }
     }

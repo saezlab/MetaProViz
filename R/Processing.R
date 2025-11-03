@@ -728,7 +728,12 @@ pool_estimation <- function(
     }
 
     if (!is.numeric(cutoff_cv) | cutoff_cv < 0) {
-        stop("Check input. The selected cutoff_cv value should be a positive numeric value.")
+        msg <- paste0(
+            "Check input. The selected cutoff_cv value should be a positive numeric ",
+            "value."
+        )
+        log_error(msg)
+        stop(msg)
     }
 
     ## ------------------  Create output folders  and path ------------------- ##
@@ -1071,7 +1076,13 @@ feature_filtering <- function(
             stop(message)
         }
         if (length(unique(feat_filt_Conditions)) == 1) {
-            message("to perform the Modified feature filtering there have to be at least 2 different Conditions in the `Condition` column in the Experimental design. Consider using the Standard feature filtering option.")
+            msg <- paste0(
+                "to perform the Modified feature filtering there have to be at least 2 ",
+                "different Conditions in the `Condition` column in the Experimental ",
+                "design. Consider using the Standard feature filtering option."
+            )
+            log_info(msg)
+            message(msg)
             log_trace(message)
             stop(message)
         }

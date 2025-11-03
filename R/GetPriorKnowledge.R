@@ -267,7 +267,12 @@ make_gene_metab_set <- function(
     ## ------------ Check Input files ----------- ##
     # 1. The input data:
     if (!is.data.frame(input_pk)) {
-        stop("`input_pk` must be of class data.frame with columns for source (= term) and Target (= gene). Please check your input")
+        msg <- paste0(
+            "`input_pk` must be of class data.frame with columns for source (= ",
+            "term) and Target (= gene). Please check your input"
+        )
+        log_error(msg)
+        stop(msg)
     }
     # 2. Target:
     if ("Target" %in% names(metadata_info)) {
@@ -534,7 +539,13 @@ metsigdb_metalinks <- function(
         }
         }
     }
-    message("No result is returned unless correct options for your selections are used. `?` is not a valid option, but only returns you the list of options.")
+    msg <- paste0(
+        "No result is returned unless correct options for your selections are ",
+        "used. `?` is not a valid option, but only returns you the list of ",
+        "options."
+    )
+    log_info(msg)
+    message(msg)
     return()
     }
 

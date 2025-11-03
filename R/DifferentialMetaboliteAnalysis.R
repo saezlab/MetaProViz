@@ -207,7 +207,10 @@ dma <- function(
     # 1. Normality
     if (shapiro) {
         if (length(Settings[["Metabolites_Miss"]] >= 1L)) {
-            msg <- "There are NA's / 0s in the data. This can impact the output of the SHapiro-Wilk test for all metabolites that include NAs / 0s."
+            msg <- paste0(
+                "There are NA's / 0s in the data. This can impact the output of the ",
+                "SHapiro-Wilk test for all metabolites that include NAs / 0s."
+            )
             log_warn(msg)
             warning(msg, call. = FALSE)
         }

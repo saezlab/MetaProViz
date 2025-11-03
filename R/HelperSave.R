@@ -344,7 +344,12 @@ save_res <- function(
                             grid::grid.draw(patchwork::patchworkGrob(plot_obj))
                         },
                         error = function(e) {
-                            message("Note: Could not render upset plot to screen due to theme compatibility issues. Plot was saved to file successfully.")
+                            msg <- paste0(
+                                "Note: Could not render upset plot to screen due to theme compatibility ",
+                                "issues. Plot was saved to file successfully."
+                            )
+                            log_info(msg)
+                            message(msg)
                         }
                     )
                 } else {

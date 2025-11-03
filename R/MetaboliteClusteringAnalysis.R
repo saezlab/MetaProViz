@@ -296,7 +296,12 @@ mca_2cond <- function(data_c1,
     } else if (method_background == "*") {  # Use all genes as the background
         MergeDF$BG_method <- "TRUE"
     } else {
-        stop("Please use one of the following method_backgrounds: C1|C2, C1&C2, C2, C1, *")
+        msg <- paste0(
+            "Please use one of the following method_backgrounds: C1|C2, C1&C2, C2, ",
+            "C1, *"
+        )
+        log_error(msg)
+        stop(msg)
     }
 
     #Assign SiRCle cluster names to the genes
@@ -1165,7 +1170,12 @@ mca_core <- function(data_intra,
     MergeDF$BG_method <- "TRUE"
     } else {
     # error message
-    stop("Please use one of the following method_backgrounds: Intra|core, Intra&core, core, Intra, *")
+    msg <- paste0(
+        "Please use one of the following method_backgrounds: Intra|core, ",
+        "Intra&core, core, Intra, *"
+    )
+    log_error(msg)
+    stop(msg)
     }
 
     #Assign Metabolite cluster names to the metabolites

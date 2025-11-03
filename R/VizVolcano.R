@@ -995,7 +995,13 @@ viz_volcano_compare <- function(
             "color" %in% names(metadata_info)
         ) {
             # Here we have already used color from metadata_info and we need to use shape for the conditions
-            message("For Plot_setting = `Consitions`we can only use colour or shape from metadata_feature. We ignore shape and use it to label the Comparison_name.")
+            msg <- paste0(
+                "For Plot_setting = `Consitions`we can only use colour or shape from ",
+                "metadata_feature. We ignore shape and use it to label the ",
+                "Comparison_name."
+            )
+            log_info(msg)
+            message(msg)
             shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
 
             keyvalsshape <- c()
@@ -1147,7 +1153,13 @@ viz_volcano_compare <- function(
                 "color" %in% names(metadata_info)
             ) {
                 # Here we have already used color from metadata_info and we need to use shape for the conditions
-                message("For plot_types Comparison we can only use colour or shape from metadata_feature. Hence, we ignore shape and use it to label the name_comparison.")
+                msg <- paste0(
+                    "For plot_types Comparison we can only use colour or shape from ",
+                    "metadata_feature. Hence, we ignore shape and use it to label the ",
+                    "name_comparison."
+                )
+                log_info(msg)
+                message(msg)
                 shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
 
                 keyvalsshape <- c()

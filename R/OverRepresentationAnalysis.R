@@ -427,7 +427,13 @@ standard_ora <- function(
         clusterGosummary <- clusterGosummary[order(clusterGosummary$p.adjust), ]
         clusterGosummary %<>% rename("Metabolites_in_pathway" = "geneID")
     } else {
-        stop("None of the Input_data Metabolites were present in any terms of the input_pathway. Hence the ClusterGosummary ouput will be empty. Please check that the metabolite IDs match the pathway IDs.")
+        msg <- paste0(
+            "None of the Input_data Metabolites were present in any terms of the ",
+            "input_pathway. Hence the ClusterGosummary ouput will be empty. Please ",
+            "check that the metabolite IDs match the pathway IDs."
+        )
+        log_error(msg)
+        stop(msg)
     }
 
     # Return and save list of DFs
@@ -452,12 +458,5 @@ standard_ora <- function(
     ORA_output_list %<>% c(list("ClusterGo" = clusterGo))
 
     invisible(return(ORA_output_list))
-    }
 
-
-#
-# Helper Fishers exact test
-#
-
-# perform test on n groups of features. DF with column feature and column group
-# output list of DFs named after groups
+}
