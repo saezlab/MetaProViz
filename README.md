@@ -11,6 +11,7 @@
 
 <center>
 
+
 ![**Fig. 1:** Overview of MetaProViz functions.](https://github.com/saezlab/MetaProViz/blob/development/vignettes/Fig.1.png?raw=true)
 
 </center>
