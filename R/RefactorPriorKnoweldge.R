@@ -986,10 +986,7 @@ path = NULL
     # If the to column is not a list of IDs, but a character column, we need to
     # convert it into a list of IDs
     if (is.character(data[[to]])) {
-        data[[to]] <-
-            data[[to]] %>%
-            strsplit(", ") %>%
-            lapply(as.character)
+        data[[to]] %<>% strsplit(", ") %>% lapply(as.character)
     }
 
     # # ------------------  Perform ambiguity mapping ------------------- ##
@@ -1010,8 +1007,9 @@ path = NULL
                 Comp[[comp]]$to,
                 sep = ""
             )
-        ]] <- data %>%
-        unnest(  # unlist the columns in case they are not expaned
+        ]] <-
+            data %>%
+            unnest(  # unlist the columns in case they are not expaned
                 cols = all_of(Comp[[comp]]$from)
             ) %>%
             # Remove NA values, otherwise they are counted as column is
@@ -1044,23 +1042,24 @@ path = NULL
                 "_summary",
                 sep = ""
             )
-        ]] <- ResList[[
-            paste0(
-                Comp[[comp]]$from,
-                "-to-",
-                Comp[[comp]]$to,
-                sep = ""
+        ]] <-
+            ResList[[
+                paste0(
+                    Comp[[comp]]$from,
+                    "-to-",
+                    Comp[[comp]]$to,
+                    sep = ""
+                )
+            ]] %>%
+            attr(
+                paste0(
+                    "ambiguity_",
+                    Comp[[comp]]$from,
+                    "_",
+                    Comp[[comp]]$to,
+                    sep = ""
+                )
             )
-        ]] %>%
-        attr(
-            paste0(
-                "ambiguity_",
-                Comp[[comp]]$from,
-                "_",
-                Comp[[comp]]$to,
-                sep = ""
-            )
-        )
 
         # #######################################################################
         if (summary) {
@@ -1717,11 +1716,20 @@ checkmatch_pk_to_data <- function(
         message(message)
     }
 
-    if (nrow(input_pk) - nrow(distinct(input_pk, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["grouping_variable"]]]])) >= 1L) {
+    n_removed <-
+        nrow(input_pk) -
+        nrow(
+            distinct(
+                input_pk,
+                .data[[metadata_info[["PriorID"]]]],
+                .data[[metadata_info[["grouping_variable"]]]]
+            )
+        )
+    if (n_removed >= 1L) {
         # Remove duplicate IDs
         message <-
             paste0(
-                nrow(input_pk) - nrow(distinct(input_pk, .data[[metadata_info[["PriorID"]]]], .data[[metadata_info[["grouping_variable"]]]])),
+                n_removed,
                 " duplicated IDs were removed from PK column ",
                 metadata_info[["PriorID"]]
             )
@@ -1761,24 +1769,24 @@ checkmatch_pk_to_data <- function(
                 ", \\s*",
                 input_pk[[metadata_info[["PriorID"]]]]
             ) |  # Comma-separated
-                map_lgl(
-                    input_pk[[metadata_info[["PriorID"]]]],
-                    function(x) {
-                        if (grepl("^c\\(|^list\\(", x)) {
-                            parsed <- tryCatch(
-                                eval(parse(text = x)),
-                                error = function(e) NULL
-                            )
-                            return(
-                                is.list(parsed) &&
-                                length(parsed) > 1L ||
-                                is.vector(parsed) &&
-                                length(parsed) > 1L
-                            )
-                        }
-                        FALSE
+            map_lgl(
+                input_pk[[metadata_info[["PriorID"]]]],
+                function(x) {
+                    if (grepl("^c\\(|^list\\(", x)) {
+                        parsed <- tryCatch(
+                            eval(parse(text = x)),
+                            error = function(e) NULL
+                        )
+                        return(
+                            is.list(parsed) &&
+                            length(parsed) > 1L ||
+                            is.vector(parsed) &&
+                            length(parsed) > 1L
+                        )
                     }
-                )
+                    FALSE
+                }
+            )
         )
 
     # # ------------ Create Results output folder ----------- ##
@@ -1979,8 +1987,10 @@ checkmatch_pk_to_data <- function(
         ) %>%
         mutate(
             Count_FeatureIDs_to_GroupingVariable = case_when(
-                is.na(!!sym(metadata_info[["grouping_variable"]])) ~ NA_integer_,
-                TRUE ~ n_distinct(!!sym(metadata_info[["PriorID"]]), na.rm = TRUE)
+                is.na(!!sym(metadata_info[["grouping_variable"]]))
+                    ~NA_integer_,
+                TRUE
+                    ~n_distinct(!!sym(metadata_info[["PriorID"]]), na.rm = TRUE)
             )
         ) %>%
         mutate(
@@ -2112,7 +2122,11 @@ checkmatch_pk_to_data <- function(
             " IDs. Of those IDs, ",
             nrow(summary_df_short %>% filter(matches_count >= 1L)),
             " match, which is ",
-            (nrow(summary_df_short %>% filter(matches_count >= 1L)) / n_distinct(unique(data_long[[metadata_info[["InputID"]]]]))) * 100,
+            (
+                nrow(summary_df_short %>% filter(matches_count >= 1L)) /
+                n_distinct(unique(data_long[[metadata_info[["InputID"]]]])) *
+                100
+            ),
             "%.",
             sep = ""
         )
@@ -2127,7 +2141,11 @@ checkmatch_pk_to_data <- function(
             " IDs. Of those IDs, ",
             nrow(summary_df_short %>% filter(matches_count >= 1L)),
             " are detected in the data, which is ",
-            (nrow(summary_df_short %>% filter(matches_count >= 1L)) / n_distinct(PK_long[[metadata_info[["PriorID"]]]])) * 100,
+            (
+                nrow(summary_df_short %>% filter(matches_count >= 1L)) /
+                n_distinct(PK_long[[metadata_info[["PriorID"]]]]) *
+                100
+            ),
             "%."
         )
 
@@ -2136,13 +2154,14 @@ checkmatch_pk_to_data <- function(
     message(message2)
 
     if (nrow(summary_df_short %>% filter(ActionRequired == "Check")) >= 1L) {
-        warning1 <-# "Check"
+        warning1 <-  # "Check"
             paste0(
                 "There are cases where multiple detected IDs match to ",
                 "multiple ",
                 "prior knowledge ",
                 "IDs of the same category"
             )
+        log_warn(warning1)
         warning(warning1)
     }
 
@@ -2255,9 +2274,17 @@ cluster_pk <- function(
                 2,
                 function(terms) {
                     term1_ids <-
-                        term_metabolites$MetaboliteIDs[term_metabolites[[metadata_info[["grouping_variable"]]]] == terms[1]][[1]]
+                        term_metabolites$MetaboliteIDs[
+                            term_metabolites[[
+                                metadata_info[["grouping_variable"]]
+                            ]] == terms[1]
+                        ][[1]]
                     term2_ids <-
-                        term_metabolites$MetaboliteIDs[term_metabolites[[metadata_info[["grouping_variable"]]]] == terms[2]][[1]]
+                        term_metabolites$MetaboliteIDs[
+                            term_metabolites[[
+                                metadata_info[["grouping_variable"]]
+                            ]] == terms[2]
+                        ][[1]]
 
                     overlap <-
                         length(
@@ -2378,7 +2405,12 @@ cluster_pk <- function(
         initial_clusters <-
             components(g)$membership
         term_metabolites$cluster <-
-            initial_clusters[match(term_metabolites[[metadata_info[["grouping_variable"]]]], names(initial_clusters))]
+            initial_clusters[
+                match(
+                    term_metabolites[[metadata_info[["grouping_variable"]]]],
+                    names(initial_clusters)
+                )
+            ]
     } else if (clust == "Hierarchical") {
         # Hierarchical clustering
         hclust_result <-
@@ -2410,9 +2442,9 @@ cluster_pk <- function(
         left_join(
             term_metabolites %>%
             select(
-                    !!sym(metadata_info[["grouping_variable"]]),
-                    cluster
-                ),
+                !!sym(metadata_info[["grouping_variable"]]),
+                cluster
+            ),
             by = metadata_info[["grouping_variable"]]
         ) %>%
         mutate(
