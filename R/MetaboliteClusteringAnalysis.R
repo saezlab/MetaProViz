@@ -172,18 +172,9 @@ mca_2cond <- function(data_c1,
 
     ##Mark the undetected genes in each data layer
     MergeDF<-MergeDF %>%
-    mutate_at(
-        c("Cond2_DF_Detected","Cond1_DF_Detected"),
-        ~replace_na(.,"FALSE")
-    )%>%
-    mutate_at(
-        c("Cond2_DF_Cutoff","Cond1_DF_Cutoff"),
-        ~replace_na(.,"No Change")
-    )%>%
-    mutate_at(
-        c("Cond2_DF_Cutoff_Specific", "Cond1_DF_Cutoff_Specific"),
-        ~replace_na(.,"Not Detected")
-    )
+    mutate_at(c("Cond2_DF_Detected","Cond1_DF_Detected"), ~replace_na(.,"FALSE"))%>%
+    mutate_at(c("Cond2_DF_Cutoff","Cond1_DF_Cutoff"), ~replace_na(.,"No Change"))%>%
+    mutate_at(c("Cond2_DF_Cutoff_Specific", "Cond1_DF_Cutoff_Specific"), ~replace_na(.,"Not Detected"))
 
     #Apply Background filter (label genes that will be removed based on choosen background)
     if(method_background == "C1|C2"){# C1|C2 = Cond2 OR Cond1
@@ -397,25 +388,13 @@ mca_2cond <- function(data_c1,
     Cond1ValueCol_Unique<-paste("Cond1_DF_",metadata_info_c1[["ValueCol"]])
     Cond1PadjCol_Unique <-paste("Cond1_DF_",metadata_info_c1[["StatCol"]])
 
-    MergeDF_Select2<-
-        subset(
-            MergeDF,
-            select=-c(Cond1_DF_Detected,Cond1_DF_Cutoff, Cond2_DF_Detected,Cond2_DF_Cutoff, Cond2_DF_Cutoff_Specific, BG_method, RG1_All, RG2_Significant, RG3_SignificantChange)
-        )%>%
-    rename(
-        !!Cond2ValueCol_Unique :="Cond2_DF_ValueCol",
-        #This syntax is needed since paste(MetaboliteID
-    )="MetaboliteID" is not working in dyplr
+    MergeDF_Select2<- subset(MergeDF, select=-c(Cond1_DF_Detected,Cond1_DF_Cutoff, Cond2_DF_Detected,Cond2_DF_Cutoff, Cond2_DF_Cutoff_Specific, BG_method, RG1_All, RG2_Significant, RG3_SignificantChange))%>%
+    rename(!!Cond2ValueCol_Unique :="Cond2_DF_ValueCol",#This syntax is needed since paste(MetaboliteID)="MetaboliteID" is not working in dyplr
                     !!Cond2PadjCol_Unique :="Cond2_DF_PadjCol",
                     !!Cond1ValueCol_Unique :="Cond1_DF_ValueCol",
                     !!Cond1PadjCol_Unique :="Cond1_DF_PadjCol")
 
-    MergeDF_Rearrange <-
-        merge(
-            MergeDF_Select1,
-            MergeDF_Select2,
-            by="MetaboliteID"
-        )
+    MergeDF_Rearrange <- merge(MergeDF_Select1, MergeDF_Select2, by="MetaboliteID")
     MergeDF_Rearrange <-MergeDF_Rearrange%>%
     rename("Metabolite"="MetaboliteID")
 
@@ -435,12 +414,7 @@ mca_2cond <- function(data_c1,
     rename("SiRCle cluster Name"= "RG3_SignificantChange")
     Clustersummary_RG3$`Regulation Grouping` <- "RG3_SignificantChange"
 
-    Clustersummary <-
-        rbind(
-            Clustersummary_RG1,
-            Clustersummary_RG2,
-            Clustersummary_RG3
-        )
+    Clustersummary <- rbind(Clustersummary_RG1, Clustersummary_RG2,Clustersummary_RG3)
     Clustersummary <- Clustersummary[,c(3,1,2)]
 
     ## Rename feature
@@ -450,11 +424,7 @@ mca_2cond <- function(data_c1,
     ######################################################################################################################################################################
     ##----- Save and Return
     #Here we make a list in which we will save the outputs:
-    DF_List <-
-        list(
-            "MCA_2Cond_summary"=Clustersummary,
-            "MCA_2Cond_Results"=MergeDF_Rearrange
-        )
+    DF_List <- list("MCA_2Cond_summary"=Clustersummary, "MCA_2Cond_Results"=MergeDF_Rearrange)
 
     save_res(inputlist_df = DF_List,
         inputlist_plot = NULL,
@@ -653,18 +623,9 @@ mca_core <- function(data_intra,
 
     ##Mark the undetected genes in each data layer
     MergeDF<-MergeDF %>%
-    mutate_at(
-        c("core_DF_Detected","Intra_DF_Detected"),
-        ~replace_na(.,"FALSE")
-    )%>%
-    mutate_at(
-        c("core_DF_Cutoff","Intra_DF_Cutoff"),
-        ~replace_na(.,"No Change")
-    )%>%
-    mutate_at(
-        c("core_DF_Cutoff_Specific", "Intra_DF_Cutoff_Specific"),
-        ~replace_na(.,"Not Detected")
-    )%>%
+    mutate_at(c("core_DF_Detected","Intra_DF_Detected"), ~replace_na(.,"FALSE"))%>%
+    mutate_at(c("core_DF_Cutoff","Intra_DF_Cutoff"), ~replace_na(.,"No Change"))%>%
+    mutate_at(c("core_DF_Cutoff_Specific", "Intra_DF_Cutoff_Specific"), ~replace_na(.,"Not Detected"))%>%
     mutate_at(c("core_DF_core_Direction"), ~replace_na(.,"Not Detected"))
 
     #Apply Background filter (label metabolites that will be removed based on chosen background)
@@ -1093,25 +1054,13 @@ mca_core <- function(data_intra,
     IntraValueCol_Unique<-paste("Cond1_DF_",metadata_info_intra[["ValueCol"]])
     IntraPadjCol_Unique <-paste("Cond1_DF_",metadata_info_intra[["StatCol"]])
 
-    MergeDF_Select2<-
-        subset(
-            MergeDF,
-            select=-c(Intra_DF_Detected,Intra_DF_Cutoff, core_DF_Detected,core_DF_Cutoff, core_DF_Cutoff_Specific, BG_method, RG1_All, RG2_Significant, RG3_Change)
-        )%>%
-    rename(
-        !!coreValueCol_Unique :="core_DF_ValueCol",
-        #This syntax is needed since paste(MetaboliteID
-    )="MetaboliteID" is not working in dyplr
+    MergeDF_Select2<- subset(MergeDF, select=-c(Intra_DF_Detected,Intra_DF_Cutoff, core_DF_Detected,core_DF_Cutoff, core_DF_Cutoff_Specific, BG_method, RG1_All, RG2_Significant, RG3_Change))%>%
+    rename(!!coreValueCol_Unique :="core_DF_ValueCol",#This syntax is needed since paste(MetaboliteID)="MetaboliteID" is not working in dyplr
                     !!corePadjCol_Unique :="core_DF_PadjCol",
                     !!IntraValueCol_Unique :="Intra_DF_ValueCol",
                     !!IntraPadjCol_Unique :="Intra_DF_PadjCol")
 
-    MergeDF_Rearrange <-
-        merge(
-            MergeDF_Select1,
-            MergeDF_Select2,
-            by="MetaboliteID"
-        )
+    MergeDF_Rearrange <- merge(MergeDF_Select1, MergeDF_Select2, by="MetaboliteID")
     MergeDF_Rearrange <-MergeDF_Rearrange%>%
     rename("Metabolite"="MetaboliteID")
 
@@ -1141,12 +1090,7 @@ mca_core <- function(data_intra,
     Clustersummary_RG3$`Regulation Grouping` <- "RG3_Change"
     Clustersummary_RG3 <- Clustersummary_RG3[-c(1)]
 
-    Clustersummary <-
-        rbind(
-            Clustersummary_RG1,
-            Clustersummary_RG2,
-            Clustersummary_RG3
-        )
+    Clustersummary <- rbind(Clustersummary_RG1, Clustersummary_RG2,Clustersummary_RG3)
     Clustersummary <- Clustersummary[,c(3,1,2)]
 
     ## Rename feature
@@ -1156,11 +1100,7 @@ mca_core <- function(data_intra,
     ######################################################################################################################################################################
     ##----- Save and Return
     #Here we make a list in which we will save the outputs:
-    DF_List <-
-        list(
-            "MCA_core_summary"=Clustersummary,
-            "MCA_core_Results"=MergeDF_Rearrange
-        )
+    DF_List <- list("MCA_core_summary"=Clustersummary, "MCA_core_Results"=MergeDF_Rearrange)
 
     save_res(inputlist_df = DF_List,
         inputlist_plot = NULL,

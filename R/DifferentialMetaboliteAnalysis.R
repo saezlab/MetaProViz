@@ -223,11 +223,7 @@ dma <- function(
                     )
             },
             error = function(e) {
-                msg <-
-                    sprintf(
-                        "Error in shapiro (Shapiro-Wilk test): %s",
-                        conditionMessage(e)
-                    )
+                msg <- sprintf("Error in shapiro (Shapiro-Wilk test): %s", conditionMessage(e))
                 log_error(msg)
                 stop(msg, call. = FALSE)
             }
@@ -259,11 +255,7 @@ dma <- function(
                             )
                     },
                     error = function(e) {
-                        msg <-
-                            sprintf(
-                                "Error in bartlett (Bartlett test): %s",
-                                conditionMessage(e)
-                            )
+                        msg <- sprintf("Error in bartlett (Bartlett test): %s", conditionMessage(e))
                         log_error(msg)
                         stop(msg, call. = FALSE)
                     }
@@ -1305,12 +1297,7 @@ dma_stat_single <-
         }
 
         Metabolite <- colnames(C2)
-        PVal_C1vC2 <-
-            data.frame(
-                Metabolite,
-                p.val = VecPVAL_C1vC2,
-                t.val = VecTVAL_C1vC2
-            )
+        PVal_C1vC2 <- data.frame(Metabolite, p.val = VecPVAL_C1vC2, t.val = VecTVAL_C1vC2)
 
         # we set p.val= NA, for metabolites that had 1 or more replicates with NA/0 values and remove them prior to p-value adjustment
         PVal_C1vC2$`NA/0` <- PVal_C1vC2$Metabolite %in% Metabolites_Miss
@@ -2371,10 +2358,7 @@ dma_stat_limma <-
             )
             cont.matrix <-
                 as.data.frame(
-                    makeContrasts(
-                        contrasts = Name_Comp,
-                        levels = colnames(design)
-                    )
+                    makeContrasts(contrasts = Name_Comp, levels = colnames(design))
                 ) %>%
                 rename(
                     !!paste(
@@ -3162,10 +3146,7 @@ mpv_bartlett <- function(
     # if p<0.05 then unequal variances
     message(
         "For ",
-        round(
-            sum(DF_bartlett_results$`Var homogeneity`) / nrow(DF_bartlett_results),
-            digits = 4
-        ) * 100,
+        round(sum(DF_bartlett_results$`Var homogeneity`) / nrow(DF_bartlett_results), digits = 4) * 100,
         "% of metabolites the group variances are equal."
     )
 

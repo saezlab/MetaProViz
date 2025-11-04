@@ -232,10 +232,7 @@ parse_unit <- function(
                             !any(is.na(.)),
                             unit(.[, 2L], .[, 3L]),
                             {
-                                log_warn(
-                                    "Could not parse unit %s",
-                                    paste0(u, collapse = ", ")
-                                )
+                                log_warn("Could not parse unit %s", paste0(u, collapse = ", "))
                                 unit(1, "null")
                             }
                         )
@@ -385,11 +382,7 @@ adjust_legend <- function(
                 round(1L) %>%
                 max(legend_nchar)
 
-        log_trace(
-            "Legend nchar: %.02fcm, Legend width: %.02fcm",
-            legend_nchar,
-            legend_width
-        )
+        log_trace("Legend nchar: %.02fcm, Legend width: %.02fcm", legend_nchar, legend_width)
 
         # # Legend space:
         gtbl %<>%
@@ -511,21 +504,12 @@ plotGrob_Processing <- function(
         heights = list(
             list("axis-l", "8cm"),
             list("axis-b", "0.5cm"),  # This is adjusted for the x-axis ticks!
-            list(
-                "xlab-b",
-                "0.75cm"
-            ),  # This gives us the distance of the caption to the x-axis label
+            list("xlab-b", "0.75cm"),  # This gives us the distance of the caption to the x-axis label
             list("title", "0cm", offset = -2L, ifempty = FALSE),
             list("title", "0cm", offset = -1L),
-            list(
-                "title",
-                "0.25cm"
-            ),  # how much space is between title and y-axis label
+            list("title", "0.25cm"),  # how much space is between title and y-axis label
             list("subtitle", "0cm"),
-            list(
-                "caption",
-                "0.5cm"
-            ),  # plots statistics information, space to bottom
+            list("caption", "0.5cm"),  # plots statistics information, space to bottom
             list("guide-box-top", "0cm"),
             list("xlab-t", "0cm", offset = -1L)
         )
@@ -586,10 +570,7 @@ plot_grob_pca <- function(
             list("xlab-b", "1cm", offset = 1L),
             list("title", "0cm", offset = -2L, ifempty = FALSE),
             list("title", "0cm", offset = -1L),
-            list(
-                "title",
-                "0.25cm"
-            ),  # how much space is between title and y-axis label
+            list("title", "0.25cm"),  # how much space is between title and y-axis label
             list("subtitle", "0cm"),
             list("guide-box-top", "0cm"),
             list("xlab-t", "0cm", offset = -1L)
@@ -701,20 +682,12 @@ plot_grob_heatmap <- function(
         longest_name <- legend_names[which.max(nchar(legend_names[[1]]))]
         character_count <- nchar(longest_name)  # This is the length of the legend colour names
 
-        legendWidth <-
-            unit(
-                ((max(character_count_head, character_count)) * 0.3),
-                "cm"
-            )  # legend space
+        legendWidth <- unit(((max(character_count_head, character_count)) * 0.3), "cm")  # legend space
 
         # Sum up total heights:
         Plot_Sized$width %<>% add(legendWidth)
 
-        legendHeights <-
-            unit(
-                (sum(length(unique(legend_names_M)) + length(unique(colour_names_M)) + length(unique(legend_names)) + length(unique(colour_names)))),
-                "cm"
-            )
+        legendHeights <- unit((sum(length(unique(legend_names_M)) + length(unique(colour_names_M)) + length(unique(legend_names)) + length(unique(colour_names)))), "cm")
 
         Plot_Sized$width %<>% add(legendWidth)
         if ((convertUnit(legendHeights, "cm", valueOnly = TRUE)) > (convertUnit(Plot_Sized$height, "cm", valueOnly = TRUE))) {
@@ -760,17 +733,11 @@ plot_grob_volcano <- function(
         heights = list(
             list("axis-l", "8cm"),
             list("axis-b", "0.75cm"),  # This is the distance to x-axis!
-            list(
-                "xlab-b",
-                "0.75cm"
-            ),  # This gives us the distance of the caption to the x-axis label
+            list("xlab-b", "0.75cm"),  # This gives us the distance of the caption to the x-axis label
             # list("xlab-b", "1cm", offset = 1L),
             list("title", "0cm", offset = -2L, ifempty = FALSE),
             list("title", "0cm", offset = -1L),  # Space above title
-            list(
-                "title",
-                "0.25cm"
-            ),  # how much space is between title and y-axis label
+            list("title", "0.25cm"),  # how much space is between title and y-axis label
             list("subtitle", "0cm"),
             list("guide-box-top", "0cm"),
             list("xlab-t", "0cm", offset = -1L)
@@ -857,21 +824,12 @@ plot_grob_superplot <- function(
         heights = list(
             list("axis-l", "8cm"),
             list("axis-b", X_tick),  # This is adjusted for the x-axis ticks!
-            list(
-                "xlab-b",
-                "0.75cm"
-            ),  # This gives us the distance of the caption to the x-axis label
+            list("xlab-b", "0.75cm"),  # This gives us the distance of the caption to the x-axis label
             list("title", "0cm", offset = -2L, ifempty = FALSE),
             list("title", "0cm", offset = -1L),
-            list(
-                "title",
-                "0.25cm"
-            ),  # how much space is between title and y-axis label
+            list("title", "0.25cm"),  # how much space is between title and y-axis label
             list("subtitle", "0cm"),
-            list(
-                "caption",
-                "0.5cm"
-            ),  # plots statistics information, space to bottom
+            list("caption", "0.5cm"),  # plots statistics information, space to bottom
             list("guide-box-top", "0cm"),
             list("xlab-t", "0cm", offset = -1L)
         )

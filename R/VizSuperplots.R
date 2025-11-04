@@ -164,12 +164,7 @@ viz_superplot <- function(
     if (is.null(plot_conditions) == FALSE) {
         for (Condition in plot_conditions) {
         if (Condition %in% metadata_sample[[metadata_info[["Conditions"]]]] == FALSE) {
-            message <-
-                paste0(
-                    "Check Input. The plot_conditions ",
-                    Condition,
-                    " were not found in the Conditions Column."
-                )
+            message <- paste0("Check Input. The plot_conditions ",Condition," were not found in the Conditions Column.")
             log_trace(paste("Error ", message, sep =""))
             stop(message)
         }
@@ -180,22 +175,12 @@ viz_superplot <- function(
         for (Comp in stat_comparison) {
         if (is.null(plot_conditions) == FALSE) {
             if (plot_conditions[Comp[1]] %in% metadata_sample[[metadata_info[["Conditions"]]]] == FALSE) {
-            message <-
-                paste0(
-                    "Check Input. The stat_comparison condition ",
-                    Comp[1],
-                    " is not found in the Conditions Column of the metadata_sample."
-                )
+            message <- paste0("Check Input. The stat_comparison condition ",Comp[1], " is not found in the Conditions Column of the metadata_sample.")
             log_trace(paste("Error ", message, sep =""))
             stop(message)
         }
         if (plot_conditions[Comp[2]] %in% metadata_sample[[metadata_info[["Conditions"]]]] == FALSE) {
-            message <-
-                paste0(
-                    "Check Input. The stat_comparison condition ",
-                    Comp[2],
-                    " is not found in the Conditions Column of the metadata_sample."
-                )
+            message <- paste0("Check Input. The stat_comparison condition ",Comp[2], " is not found in the Conditions Column of the metadata_sample.")
             log_trace(paste("Error ", message, sep =""))
             stop(message)
         }
@@ -229,22 +214,12 @@ viz_superplot <- function(
 
     if (is.null(pval) == FALSE) {
         if (MultipleComparison == TRUE & (pval =="t.test" | pval =="wilcox.test")) {
-        message <-
-            paste0(
-                "Check input. The selected pval option for Hypothesis testing,",
-                pval,
-                " is for multiple comparison, but you have only 2 conditions. Hence aov is performed."
-            )
+        message <- paste0("Check input. The selected pval option for Hypothesis testing,", pval, " is for multiple comparison, but you have only 2 conditions. Hence aov is performed.")
         log_trace(paste("Warning ", message, sep =""))
         warning(message)
         pval <- "aov"
     }else if (MultipleComparison == FALSE & (pval =="aov" | pval =="kruskal.test")) {
-        message <-
-            paste0(
-                "Check input. The selected pval option for Hypothesis testing,",
-                pval,
-                " is for multiple comparison, but you have only 2 conditions. Hence t.test is performed."
-            )
+        message <- paste0("Check input. The selected pval option for Hypothesis testing,", pval, " is for multiple comparison, but you have only 2 conditions. Hence t.test is performed.")
         log_trace(paste("Warning ", message, sep =""))
         warning(message)
         pval <- "t.test"
@@ -259,25 +234,10 @@ viz_superplot <- function(
         pval <- "aov"
     }
 
-    STAT_padj_options <-
-        c(
-            "holm",
-            "hochberg",
-            "hommel",
-            "bonferroni",
-            "BH",
-            "BY",
-            "fdr",
-            "none"
-        )
+    STAT_padj_options <- c("holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none")
     if (is.null(padj) == FALSE) {
         if (padj %in% STAT_padj_options == FALSE) {
-        message <-
-            paste0(
-                "Check input. The selected padj option for multiple Hypothesis testing correction is not valid. Please select NULL or one of the folowing: ",
-                paste(STAT_padj_options,collapse = ", "),
-                "."
-            )
+        message <- paste0("Check input. The selected padj option for multiple Hypothesis testing correction is not valid. Please select NULL or one of the folowing: ",paste(STAT_padj_options,collapse = ", "),"." )
         log_trace(paste("Error ", message, sep =""))
         stop(message)
     }
@@ -303,12 +263,7 @@ viz_superplot <- function(
         metadata_sample <- metadata_sample %>%
         rename("Superplot"= paste(metadata_info[["Superplot"]]) )
 
-        data_merge <-
-            merge(
-                metadata_sample[c("Conditions","Superplot")],
-                data,
-                by = 0
-            )
+        data_merge <- merge(metadata_sample[c("Conditions","Superplot")] , data, by = 0)
         data_merge <- column_to_rownames(data_merge, "Row.names")
     } else {
     data_merge <- merge(metadata_sample[c("Conditions")] ,data, by = 0)
@@ -404,17 +359,11 @@ viz_superplot <- function(
     if ("Superplot" %in% names(metadata_info)) {
         if (is.null(color_palette_dot) == FALSE) {
             Plot <- Plot+ geom_beeswarm(aes(x = Conditions,y = Intensity,color = as.factor(Superplot)),size = 3)+
-            labs(
-                color = metadata_info[["Superplot"]],
-                fill = metadata_info[["Superplot"]]
-            )+
+            labs(color = metadata_info[["Superplot"]], fill = metadata_info[["Superplot"]])+
             scale_color_manual(values = color_palette_dot)
         } else {
         Plot <- Plot+ geom_beeswarm(aes(x = Conditions,y = Intensity,color = as.factor(Superplot)),size = 3)+
-            labs(
-                color = metadata_info[["Superplot"]],
-                fill = metadata_info[["Superplot"]]
-            )
+            labs(color = metadata_info[["Superplot"]], fill = metadata_info[["Superplot"]])
         }
     } else {
         Plot <- Plot+ geom_beeswarm(aes(x = Conditions,y = Intensity),size = 2)
@@ -456,23 +405,9 @@ viz_superplot <- function(
         }
 
         # Prepare df to add stats to plot
-        df <-
-            data.frame(
-                comparisons = names(STAT_C1vC2),
-                stringsAsFactors = FALSE
-            ) %>%
-            separate(
-                comparisons,
-                into = c("group1", "group2"),
-                sep ="_vs_",
-                remove = FALSE
-            ) %>%
-            unite(
-                comparisons_rev,
-                c("group2", "group1"),
-                sep ="_vs_",
-                remove = FALSE
-            )
+        df <- data.frame(comparisons = names(STAT_C1vC2), stringsAsFactors = FALSE) %>%
+            separate(comparisons, into = c("group1", "group2"), sep ="_vs_", remove = FALSE) %>%
+            unite(comparisons_rev, c("group2", "group1"), sep ="_vs_", remove = FALSE)
         df$p.adj <- round(map_dbl(STAT_C1vC2, ~ .x$p.adj), 5)
 
         # Add the 'res' column by repeating 'position' to match the number of rows
@@ -488,34 +423,15 @@ viz_superplot <- function(
             # Generate the comparisons
             df_select <- data.frame()
             for (comp in stat_comparison) {
-            entry <-
-                paste0(
-                    plot_conditions[comp[1]],
-                    "_vs_",
-                    plot_conditions[comp[2]]
-                )
+            entry <- paste0(plot_conditions[comp[1]], "_vs_", plot_conditions[comp[2]])
             df_select <- rbind(df_select, data.frame(entry))
             }
 
-            df_merge <-
-                merge(
-                    df_select,
-                    df,
-                    by.x ="entry",
-                    by.y ="comparisons",
-                    all.x = TRUE
-                ) %>%
+            df_merge <- merge(df_select, df, by.x ="entry", by.y ="comparisons", all.x = TRUE) %>%
             column_to_rownames("entry")
 
             if (all(is.na(df_merge)) == TRUE) { # in case the reverse comparisons are needed
-                df_merge <-
-                    merge(
-                        df_select,
-                        df,
-                        by.x ="entry",
-                        by.y ="comparisons_rev",
-                        all.x = TRUE
-                    ) %>%
+                df_merge <- merge(df_select, df, by.x ="entry", by.y ="comparisons_rev", all.x = TRUE) %>%
                 column_to_rownames("entry")
             }
         } else {
@@ -541,15 +457,7 @@ viz_superplot <- function(
     PlotList[[i]] <- Plot
 
     # Make plot into nice format:
-    Plot_Sized <-
-        plot_grob_superplot(
-            input_plot = Plot,
-            metadata_info = metadata_info,
-            metadata_sample = metadata_sample,
-            plot_name = plot_name,
-            subtitle = i,
-            plot_type = plot_type
-        )
+    Plot_Sized <-  plot_grob_superplot(input_plot = Plot, metadata_info = metadata_info, metadata_sample = metadata_sample, plot_name = plot_name, subtitle = i, plot_type = plot_type)
     plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
     plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
     Plot_Sized %<>%
@@ -558,12 +466,7 @@ viz_superplot <- function(
 
     ##########################################################################
     ## --------------- save ----------------- # #
-    cleaned_i <-
-        gsub(
-            "[[:space:],/\\\\:*?\"<> |]",
-            "-",
-            i
-        ) # removes empty spaces and replaces /,\ with -
+    cleaned_i <- gsub("[[:space:],/\\\\:*?\"<> |]", "-", i) # removes empty spaces and replaces /,\ with -
     PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
 
     SaveList <- list()

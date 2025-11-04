@@ -124,11 +124,7 @@ viz_upset <- function(
 
                 log_trace(paste("Warning ", message, sep = ""))
             }
-            my_palette_named <-
-                setNames(
-                    my_palette[seq_along(class_levels)],
-                    class_levels
-                )
+            my_palette_named <- setNames(my_palette[seq_along(class_levels)], class_levels)
             fill_scale <- scale_fill_manual(values = my_palette_named)
         }
 
