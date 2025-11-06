@@ -36,12 +36,9 @@
 #' @return Returns `NULL`.
 #'
 #' @examples
-#' \dontrun{
-#' # after this, all downloads will default to commercial licenses
-#' # i.e. the resources that allow only academic use will be excluded:
-#' options(metaproviz.console_loglevel = "trace")
+#' # restore the defaults and write them to the default config file:
+#' metaproviz_reset_config()
 #' metaproviz_save_config()
-#' }
 #'
 #' @importFrom OmnipathR save_config
 #' @export
@@ -50,7 +47,9 @@ metaproviz_save_config <- function(
     title = "default",
     local = FALSE
 ) {
+
     save_config(path = path, title = title, local = local, pkg = "MetaProViz")
+
 }
 
 
@@ -68,10 +67,7 @@ metaproviz_save_config <- function(
 #' @return Invisibly returns the config as a list.
 #'
 #' @examples
-#' \dontrun{
-#' # load the config from a custom config file:
-#' metaproviz_load_config(path = "my_custom_metaproviz_config.yml")
-#' }
+#' metaproviz_load_config()
 #'
 #' @importFrom OmnipathR load_config
 #' @export
@@ -81,7 +77,7 @@ metaproviz_load_config <- function(
     user = FALSE,
     ...
 ) {
-    metaproviz_load_config(
+    load_config(
         path = path,
         title = title,
         user = user,
@@ -101,11 +97,9 @@ metaproviz_load_config <- function(
 #' @return The config as a list.
 #'
 #' @examples
-#' \dontrun{
 #' # restore the defaults and write them to the default config file:
 #' metaproviz_reset_config()
 #' metaproviz_save_config()
-#' }
 #'
 #' @seealso
 #' \code{\link{metaproviz_load_config}, \link{metaproviz_save_config}}
