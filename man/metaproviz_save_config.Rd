@@ -24,11 +24,8 @@ Returns \code{NULL}.
 Save the current package configuration
 }
 \examples{
-\dontrun{
-# after this, all downloads will default to commercial licenses
-# i.e. the resources that allow only academic use will be excluded:
-options(metaproviz.console_loglevel = "trace")
+# restore the defaults and write them to the default config file:
+metaproviz_reset_config()
 metaproviz_save_config()
-}
 
 }
