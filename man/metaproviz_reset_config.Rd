@@ -20,11 +20,9 @@ The config as a list.
 Restore the built-in default values of all config parameters of MetaProViz
 }
 \examples{
-\dontrun{
 # restore the defaults and write them to the default config file:
 metaproviz_reset_config()
 metaproviz_save_config()
-}
 
 }
 \seealso{
