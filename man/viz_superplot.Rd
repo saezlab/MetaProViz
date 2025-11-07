@@ -53,8 +53,8 @@ Bar. Box and Violin  \strong{Default = Box}}
 to order the Conditions in the way they should be displayed on the
 x-axis of the plot. \strong{Default = NULL}}
 
-\item{stat_comparison}{List of numeric vectors containing Condition pairs to compare based on
-the order of the plot_conditions vector. \strong{Default = NULL}}
+\item{stat_comparison}{List of numeric vectors containing Condition pairs to
+compare based on the order of the plot_conditions vector. \strong{Default = NULL}}
 
 \item{pval}{\emph{Optional: } String which contains an abbreviation of the selected
 test to calculate p.value. For one-vs-one comparisons choose t.test or
@@ -83,11 +83,11 @@ NULL}}
 \item{color_palette_dot}{\emph{Optional: } Provide customized color_palette in vector format.
 \strong{Default = NULL}}
 
-\item{save_plot}{\emph{Optional: } Select the file type of output plots. Options are svg,
-pdf, png or NULL. \strong{Default = svg}}
+\item{save_plot}{\emph{Optional: } Select the file type of output plots.
+Options are svg, pdf, png or NULL. \strong{Default = svg}}
 
-\item{print_plot}{\emph{Optional: } TRUE or FALSE, if TRUE plots are saved as an overview
-of the results. \strong{Default = TRUE}}
+\item{print_plot}{\emph{Optional: } TRUE or FALSE, if TRUE plots are saved
+as an overview of the results. \strong{Default = TRUE}}
 
 \item{path}{\emph{Optional:} Path to the folder the results should be saved at.
 \strong{Default = NULL}}
@@ -100,10 +100,14 @@ Bar, Box or Violin plot in Superplot style visualization
 }
 \examples{
 data(intracell_raw_se)
-Res <- viz_superplot(data = intracell_raw_se[1:2, , drop = FALSE]) # only plot the first 2 metabolites
+# only plot the first 2 metabolites
+Res <- viz_superplot(data = intracell_raw_se[1:2, , drop = FALSE])
 
 data(intracell_raw)
 Intra <- intracell_raw[, c(1:6)] \%>\% tibble::column_to_rownames("Code")
-Res <- viz_superplot(data = Intra[, -c(1:3)], metadata_sample = Intra[, c(1:3)])
+Res <- viz_superplot(
+    data = Intra[, -c(1:3)],
+    metadata_sample = Intra[, c(1:3)]
+)
 
 }

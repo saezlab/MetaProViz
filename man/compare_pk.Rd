@@ -91,10 +91,13 @@ grouping in the UpSet plot.
 }
 \examples{
 \dontrun{
-## Example 1: Within-Resource Comparison (Comparing Columns Within a Single data Frame)
+## Example 1: Within-Resource Comparison
+## (Comparing Columns Within a Single data Frame)
 
-# biocrates_features is a data frame with columns: "TrivialName", "CHEBI", "HMDB", "LIMID", and "Class".
-# Here the "Class" column is used as the grouping variable in the UpSet plot.
+# biocrates_features is a data frame with columns:
+# "TrivialName", "CHEBI", "HMDB", "LIMID", and "Class".
+# Here the "Class" column is used as the grouping variable
+# in the UpSet plot.
 data(biocrates_features)
 data_single <- list(Biocft = biocrates_features)
 metadata_info_single <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
