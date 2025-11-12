@@ -102,3 +102,4 @@ Clark, David J, Saravana M Dhanasekaran, Francesca Petralia, Jianbo Pan, Xiaoyu 
 Hakimi, A Ari, Ed Reznik, Chung-Han Lee, Chad J Creighton, A Rose Brannon, Augustin Luna, B Arman Aksoy, et al. 2016. "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma." *Cancer Cell* 29 (1): 104–16. https://doi.org/10.1016/j.ccell.2015.12.004.
 
 Mora, Ariane, Christina Schmidt, Brad Balderson, Christian Frezza, and Mikael Bodén. 2024. "SiRCle (Signature Regulatory Clustering) Model Integration Reveals Mechanisms of Phenotype Regulation in Renal Cancer." *Genome Medicine* 16 (1): 144. https://doi.org/10.1186/s13073-024-01415-3.
+
