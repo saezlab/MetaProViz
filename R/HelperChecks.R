@@ -565,10 +565,9 @@ check_param_processing <- function(
 
     # -------------General parameters
     Feature_Filtering_options <- c("Standard", "Modified")
-    if (!(
-        !(featurefilt %in% Feature_Filtering_options) &
-        is.null(featurefilt)
-    )) {
+
+    if (!(is.null(featurefilt) || featurefilt %in% Feature_Filtering_options)) {
+        ## featurefilt is Neither NULL nor in the options
         message <-
             paste0(
                 "Check input. The selected featurefilt option is not valid. Please set to NULL or select one of the folowwing: ",
