@@ -14,7 +14,7 @@ jobs:
 
     runs-on: ubuntu-latest
     container:
-      image: bioconductor/bioconductor_docker:devel
+      image: bioconductor/bioconductor_docker:release
 
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -44,15 +44,27 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-r-${{ env.R_VERSION }}
 
-      - name: Install system dependencies (macOS)
-        if: runner.os == 'macOS'
-        run: brew install --cask xquartz
-
       - name: Install pkgdown & OmnipathR
         run: |
           Rscript -e 'install.packages("remotes")'
           Rscript -e 'install.packages("pkgdown")'
           Rscript -e "remotes::install_github('saezlab/OmnipathR@devel')"
+
+      - name: Install EnhancedVolcano (not yet in Bioc 3.22)
+        run: |
+          Rscript -e 'remotes::install_github("kevinblighe/EnhancedVolcano")'
+
+      # Set Bioconductor back to release and install other Bioconductor dependencies
+      - name: Install other Bioconductor dependencies from release
+        run: |
+          Rscript -e 'remotes::install_deps(dependencies = TRUE)'
+
+      # ComplexUpset should be installed after ggplot2 to ensure compatibility, especially on Linux/Ubuntu.
+      - name: Install latest ggplot2
+        run: Rscript -e 'install.packages("ggplot2", type="source")'
+
+      - name: Install ComplexUpset from source
+        run: Rscript -e 'install.packages("ComplexUpset", type="source")'
 
       - name: Install MetaProViz from GitHub by remotes
         run: Rscript -e 'remotes::install_github("saezlab/MetaProViz", dependencies = TRUE)' #we install from GitHub as if we are a random user
