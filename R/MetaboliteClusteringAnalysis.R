@@ -972,7 +972,7 @@ mca_2cond <- function(
 #'
 #' Res <- mca_core(
 #'     data_intra = as.data.frame(IntraDMA),
-#'     data_core = as.data.frame(MediaDMA[["dma"]][["786-M1A_vs_HK2"]])
+#'     data_core = as.data.frame(MediaDMA[["dma"]][[1]])
 #' )
 #'
 #' @importFrom dplyr rename mutate case_when mutate_at count distinct group_by
