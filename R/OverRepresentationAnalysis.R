@@ -359,8 +359,8 @@ standard_ora <- function(
     mutate(
         Significant = get(metadata_info[["pvalColumn"]]) <= cutoff_stat,
         Cluster_ChangedMetabolites = case_when(
-            Significant & `top/Bottom_percentage` ~ "TRUE",
-            TRUE ~ "FALSE"
+            Significant & `top/Bottom_percentage` ~ TRUE,
+            TRUE ~ FALSE
         )
     )
     
@@ -368,7 +368,7 @@ standard_ora <- function(
     InputSelection$`top/Bottom` <- NULL
 
     selectMetabolites <- InputSelection %>%
-    subset(Cluster_ChangedMetabolites)
+        subset(Cluster_ChangedMetabolites)
     selectMetabolites <- as.character(selectMetabolites$Metabolite)
 
     # Load Pathways
