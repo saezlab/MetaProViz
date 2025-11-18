@@ -655,7 +655,7 @@ dma <- function(
 #' @return List of DFs named after comparison (e.g. Tumour versus Normal) with
 #'     Log2FC or Log2(Distance) column and column with feature names
 #'
-#' @importFrom magrittr %>% is_in not
+#' @importFrom magrittr %>% is_in not equals
 #' @importFrom dplyr filter mutate rename select_if summarise_all
 #' @importFrom gtools foldchange2logratio
 #' @importFrom tibble rownames_to_column
@@ -692,7 +692,7 @@ log2fc <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE)) %>% all) {
+    } else if (denom_num %>% is_in(meta_vars) %>% magrittr::equals(c(TRUE, FALSE)) %>% all) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
@@ -737,7 +737,7 @@ log2fc <- function(
     # all_vs_all.
     if (denom_num %>% is_in(meta_vars) %>% any %>% not) {
         MultipleComparison <- TRUE
-    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE)) %>% all) {
+    } else if (denom_num %>% is_in(meta_vars) %>% magrittr::equals(c(TRUE, FALSE)) %>% all) {
         MultipleComparison <- TRUE
     } else if (denom_num %>% is_in(meta_vars) %>% all) {
         MultipleComparison <- FALSE
@@ -1424,7 +1424,7 @@ dma_stat_single <-
 #'
 #' @importFrom stats aov TukeyHSD
 #' @importFrom dplyr rename
-#' @importFrom magrittr %>%
+#' @importFrom magrittr %>% equals
 #' @importFrom tibble rownames_to_column
 #' @importFrom utils combn
 #' @noRd
@@ -1464,7 +1464,7 @@ mpv_aov <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE)) %>% all) {
+    } else if (denom_num %>% is_in(meta_vars) %>% magrittr::equals(c(TRUE, FALSE)) %>% all) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
@@ -1674,7 +1674,7 @@ mpv_aov <- function(
 #' @importFrom stats kruskal.test
 #' @importFrom rstatix dunn_test
 #' @importFrom dplyr rename mutate_all mutate select
-#' @importFrom magrittr %>%
+#' @importFrom magrittr %>% equals
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom utils combn
 #' @noRd
@@ -1714,7 +1714,7 @@ mpv_kruskal <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE)) %>% all) {
+    } else if (denom_num %>% is_in(meta_vars) %>% magrittr::(c(TRUE, FALSE)) %>% all) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
@@ -1941,7 +1941,7 @@ mpv_kruskal <- function(
 #'
 #' @importFrom rstatix games_howell_test
 #' @importFrom dplyr rename
-#' @importFrom magrittr %>% is_in not
+#' @importFrom magrittr %>% is_in not equals
 #' @importFrom tibble rownames_to_column
 #' @importFrom utils combn
 #' @noRd
@@ -1982,7 +1982,7 @@ mpv_welch <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE)) %>% all) {
+    } else if (denom_num %>% is_in(meta_vars) %>% magrittr::equals(c(TRUE, FALSE)) %>% all) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
@@ -2192,7 +2192,7 @@ mpv_welch <- function(
 #' @importFrom limma lmFit makeContrasts contrasts.fit eBayes topTable
 #' @importFrom dplyr rename arrange filter distinct
 #' @importFrom tidyr separate unite
-#' @importFrom magrittr %>%
+#' @importFrom magrittr %>% equals
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom stats model.matrix
 #' @noRd
@@ -2224,7 +2224,7 @@ dma_stat_limma <-
     if (denom_num %>% is_in(meta_vars) %>% any %>% not) {
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE)) %>% all) {
+    } else if (denom_num %>% is_in(meta_vars) %>% magrittr::equals(c(TRUE, FALSE)) %>% all) {
         MultipleComparison <- TRUE
         all_vs_all <- FALSE
     } else if (denom_num %>% is_in(meta_vars) %>% all) {
@@ -2643,7 +2643,7 @@ dma_stat_limma <-
 #' @importFrom ggplot2 ggplot geom_histogram geom_density scale_x_continuous
 #' @importFrom ggplot2 theme_minimal labs ggplot_build geom_qq geom_qq_line after_stat
 #' @importFrom dplyr rename select_if filter
-#' @importFrom magrittr %>%
+#' @importFrom magrittr equals %>%
 #' @importFrom tibble rownames_to_column column_to_rownames
 #' @importFrom utils combn
 #' @importFrom grDevices recordPlot
@@ -2713,7 +2713,7 @@ mpv_shapiro <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE)) %>% all) {
+    } else if (denom_num %>% is_in(meta_vars) %>% magrittr::equals(c(TRUE, FALSE)) %>% all) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
