@@ -2312,12 +2312,12 @@ outlier_detection <- function(
     data_norm_filtered_full <-
         data_norm_filtered_full %>%
         relocate(Outliers) %>%  # Put Outlier columns in the front
-        merge(
-            metadata_sample,
-            data_norm_filtered_full,
-            # add the design in the output df (merge by rownames/sample names
+        merge(       # add the design in the output df (merge by rownames/sample names
+            x = metadata_sample, 
+            y = . , 
             by = 0
-        )
+        )   
+
     rownames(data_norm_filtered_full) <- data_norm_filtered_full$Row.names
     data_norm_filtered_full$Row.names <- c()
 
