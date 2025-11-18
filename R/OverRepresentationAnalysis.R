@@ -354,8 +354,7 @@ standard_ora <- function(
 
     InputSelection <- selectMetabolites_DF %>%
     mutate(
-        `top/Bottom_percentage` = case_when(`top/Bottom` ~ 'TRUE',
-        TRUE ~ 'FALSE')
+        `top/Bottom_percentage` = case_when(`top/Bottom` == "TRUE" ~ "TRUE", TRUE ~ "FALSE")
     ) %>%
     mutate(Significant = case_when(get(metadata_info[["pvalColumn"]]) <= cutoff_stat ~ 'TRUE',
                                     TRUE ~ 'FALSE')) %>%
