@@ -1714,7 +1714,7 @@ mpv_kruskal <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if (denom_num %>% is_in(meta_vars) %>% magrittr::(c(TRUE, FALSE)) %>% all) {
+    } else if (denom_num %>% is_in(meta_vars) %>% magrittr::equals(c(TRUE, FALSE)) %>% all) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]
