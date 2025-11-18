@@ -565,10 +565,9 @@ check_param_processing <- function(
 
     # -------------General parameters
     Feature_Filtering_options <- c("Standard", "Modified")
-    if (!(
-        !(featurefilt %in% Feature_Filtering_options) &
-        is.null(featurefilt)
-    )) {
+
+    if (!(is.null(featurefilt) || featurefilt %in% Feature_Filtering_options)) {
+        ## featurefilt is Neither NULL nor in the options
         message <-
             paste0(
                 "Check input. The selected featurefilt option is not valid. Please set to NULL or select one of the folowwing: ",
@@ -661,7 +660,7 @@ check_param_processing <- function(
 #'
 #' @importFrom logger log_trace log_info
 #' @importFrom dplyr filter select_if
-#' @importFrom magrittr %>%
+#' @importFrom magrittr equals %>%
 #' @importFrom utils combn
 #' @noRd
 check_param_dma <- function(
@@ -697,7 +696,7 @@ check_param_dma <- function(
         # Settings:
         MultipleComparison <- TRUE
         all_vs_all <- TRUE
-    } else if (denom_num %>% is_in(meta_vars) %>% equals(c(TRUE, FALSE)) %>% all) {
+    } else if (denom_num %>% is_in(meta_vars) %>% magrittr::equals(c(TRUE, FALSE)) %>% all) {
         # all-vs-one: Generate the pairwise combinations
         conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
         denominator <- metadata_info[["Denominator"]]

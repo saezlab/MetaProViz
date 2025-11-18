@@ -292,18 +292,28 @@ make_gene_metab_set <- function(
     }
 
     ## ------------ folder ----------- ##
-    if (!is.null(save_table)) {
+    if (!is.null(save_table)) { 
+        ## in case the user wants to save the results -> save_table is not NULL, folder is created
         folder <- save_path(
             folder_name = "PK",
             path = path
         )
-        SubfolderPK <- file.path(folder, "LoadedPK")
-    } else if (!dir.exists(SubfolderPK)) {
-        dir.create(SubfolderPK)
-        Subfolder <- file.path(SubfolderPK, "MetaboliteSet")
-    } else if (!dir.exists(Subfolder)) {
-        dir.create(Subfolder)
+    } else if (is.null(path)) {
+        ## in case the user does NOT to save, i.e. save_table == NULL
+        ## but no path is specified, i.e. path == NULL (default)
+        folder <- file.path(getwd(), "MetaProViz_Results", "PK")
+    } else {
+        ## in case the user does NOT to save, i.e. save_table == NULL
+        ## but a path IS specified, i.e. path is not NULL
+        folder <- file.path(path, "PK")
     }
+
+    SubfolderPK <- file.path(folder, "LoadedPK")
+    if (!dir.exists(SubfolderPK)) dir.create(SubfolderPK, recursive = TRUE)
+
+    Subfolder <- file.path(SubfolderPK, "MetaboliteSet")
+    if (!dir.exists(Subfolder)) dir.create(Subfolder, recursive = TRUE)
+
 
 
     ##########################################################################

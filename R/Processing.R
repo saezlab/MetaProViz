@@ -191,7 +191,7 @@ processing <- function(
     # data files:
     data %<>% as.data.frame()
     # Make sure all 0 are changed to NAs
-    mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
+    data %<>% mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
 
     data <- as.data.frame(mutate_all(as.data.frame(data), function(x) as.numeric(as.character(x))))
 
@@ -2310,13 +2310,14 @@ outlier_detection <- function(
     }
 
     data_norm_filtered_full <-
+        data_norm_filtered_full %>%
         relocate(Outliers) %>%  # Put Outlier columns in the front
-        merge(
-            metadata_sample,
-            data_norm_filtered_full,
-            # add the design in the output df (merge by rownames/sample names
+        merge(       # add the design in the output df (merge by rownames/sample names
+            x = metadata_sample, 
+            y = . , 
             by = 0
-        )
+        )   
+
     rownames(data_norm_filtered_full) <- data_norm_filtered_full$Row.names
     data_norm_filtered_full$Row.names <- c()
 
