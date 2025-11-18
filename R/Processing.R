@@ -191,7 +191,7 @@ processing <- function(
     # data files:
     data %<>% as.data.frame()
     # Make sure all 0 are changed to NAs
-    mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
+    data %<>% mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
 
     data <- as.data.frame(mutate_all(as.data.frame(data), function(x) as.numeric(as.character(x))))
 
