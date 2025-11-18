@@ -2310,6 +2310,7 @@ outlier_detection <- function(
     }
 
     data_norm_filtered_full <-
+        data_norm_filtered_full %>%
         relocate(Outliers) %>%  # Put Outlier columns in the front
         merge(
             metadata_sample,
