@@ -354,21 +354,16 @@ standard_ora <- function(
 
     InputSelection <- selectMetabolites_DF %>%
     mutate(
-        `top/Bottom_percentage` = case_when(`top/Bottom` == "TRUE" ~ "TRUE", TRUE ~ "FALSE")
+        `top/Bottom_percentage` = (`top/Bottom` == "TRUE")
     ) %>%
     mutate(
-        Significant = case_when(
-            get(metadata_info[["pvalColumn"]]) <= cutoff_stat ~ 'TRUE', 
-            TRUE ~ 'FALSE'
-        )
-    ) %>%
-    mutate(
+        Significant = get(metadata_info[["pvalColumn"]]) <= cutoff_stat,
         Cluster_ChangedMetabolites = case_when(
-            Significant & (`top/Bottom_percentage` == "TRUE") ~ 'TRUE',
-            TRUE ~ 'FALSE'
+            Significant & `top/Bottom_percentage` ~ "TRUE",
+            TRUE ~ "FALSE"
         )
-
     )
+    
     # remove column as its not needed for output
     InputSelection$`top/Bottom` <- NULL
 
