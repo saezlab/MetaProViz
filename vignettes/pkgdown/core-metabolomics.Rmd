@@ -256,8 +256,8 @@ metadata_feature = MappingInfo,
 core=TRUE)
 
 # Inspect the dma results tables:
-DMA_786M1A_vs_HK2 <- DMA_Annova[["dma"]][["786-M1A_vs_HK2"]]
-DMA_786O_vs_HK2 <- DMA_Annova[["dma"]][["786-O_vs_HK2"]]
+DMA_HK2_vs_786M1A <- DMA_Annova[["dma"]][["HK2_vs_786-M1A"]]
+DMA_HK2_vs_786O <- DMA_Annova[["dma"]][["HK2_vs_786-O"]]
 shapiro <- DMA_Annova[["ShapiroTest"]][["DF"]][["Shapiro_result"]]
 ```
 </div>
@@ -270,7 +270,7 @@ shapiro[,c(1:5)]%>%
 kableExtra::kbl(caption = "1. Preview of the Shaprio results for the different conditions.", row.names=FALSE) %>%
 kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 
-DMA_786M1A_vs_HK2[c(7,9,11:12,14),]%>%
+DMA_HK2_vs_786M1A[c(7,9,11:12,14),]%>%
 kableExtra::kbl(caption = "2. Preview of the dma results for the comparison of 786-M1A versus HK2 cells.", row.names=FALSE) %>%
 kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
@@ -353,11 +353,11 @@ for(comparison in comparisons){
 }
 
 # Lets check how the results look like:
-MC_ORA_786M1A_vs_HK2_Consumed <- DM_ORA_res[["786-M1A_vs_HK2"]][["DF"]][["Consumed"]]
+MC_ORA_HK2_vs_786M1A_Consumed <- DM_ORA_res[["HK2_vs_786-M1A"]][["DF"]][["Consumed"]]
 ```
 ```{r code-11, echo=FALSE}
 # Check how our data looks like:
-MC_ORA_786M1A_vs_HK2_Consumed[c(1:5),-1]%>%
+MC_ORA_HK2_vs_786M1A_Consumed[c(1:5),-1]%>%
 kableExtra::kbl(caption = "Preview of the ORA results for the comparison of 786-M1A versus HK2 cells focusing on pathways enriched in `consumed` metabolites.", row.names=FALSE) %>%
 kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
@@ -458,12 +458,12 @@ Now we can load the corresponding pre-processed intracellular example data for t
 # Load the Pre-processed intracellular data:
 data(intracell_dma)
 
-Intra_DMA_786M1A_vs_HK2 <- intracell_dma%>%
+Intra_DMA_HK2_vs_786M1A <- intracell_dma%>%
 as.data.frame()
 
 # Perform metabolite clustering:
-MCA_core_res <- mca_core(data_intra =Intra_DMA_786M1A_vs_HK2,
-data_core = DMA_786M1A_vs_HK2,
+MCA_core_res <- mca_core(data_intra =Intra_DMA_HK2_vs_786M1A,
+data_core = DMA_HK2_vs_786M1A,
 metadata_info_intra=c(ValueCol="Log2FC",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=0.8),
 metadata_info_core=c(DirectionCol="core", ValueCol="Log2(Distance)",StatCol="p.adj", cutoff_stat= 0.05, ValueCutoff=28),
 feature= "Metabolite",
@@ -869,23 +869,23 @@ Just a quick reminder, how the input data look like:\
 1. Results of Differential Metabolite Analysis (dma): Log2(Distance) and stats:\
 ```{r viz-volcano, echo=FALSE}
 # Check how our data looks like:
-DMA_786M1A_vs_HK2[1:7,1:6]%>%
+DMA_HK2_vs_786M1A[1:7,1:6]%>%
 kableExtra::kbl(caption = "Input_data for `viz_volcano()` are for example differential analysis results from `dma()`.") %>%
 kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 
 #### **Standard**
-Here we will first look into the results from the differential analysis (see section `dma` above) for the comparison of `786-M1A_vs_HK2`:
+Here we will first look into the results from the differential analysis (see section `dma` above) for the comparison of `HK2_vs_786M1A`:
 ```{r viz-volcano-2, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying dma results."}
 # Run with default parameter --> only need to provide Input_data and the title we like
-viz_volcano(data=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
+viz_volcano(data=DMA_HK2_vs_786M1A%>%column_to_rownames("Metabolite"),
 x= "Log2(Distance)")
 ```
 \
 If you seek to plot the metabolite names you can change the paramter `select_label` from its default (`select_label=""`) to NULL and the metabolite names will be plotted randomly.
 ```{r viz-volcano-3, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying dma results."}
 # Run with default parameter --> only need to provide Input_data and the title we like
-viz_volcano(data=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
+viz_volcano(data=DMA_HK2_vs_786M1A%>%column_to_rownames("Metabolite"),
 x= "Log2(Distance)",
 select_label = NULL)
 ```
@@ -893,7 +893,7 @@ select_label = NULL)
 With the parameter `select_label` you can also pass a vector with Metabolite names that should be labeled:
 ```{r viz-volcano-4, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying dma results."}
 # Run with default parameter --> only need to provide Input_data and the title we like
-viz_volcano(data=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
+viz_volcano(data=DMA_HK2_vs_786M1A%>%column_to_rownames("Metabolite"),
 x= "Log2(Distance)",
 select_label = c("histidine", "phenylalanine", "lactate"))
 ```
@@ -902,7 +902,7 @@ As explained above, when analyzing core data it is important to take into accoun
 For this we need to add this information into the Metadata_Metabolite file:
 ```{r code-22}
 # colour for consumption and release: For this we need to add this information into the Metadata_Metabolite file
-MetaData_Metab <- merge(MappingInfo%>%rownames_to_column("Metabolite"), DMA_786M1A_vs_HK2[,c(1,6,8:10)], by="Metabolite", all.y=TRUE)%>%
+MetaData_Metab <- merge(MappingInfo%>%rownames_to_column("Metabolite"), DMA_HK2_vs_786M1A[,c(1,6,8:10)], by="Metabolite", all.y=TRUE)%>%
 column_to_rownames("Metabolite")
 
 ```
@@ -919,7 +919,7 @@ Now we can make the different plots:
 viz_volcano(plot_types="Standard",
 metadata_info= c(color="core_specific"),
 metadata_feature= MetaData_Metab,
-data=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
+data=DMA_HK2_vs_786M1A%>%column_to_rownames("Metabolite"),
 x= "Log2(Distance)",
 plot_name= "786M1A versus HK2",
 subtitle= "Results of dma. Colour coded for consumption/release" )
@@ -928,7 +928,7 @@ subtitle= "Results of dma. Colour coded for consumption/release" )
 viz_volcano(plot_types="Standard",
 metadata_info= c(shape="core_specific"),
 metadata_feature= MetaData_Metab,
-data=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
+data=DMA_HK2_vs_786M1A%>%column_to_rownames("Metabolite"),
 x= "Log2(Distance)",
 plot_name= "786M1A versus HK2",
 subtitle= "Results of dma. Shape for consumption/release, color for significance." )
@@ -937,7 +937,7 @@ subtitle= "Results of dma. Shape for consumption/release, color for significance
 viz_volcano(plot_types="Standard",
 metadata_info= c(shape="core_specific", color="core_specific"),
 metadata_feature= MetaData_Metab,
-data=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
+data=DMA_HK2_vs_786M1A%>%column_to_rownames("Metabolite"),
 x= "Log2(Distance)",
 plot_name= "786M1A versus HK2",
 subtitle= "Results of dma. Shape and color for consumption/release." )
@@ -950,20 +950,20 @@ Of course, here we may also want an individual plot for each of the consumption/
 viz_volcano(plot_types="Standard",
 metadata_info= c(individual="core", shape="core_specific"),
 metadata_feature= MetaData_Metab,
-data=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
+data=DMA_HK2_vs_786M1A%>%column_to_rownames("Metabolite"),
 x= "Log2(Distance)",
 plot_name= "786M1A versus HK2",
 subtitle= "Results of dma." )
 
 ```
 \
-Given that we also know, which metabolic pathway the metabolites correspond to, we can add this information into the plot. This is also a good example to showcase the flexibility of the visualisation function: Either you use the parameter `Plot_SettingsFile= MetaData_Metab` as above, but as we have the column "Pathway" also in our Input_data you can also pass `Plot_SettingsFile= DMA_786-M1A_vs_HK2` or simply use the default `Plot_SettingsFile=NULL`, in which case the `Plot_metadata_info` information (here `color`) will be used from Input_data. \
+Given that we also know, which metabolic pathway the metabolites correspond to, we can add this information into the plot. This is also a good example to showcase the flexibility of the visualisation function: Either you use the parameter `Plot_SettingsFile= MetaData_Metab` as above, but as we have the column "Pathway" also in our Input_data you can also pass `Plot_SettingsFile= DMA_HK2_vs_786M1A` or simply use the default `Plot_SettingsFile=NULL`, in which case the `Plot_metadata_info` information (here `color`) will be used from Input_data. \
 ```{r viz-volcano-7, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Standard figure displaying dma results colour coded for metabolic pathways and shaped for metabolic clusters."}
 # Now we can use color for the pathways and shape for the metabolite clusters:
 viz_volcano(plot_types="Standard",
 metadata_info= c(individual="core", shape="core_specific", color="Pathway"),
 metadata_feature= MetaData_Metab,
-data=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
+data=DMA_HK2_vs_786M1A%>%column_to_rownames("Metabolite"),
 x= "Log2(Distance)",
 plot_name= "786M1A versus HK2",
 subtitle= "Results of dma." )
@@ -975,9 +975,9 @@ The parameter `Plot_Settings="Compare"` is helpful if you have performed multipl
 ```{r viz-volcano-8, fig.align="left", fig.width=7, fig.height=5, fig.cap="Figure: Comparison."}
 # Make the plot
 viz_volcano(plot_types="Compare",
-data=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
-data2= DMA_Annova[["dma"]][["786-O_vs_HK2"]]%>%column_to_rownames("Metabolite"),
-name_comparison= c(data="786M1A_vs_HK", data2= "786-O_vs_HK2"),
+data=DMA_HK2_vs_786M1A%>%column_to_rownames("Metabolite"),
+data2= DMA_Annova[["dma"]][["HK2_vs_786-O"]]%>%column_to_rownames("Metabolite"),
+name_comparison= c(data="HK2_vs_786-M1A", data2= "HK2_vs_786-O"),
 x= "Log2(Distance)",
 plot_name= "786M1A vs HK2 compared to 7860 vs HK2",
 subtitle= "Results of dma" )
@@ -989,9 +989,9 @@ Of course you have option to use shape or color to further customize your graph 
 viz_volcano(plot_types="Compare",
 metadata_info= c(color="Pathway"),
 metadata_feature= MetaData_Metab,
-data=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
-data2= DMA_Annova[["dma"]][["786-O_vs_HK2"]]%>%column_to_rownames("Metabolite"),
-name_comparison= c(data="786M1A_vs_HK", data2= "786-O_vs_HK2"),
+data=DMA_HK2_vs_786M1A%>%column_to_rownames("Metabolite"),
+data2= DMA_Annova[["dma"]][["HK2_vs_786-O"]]%>%column_to_rownames("Metabolite"),
+name_comparison= c(data="HK2_vs_786-M1A", data2= "HK2_vs_786-O"),
 x= "Log2(Distance)",
 plot_name= "786M1A vs HK2 compared to 7860 vs HK2",
 subtitle= "Results of dma" )
@@ -1003,9 +1003,9 @@ Now we do individual plots again:
 viz_volcano(plot_types="Compare",
 metadata_info= c(individual="Pathway"),
 metadata_feature= MetaData_Metab,
-data=DMA_786M1A_vs_HK2%>%column_to_rownames("Metabolite"),
-data2= DMA_Annova[["dma"]][["786-O_vs_HK2"]]%>%column_to_rownames("Metabolite"),
-name_comparison= c(data="786M1A_vs_HK", data2= "786-O_vs_HK2"),
+data=DMA_HK2_vs_786M1A%>%column_to_rownames("Metabolite"),
+data2= DMA_Annova[["dma"]][["HK2_vs_786-O"]]%>%column_to_rownames("Metabolite"),
+name_comparison= c(data="HK2_vs_786-M1A", data2= "HK2_vs_786-O"),
 x= "Log2(Distance)",
 plot_name= "786M1A vs HK2 compared to 7860 vs HK2",
 subtitle= "Results of dma" )
@@ -1016,16 +1016,16 @@ subtitle= "Results of dma" )
 
 #### **PathwayEnrichmentAnalysis**
 If you have performed Pathway Enrichment Analysis (PEA) such as ORA or GSEA, we can also plot the results and add the information into the Figure legends.\
-Here we can for example use the results of the ORA we have performed on the differential expression results. Indeed for DMA_786M1A_vs_HK2 we have performed ORA on each cluster (consumed, released, consumed/released). Here, I will plot the ORA results of the metabolites that are released in both conditions, HK2 and 786-M1A.
+Here we can for example use the results of the ORA we have performed on the differential expression results. Indeed for DMA_HK2_vs_786M1A we have performed ORA on each cluster (consumed, released, consumed/released). Here, I will plot the ORA results of the metabolites that are released in both conditions, HK2 and 786-M1A.
 ```{r data-prep-3}
 # Prepare the Input:
 # 1. data=Pathway analysis input: Must have features as column names. Those feature names need to match features in the pathway analysis file metadata_feature.
-InputPEA <- DMA_786M1A_vs_HK2 %>%
+InputPEA <- DMA_HK2_vs_786M1A %>%
 filter(!is.na(KEGGCompound)) %>%
 column_to_rownames("KEGGCompound")
 
 # 2. data2=Pathway analysis output: Must have same column names as metadata_feature for Pathway name
-InputPEA2 <- MC_ORA_786M1A_vs_HK2_Consumed %>%
+InputPEA2 <- MC_ORA_HK2_vs_786M1A_Consumed %>%
 dplyr::rename("term"="ID")
 
 # 3. metadata_feature= Pathways used for pathway analysis: Must have same column names as metadata_feature for Pathway name and feature names need to match features in the data. PEA_Feature passes this column name!

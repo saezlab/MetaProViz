@@ -955,6 +955,9 @@ viz_volcano_compare <- function(
         for (i in IndividualPlots) {
         InputVolcano <- subset(InputCompare, individual == paste(i))
 
+        ## initialize keyvalshape variable so it is safe to access by EnhancedVolcano below
+        keyvalsshape <- NULL
+
         if (nrow(InputVolcano) >= 1L) {
             # Prepare the colour scheme:
             if ("color" %in% names(metadata_info)) {
