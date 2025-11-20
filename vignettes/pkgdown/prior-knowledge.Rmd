@@ -500,7 +500,7 @@ kableExtra::kbl(caption = "Preview of the DF `pk_comp_res$summary_table` showing
 kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size = 12)
 ```
 \
-```{r code-9, echo=FALSE, fig.width=8, fig.height=6}
+```{r code-9, eval=FALSE, echo=FALSE, fig.width=8, fig.height=6}
 pk_comp_res$upset_plot
 ```
 \
