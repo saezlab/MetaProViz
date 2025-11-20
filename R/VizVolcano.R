@@ -960,10 +960,9 @@ viz_volcano_compare <- function(
 
             if (nrow(InputVolcano) < 1L) {
                 message(
-                    paste0(
-                        "Skipping viz_volcano compare plot for '",
-                        i,
-                        "' because no rows are available after filtering."
+                    sprintf(
+                        "Skipping viz_volcano compare plot for '%s' because no rows are available after filtering.",
+                        i
                     )
                 )
                 next
