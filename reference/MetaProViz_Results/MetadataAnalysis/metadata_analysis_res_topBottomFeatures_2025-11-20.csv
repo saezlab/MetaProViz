@@ -15681,53 +15681,53 @@ PC276,leucyltyrosine,penicillin G
 PC276,1-palmitoylplasmenylethanolamine*,N-6-trimethyllysine
 PC276,"cytosine-2',3'-cyclic monophosphate","gulono-1,4-lactone"
 PC276,alanylglycine,glycerate
-PC276,valylglycine,"1,2-propanediol"
-PC276,scyllo-inositol,thymidine
-PC276,metoprolol acid metabolite*,tartarate
-PC276,alpha-glutamyltyrosine,1-palmitoylglycerophosphoinositol*
-PC276,histidine,stearoylcarnitine
-PC276,erucate (22:1n9),phenylalanylphenylalanine
-PC276,gamma-glutamylphenylalanine,N-methylglutamate
-PC276,1-linoleoylglycerophosphoethanolamine*,2-stearoylglycerophosphoethanolamine*
-PC276,1-heptadecanoylglycerophosphoethanolamine*,1-palmitoleoylglycerophosphoethanolamine*
-PC276,xylulose,N-acetylleucine
-PC276,15-methylpalmitate (isobar with 2-methylpalmitate),metoprolol
-PC276,N-acetylthreonine,myristate (14:0)
-PC276,p-acetamidophenylglucuronide,3-indoxyl sulfate
-PC276,2-linoleoylglycerol (2-monolinolein),nicotinamide adenine dinucleotide (NAD+)
+PC276,scyllo-inositol,"1,2-propanediol"
+PC276,valylglycine,thymidine
+PC276,alpha-glutamyltyrosine,tartarate
+PC276,metoprolol acid metabolite*,stearoylcarnitine
+PC276,histidine,1-palmitoylglycerophosphoinositol*
+PC276,gamma-glutamylphenylalanine,phenylalanylphenylalanine
+PC276,erucate (22:1n9),2-stearoylglycerophosphoethanolamine*
+PC276,N-acetylthreonine,N-acetylleucine
+PC276,p-acetamidophenylglucuronide,N-methylglutamate
+PC276,15-methylpalmitate (isobar with 2-methylpalmitate),1-palmitoleoylglycerophosphoethanolamine*
+PC276,xylulose,myristate (14:0)
+PC276,1-linoleoylglycerophosphoethanolamine*,3-indoxyl sulfate
+PC276,cortisone,metoprolol
+PC276,2-linoleoylglycerol (2-monolinolein),2-docosapentaenoylglycerophosphoethanolamine*
+PC276,pseudouridine,nicotinamide adenine dinucleotide (NAD+)
+PC276,1-heptadecanoylglycerophosphoethanolamine*,chiro-inositol
 PC276,pregnen-diol disulfate*,codeine
-PC276,phenylalanylalanine,chiro-inositol
-PC276,pseudouridine,2-docosapentaenoylglycerophosphoethanolamine*
-PC276,cortisone,1-stearoylglycerophosphoinositol
-PC276,palmitoyl sphingomyelin,guanidinoacetate
-PC276,"3,4-dihydroxyphenethyleneglycol",isoleucylglutamate
-PC276,triethyleneglycol,glycerophosphoethanolamine
-PC276,phenylalanylglutamate,2-oleoylglycerophosphoserine*
-PC276,2-hydroxyhippurate (salicylurate),docosapentaenoate (n6 DPA; 22:5n6)
-PC276,2-palmitoleoylglycerophosphocholine*,glycerophosphorylcholine (GPC)
-PC276,theobromine,leucylarginine
-PC276,2-phosphoglycerate,glycolithocholate sulfate*
-PC276,palmitate (16:0),2-palmitoylglycerol (2-monopalmitin)
-PC276,sorbitol 6-phosphate,pivaloylcarnitine
-PC276,arginyltyrosine,N6-acetyllysine
-PC276,N-acetylserine,butyrylcarnitine
-PC276,atenolol,methylphosphate
-PC276,azelate (nonanedioate),homocysteine
-PC276,ranitidine,glycolate (hydroxyacetate)
-PC276,phytosphingosine,docosadienoate (22:2n6)
-PC276,octanoylcarnitine,leucylhistidine
-PC276,stachydrine,quinolinate
-PC276,deoxycarnitine,isoleucylisoleucine
-PC276,xanthine,isovalerylcarnitine
-PC276,adenosine,isobutyrylcarnitine
-PC276,citramalate,10-nonadecenoate (19:1n9)
-PC276,1-myristoylglycerophosphoethanolamine,ethanolamine
-PC276,inosine,glycylproline
-PC276,valylaspartate,3-phosphoglycerate
-PC276,ornithine,ascorbate (Vitamin C)
-PC276,prostaglandin A2,alpha-hydroxyisovalerate
-PC276,leucyltryptophan,cortisol
-PC276,indoleacetate,2-linoleoylglycerophosphoethanolamine*
-PC276,caprylate (8:0),7-alpha-hydroxycholesterol
-PC276,palmitoleate (16:1n7),10-heptadecenoate (17:1n7)
-PC276,pantothenate,N-acetyl-aspartyl-glutamate (NAAG)
+PC276,phenylalanylalanine,guanidinoacetate
+PC276,"3,4-dihydroxyphenethyleneglycol",2-oleoylglycerophosphoserine*
+PC276,triethyleneglycol,1-stearoylglycerophosphoinositol
+PC276,palmitoyl sphingomyelin,docosapentaenoate (n6 DPA; 22:5n6)
+PC276,2-hydroxyhippurate (salicylurate),glycolithocholate sulfate*
+PC276,theobromine,glycerophosphoethanolamine
+PC276,ranitidine,ethanolamine
+PC276,phenylalanylglutamate,isobutyrylcarnitine
+PC276,azelate (nonanedioate),leucylhistidine
+PC276,arginyltyrosine,leucylarginine
+PC276,phytosphingosine,glycerophosphorylcholine (GPC)
+PC276,xanthine,glycolate (hydroxyacetate)
+PC276,palmitate (16:0),docosadienoate (22:2n6)
+PC276,sorbitol 6-phosphate,isoleucylglutamate
+PC276,2-phosphoglycerate,pivaloylcarnitine
+PC276,2-palmitoleoylglycerophosphocholine*,cortisol
+PC276,citramalate,N6-acetyllysine
+PC276,octanoylcarnitine,butyrylcarnitine
+PC276,adenosine,2-palmitoylglycerol (2-monopalmitin)
+PC276,deoxycarnitine,homocysteine
+PC276,atenolol,ascorbate (Vitamin C)
+PC276,stachydrine,7-alpha-hydroxycholesterol
+PC276,N-acetylserine,quinolinate
+PC276,leucyltryptophan,methylphosphate
+PC276,indoleacetate,isoleucylisoleucine
+PC276,prostaglandin A2,isovalerylcarnitine
+PC276,ornithine,alpha-hydroxyisovalerate
+PC276,allo-threonine,10-heptadecenoate (17:1n7)
+PC276,1-myristoylglycerophosphoethanolamine,glycylproline
+PC276,citrate,3-phosphoglycerate
+PC276,"glutamate, gamma-methyl ester",2-oleoylglycerophosphoethanolamine*
+PC276,valylaspartate,10-nonadecenoate (19:1n9)
+PC276,inosine,3'-dephosphocoenzyme A

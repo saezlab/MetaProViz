@@ -175,14 +175,14 @@ We generated the summarised results output DF, where each feature
 (=metabolite) was assigned a main demographics parameter this feature is
 separating:  
 
-| feature                                     | term                                  | Sum(Explained_Variance)                                                                    | MainDriver                       | MainDriver_Term | MainDriver_Sum(VarianceExplained) |
-|:--------------------------------------------|:--------------------------------------|:-------------------------------------------------------------------------------------------|:---------------------------------|:----------------|----------------------------------:|
-| N2-methylguanosine                          | AGE, GENDER, RACE, STAGE, TISSUE_TYPE | 3.7598809871366, 2.75344828467363, 1.43932034747081, 25.2803273612931, 33.9484968841434    | FALSE, FALSE, FALSE, FALSE, TRUE | TISSUE_TYPE     |                           33.9485 |
-| 5-methyltetrahydrofolate (5MeTHF)           | AGE, GENDER, RACE, STAGE, TISSUE_TYPE | 0.35114340819656, 0.29468807988021, 0.252515004077172, 19.4058160726611, 32.5442969233501  | FALSE, FALSE, FALSE, FALSE, TRUE | TISSUE_TYPE     |                           32.5443 |
-| N-acetylalanine                             | AGE, GENDER, RACE, STAGE, TISSUE_TYPE | 0.381811888038144, 1.82507161869685, 2.97460134435356, 19.0079573465896, 32.5442969233501  | FALSE, FALSE, FALSE, FALSE, TRUE | TISSUE_TYPE     |                           32.5443 |
-| N-acetyl-aspartyl-glutamate (NAAG)          | AGE, GENDER, RACE, STAGE, TISSUE_TYPE | 0.212976478603115, 2.75344828467363, 0.235952044704099, 20.3572056704699, 32.2825995362096 | FALSE, FALSE, FALSE, FALSE, TRUE | TISSUE_TYPE     |                           32.2826 |
-| 1-heptadecanoylglycerophosphoethanolamine\* | AGE, GENDER, RACE, STAGE, TISSUE_TYPE | 4.33031140898825, 0.267851018697989, 0.437853800763463, 22.8424358182214, 30.8783995754163 | FALSE, FALSE, FALSE, FALSE, TRUE | TISSUE_TYPE     |                           30.8784 |
-| 1-linoleoylglycerophosphoethanolamine\*     | AGE, STAGE, TISSUE_TYPE               | 4.2011500430443, 22.7555733683955, 30.8783995754163                                        | FALSE, FALSE, TRUE               | TISSUE_TYPE     |                           30.8784 |
+| feature                                     | term                                  | Sum(Explained_Variance)                                                                     | MainDriver                       | MainDriver_Term | MainDriver_Sum(VarianceExplained) |
+|:--------------------------------------------|:--------------------------------------|:--------------------------------------------------------------------------------------------|:---------------------------------|:----------------|----------------------------------:|
+| N2-methylguanosine                          | AGE, GENDER, RACE, STAGE, TISSUE_TYPE | 3.7598809871366, 2.75344828467363, 1.43932034747081, 25.2803273612931, 33.9484968841434     | FALSE, FALSE, FALSE, FALSE, TRUE | TISSUE_TYPE     |                           33.9485 |
+| 5-methyltetrahydrofolate (5MeTHF)           | AGE, GENDER, RACE, STAGE, TISSUE_TYPE | 0.351143408196559, 0.294688079880209, 0.252515004077172, 19.4058160726611, 32.5442969233501 | FALSE, FALSE, FALSE, FALSE, TRUE | TISSUE_TYPE     |                           32.5443 |
+| N-acetylalanine                             | AGE, GENDER, RACE, STAGE, TISSUE_TYPE | 0.381811888038144, 1.82507161869685, 2.97460134435356, 19.0079573465895, 32.5442969233501   | FALSE, FALSE, FALSE, FALSE, TRUE | TISSUE_TYPE     |                           32.5443 |
+| N-acetyl-aspartyl-glutamate (NAAG)          | AGE, GENDER, RACE, STAGE, TISSUE_TYPE | 0.212976478603115, 2.75344828467363, 0.235952044704099, 20.3572056704699, 32.2825995362096  | FALSE, FALSE, FALSE, FALSE, TRUE | TISSUE_TYPE     |                           32.2826 |
+| 1-heptadecanoylglycerophosphoethanolamine\* | AGE, GENDER, RACE, STAGE, TISSUE_TYPE | 4.33031140898824, 0.267851018697989, 0.437853800763463, 22.8424358182214, 30.8783995754163  | FALSE, FALSE, FALSE, FALSE, TRUE | TISSUE_TYPE     |                           30.8784 |
+| 1-linoleoylglycerophosphoethanolamine\*     | AGE, STAGE, TISSUE_TYPE               | 4.20115004304429, 22.7555733683955, 30.8783995754163                                        | FALSE, FALSE, TRUE               | TISSUE_TYPE     |                           30.8784 |
 
 Preview of the DF MetaRes\[\[`res_summary`\]\] including the metabolite
 drivers in rows and list the patients demographics they can separate.
@@ -983,7 +983,7 @@ for(comparison in names(ResList)){
     #> 
     #> other attached packages:
     #> [1] stringr_1.6.0      tibble_3.3.0       tidyr_1.3.1        rlang_1.1.6        dplyr_1.1.4        magrittr_2.0.4    
-    #> [7] MetaProViz_3.99.25 BiocStyle_2.38.0  
+    #> [7] MetaProViz_3.99.26 BiocStyle_2.38.0  
     #> 
     #> loaded via a namespace (and not attached):
     #>   [1] RColorBrewer_1.1-3          rstudioapi_0.17.1           jsonlite_2.0.0              ggbeeswarm_0.7.2           

@@ -1570,7 +1570,7 @@ select_label = NULL)
     #> 
     #> other attached packages:
     #> [1] tibble_3.3.0       ggfortify_0.4.19   ggplot2_4.0.1      rlang_1.1.6        dplyr_1.1.4        magrittr_2.0.4    
-    #> [7] MetaProViz_3.99.25 BiocStyle_2.38.0  
+    #> [7] MetaProViz_3.99.26 BiocStyle_2.38.0  
     #> 
     #> loaded via a namespace (and not attached):
     #>   [1] RColorBrewer_1.1-3          rstudioapi_0.17.1           jsonlite_2.0.0              ggbeeswarm_0.7.2           

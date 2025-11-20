@@ -21,6 +21,6 @@ available.
 
 ``` r
 metaproviz_logfile()
-#> [1] "/__w/MetaProViz/MetaProViz/docs/reference/metaproviz-log/metaproviz-20251120-1347.log"
+#> [1] "/__w/MetaProViz/MetaProViz/docs/reference/metaproviz-log/metaproviz-20251120-1428.log"
 # [1] "path/metaproviz/metaproviz-log/metaproviz-20210309-1642.log"
 ```
