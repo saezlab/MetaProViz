@@ -1,13 +1,16 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>/404.html</loc></url>
+<url><loc>/CLAUDE.html</loc></url>
 <url><loc>/LICENSE-text.html</loc></url>
-<url><loc>/articles/core-metabolomics.html</loc></url>
 <url><loc>/articles/index.html</loc></url>
-<url><loc>/articles/prior-knowledge.html</loc></url>
-<url><loc>/articles/sample-metadata.html</loc></url>
-<url><loc>/articles/standard-metabolomics.html</loc></url>
+<url><loc>/articles/pkgdown/core-metabolomics.html</loc></url>
+<url><loc>/articles/pkgdown/prior-knowledge.html</loc></url>
+<url><loc>/articles/pkgdown/sample-metadata.html</loc></url>
+<url><loc>/articles/pkgdown/standard-metabolomics.html</loc></url>
+<url><loc>/articles/quick-start.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
+<url><loc>/news/index.html</loc></url>
 <url><loc>/reference/MetaProViz.html</loc></url>
 <url><loc>/reference/alanine_pathways.html</loc></url>
 <url><loc>/reference/biocrates_features.html</loc></url>
@@ -24,6 +27,7 @@
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/intracell_dma.html</loc></url>
 <url><loc>/reference/intracell_raw.html</loc></url>
+<url><loc>/reference/intracell_raw_se.html</loc></url>
 <url><loc>/reference/make_gene_metab_set.html</loc></url>
 <url><loc>/reference/mapping_ambiguity.html</loc></url>
 <url><loc>/reference/mca_2cond.html</loc></url>
@@ -53,6 +57,7 @@
 <url><loc>/reference/tissue_dma_young.html</loc></url>
 <url><loc>/reference/tissue_meta.html</loc></url>
 <url><loc>/reference/tissue_norm.html</loc></url>
+<url><loc>/reference/tissue_norm_se.html</loc></url>
 <url><loc>/reference/tissue_tvn_proteomics.html</loc></url>
 <url><loc>/reference/tissue_tvn_rnaseq.html</loc></url>
 <url><loc>/reference/translate_id.html</loc></url>

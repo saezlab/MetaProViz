@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.99.24</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -16,13 +16,15 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-book-open"></span> Tutorials</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials"><li><a class="dropdown-item" href="../articles/standard-metabolomics.html">Standard Metabolomics</a></li>
-    <li><a class="dropdown-item" href="../articles/core-metabolomics.html">CoRe Metabolomics</a></li>
-    <li><a class="dropdown-item" href="../articles/prior-knowledge.html">Prior knowledge</a></li>
-    <li><a class="dropdown-item" href="../articles/sample-metadata.html">Sample Metadata Analysis</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-book-open"></span></button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-"><li><a class="dropdown-item" href="../articles/quick-start.html">Getting started</a></li>
+    <li><a class="dropdown-item" href="../articles/vignettes/pkgdown/standard-metabolomics.html">Standard Metabolomics</a></li>
+    <li><a class="dropdown-item" href="../articles/vignettes/pkgdown/core-metabolomics.html">CoRe Metabolomics</a></li>
+    <li><a class="dropdown-item" href="../articles/vignettes/pkgdown/prior-knowledge.html">Prior Knowledge</a></li>
+    <li><a class="dropdown-item" href="../articles/vignettes/pkgdown/sample-metadata.html">Sample Metadata Analysis</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-solid fa-rocket"></span> Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/saezlab/MetaProViz"><span class="fa fa-brands fa-github"></span></a></li>
@@ -67,33 +69,35 @@
 
 
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>DF with unique sample identifiers as row names and
-metabolite numerical values in columns with metabolite identifiers as column
-names. Includes experimental design and outlier column.</p></dd>
+<dd><p>SummarizedExperiment (se) file including assay and colData. If se file
+is provided, metadata_sample is extracted from the colData of the se
+object. metadata_feature, if available, are extracted from the rowData.
+Alternatively provide a DF with unique sample identifiers as row names
+and metabolite numerical values in columns with metabolite identifiers
+as column names. Use NA for metabolites that were not detected.</p></dd>
 
 
 <dt id="arg-metadata-info">metadata_info<a class="anchor" aria-label="anchor" href="#arg-metadata-info"></a></dt>
-<dd><p><em>Optional: </em> NULL or Named vector  where you can
-include vectors or lists for annotation c(individual_Metab=
+<dd><p><em>Optional: </em> NULL or Named vector where you can include vectors or
+lists for annotation c(individual_Metab=
 "ColumnName_metadata_feature",individual_Sample=
-"ColumnName_metadata_sample",
-color_Metab="ColumnName_metadata_feature", color_Sample=
-list("ColumnName_metadata_sample",
+"ColumnName_metadata_sample", color_Metab="ColumnName_metadata_feature",
+color_Sample= list("ColumnName_metadata_sample",
 "ColumnName_metadata_sample",...)).<strong>Default = NULL</strong></p></dd>
 
 
 <dt id="arg-metadata-sample">metadata_sample<a class="anchor" aria-label="anchor" href="#arg-metadata-sample"></a></dt>
-<dd><p>DF which contains information about the samples,
-which will be combined with your input data based on the unique sample
-identifiers. and other columns with required plot_typeInfo.<strong>Default
-= NULL</strong></p></dd>
+<dd><p><em>Optional: </em> Only required if you did not provide se file in
+parameter data. Provide DF which contains metadata information about the
+samples, which will be combined with your input data based on the unique
+sample identifiers used as rownames. <strong>Default = NULL</strong></p></dd>
 
 
 <dt id="arg-metadata-feature">metadata_feature<a class="anchor" aria-label="anchor" href="#arg-metadata-feature"></a></dt>
-<dd><p><em>Optional: </em> DF with column "Metabolite"
-including the Metabolite names (needs to match Metabolite names of
-Input_data) and other columns with required plot_typeInfo. <strong>Default
-= NULL</strong></p></dd>
+<dd><p><em>Optional: </em> To provide metadata information for each metabolite.
+Only used if you did not provide se file in parameter data. Provide DF
+where the row names must match the metabolite names in the columns of
+the data. <strong>Default = NULL</strong></p></dd>
 
 
 <dt id="arg-plot-name">plot_name<a class="anchor" aria-label="anchor" href="#arg-plot-name"></a></dt>
@@ -101,28 +105,34 @@ Input_data) and other columns with required plot_typeInfo. <strong>Default
 
 
 <dt id="arg-scale">scale<a class="anchor" aria-label="anchor" href="#arg-scale"></a></dt>
-<dd><p><em>Optional: </em> String with the information for scale row, column or none. <strong>Default = row</strong></p></dd>
+<dd><p><em>Optional: </em> String with the information for scale row, column or
+none. <strong>Default = row</strong></p></dd>
 
 
 <dt id="arg-save-plot">save_plot<a class="anchor" aria-label="anchor" href="#arg-save-plot"></a></dt>
-<dd><p><em>Optional: </em> Select the file type of output plots. Options are svg, pdf, png or NULL. <strong>Default = "svg"</strong></p></dd>
+<dd><p><em>Optional: </em> Select the file type of output plots. Options are svg,
+pdf, png or NULL. <strong>Default = "svg"</strong></p></dd>
 
 
 <dt id="arg-enforce-featurenames">enforce_featurenames<a class="anchor" aria-label="anchor" href="#arg-enforce-featurenames"></a></dt>
-<dd><p><em>Optional: </em> If there are more than 100 features no rownames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. <strong>Default = FALSE</strong></p></dd>
+<dd><p><em>Optional: </em> If there are more than 100 features no rownames will
+be shown, which is due to readability. You can Enforce this by setting
+this parameter to TRUE. <strong>Default = FALSE</strong></p></dd>
 
 
 <dt id="arg-enforce-samplenames">enforce_samplenames<a class="anchor" aria-label="anchor" href="#arg-enforce-samplenames"></a></dt>
-<dd><p><em>Optional: </em> If there are more than 50 sampless no colnames will be shown, which is due to readability. You can Enforce this by setting this parameter to TRUE. <strong>Default = FALSE</strong></p></dd>
+<dd><p><em>Optional: </em> If there are more than 50 sampless no colnames will be
+shown, which is due to readability. You can Enforce this by setting this
+parameter to TRUE. <strong>Default = FALSE</strong></p></dd>
 
 
 <dt id="arg-print-plot">print_plot<a class="anchor" aria-label="anchor" href="#arg-print-plot"></a></dt>
-<dd><p><em>Optional: </em> print the plots to the active graphic
-device.</p></dd>
+<dd><p><em>Optional: </em> print the plots to the active graphic device.</p></dd>
 
 
 <dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
-<dd><p>Optional: String which is added to the resulting folder name <strong>default: NULL</strong></p></dd>
+<dd><p>Optional: String which is added to the resulting folder name
+<strong>default: NULL</strong></p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -132,9 +142,14 @@ device.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">Intra</span> <span class="op">&lt;-</span> <span class="va">intracell_raw</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Code"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">Res</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu">viz_heatmap</span><span class="op">(</span>data<span class="op">=</span><span class="va">Intra</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">intracell_raw_se</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">Res</span> <span class="op">&lt;-</span> <span class="fu">viz_heatmap</span><span class="op">(</span>data <span class="op">=</span> <span class="va">intracell_raw_se</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="viz_heatmap-1.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">intracell_raw</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">Intra</span> <span class="op">&lt;-</span> <span class="va">intracell_raw</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Code"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">Res</span> <span class="op">&lt;-</span> <span class="fu">viz_heatmap</span><span class="op">(</span>data <span class="op">=</span> <span class="va">Intra</span><span class="op">[</span>, <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="viz_heatmap-2.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -143,11 +158,11 @@ device.</p></dd>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez, Christian Frezza.</p>
+  <p>Developed by Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Jannik Franken, Julio Saez-Rodriguez, Christian Frezza.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

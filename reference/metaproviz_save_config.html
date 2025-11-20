@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.99.24</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -16,13 +16,15 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-book-open"></span> Tutorials</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials"><li><a class="dropdown-item" href="../articles/standard-metabolomics.html">Standard Metabolomics</a></li>
-    <li><a class="dropdown-item" href="../articles/core-metabolomics.html">CoRe Metabolomics</a></li>
-    <li><a class="dropdown-item" href="../articles/prior-knowledge.html">Prior knowledge</a></li>
-    <li><a class="dropdown-item" href="../articles/sample-metadata.html">Sample Metadata Analysis</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-book-open"></span></button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-"><li><a class="dropdown-item" href="../articles/quick-start.html">Getting started</a></li>
+    <li><a class="dropdown-item" href="../articles/vignettes/pkgdown/standard-metabolomics.html">Standard Metabolomics</a></li>
+    <li><a class="dropdown-item" href="../articles/vignettes/pkgdown/core-metabolomics.html">CoRe Metabolomics</a></li>
+    <li><a class="dropdown-item" href="../articles/vignettes/pkgdown/prior-knowledge.html">Prior Knowledge</a></li>
+    <li><a class="dropdown-item" href="../articles/vignettes/pkgdown/sample-metadata.html">Sample Metadata Analysis</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-solid fa-rocket"></span> Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/saezlab/MetaProViz"><span class="fa fa-brands fa-github"></span></a></li>
@@ -55,19 +57,19 @@
 
 
 <dl><dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
-<dd><p>Path to the config file. Directories and the file will be
-created if don't exist.</p></dd>
+<dd><p>Path to the config file. Directories and the file will be created if
+don't exist.</p></dd>
 
 
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
-<dd><p>Save the config under this title. One config file might
-contain multiple configurations, each identified by a title.</p></dd>
+<dd><p>Save the config under this title. One config file might contain multiple
+configurations, each identified by a title.</p></dd>
 
 
 <dt id="arg-local">local<a class="anchor" aria-label="anchor" href="#arg-local"></a></dt>
-<dd><p>Save into a config file in the current directory instead of
-a user level config file. When loading, the config in the current
-directory has priority over the user level config.</p></dd>
+<dd><p>Save into a config file in the current directory instead of a user level
+config file. When loading, the config in the current directory has
+priority over the user level config.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -77,12 +79,9 @@ directory has priority over the user level config.</p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
-<span class="r-in"><span><span class="co"># after this, all downloads will default to commercial licenses</span></span></span>
-<span class="r-in"><span><span class="co"># i.e. the resources that allow only academic use will be excluded:</span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">options</a></span><span class="op">(</span>metaproviz.console_loglevel <span class="op">=</span> <span class="st">'trace'</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># restore the defaults and write them to the default config file:</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="metaproviz_reset_config.html">metaproviz_reset_config</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu">metaproviz_save_config</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -91,11 +90,11 @@ directory has priority over the user level config.</p></dd>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez, Christian Frezza.</p>
+  <p>Developed by Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Jannik Franken, Julio Saez-Rodriguez, Christian Frezza.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

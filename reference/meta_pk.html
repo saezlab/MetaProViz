@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.99.24</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -16,13 +16,15 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-book-open"></span> Tutorials</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials"><li><a class="dropdown-item" href="../articles/standard-metabolomics.html">Standard Metabolomics</a></li>
-    <li><a class="dropdown-item" href="../articles/core-metabolomics.html">CoRe Metabolomics</a></li>
-    <li><a class="dropdown-item" href="../articles/prior-knowledge.html">Prior knowledge</a></li>
-    <li><a class="dropdown-item" href="../articles/sample-metadata.html">Sample Metadata Analysis</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-book-open"></span></button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-"><li><a class="dropdown-item" href="../articles/quick-start.html">Getting started</a></li>
+    <li><a class="dropdown-item" href="../articles/vignettes/pkgdown/standard-metabolomics.html">Standard Metabolomics</a></li>
+    <li><a class="dropdown-item" href="../articles/vignettes/pkgdown/core-metabolomics.html">CoRe Metabolomics</a></li>
+    <li><a class="dropdown-item" href="../articles/vignettes/pkgdown/prior-knowledge.html">Prior Knowledge</a></li>
+    <li><a class="dropdown-item" href="../articles/vignettes/pkgdown/sample-metadata.html">Sample Metadata Analysis</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-solid fa-rocket"></span> Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="../news/index.html">Changelog</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/saezlab/MetaProViz"><span class="fa fa-brands fa-github"></span></a></li>
@@ -61,23 +63,34 @@
 
 
 <dl><dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>DF with unique sample identifiers as row names and metabolite numerical values in columns with metabolite identifiers as column names. Use NA for metabolites that were not detected. includes experimental design and outlier column.</p></dd>
+<dd><p>SummarizedExperiment (se) file including assay and colData. If se file
+is provided, metadata_sample is extracted from the colData of the se
+object. Alternatively provide a DF with unique sample identifiers as row
+names and metabolite numerical values in columns with metabolite
+identifiers as column names. Use NA for metabolites that were not
+detected.</p></dd>
 
 
 <dt id="arg-metadata-sample">metadata_sample<a class="anchor" aria-label="anchor" href="#arg-metadata-sample"></a></dt>
-<dd><p><em>Optional: </em> DF which contains information about the samples, which will be combined with your input data based on the unique sample identifiers used as rownames. Column "Conditions" with information about the sample conditions (e.g. "N" and "T" or "Normal" and "Tumor"), can be used for feature filtering and colour coding in the PCA. Column "AnalyticalReplicate" including numerical values, defines technical repetitions of measurements, which will be summarised. Column "BiologicalReplicates" including numerical values. Please use the following names: "Conditions", "Biological_Replicates", "Analytical_Replicates".<strong>Default = NULL</strong></p></dd>
+<dd><p><em>Optional: </em> Only required if you did not provide se file in
+parameter data. Provide DF which contains metadata information about the
+samples, which will be combined with your input data based on the unique
+sample identifiers used as rownames. <strong>Default = NULL</strong></p></dd>
 
 
 <dt id="arg-metadata-info">metadata_info<a class="anchor" aria-label="anchor" href="#arg-metadata-info"></a></dt>
-<dd><p><em>Optional: </em> NULL or vector with column names that should be used, i.e. c("Age", "gender", "Tumour-stage"). <strong>default: NULL</strong></p></dd>
+<dd><p><em>Optional: </em> NULL or vector with column names that should be used,
+i.e. c("Age", "gender", "Tumour-stage"). <strong>default: NULL</strong></p></dd>
 
 
 <dt id="arg-save-table">save_table<a class="anchor" aria-label="anchor" href="#arg-save-table"></a></dt>
-<dd><p><em>Optional: </em> File types for the analysis results are: "csv", "xlsx", "txt". <strong>Default = "csv"</strong></p></dd>
+<dd><p><em>Optional: </em> File types for the analysis results are: "csv",
+"xlsx", "txt". <strong>Default = "csv"</strong></p></dd>
 
 
 <dt id="arg-path">path<a class="anchor" aria-label="anchor" href="#arg-path"></a></dt>
-<dd><p><em>Optional:</em> Path to the folder the results should be saved at. <strong>default: NULL</strong></p></dd>
+<dd><p><em>Optional:</em> Path to the folder the results should be saved at.
+<strong>default: NULL</strong></p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -87,9 +100,15 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">Tissue_Norm</span> <span class="op">&lt;-</span> <span class="va">tissue_norm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Code"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">Res</span> <span class="op">&lt;-</span> <span class="fu">MetaProViz</span><span class="fu">::</span><span class="fu">meta_pk</span><span class="op">(</span>data<span class="op">=</span><span class="va">Tissue_Norm</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">13</span><span class="op">)</span><span class="op">]</span>,</span></span>
-<span class="r-in"><span>                          metadata_sample<span class="op">=</span> <span class="va">Tissue_Norm</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>,<span class="fl">4</span><span class="op">:</span><span class="fl">5</span>,<span class="fl">12</span><span class="op">:</span><span class="fl">13</span><span class="op">)</span><span class="op">]</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tissue_norm_se</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">Res</span> <span class="op">&lt;-</span> <span class="fu">meta_pk</span><span class="op">(</span><span class="va">tissue_norm_se</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tissue_norm</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">Tissue_Norm</span> <span class="op">&lt;-</span> <span class="va">tissue_norm</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Code"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">Res</span> <span class="op">&lt;-</span> <span class="fu">meta_pk</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    data <span class="op">=</span> <span class="va">Tissue_Norm</span><span class="op">[</span>, <span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">13</span><span class="op">)</span><span class="op">]</span>,</span></span>
+<span class="r-in"><span>    metadata_sample <span class="op">=</span> <span class="va">Tissue_Norm</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">2</span>, <span class="fl">4</span><span class="op">:</span><span class="fl">5</span>, <span class="fl">12</span><span class="op">:</span><span class="fl">13</span><span class="op">)</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -98,11 +117,11 @@
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez, Christian Frezza.</p>
+  <p>Developed by Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Jannik Franken, Julio Saez-Rodriguez, Christian Frezza.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>

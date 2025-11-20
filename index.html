@@ -12,8 +12,8 @@
 <link href="deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><link href="extra.css" rel="stylesheet">
 <meta property="og:title" content="METabolomics pre-PRocessing, functiOnal analysis and VIZualisation">
-<meta name="description" content="MetaProViz can analyse standard metabolomics and exometabolomics data (CoRe).It performs pre-processing including feature filtering, missimg value imputation, normalisation and outlier detection. It perform functional analysis including differential metabolite analysis (DMA), clustering based on regulatory rules (MCA) and contains different visualisation methods to extract biological interpretable graphs and saves them in a publication ready format.">
-<meta property="og:description" content="MetaProViz can analyse standard metabolomics and exometabolomics data (CoRe).It performs pre-processing including feature filtering, missimg value imputation, normalisation and outlier detection. It perform functional analysis including differential metabolite analysis (DMA), clustering based on regulatory rules (MCA) and contains different visualisation methods to extract biological interpretable graphs and saves them in a publication ready format.">
+<meta name="description" content="MetaProViz can analyse standard metabolomics and exometabolomics data (CoRe). It performs pre-processing including feature filtering, missing value imputation, normalisation and outlier detection. It performs functional analysis including differential metabolite analysis (DMA), clustering based on regulatory rules (MCA) and contains different visualisation methods to extract biological interpretable graphs and saves them in a publication ready format.">
+<meta property="og:description" content="MetaProViz can analyse standard metabolomics and exometabolomics data (CoRe). It performs pre-processing including feature filtering, missing value imputation, normalisation and outlier detection. It performs functional analysis including differential metabolite analysis (DMA), clustering based on regulatory rules (MCA) and contains different visualisation methods to extract biological interpretable graphs and saves them in a publication ready format.">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -23,7 +23,7 @@
 
     <a class="navbar-brand me-2" href="index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.99.24</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -33,15 +33,17 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-tutorials" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-book-open"></span> Tutorials</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-tutorials">
-<li><a class="dropdown-item" href="articles/standard-metabolomics.html">Standard Metabolomics</a></li>
-    <li><a class="dropdown-item" href="articles/core-metabolomics.html">CoRe Metabolomics</a></li>
-    <li><a class="dropdown-item" href="articles/prior-knowledge.html">Prior knowledge</a></li>
-    <li><a class="dropdown-item" href="articles/sample-metadata.html">Sample Metadata Analysis</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-book-open"></span></button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-">
+<li><a class="dropdown-item" href="articles/quick-start.html">Getting started</a></li>
+    <li><a class="dropdown-item" href="articles/vignettes/pkgdown/standard-metabolomics.html">Standard Metabolomics</a></li>
+    <li><a class="dropdown-item" href="articles/vignettes/pkgdown/core-metabolomics.html">CoRe Metabolomics</a></li>
+    <li><a class="dropdown-item" href="articles/vignettes/pkgdown/prior-knowledge.html">Prior Knowledge</a></li>
+    <li><a class="dropdown-item" href="articles/vignettes/pkgdown/sample-metadata.html">Sample Metadata Analysis</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html"><span class="fa fa-solid fa-rocket"></span> Reference</a></li>
+<li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -68,39 +70,53 @@
 </h2>
 <p><strong>MetaProViz</strong> (<strong>Meta</strong>bolomics <strong>Pr</strong>ocessing, functi<strong>o</strong>nal analysis and <strong>Vi</strong>suali<strong>z</strong>ation), a free open-source R-package that provides mechanistic hypotheses from metabolomics data by integrating prior knowledge from literature with metabolomics. MetaProViz offers an interactive framework consisting of five modules: Processing, differential analysis, prior knwoledge access and refactoring, functional analysis and visualization of both intracellular and exometabolomics (=consumption-release (CoRe) data). Those modules and their functions can be used independently from each other or in combination (<strong>Fig.1</strong>).</p>
 <center>
-<figure><img src="https://github.com/saezlab/MetaProViz/blob/development/vignettes/Fig.1.png?raw=true" style="width:90.0%" alt="Fig. 1: Overview of MetaProViz functions."><figcaption aria-hidden="true"><strong>Fig. 1:</strong> Overview of MetaProViz functions.
-</figcaption></figure>
+<div class="float">
+<img src="https://github.com/saezlab/MetaProViz/blob/development/vignettes/Fig.1.png?raw=true" alt="Fig. 1: Overview of MetaProViz functions."><div class="figcaption">
+<strong>Fig. 1:</strong> Overview of MetaProViz functions.</div>
+</div>
 </center>
-<p>The first module, <strong>MetaProViz</strong>, <code>Processing</code>, allows the customized processing of raw peak metabolomics data from different experimental setups, including options to perform feature filtering due to missingness, Total Ion Count (TIC) normalisation, Missing Value Imputation (MVI) based on half-minimum and outlier detection based on Hotellin’s T2. All of these pre-processing parameters can be customized and combined as needed.<br>
-The second module of <strong>MetaProViz</strong>, <code>Differential Metabolite Analysis (DMA)</code>, allows the user to perform differential analysis between two conditions (e.g. Tumour versus Healthy) calculating the Log2FC, p-value, adjusted p-value and t-value, whereby the user can choose all the test statistics. The input can either be the output of the <code>Preprocessing</code> module or any DF including metabolite values and information about the conditions that should be compared.<br>
-The third module of <strong>MetaProViz</strong>, <code>Functional Analysis</code>, includes different methods to create clusters of metabolites based on their distribution across the data using logical regulatory rules, prior knowledge for enrichment analysis and functions to perform over representation analysis (ORA). Here, the user can either input the output of the <code>Processing</code> or <code>Differential Metabolite Analysis (DMA)</code> module, or any other DF including Log2FC and statistics or metabolite values.<br>
-The fourth module of <strong>MetaProViz</strong>, <code>Visualization</code>, can easily create customized visualizations of the output results of each of the other <strong>MetaProViz</strong> modules or custom files. Here we not only enable overview plots such as PCA, heatmap, Volcano plot, but also individual graphs of each metabolite as bar graphs, box plots or violin plots. Moreover, the user can provide additional information such as pathways the metabolites correspond to, the clusters the metabolites where assigned to or any other meta-information to customize the plots for color, shape or selections, thus enabling biological interpretation of the results otherwise missed in the data.</p>
+<p>The first module, <strong>MetaProViz</strong>, <code>Processing</code>, allows the customized processing of raw peak metabolomics data from different experimental setups, including options to perform feature filtering due to missingness, Total Ion Count (TIC) normalisation, Missing Value Imputation (MVI) based on half-minimum and outlier detection based on Hotellin’s T2. All of these pre-processing parameters can be customized and combined as needed.</p>
+<p>The second module of <strong>MetaProViz</strong>, <code>Differential Metabolite Analysis (DMA)</code>, allows the user to perform differential analysis between two conditions (e.g. Tumour versus Healthy) calculating the Log2FC, p-value, adjusted p-value and t-value, whereby the user can choose all the test statistics. The input can either be the output of the <code>Preprocessing</code> module or any DF including metabolite values and information about the conditions that should be compared.</p>
+<p>The third module of <strong>MetaProViz</strong>, <code>Functional Analysis</code>, includes different methods to create clusters of metabolites based on their distribution across the data using logical regulatory rules, prior knowledge for enrichment analysis and functions to perform over representation analysis (ORA). Here, the user can either input the output of the <code>Processing</code> or <code>Differential Metabolite Analysis (DMA)</code> module, or any other DF including Log2FC and statistics or metabolite values.</p>
+<p>The fourth module of <strong>MetaProViz</strong>, <code>Visualization</code>, can easily create customized visualizations of the output results of each of the other <strong>MetaProViz</strong> modules or custom files. Here we not only enable overview plots such as PCA, heatmap, Volcano plot, but also individual graphs of each metabolite as bar graphs, box plots or violin plots. Moreover, the user can provide additional information such as pathways the metabolites correspond to, the clusters the metabolites where assigned to or any other meta-information to customize the plots for color, shape or selections, thus enabling biological interpretation of the results otherwise missed in the data.</p>
 </div>
 <div class="section level2">
 <h2 id="tutorials">Tutorials<a class="anchor" aria-label="anchor" href="#tutorials"></a>
 </h2>
-<p>We have generated several tutorials showcasing the different functionalities MetaProViz offers using publicly available datasets, which are included as example data within <strong>MetaProViz</strong>. You can find those tutorial on the top under the “Tutorials” button, where you can follow specific user case examples for different analysis. Otherwise, you can also follow the links below:<br>
-- <a href="https://saezlab.github.io/MetaProViz/articles/standard-metabolomics.html" class="external-link">Standard metabolomics data</a><br>
-- <a href="https://saezlab.github.io/MetaProViz/articles/core-metabolomics.html" class="external-link">Consumption-Release (CoRe) metabolomics data from cell culture media</a><br>
-- <a href="https://saezlab.github.io/MetaProViz/articles/prior-knowledge.html" class="external-link">Prior Knowledge Access &amp; Integration</a><br>
-- <a href="https://saezlab.github.io/MetaProViz/articles/sample-metadata.html" class="external-link">Sample Metadata Analysis</a></p>
+<p>We have generated several tutorials showcasing the different functionalities MetaProViz offers using publicly available datasets, which are included as example data within <strong>MetaProViz</strong>. You can find those tutorial on the top under the “Tutorials” button, where you can follow specific user case examples for different analysis. Otherwise, you can also follow the links below:</p>
+<ul>
+<li><a href="https://saezlab.github.io/MetaProViz/articles/standard-metabolomics.html" class="external-link">Standard metabolomics data</a></li>
+<li><a href="https://saezlab.github.io/MetaProViz/articles/core-metabolomics.html" class="external-link">Consumption-Release (CoRe) metabolomics data from cell culture media</a></li>
+<li><a href="https://saezlab.github.io/MetaProViz/articles/prior-knowledge.html" class="external-link">Prior Knowledge Access &amp; Integration</a></li>
+<li><a href="https://saezlab.github.io/MetaProViz/articles/sample-metadata.html" class="external-link">Sample Metadata Analysis</a></li>
+</ul>
 <p>Here you will find a brief overview and information about the installation of the package and its dependencies.</p>
 </div>
 <div class="section level2">
 <h2 id="example-data">Example Data<a class="anchor" aria-label="anchor" href="#example-data"></a>
 </h2>
-<p>clear cell Renal Cell Carcinoma (ccRCC) patients data from Hakimi et. al including 138 matched tumour and normal tissue pairs (Hakimi et al. 2016). Cell-lines data from intra- and extracellular metabolomics data from cell culture media from <a href="https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&amp;ProjectID=PR001418" class="external-link">metabolomics workbench project PR001418</a>. <img src="vignettesunnamed-chunk-2-1.png" width="100%" style="display: block; margin: auto auto auto 0;"><br>
-Additionally we also added transcriptomics and proteomics data of ccRCC patients processed with SiRCle (Mora et al. 2024), originally from <a href="https://proteomic.datacommons.cancer.gov/pdc/study/PDC000127" class="external-link">PDC000127</a> (Clark et al. 2019).</p>
+<p>clear cell Renal Cell Carcinoma (ccRCC) patients data from Hakimi et. al including 138 matched tumour and normal tissue pairs (Hakimi et al. 2016). Cell-lines data from intra- and extracellular metabolomics data from cell culture media from <a href="https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&amp;ProjectID=PR001418" class="external-link">metabolomics workbench project PR001418</a>.</p>
+<p><img src="articles/readme-example-data.png" width="100%" style="display: block; margin: auto auto auto 0;"></p>
+<p>Additionally we also added transcriptomics and proteomics data of ccRCC patients processed with SiRCle (Mora et al. 2024), originally from <a href="https://proteomic.datacommons.cancer.gov/pdc/study/PDC000127" class="external-link">PDC000127</a> (Clark et al. 2019).</p>
 </div>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p><strong>MetaProViz</strong> is an R package and to install the package, start R and enter:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"https://github.com/saezlab/MetaProViz"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"https://github.com/saezlab/MetaProViz"</span><span class="op">)</span></span></code></pre></div>
 <p>Now <strong>MetaProViz</strong> can be imported as:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://saezlab.github.io/MetaProViz" class="external-link">MetaProViz</a></span><span class="op">)</span></span></code></pre></div>
+<div class="section level3">
+<h3 id="omnipathr-version-requirement">OmnipathR version requirement<a class="anchor" aria-label="anchor" href="#omnipathr-version-requirement"></a>
+</h3>
+<p>MetaProViz requires OmnipathR version &gt;= 3.17.4. If this version is not available in your Bioconductor release, you can install it from Bioconductor devel with:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"BiocManager"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"BiocManager"</span><span class="op">)</span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span>version <span class="op">=</span> <span class="st">"devel"</span><span class="op">)</span></span>
+<span><span class="fu">BiocManager</span><span class="fu">::</span><span class="fu"><a href="https://bioconductor.github.io/BiocManager/reference/install.html" class="external-link">install</a></span><span class="op">(</span><span class="st">"OmnipathR"</span><span class="op">)</span></span></code></pre></div>
+</div>
 <div class="section level3">
 <h3 id="windows-specifications">Windows specifications<a class="anchor" aria-label="anchor" href="#windows-specifications"></a>
 </h3>
@@ -113,31 +129,28 @@ Additionally we also added transcriptomics and proteomics data of ccRCC patients
 <p>GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007</p>
 </div>
 <div class="section level2">
+<h2 id="contributors">Contributors<a class="anchor" aria-label="anchor" href="#contributors"></a>
+</h2>
+<p>Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Jannik Franken, Christian Frezza, Julio Saez-Rodriguez</p>
+</div>
+<div class="section level2">
 <h2 id="citation">Citation<a class="anchor" aria-label="anchor" href="#citation"></a>
 </h2>
-<div class="sourceCode" id="cb3"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="sc">@</span>Manual{,</span>
-<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a>  title <span class="ot">=</span> {MetaProViz<span class="sc">:</span> METabolomics pre<span class="sc">-</span>PRocessing, functiOnal analysis and VIZualisation},</span>
-<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  author <span class="ot">=</span> {Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Julio Saez<span class="sc">-</span>Rodriguez and Christian Frezza},</span>
-<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  year <span class="ot">=</span> {<span class="dv">2024</span>},</span>
-<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  note <span class="ot">=</span> {R package version <span class="dv">3</span>.<span class="fl">0.3</span>},</span>
-<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>}</span></code></pre></div>
+<p>Please cite our bioRxiv preprint: <a href="https://www.biorxiv.org/content/10.1101/2025.08.18.670781v1.full" class="external-link uri">https://www.biorxiv.org/content/10.1101/2025.08.18.670781v1.full</a></p>
+<pre><code>@article{Schmidt_Turei_Prymidis_Daley_Frezza_Saez-Rodriguez_2025,
+         title={Integrated metabolomics data analysis to generate mechanistic hypotheses with MetaProViz},
+         DOI={10.1101/2025.08.18.670781},
+         journal={BioRxiv},
+         author={Schmidt, Christina and Turei, Denes and Prymidis, Dimitrios and Daley, Macabe and Frezza, Christian and Saez-Rodriguez, Julio},
+         year={2025},
+         month={Aug}}</code></pre>
 </div>
 <div class="section level2">
 <h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
-<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
-<div id="ref-Clark2019" class="csl-entry">
-Clark, David J, Saravana M Dhanasekaran, Francesca Petralia, Jianbo Pan, Xiaoyu Song, Yingwei Hu, Felipe da Veiga Leprevost, et al. 2019. “Integrated Proteogenomic Characterization of Clear Cell Renal Cell Carcinoma.” <em>Cell</em> 179 (4): 964–983.e31. <a href="https://doi.org/10.1016/j.cell.2019.10.007" class="external-link uri">https://doi.org/10.1016/j.cell.2019.10.007</a>.
-</div>
-<div id="ref-Hakimi2016" class="csl-entry">
-Hakimi, A Ari, Ed Reznik, Chung-Han Lee, Chad J Creighton, A Rose Brannon, Augustin Luna, B Arman Aksoy, et al. 2016. “An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma.” <em>Cancer Cell</em> 29 (1): 104–16. <a href="https://doi.org/10.1016/j.ccell.2015.12.004" class="external-link uri">https://doi.org/10.1016/j.ccell.2015.12.004</a>.
-</div>
-<div id="ref-Mora_Schmidt2024" class="csl-entry">
-Mora, Ariane, Christina Schmidt, Brad Balderson, Christian Frezza, and Mikael Bodén. 2024. “SiRCle (Signature Regulatory Clustering) Model Integration Reveals Mechanisms of Phenotype Regulation in Renal Cancer.” <em>Genome Medicine</em> 16 (1): 144. <a href="https://doi.org/10.1186/s13073-024-01415-3" class="external-link uri">https://doi.org/10.1186/s13073-024-01415-3</a>.
-</div>
-</div>
+<p>Clark, David J, Saravana M Dhanasekaran, Francesca Petralia, Jianbo Pan, Xiaoyu Song, Yingwei Hu, Felipe da Veiga Leprevost, et al. 2019. “Integrated Proteogenomic Characterization of Clear Cell Renal Cell Carcinoma.” <em>Cell</em> 179 (4): 964–983.e31. <a href="https://doi.org/10.1016/j.cell.2019.10.007" class="external-link uri">https://doi.org/10.1016/j.cell.2019.10.007</a>.</p>
+<p>Hakimi, A Ari, Ed Reznik, Chung-Han Lee, Chad J Creighton, A Rose Brannon, Augustin Luna, B Arman Aksoy, et al. 2016. “An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma.” <em>Cancer Cell</em> 29 (1): 104–16. <a href="https://doi.org/10.1016/j.ccell.2015.12.004" class="external-link uri">https://doi.org/10.1016/j.ccell.2015.12.004</a>.</p>
+<p>Mora, Ariane, Christina Schmidt, Brad Balderson, Christian Frezza, and Mikael Bodén. 2024. “SiRCle (Signature Regulatory Clustering) Model Integration Reveals Mechanisms of Phenotype Regulation in Renal Cancer.” <em>Genome Medicine</em> 16 (1): 144. <a href="https://doi.org/10.1186/s13073-024-01415-3" class="external-link uri">https://doi.org/10.1186/s13073-024-01415-3</a>.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -157,10 +170,11 @@ Mora, Ariane, Christina Schmidt, Brad Balderson, Christian Frezza, and Mikael Bo
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Christina Schmidt <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0002-3867-0881" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Christina Schmidt <br><small class="roles"> Author, maintainer, funder </small> <a href="https://orcid.org/0000-0002-3867-0881" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Denes Turei <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-7249-9379" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
-<li>Dimitrios Prymidis <br><small class="roles"> Author </small>   </li>
+<li>Dimitrios Prymidis <br><small class="roles"> Author </small> <a href="https://orcid.org/0009-0000-0168-3841" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Macabe Daley <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-8026-7068" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
+<li>Jannik Franken <br><small class="roles"> Author </small>   </li>
 <li>Julio Saez-Rodriguez <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-8552-8976" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 <li>Christian Frezza <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-3293-7397" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a>  </li>
 </ul>
@@ -194,11 +208,11 @@ Mora, Ariane, Christina Schmidt, Brad Balderson, Christian Frezza, and Mikael Bo
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez, Christian Frezza.</p>
+  <p>Developed by Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Jannik Franken, Julio Saez-Rodriguez, Christian Frezza.</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>
