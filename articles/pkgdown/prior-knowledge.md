@@ -1150,7 +1150,7 @@ Tissue_TvsN_Young <- tissue_dma_young
     #> 
     #> other attached packages:
     #> [1] tibble_3.3.0       stringr_1.6.0      dplyr_1.1.4        purrr_1.2.0        rlang_1.1.6        magrittr_2.0.4    
-    #> [7] MetaProViz_3.99.24 BiocStyle_2.38.0  
+    #> [7] MetaProViz_3.99.25 BiocStyle_2.38.0  
     #> 
     #> loaded via a namespace (and not attached):
     #>   [1] RColorBrewer_1.1-3          rstudioapi_0.17.1           jsonlite_2.0.0              ggbeeswarm_0.7.2           
