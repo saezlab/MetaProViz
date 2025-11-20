@@ -3070,14 +3070,25 @@ compare_pk <- function(
 
         # Generate the UpSet plot.
         upset_plot <-
-            viz_upset(
-                df = df_binary,
-                class_col = "Type",
-                intersect_cols = resource_cols,
-                plot_name = plot_name,
-                palette_type = palette_type,
-                save_plot = NULL,
-                print_plot = FALSE
+            tryCatch(
+                viz_upset(
+                    df = df_binary,
+                    class_col = "Type",
+                    intersect_cols = resource_cols,
+                    plot_name = plot_name,
+                    palette_type = palette_type,
+                    save_plot = NULL,
+                    print_plot = FALSE
+                ),
+                error = function(e) {
+                    log_warn(
+                        paste0(
+                            "viz_upset failed inside compare_pk(): ",
+                            conditionMessage(e)
+                        )
+                    )
+                    NULL     ## viz_upset failed -> set upset_plot variable to NULL
+                }
             )
 
         summary_table <- df_binary
