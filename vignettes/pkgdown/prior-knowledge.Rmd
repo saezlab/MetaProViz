@@ -481,7 +481,7 @@ kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size =
 
 We have now loaded a number of different PK sources (details above) and aim to compare the overlap in coverage between these PK sources to understand if there are certain genes or metabolites covered by one PK resource but not the others.
 As an example, we will compare the resources containing gene-metabolite sets (Hallmarks, Gaude, MetalinksDB) using `compare_pk()` function, which will generate a combined datatable and visualises it as an Upset plot. The Upset plot shows the overlap of coverage, similar to how a Venn diagram works, but enable to visualize multiple combinations clearly.
-```{r compare-pk, eval=FALSE}
+```{r compare-pk, eval=TRUE, echo=FALSE}
 # Compare the PK resources
 pk_comp_res <- compare_pk(data = list(Hallmarks = as.data.frame(Hallmarks_GeneMetab[["GeneMetabSet"]]),
 Gaude = as.data.frame(Gaude_GeneMetab[["GeneMetabSet"]]),
@@ -544,7 +544,7 @@ In the Biocrates data the available metabolite identifiers are mostly CHEBI, HMD
 Now we select these metabolite identifier columns to count the coverage and look at the combinations of the coverage grouped by the class of metabolite.
 This helps us to understand what to expect, when linking the data to prior knowledge.\
 
-```{r compare-pk-2, eval=FALSE}
+```{r compare-pk-2, eval=TRUE, echo=FALSE}
 pk_comp_res_biocft <- compare_pk(data = list(Biocft = FeatureMetadata_Biocrates),
 metadata_info = list(Biocft = c("CHEBI", "HMDB", "LIMID")),
 plot_name = "Overlap of BioCrates Columns")
@@ -1000,7 +1000,7 @@ Tissue_TvsN <- tissue_dma
 data(tissue_dma_old)
 Tissue_TvsN_Old <- tissue_dma_old
 
-data(tissue_dma_new)
+data(tissue_dma_young)
 Tissue_TvsN_Young <- tissue_dma_young
 ```
 
