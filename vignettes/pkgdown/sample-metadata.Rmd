@@ -624,7 +624,9 @@ MetaData_Metab <- merge(x=Tissue_MetaData,
 y= MCAres[["MCA_2Cond_Results"]][, c(1, 14:15)]%>%tibble::column_to_rownames("Metabolite"),
 by=0,
 all.y=TRUE)%>%
-tibble::column_to_rownames("Row.names")
+tibble::column_to_rownames("Row.names")%>%
+dplyr::filter(!is.na(SUPER_PATHWAY))%>%
+dplyr::filter(!is.na(SUB_PATHWAY))
 
 viz_volcano(plot_types="Compare",
 data=ResList[["Young"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
@@ -654,7 +656,9 @@ MetaData_Metab <- merge(x=Tissue_MetaData,
 y= MCAres[["MCA_2Cond_Results"]][, c(1, 14:15)]%>%tibble::column_to_rownames("Metabolite"),
 by=0,
 all.y=TRUE)%>%
-tibble::column_to_rownames("Row.names")
+tibble::column_to_rownames("Row.names")%>%
+dplyr::filter(!is.na(SUPER_PATHWAY))%>%
+dplyr::filter(!is.na(SUB_PATHWAY))
 
 viz_volcano(plot_types="Compare",
 data=ResList[["Young"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
