@@ -953,12 +953,22 @@ viz_volcano_compare <- function(
         PlotList_adaptedGrid <- list()  # Empty list to store all the plots
 
         for (i in IndividualPlots) {
-        InputVolcano <- subset(InputCompare, individual == paste(i))
+            InputVolcano <- subset(InputCompare, individual == paste(i))
 
-        ## initialize keyvalshape variable so it is safe to access by EnhancedVolcano below
-        keyvalsshape <- NULL
+            ## initialize keyvalshape variable so it is safe to access by EnhancedVolcano below
+            keyvalsshape <- NULL
 
-        if (nrow(InputVolcano) >= 1L) {
+            if (nrow(InputVolcano) < 1L) {
+                message(
+                    paste0(
+                        "Skipping viz_volcano compare plot for '",
+                        i,
+                        "' because no rows are available after filtering."
+                    )
+                )
+                next
+            }
+
             # Prepare the colour scheme:
             if ("color" %in% names(metadata_info)) {
                 color_select <- safe_colorblind_palette[seq_along(unique(InputVolcano$color))]
@@ -981,133 +991,133 @@ viz_volcano_compare <- function(
                 }
             }
             # Prepare the shape scheme:
-        } else if (
-            "shape" %in% names(metadata_info) &
-            !("color" %in% names(metadata_info))
-        ) {
-            shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$shape))]
+            if (
+                "shape" %in% names(metadata_info) &
+                !("color" %in% names(metadata_info))
+            ) {
+                shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$shape))]
 
-            keyvalsshape <- c()
-            for (row in seq_len(nrow(InputVolcano))) {
-            sha <- shape_select[unique(InputVolcano$shape) %in% InputVolcano[row, "shape"]]
-            names(sha) <- InputVolcano$shape[row]
-            keyvalsshape %<>% c(sha)
-            }
-        } else if (
-            "shape" %in% names(metadata_info) &
-            "color" %in% names(metadata_info)
-        ) {
-            # Here we have already used color from metadata_info and we need to use shape for the conditions
-            msg <- paste0(
-                "For Plot_setting = `Consitions`we can only use colour or shape from ",
-                "metadata_feature. We ignore shape and use it to label the ",
-                "Comparison_name."
-            )
-            log_info(msg)
-            message(msg)
-            shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
-
-            keyvalsshape <- c()
-            for (row in seq_len(nrow(InputVolcano))) {
-                sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
-                names(sha) <- InputVolcano$comparison[row]
+                keyvalsshape <- c()
+                for (row in seq_len(nrow(InputVolcano))) {
+                sha <- shape_select[unique(InputVolcano$shape) %in% InputVolcano[row, "shape"]]
+                names(sha) <- InputVolcano$shape[row]
                 keyvalsshape %<>% c(sha)
+                }
+            } else if (
+                "shape" %in% names(metadata_info) &
+                "color" %in% names(metadata_info)
+            ) {
+                # Here we have already used color from metadata_info and we need to use shape for the conditions
+                msg <- paste0(
+                    "For Plot_setting = `Consitions`we can only use colour or shape from ",
+                    "metadata_feature. We ignore shape and use it to label the ",
+                    "Comparison_name."
+                )
+                log_info(msg)
+                message(msg)
+                shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
+
+                keyvalsshape <- c()
+                for (row in seq_len(nrow(InputVolcano))) {
+                    sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
+                    names(sha) <- InputVolcano$comparison[row]
+                    keyvalsshape %<>% c(sha)
+                }
+            } else if (!("shape" %in% names(metadata_info))) {
+                shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
+
+                keyvalsshape <- c()
+                for (row in seq_len(nrow(InputVolcano))) {
+                    sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
+                    names(sha) <- InputVolcano$comparison[row]
+                    keyvalsshape %<>% c(sha)
+                }
             }
-        } else if (!("shape" %in% names(metadata_info))) {
-            shape_select <- safe_shape_palette[seq_along(unique(InputVolcano$comparison))]
-
-            keyvalsshape <- c()
-            for (row in seq_len(nrow(InputVolcano))) {
-                sha <- shape_select[unique(InputVolcano$comparison) %in% InputVolcano[row, "comparison"]]
-                names(sha) <- InputVolcano$comparison[row]
-                keyvalsshape %<>% c(sha)
-            }
-        }
-        # Prepare the Plot:
-        Plot <- EnhancedVolcano(
-            InputVolcano,
-            lab = InputVolcano$FeatureNames,
-            # Metabolite name
-            selectLab = select_label,
-            x = paste(x),
-            y = paste(y),
-            xlab = xlab,
-            ylab = ylab,
-            pCutoff = cutoff_y,
-            FCcutoff = cutoff_x,  # Cut off Log2FC, automatically 2
-            pointSize = 3,
-            labSize = 3,
-            axisLabSize = 10,
-            titleLabSize = 12,
-            subtitleLabSize = 11,
-            captionLabSize = 10,
-            col = safe_colorblind_palette,
-            colCustom = keyvals,
-            shapeCustom = keyvalsshape,
-            colAlpha = 1,
-            title = paste(plot_name, ": ", i, sep = ""),
-            subtitle = subtitle,
-            caption = paste0("total = ", (nrow(InputVolcano)/2), " ", feature),
-            xlim = c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
-            ylim = c(0, (ceiling(-log10(Reduce(min, InputVolcano[[y]]))))),
-            cutoffLineType = "dashed",
-            cutoffLineCol = "black",
-            cutoffLineWidth = 0.5,
-            legendLabels = c(paste(x, "<|", cutoff_x, "|"), paste(x, ">|", cutoff_x, "|"), paste(y, '<', cutoff_y), paste(y, '<', cutoff_y, '&', x, "<|", cutoff_x, "|")),
-            legendPosition = 'right',
-            legendLabSize = 7,
-            legendIconSize = 4,
-            gridlines.major = FALSE,
-            gridlines.minor = FALSE,
-            drawConnectors = connectors
-        )
-        # Add the theme
-        if (!is.null(theme)) {
-            Plot <- Plot+theme
-        }
-
-        ## Store the plot in the 'plots' list
-        PlotList[[i]] <- Plot
-
-        # Set the total heights and widths
-        PlotTitle <- paste(plot_name, ": ", i, sep = "")
-        Plot_Sized <-
-            plot_grob_volcano(
-                input_plot = Plot,
-                metadata_info = metadata_info,
-                plot_name = PlotTitle,
-                subtitle = subtitle
+            # Prepare the Plot:
+            Plot <- EnhancedVolcano(
+                InputVolcano,
+                lab = InputVolcano$FeatureNames,
+                # Metabolite name
+                selectLab = select_label,
+                x = paste(x),
+                y = paste(y),
+                xlab = xlab,
+                ylab = ylab,
+                pCutoff = cutoff_y,
+                FCcutoff = cutoff_x,  # Cut off Log2FC, automatically 2
+                pointSize = 3,
+                labSize = 3,
+                axisLabSize = 10,
+                titleLabSize = 12,
+                subtitleLabSize = 11,
+                captionLabSize = 10,
+                col = safe_colorblind_palette,
+                colCustom = keyvals,
+                shapeCustom = keyvalsshape,
+                colAlpha = 1,
+                title = paste(plot_name, ": ", i, sep = ""),
+                subtitle = subtitle,
+                caption = paste0("total = ", (nrow(InputVolcano)/2), " ", feature),
+                xlim = c(min(InputVolcano[[x]][is.finite(InputVolcano[[x]] )])-0.2, max(InputVolcano[[x]][is.finite(InputVolcano[[x]])])+1.2),
+                ylim = c(0, (ceiling(-log10(Reduce(min, InputVolcano[[y]]))))),
+                cutoffLineType = "dashed",
+                cutoffLineCol = "black",
+                cutoffLineWidth = 0.5,
+                legendLabels = c(paste(x, "<|", cutoff_x, "|"), paste(x, ">|", cutoff_x, "|"), paste(y, '<', cutoff_y), paste(y, '<', cutoff_y, '&', x, "<|", cutoff_x, "|")),
+                legendPosition = 'right',
+                legendLabSize = 7,
+                legendIconSize = 4,
+                gridlines.major = FALSE,
+                gridlines.minor = FALSE,
+                drawConnectors = connectors
             )
-        plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
-        plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
-        Plot_Sized %<>%
-            {ggplot() + annotation_custom(.)} %>%
-            add(theme(panel.background = element_rect(fill = "transparent")))
+            # Add the theme
+            if (!is.null(theme)) {
+                Plot <- Plot+theme
+            }
 
-        cleaned_i <-
-            gsub(
-                "[[:space:],/\\\\]",
-                "-",
-                i
-            )  # removes empty spaces and replaces /,\ with -
-        PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
+            ## Store the plot in the 'plots' list
+            PlotList[[i]] <- Plot
 
-        SaveList <- list()
-        SaveList[[cleaned_i]] <- Plot_Sized
+            # Set the total heights and widths
+            PlotTitle <- paste(plot_name, ": ", i, sep = "")
+            Plot_Sized <-
+                plot_grob_volcano(
+                    input_plot = Plot,
+                    metadata_info = metadata_info,
+                    plot_name = PlotTitle,
+                    subtitle = subtitle
+                )
+            plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
+            plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
+            Plot_Sized %<>%
+                {ggplot() + annotation_custom(.)} %>%
+                add(theme(panel.background = element_rect(fill = "transparent")))
 
-        # ----- Save
-        save_res(inputlist_df = NULL,
-            inputlist_plot = SaveList,
-            save_table = NULL,
-            save_plot = save_plot,
-            path = folder,
-            file_name = paste("Volcano_", plot_name, sep = ""),
-            core = FALSE,
-            print_plot = print_plot,
-            plot_height = plot_height,
-            plot_width = plot_width,
-            plot_unit = "cm"
-        )
+            cleaned_i <-
+                gsub(
+                    "[[:space:],/\\\\]",
+                    "-",
+                    i
+                )  # removes empty spaces and replaces /,\ with -
+            PlotList_adaptedGrid[[cleaned_i]] <- Plot_Sized
+
+            SaveList <- list()
+            SaveList[[cleaned_i]] <- Plot_Sized
+
+            # ----- Save
+            save_res(inputlist_df = NULL,
+                inputlist_plot = SaveList,
+                save_table = NULL,
+                save_plot = save_plot,
+                path = folder,
+                file_name = paste("Volcano_", plot_name, sep = ""),
+                core = FALSE,
+                print_plot = print_plot,
+                plot_height = plot_height,
+                plot_width = plot_width,
+                plot_unit = "cm"
+            )
         }
     }
 
