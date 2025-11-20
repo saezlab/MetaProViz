@@ -302,7 +302,7 @@ subtitle= "Results of dma" )
 
 ## Metabolite ID QC
 Before we perform enrichment analysis,it is important to check the availability of metabolite IDs that we aim to use. We can first create an overview plot:
-```{r compare-pk, eval=FALSE}
+```{r compare-pk, eval=TRUE, echo=FALSE}
 #Load the feature metadata:
 MetaboliteIDs <- Tissue_MetaData %>%
 rownames_to_column("Metabolite")%>%
@@ -444,7 +444,7 @@ Plot3_KEGG <- count_id(Tissue_MetaData_KEGG, "KEGG")
 ```
 \
 Lastly, we will have the new metadata table, which we can use for enrichment analysis:
-```{r compare-pk-2, eval=FALSE}
+```{r compare-pk-2, eval=TRUE, echo=FALSE}
 Tissue_MetaData_Extended <-  Tissue_MetaData_KEGG[, c(1:10,19, 11:18)]%>%
 mutate(
     KEGG = ifelse(KEGG == "", NA, KEGG),
