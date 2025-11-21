@@ -29,7 +29,7 @@ Description: MetaProViz can analyse standard metabolomics and
 URL: https://saezlab.github.io/MetaProViz
 BugReports: https://github.com/saezlab/MetaProViz/issues
 biocViews: Clustering, Metabolomics, Pathways, QualityControl, Software, SystemsBiology, Visualization
-License: GPL-3 + file LICENSE
+License: BSD_3_clause + file LICENSE
 Encoding: UTF-8
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
