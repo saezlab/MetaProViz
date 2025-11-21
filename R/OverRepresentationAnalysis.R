@@ -154,7 +154,12 @@ cluster_ora <- function(
 
     # Add the number of genes present in each pathway
     Pathway$Count <- 1
-    Pathway_Mean <- aggregate(Pathway$Count, by = list(term = Pathway$term), FUN = sum)
+    Pathway_Mean <-
+        aggregate(
+            Pathway$Count,
+            by = list(term = Pathway$term),
+            FUN = sum
+        )
     names(Pathway_Mean)[names(Pathway_Mean) == "x"] <- "Metabolites_in_Pathway"
     Pathway <- merge(x = Pathway, y = Pathway_Mean, by = "term", all.x = TRUE)
     Pathway$Count <- NULL
@@ -207,7 +212,11 @@ cluster_ora <- function(
         g_save <- gsub("/", "-", g)
         df_list[[g_save]] <- clusterGosummary
     } else {
-        log_info("None of the Input_data Metabolites of the cluster ", g ," were present in any terms of the input_pathway. Hence the ClusterGosummary ouput will be empty for this cluster. Please check that the metabolite IDs match the pathway IDs.")
+        log_info(
+            "None of the Input_data Metabolites of the cluster ",
+            g,
+            " were present in any terms of the input_pathway. Hence the ClusterGosummary ouput will be empty for this cluster. Please check that the metabolite IDs match the pathway IDs."
+        )
     }
     }
     # Save files
@@ -371,7 +380,12 @@ standard_ora <- function(
 
     # Add the number of genes present in each pathway
     Pathway$Count <- 1
-    Pathway_Mean <- aggregate(Pathway$Count, by = list(term = Pathway$term), FUN = sum)
+    Pathway_Mean <-
+        aggregate(
+            Pathway$Count,
+            by = list(term = Pathway$term),
+            FUN = sum
+        )
     names(Pathway_Mean)[names(Pathway_Mean) == "x"] <- "Metabolites_in_Pathway"
     Pathway <- merge(x = Pathway, y = Pathway_Mean, by = "term", all.x = TRUE)
     Pathway$Count <- NULL
@@ -419,7 +433,11 @@ standard_ora <- function(
     }
 
     # Return and save list of DFs
-    ORA_output_list <- list("InputSelection" = InputSelection , "ClusterGosummary" = clusterGosummary)
+    ORA_output_list <-
+        list(
+            "InputSelection" = InputSelection,
+            "ClusterGosummary" = clusterGosummary
+        )
 
     # save:
     save_res(inputlist_df = ORA_output_list,

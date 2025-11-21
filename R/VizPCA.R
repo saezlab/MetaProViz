@@ -168,7 +168,27 @@ viz_pca <- function(
     # # --- Prepare colour and shape palette
     if (is.null(color_palette)) {
         if (scale_color == "discrete") {
-            safe_colorblind_palette <- c("#88CCEE", "#DDCC77", "#661100", "#332288", "#AA4499", "#999933", "#44AA99", "#882215", "#6699CC", "#117733", "#888888", "#CC6677", "black", "gold1", "darkorchid4", "red", "orange", "blue")
+            safe_colorblind_palette <-
+                c(
+                    "#88CCEE",
+                    "#DDCC77",
+                    "#661100",
+                    "#332288",
+                    "#AA4499",
+                    "#999933",
+                    "#44AA99",
+                    "#882215",
+                    "#6699CC",
+                    "#117733",
+                    "#888888",
+                    "#CC6677",
+                    "black",
+                    "gold1",
+                    "darkorchid4",
+                    "red",
+                    "orange",
+                    "blue"
+                )
         } else if (scale_color == "continuous") {
             safe_colorblind_palette <- NULL
         }
@@ -238,7 +258,27 @@ viz_pca <- function(
             } else {
                 InputPCA$color <- as.factor(InputPCA$color)
                 # Overwrite color pallette
-                safe_colorblind_palette <- c("#88CCEE", "#DDCC77", "#661100", "#332288", "#AA4499", "#999933", "#44AA99", "#882215", "#6699CC", "#117733", "#888888", "#CC6677", "black", "gold1", "darkorchid4", "red", "orange", "blue")
+                safe_colorblind_palette <-
+                    c(
+                        "#88CCEE",
+                        "#DDCC77",
+                        "#661100",
+                        "#332288",
+                        "#AA4499",
+                        "#999933",
+                        "#44AA99",
+                        "#882215",
+                        "#6699CC",
+                        "#117733",
+                        "#888888",
+                        "#CC6677",
+                        "black",
+                        "gold1",
+                        "darkorchid4",
+                        "red",
+                        "orange",
+                        "blue"
+                    )
                 # color that will be used for distinct
                 color_select <- safe_colorblind_palette[seq_along(unique(InputPCA$color))]
                 # Overwrite color_scale
