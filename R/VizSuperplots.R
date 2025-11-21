@@ -551,15 +551,7 @@ viz_superplot <- function(
     PlotList[[i]] <- Plot
 
     # Make plot into nice format:
-    Plot_Sized <-
-        plot_grob_superplot(
-            input_plot = Plot,
-            metadata_info = metadata_info,
-            metadata_sample = metadata_sample,
-            plot_name = plot_name,
-            subtitle = i,
-            plot_type = plot_type
-        )
+    Plot_Sized <-  plot_grob_superplot(input_plot = Plot, metadata_info = metadata_info, metadata_sample = metadata_sample, plot_name = plot_name, subtitle = i, plot_type = plot_type)
     plot_height <- convertUnit(Plot_Sized$height, 'cm', valueOnly = TRUE)
     plot_width <- convertUnit(Plot_Sized$width, 'cm', valueOnly = TRUE)
     Plot_Sized %<>%

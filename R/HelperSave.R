@@ -51,11 +51,7 @@ save_path <- function(
     } else {
         if (!dir.exists(path)) {
             path <- getwd()
-            message(
-                "Provided `path` does not exist and hence results are saved here: ",
-                path,
-                sep = ""
-            )
+            message("Provided `path` does not exist and hence results are saved here: ", path, sep = "")
         }
     }
 
@@ -153,22 +149,10 @@ save_res <- function(
                         sep = ""
                     )
             } else {
-                file_name <-
-                    paste0(
-                        path,
-                        "/core_",
-                        file_name,
-                        "_",
-                        Sys.Date(),
-                        sep = ""
-                    )
+                file_name <- paste0(path, "/core_", file_name, "_", Sys.Date(), sep = "")
             }
             # Save Excel
-            write_xlsx(
-                inputlist_df,
-                paste0(file_name, ".xlsx", sep = ""),
-                col_names = TRUE
-            )
+            write_xlsx(inputlist_df, paste0(file_name, ".xlsx", sep = ""), col_names = TRUE)
         } else {
             for (DF in names(inputlist_df)) {
                 # Make file_name
@@ -185,17 +169,7 @@ save_res <- function(
                             sep = ""
                         )
                 } else {
-                    file_name_Save <-
-                        paste0(
-                            path,
-                            "/core_",
-                            file_name,
-                            "_",
-                            DF,
-                            "_",
-                            Sys.Date(),
-                            sep = ""
-                        )
+                    file_name_Save <- paste0(path, "/core_", file_name, "_", DF, "_", Sys.Date(), sep = "")
                 }
 
                 # unlist DF columns if needed
@@ -235,17 +209,7 @@ save_res <- function(
                         sep = ""
                     )
             } else {
-                file_name_Save <-
-                    paste0(
-                        path,
-                        "/core_",
-                        file_name,
-                        "_",
-                        Plot,
-                        "_",
-                        Sys.Date(),
-                        sep = ""
-                    )
+                file_name_Save <- paste0(path, "/core_", file_name, "_", Plot, "_", Sys.Date(), sep = "")
             }
 
             # Save
@@ -270,13 +234,7 @@ save_res <- function(
 
             if (is_upset_plot || grepl("upset", Plot, ignore.case = TRUE)) {
                 # Use device-based saving for upset plots
-                file_name_full <-
-                    paste0(
-                        file_name_Save,
-                        ".",
-                        save_plot,
-                        sep = ""
-                    )
+                file_name_full <- paste0(file_name_Save, ".", save_plot, sep = "")
 
                 # Convert to inches for device functions
                 width_in <- grid::convertUnit(grid::unit(plot_width, plot_unit), "inches", valueOnly = TRUE)
@@ -288,13 +246,7 @@ save_res <- function(
                 } else if (save_plot == "pdf") {
                     pdf(file_name_full, width = width_in, height = height_in)
                 } else if (save_plot == "png") {
-                    png(
-                        file_name_full,
-                        width = width_in,
-                        height = height_in,
-                        units = "in",
-                        res = 300
-                    )
+                    png(file_name_full, width = width_in, height = height_in, units = "in", res = 300)
                 }
 
                 # Plot and close device
@@ -313,11 +265,7 @@ save_res <- function(
                             error = function(e2) {
                                 # Last resort: save a blank plot with error message
                                 plot.new()
-                                text(
-                                    0.5,
-                                    0.5,
-                                    paste("Error rendering ComplexUpset plot:\n", e2$message
-                                ),
+                                text(0.5, 0.5, paste("Error rendering ComplexUpset plot:\n", e2$message),
                                     cex = 0.8, col = "red"
                                 )
                             }
@@ -327,13 +275,7 @@ save_res <- function(
                 dev.off()
             } else {
                 # Use ggsave for regular ggplot2 plots
-                ggsave(
-                    filename = paste0(file_name_Save, ".", save_plot, sep = ""),
-                    plot = plot_obj,
-                    width = plot_width,
-                    height = plot_height,
-                    units = plot_unit
-                )
+                ggsave(filename = paste0(file_name_Save, ".", save_plot, sep = ""), plot = plot_obj, width = plot_width, height = plot_height, units = plot_unit)
             }
 
             if (print_plot) {

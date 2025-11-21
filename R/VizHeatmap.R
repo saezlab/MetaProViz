@@ -182,12 +182,7 @@ viz_heatmap <- function(
                 filter(get(metadata_info[["individual_Metab"]]) == i)
             selected_path_metabs <- colnames(data)[colnames(data) %in% row.names(selected_path)]
             if (length(selected_path_metabs) == 1L) {
-                message <-
-                    paste0(
-                        "The metadata group ",
-                        i,
-                        " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored."
-                    )
+                message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
                 log_trace(paste("Warning ", message, sep = ""))
                 warning(message)
                 # Remove the pathway
@@ -289,35 +284,13 @@ viz_heatmap <- function(
                 )
 
                 # # Store the plot in the 'plots' list
-                cleaned_i <-
-                    gsub(
-                        "[[:space:], /\\\\]",
-                        "-",
-                        i
-                    )  # removes empty spaces and replaces /, \ with -
+                cleaned_i <- gsub("[[:space:], /\\\\]", "-", i)  # removes empty spaces and replaces /, \ with -
                 PlotList[[cleaned_i]] <- heatmap
 
                 # Width and height according to Sample and metabolite number
-                Plot_Sized <-
-                    plot_grob_heatmap(
-                        input_plot = heatmap,
-                        metadata_info = metadata_info,
-                        metadata_sample = metadata_sample,
-                        metadata_feature = metadata_feature,
-                        plot_name = cleaned_i
-                    )
-                plot_height <-
-                    convertUnit(
-                        Plot_Sized$height,
-                        "cm",
-                        valueOnly = TRUE
-                    )
-                plot_width <-
-                    convertUnit(
-                        Plot_Sized$width,
-                        "cm",
-                        valueOnly = TRUE
-                    )
+                Plot_Sized <- plot_grob_heatmap(input_plot = heatmap, metadata_info = metadata_info, metadata_sample = metadata_sample, metadata_feature = metadata_feature, plot_name = cleaned_i)
+                plot_height <- convertUnit(Plot_Sized$height, "cm", valueOnly = TRUE)
+                plot_width <- convertUnit(Plot_Sized$width, "cm", valueOnly = TRUE)
                 Plot_Sized %<>%
                     {
                         ggplot() +
@@ -342,11 +315,7 @@ viz_heatmap <- function(
                     plot_unit = "cm"
                 )
             } else {
-                message <-
-                    paste0(
-                        i,
-                        " includes <= 2L objects and is hence not plotted."
-                    )
+                message <- paste0(i, " includes <= 2L objects and is hence not plotted.")
                 log_trace(paste("Message ", message, sep = ""))
                 message(message)
             }
@@ -375,12 +344,7 @@ viz_heatmap <- function(
                 filter(get(metadata_info[["individual_Sample"]]) == i)
             selected_path_metabs <- colnames(data)[colnames(data) %in% row.names(selected_path)]
             if (length(selected_path_metabs) == 1L) {
-                message <-
-                    paste0(
-                        "The metadata group ",
-                        i,
-                        " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored."
-                    )
+                message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
                 log_trace(paste("Warning ", message, sep = ""))
                 warning(message)
                 # Remove the pathway
@@ -412,13 +376,7 @@ viz_heatmap <- function(
             column_to_rownames("UniqueID")
 
             # Column annotation
-            selected_metadata_sample <-
-                merge(
-                    selected_path,
-                    metadata_sample %>% rownames_to_column("UniqueID"),
-                    by = "UniqueID",
-                    all.x = TRUE
-                )
+            selected_metadata_sample <- merge(selected_path, metadata_sample %>% rownames_to_column("UniqueID"), by = "UniqueID", all.x = TRUE)
 
             col_annot_vars <- metadata_info[grepl("color_Sample", names(metadata_info))]
             col_annot <- NULL
@@ -500,35 +458,13 @@ viz_heatmap <- function(
                 )
 
                 # ----- Save
-                cleaned_i <-
-                    gsub(
-                        "[[:space:], /\\\\]",
-                        "-",
-                        i
-                    )  # removes empty spaces and replaces /, \ with -
+                cleaned_i <- gsub("[[:space:], /\\\\]", "-", i)  # removes empty spaces and replaces /, \ with -
                 PlotList[[cleaned_i]] <- heatmap
 
                 # Width and height according to Sample and metabolite number
-                Plot_Sized <-
-                    plot_grob_heatmap(
-                        input_plot = heatmap,
-                        metadata_info = metadata_info,
-                        metadata_sample = metadata_sample,
-                        metadata_feature = metadata_feature,
-                        plot_name = cleaned_i
-                    )
-                plot_height <-
-                    convertUnit(
-                        Plot_Sized$height,
-                        "cm",
-                        valueOnly = TRUE
-                    )
-                plot_width <-
-                    convertUnit(
-                        Plot_Sized$width,
-                        "cm",
-                        valueOnly = TRUE
-                    )
+                Plot_Sized <- plot_grob_heatmap(input_plot = heatmap, metadata_info = metadata_info, metadata_sample = metadata_sample, metadata_feature = metadata_feature, plot_name = cleaned_i)
+                plot_height <- convertUnit(Plot_Sized$height, "cm", valueOnly = TRUE)
+                plot_width <- convertUnit(Plot_Sized$width, "cm", valueOnly = TRUE)
                 Plot_Sized %<>%
                     {
                         ggplot() +
@@ -553,11 +489,7 @@ viz_heatmap <- function(
                     plot_unit = "cm"
                 )
             } else {
-                message <-
-                    paste0(
-                        i,
-                        " includes <= 2L objects and is hence not plotted."
-                    )
+                message <- paste0(i, " includes <= 2L objects and is hence not plotted.")
                 log_trace(paste("Message ", message, sep = ""))
                 message(message)
             }
@@ -581,12 +513,7 @@ viz_heatmap <- function(
                 filter(get(metadata_info[["individual_Metab"]]) == i)
             selected_path_metabs <- colnames(data)[colnames(data) %in% row.names(selected_path)]
             if (length(selected_path_metabs) == 1L) {
-                message <-
-                    paste0(
-                        "The metadata group ",
-                        i,
-                        " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored."
-                    )
+                message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
                 log_trace(paste("Warning ", message, sep = ""))
                 warning(message)
                 # Remove the pathway
@@ -605,12 +532,7 @@ viz_heatmap <- function(
                 filter(get(metadata_info[["individual_Sample"]]) == i)
             selected_path_metabs <- colnames(data)[colnames(data) %in% row.names(selected_path)]
             if (length(selected_path_metabs) == 1L) {
-                message <-
-                    paste0(
-                        "The metadata group ",
-                        i,
-                        " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored."
-                    )
+                message <- paste0("The metadata group ", i, " includes only 1 metabolite. Heatmap cannot be made for 1 metabolite, thus it will be ignored.")
                 log_trace(paste("Warning ", message, sep = ""))
                 warning(message)
                 # Remove the pathway
@@ -669,13 +591,7 @@ viz_heatmap <- function(
                     column_to_rownames("UniqueID")
 
                 # Column annotation
-                selected_metadata_sample <-
-                    merge(
-                        selected_path,
-                        metadata_sample %>% rownames_to_column("UniqueID"),
-                        by = "UniqueID",
-                        all.x = TRUE
-                    )
+                selected_metadata_sample <- merge(selected_path, metadata_sample %>% rownames_to_column("UniqueID"), by = "UniqueID", all.x = TRUE)
 
                 col_annot_vars <- metadata_info[grepl("color_Sample", names(metadata_info))]
                 col_annot <- NULL
@@ -741,43 +657,16 @@ viz_heatmap <- function(
                     )
 
                     # # Store the plot in the 'plots' list
-                    cleaned_i <-
-                        gsub(
-                            "[[:space:], /\\\\]",
-                            "-",
-                            i
-                        )  # removes empty spaces and replaces /, \ with -
-                    cleaned_s <-
-                        gsub(
-                            "[[:space:], /\\\\]",
-                            "-",
-                            s
-                        )  # removes empty spaces and replaces /, \ with -
+                    cleaned_i <- gsub("[[:space:], /\\\\]", "-", i)  # removes empty spaces and replaces /, \ with -
+                    cleaned_s <- gsub("[[:space:], /\\\\]", "-", s)  # removes empty spaces and replaces /, \ with -
                     PlotList[[paste(cleaned_i, cleaned_s, sep = "_")]] <- heatmap
 
                     # -------- Plot width and heights
                     # Width and height according to Sample and metabolite number
                     plot_name <- paste(cleaned_i, cleaned_s, sep = "_")
-                    Plot_Sized <-
-                        plot_grob_heatmap(
-                            input_plot = heatmap,
-                            metadata_info = metadata_info,
-                            metadata_sample = metadata_sample,
-                            metadata_feature = metadata_feature,
-                            plot_name = plot_name
-                        )
-                    plot_height <-
-                        convertUnit(
-                            Plot_Sized$height,
-                            "cm",
-                            valueOnly = TRUE
-                        )
-                    plot_width <-
-                        convertUnit(
-                            Plot_Sized$width,
-                            "cm",
-                            valueOnly = TRUE
-                        )
+                    Plot_Sized <- plot_grob_heatmap(input_plot = heatmap, metadata_info = metadata_info, metadata_sample = metadata_sample, metadata_feature = metadata_feature, plot_name = plot_name)
+                    plot_height <- convertUnit(Plot_Sized$height, "cm", valueOnly = TRUE)
+                    plot_width <- convertUnit(Plot_Sized$width, "cm", valueOnly = TRUE)
                     Plot_Sized %<>%
                         {
                             ggplot() +
@@ -802,10 +691,7 @@ viz_heatmap <- function(
                         plot_unit = "cm"
                     )
                 } else {
-                    message(
-                        i,
-                        " includes <= 2L objects and is hence not plotted."
-                    )
+                    message(i, " includes <= 2L objects and is hence not plotted.")
                 }
             }
         }
@@ -902,20 +788,8 @@ viz_heatmap <- function(
 
             # -------- Plot width and heights
             # Width and height according to Sample and metabolite number
-            Plot_Sized <-
-                plot_grob_heatmap(
-                    input_plot = heatmap,
-                    metadata_info = metadata_info,
-                    metadata_sample = metadata_sample,
-                    metadata_feature = metadata_feature,
-                    plot_name = plot_name
-                )
-            plot_height <-
-                convertUnit(
-                    Plot_Sized$height,
-                    "cm",
-                    valueOnly = TRUE
-                )
+            Plot_Sized <- plot_grob_heatmap(input_plot = heatmap, metadata_info = metadata_info, metadata_sample = metadata_sample, metadata_feature = metadata_feature, plot_name = plot_name)
+            plot_height <- convertUnit(Plot_Sized$height, "cm", valueOnly = TRUE)
             plot_width <- convertUnit(Plot_Sized$width, "cm", valueOnly = TRUE)
             Plot_Sized %<>%
                 {
@@ -941,11 +815,7 @@ viz_heatmap <- function(
                 plot_unit = "cm"
             )
         } else {
-            message <-
-                paste0(
-                    plot_name,
-                    " includes <= 2L objects and is hence not plotted."
-                )
+            message <- paste0(plot_name, " includes <= 2L objects and is hence not plotted.")
             log_trace(paste("Message ", message, sep = ""))
             message(message)
         }

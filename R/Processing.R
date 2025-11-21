@@ -767,12 +767,7 @@ pool_estimation <- function(
     ## ------------------ Coefficient of Variation ------------------- ##
 
     log_trace('Calculating coefficient of variation.')
-    result_df <-
-        apply(
-            Pooldata,
-            2,
-            function(x) { (sd(x, na.rm = TRUE)/  mean(x, na.rm = TRUE))*100 }  ) %>% t() %>% as.data.frame(
-        )
+    result_df <- apply(Pooldata, 2,  function(x) { (sd(x, na.rm = TRUE)/  mean(x, na.rm = TRUE))*100 }  ) %>% t() %>% as.data.frame()
     rownames(result_df)[1] <- "CV"
 
     NAvector <-
@@ -821,12 +816,7 @@ pool_estimation <- function(
                     save_plot = NULL)
         )
     } else {
-        pca_data <-
-            merge(
-                metadata_sample %>% select(metadata_info[["Conditions"]]),
-                data,
-                by = 0
-            ) %>%
+        pca_data <- merge(metadata_sample %>% select(metadata_info[["Conditions"]]), data, by = 0) %>%
             column_to_rownames("Row.names") %>%
             mutate(
                 Sample_type = case_when(.data[[metadata_info[["Conditions"]]]] == metadata_info[["PoolSamples"]] ~ "Pool",
@@ -896,12 +886,7 @@ pool_estimation <- function(
         )+
         theme_classic())
 
-    ViolinCV_Sized <-
-        plotGrob_Processing(
-            input_plot = ViolinCV,
-            plot_name = "CV for metabolites of Pool samples",
-            plot_type = "Violin"
-        )
+    ViolinCV_Sized <- plotGrob_Processing(input_plot = ViolinCV,plot_name = "CV for metabolites of Pool samples", plot_type = "Violin")
 
     PlotList [["ViolinPlot_CV-PoolSamples"]] <- ViolinCV_Sized
 
@@ -1108,12 +1093,7 @@ feature_filtering <- function(
             feat_file_res <- "There where no metabolites exluded"
         } else {
             names <- unique(colnames(data)[miss])
-            msg <-
-                sprintf(
-                    "%d metabolites where removed: %s",
-                    length(unique(miss)),
-                    paste0(names, collapse = ", ")
-                )
+            msg <- sprintf("%d metabolites where removed: %s", length(unique(miss)), paste0(names, collapse = ", "))
             log_info(msg)
             message(msg)
             filtered_matrix <- data[, -miss]
@@ -1146,12 +1126,7 @@ feature_filtering <- function(
             feat_file_res <- "There where no metabolites exluded"
         } else {
             names <- unique(colnames(data)[miss])
-            message <-
-                paste0(
-                    length(unique(miss)),
-                    " metabolites where removed: ",
-                    paste0(names, collapse = ", ")
-                )
+            message <- paste0(length(unique(miss)) ," metabolites where removed: ", paste0(names, collapse = ", "))
             log_info(message)
             message(message)
             filtered_matrix <- data[, -miss]
@@ -1269,11 +1244,7 @@ mvi_imputation <- function(
                     if (all(is.na(.x))) {
                         .x  # leaves as-is (here keep NAs)
                     } else {
-                        ifelse(
-                            is.na(.x),
-                            min(.x, na.rm = TRUE) * mvi_percentage / 100,
-                            .x
-                        )
+                        ifelse(is.na(.x), min(.x, na.rm = TRUE) * mvi_percentage / 100, .x)
                     }
                 },
                 .names = "{.col}"
@@ -1325,22 +1296,12 @@ mvi_imputation <- function(
             log_info(message)
             message(message)
             if (sum(na_percentage>20 & na_percentage<100)>0) {
-                message <-
-                    paste0(
-                        "Metabolites with high NA load (>20%) in Control_media samples are: ",
-                        paste(names(highNA_metabs), collapse = ", "),
-                        "."
-                    )
+                message <- paste0("Metabolites with high NA load (>20%) in Control_media samples are: ",paste(names(highNA_metabs), collapse = ", "), ".")
                 log_info(message)
                 message(message)
             }
             if (sum(na_percentage == 100)>0) {
-                message <-
-                    paste0(
-                        "Metabolites with only NAs (= 100%) in Control_media samples are: ",
-                        paste(names(OnlyNA_metabs), collapse = ", "),
-                        ". Those NAs are set zero as we consider them true zeros"
-                    )
+                message <- paste0("Metabolites with only NAs (= 100%) in Control_media samples are: ",paste(names(OnlyNA_metabs), collapse = ", "), ". Those NAs are set zero as we consider them true zeros")
                 log_info(message)
                 message(message)
             }
@@ -1466,11 +1427,7 @@ tic_norm <- function(
     }
 
     # Create the ggplot boxplot
-    RLA_data_raw <-
-        ggplot(
-            RLA_data_long,
-            aes_string(x = "Samples", y = "Intensity", color = metadata_info[["Conditions"]])
-        ) +
+    RLA_data_raw <- ggplot(RLA_data_long, aes_string(x = "Samples", y = "Intensity", color = metadata_info[["Conditions"]])) +
         geom_boxplot() +
         geom_hline(yintercept = 0, color = "red", linetype = "solid") +
         labs(title = "Before tic Normalization")+
@@ -1517,11 +1474,7 @@ tic_norm <- function(
         }
 
         # Create the ggplot boxplot
-        RLA_data_norm <-
-            ggplot(
-                RLA_data_long,
-                aes_string(x = "Samples", y = "Intensity", color = metadata_info[["Conditions"]])
-            ) +
+        RLA_data_norm <- ggplot(RLA_data_long, aes_string(x = "Samples", y = "Intensity", color = metadata_info[["Conditions"]])) +
             geom_boxplot() +
             geom_hline(yintercept = 0, color = "red", linetype = "solid") +
             labs(title = "After tic Normalization")+
@@ -1632,12 +1585,7 @@ core_norm <- function(
         ## ------------------ QC Plots
         PlotList <- list()
         # # -- 1. PCA Media_control
-        media_pca_data <-
-            merge(
-                x = metadata_sample %>% select(metadata_info[["Conditions"]]),
-                y = data_tic,
-                by = 0
-            ) %>%
+        media_pca_data <- merge(x = metadata_sample %>% select(metadata_info[["Conditions"]]), y = data_tic, by = 0) %>%
             column_to_rownames("Row.names") %>%
             mutate(
                 Sample_type = case_when(Conditions == metadata_info[["core_media"]] ~ "core_media",
@@ -1673,23 +1621,14 @@ core_norm <- function(
         rownames(result_df) <- colnames(core_medias)
 
         # calculate the NAs
-        NAvector <-
-            apply(
-                core_medias,
-                2,
-                function(x) { (sum(is.na(x))/length(x))*100 }
-            )
+        NAvector <- apply(core_medias, 2,  function(x) { (sum(is.na(x))/length(x))*100 })
         result_df$MissingValuepercentage <- NAvector
 
         cv_result_df <- result_df
 
         HighVar_metabs <- sum(result_df$HighVar)
         if (HighVar_metabs>0) {
-            message <-
-                paste0(
-                    HighVar_metabs,
-                    " of variables have high variability (CV > 30) in the core_media control samples. Consider checking the pooled samples to decide whether to remove these metabolites or not."
-                )
+            message <- paste0(HighVar_metabs, " of variables have high variability (CV > 30) in the core_media control samples. Consider checking the pooled samples to decide whether to remove these metabolites or not.")
             log_info(message)
             message(message)
         }
@@ -1711,12 +1650,7 @@ core_norm <- function(
                                 )+
                                 theme_classic())
 
-        HistCV_Sized <-
-            plotGrob_Processing(
-                input_plot = HistCV,
-                plot_name = "CV for metabolites of control media samples (no cells)",
-                plot_type = "Hist"
-            )
+        HistCV_Sized <- plotGrob_Processing(input_plot = HistCV,plot_name = "CV for metabolites of control media samples (no cells)", plot_type = "Hist")
 
         PlotList[["Histogram_coreMediaCV"]] <- HistCV_Sized
 
@@ -1745,12 +1679,7 @@ core_norm <- function(
             )+
             theme_classic())
 
-        ViolinCV_Sized <-
-            plotGrob_Processing(
-                input_plot = ViolinCV,
-                plot_name = "CV for metabolites of control media samples (no cells)",
-                plot_type = "Violin"
-            )
+        ViolinCV_Sized <- plotGrob_Processing(input_plot = ViolinCV,plot_name = "CV for metabolites of control media samples (no cells)", plot_type = "Violin")
         PlotList[["core_Media_CV_Violin"]] <- ViolinCV_Sized
 
         ##########################################################################
@@ -1801,12 +1730,7 @@ core_norm <- function(
 
             # List to store results
             fisher_test_results <- list()
-            large_contingency_table <-
-                matrix(
-                    0,
-                    nrow = 2,
-                    ncol = ncol(data_cont)
-                )
+            large_contingency_table <- matrix(0, nrow = 2, ncol = ncol(data_cont))
 
             for (i in seq_along(colnames(data_cont))) {
                 sample <- colnames(data_cont)[i]
@@ -1907,18 +1831,9 @@ core_norm <- function(
     ##########################################################################
     # # ------------------------ Return Plots and data
     if (dim(core_medias)[1]>=3) {
-        DF_list <-
-            list(
-                "CV_core_blank" = cv_result_df,
-                "Contigency_table_core_blank" = contingency_data_contframe,
-                "core_Norm" = data_tic_coreNorm
-            )
+        DF_list <- list("CV_core_blank" = cv_result_df, "Contigency_table_core_blank" = contingency_data_contframe, "core_Norm" = data_tic_coreNorm)
     } else {
-        DF_list <-
-            list(
-                "CV_core_blank" = cv_result_df,
-                "core_Norm" = data_tic_coreNorm
-            )
+        DF_list <- list("CV_core_blank" = cv_result_df, "core_Norm" = data_tic_coreNorm)
     }
 
     # Return
@@ -2101,14 +2016,7 @@ outlier_detection <- function(
                                     linecolor = "black", linetype = 1) +
             theme_classic()+
             geom_vline(xintercept = npcs+0.5, linetype = 2, color = "red") +
-            annotate(
-                "text",
-                x = c(seq_len(20)),
-                y = -0.8,
-                label = screeplot_cumul,
-                col = "black",
-                size = 1.75
-            )
+            annotate("text", x = c(seq_len(20)),y = -0.8,label = screeplot_cumul,col = "black", size = 1.75)
 
         # screeplot_Sized <- plotGrob_Processing(input_plot = screeplot,plot_name= paste("PCA Explained variance plot filtering round ",loop, sep = ""), plot_type= "Scree")
 
@@ -2133,25 +2041,14 @@ outlier_detection <- function(
                 plot = FALSE
             )
         HotellingT2plot_data <- as.data.frame(hotelling_qcc$statistics)
-        HotellingT2plot_data <-
-            rownames_to_column(
-                HotellingT2plot_data,
-                "Samples"
-            )
-        colnames(
-            HotellingT2plot_data) <- c("Samples",
-            "Group summary statistics"
-        )
+        HotellingT2plot_data <- rownames_to_column(HotellingT2plot_data, "Samples")
+        colnames(HotellingT2plot_data) <- c("Samples", "Group summary statistics")
         outlier <- HotellingT2plot_data %>% filter(HotellingT2plot_data$`Group summary statistics`>hotelling_qcc$limits[2])
         limits <- as.data.frame(hotelling_qcc$limits)
         legend <- colnames(HotellingT2plot_data[2])
         LegendTitle <- "Limits"
 
-        HotellingT2plot <-
-            ggplot(
-                HotellingT2plot_data,
-                aes(x = Samples, y = `Group summary statistics`, group = 1, fill = )
-            )
+        HotellingT2plot <- ggplot(HotellingT2plot_data, aes(x = Samples, y = `Group summary statistics`, group = 1, fill = ))
         HotellingT2plot <- HotellingT2plot +
             geom_point(
                 aes(x = Samples, y = `Group summary statistics`),
@@ -2223,11 +2120,7 @@ outlier_detection <- function(
             # Change the names of outliers in mqcc . Instead of saving the order number it saves the name
             sm_out <- c()  # list of outliers samples
             for (i in seq_along(hotelling_qcc[["violations"]][["beyond.limits"]])) {
-                sm_out <-
-                    append(
-                        sm_out,
-                        rownames(data_hot)[hotelling_qcc[["violations"]][["beyond.limits"]][i]]
-                    )
+                sm_out <-  append(sm_out, rownames(data_hot)[hotelling_qcc[["violations"]][["beyond.limits"]][i]])
             }
             sample_outliers[loop] <- list(sm_out )
         }
@@ -2361,11 +2254,7 @@ outlier_detection <- function(
 
     # # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## #
     # # --- Save and Return plots and DFs
-    DF_list <-
-        list(
-            "Zero_variance_metabolites_core" = zero_var_metab_export_df,
-            "data_outliers" = data_norm_filtered_full
-        )
+    DF_list <- list("Zero_variance_metabolites_core" = zero_var_metab_export_df, "data_outliers" = data_norm_filtered_full)
 
     # Return
     Output_list <- list("DF" = DF_list, "Plot" = outlier_plot_list)
