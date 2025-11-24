@@ -104,6 +104,7 @@ metaproviz_init <- function() {
         (OmnipathR %:::% init_log)(pkg = "MetaProViz")
         log_info("Welcome to MetaProViz!")
         log_info("MetaProViz version: %s", packageVersion("MetaProViz"))
+        log_error("OmnipathR version: %s", packageVersion("OmnipathR"))
 
         # Do we run in a build server like bioconductor?
         buildserver <- (OmnipathR %:::% .on_buildserver)()

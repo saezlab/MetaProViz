@@ -416,6 +416,7 @@ equivalent_id <- function(
         PotentialAdditionalIDs <- AllIDs <- AllIDs.x <- AllIDs.y <- NULL
 
     metaproviz_init()
+    log_error("OmnipathR version: %s", packageVersion("OmnipathR"))
 
     # # ------------------  Check Input ------------------- ##
     # HelperFunction `check_param`
