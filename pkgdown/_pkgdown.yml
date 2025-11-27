@@ -27,13 +27,13 @@ navbar:
         - text: "Getting started"
           href: articles/quick-start.html
         - text: "Standard Metabolomics"
-          href: articles/vignettes/pkgdown/standard-metabolomics.html
+          href: articles/pkgdown/standard-metabolomics.html
         - text: "CoRe Metabolomics"
-          href: articles/vignettes/pkgdown/core-metabolomics.html
+          href: articles/pkgdown/core-metabolomics.html
         - text: "Prior Knowledge"
-          href: articles/vignettes/pkgdown/prior-knowledge.html
+          href: articles/pkgdown/prior-knowledge.html
         - text: "Sample Metadata Analysis"
-          href: articles/vignettes/pkgdown/sample-metadata.html
+          href: articles/pkgdown/sample-metadata.html
     #customize intro:
     reference:
       text: Reference
