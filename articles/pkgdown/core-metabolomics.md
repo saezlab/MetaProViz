@@ -1922,12 +1922,12 @@ select_label = NULL)
     #>   [5] farver_2.1.2                rmarkdown_2.30              fs_1.6.6                    ragg_1.5.0                 
     #>   [9] vctrs_0.6.5                 memoise_2.0.1               rstatix_0.7.3               htmltools_0.5.8.1          
     #>  [13] S4Arrays_1.10.0             progress_1.2.3              curl_7.0.0                  ComplexUpset_1.3.3         
-    #>  [17] decoupleR_2.16.0            broom_1.0.10                cellranger_1.1.0            SparseArray_1.10.1         
+    #>  [17] decoupleR_2.16.0            broom_1.0.10                cellranger_1.1.0            SparseArray_1.10.2         
     #>  [21] Formula_1.2-5               sass_0.4.10                 parallelly_1.45.1           bslib_0.9.0                
     #>  [25] htmlwidgets_1.6.4           desc_1.4.3                  plyr_1.8.9                  httr2_1.2.1                
     #>  [29] lubridate_1.9.4             cachem_1.1.0                igraph_2.2.1                lifecycle_1.0.4            
     #>  [33] pkgconfig_2.0.3             Matrix_1.7-4                R6_2.6.1                    fastmap_1.2.0              
-    #>  [37] MatrixGenerics_1.22.0       digest_0.6.38               colorspace_2.1-2            patchwork_1.3.2            
+    #>  [37] MatrixGenerics_1.22.0       digest_0.6.39               colorspace_2.1-2            patchwork_1.3.2            
     #>  [41] S4Vectors_0.48.0            textshaping_1.0.4           GenomicRanges_1.62.0        RSQLite_2.4.4              
     #>  [45] ggpubr_0.6.2                labeling_0.4.3              timechange_0.3.0            httr_1.4.7                 
     #>  [49] abind_1.4-8                 compiler_4.5.2              bit64_4.6.0-1               withr_3.0.2                
