@@ -344,6 +344,30 @@ translate_id <- function(
 # Find additional potential IDs
 #
 
+
+#' @importFrom rlang exec !!!
+#' @importFrom purrr map pmap_chr
+#' @importFrom logger log_warn
+#' @noRd
+.log_df <- function(d) {
+
+    match.call() %>% {deparse(.$d)} %>% log_warn('DF: %s', .)
+
+    d %>% dim %>% {exec(log_warn, 'DF of size %i x %i', !!!.)}
+
+    d %>%
+    map(class) %>%
+    sprintf('%s <%s>', names(.), .) %>%
+    paste0(collapse = ', ') %>%
+    log_warn('Columns: %s', .)
+
+    log_warn('First 3 rows:')
+
+    d %>% head(3L) %>% pmap_chr(~paste0(c(...), collapse = '|')) %>% log_warn()
+
+}
+
+
 #' Find additional potential IDs for  "kegg", "pubchem", "chebi", "hmdb"
 #'
 #' @param data dataframe with at least one column with the detected metabolite IDs (one
@@ -374,7 +398,8 @@ translate_id <- function(
 #' @importFrom purrr map_chr map_lgl map_int
 #' @importFrom tidyselect all_of starts_with
 #' @importFrom rlang !!! !! := sym syms
-#' @importFrom OmnipathR id_types translate_ids
+#' @importFrom OmnipathR id_types translate_ids ensembl_organisms
+#' @importFrom OmnipathR uniprot_organisms oma_organisms
 #' @importFrom logger log_warn log_trace
 #' @importFrom stringr str_to_lower str_split
 #' @importFrom utils data
@@ -414,9 +439,45 @@ equivalent_id <- function(
     # NSE vs. R CMD check workaround
     InputID <- AdditionalID <- fromList <-
         PotentialAdditionalIDs <- AllIDs <- AllIDs.x <- AllIDs.y <- NULL
+    # NSE variables in debugging code for `OmnipathR::taxon_names_table`
+    # issue specific to BioC single package builder
+    code <- synonym <- latin_name <- common_name <- genome_source <-
+        genome_version <- .optrace <- NULL
 
+    (OmnipathR %:::% .optrace)()
     metaproviz_init()
-    log_error("OmnipathR version: %s", packageVersion("OmnipathR"))
+    log_warn("OmnipathR version: %s", packageVersion("OmnipathR"))
+
+    ensembl_o <- ensembl_organisms()
+    uniprot_o <- uniprot_organisms()
+    oma_o <- oma_organisms()
+
+    .log_df(ensembl_o)
+    .log_df(uniprot_o)
+    .log_df(oma_o)
+
+    taxons_table <-
+        ensembl_o %>%
+        rename(common_name_ensembl = common_name) %>%
+        full_join(
+            oma_o %>%
+            select(-genome_source, -genome_version),
+            by = 'ncbi_tax_id',
+            suffix = c('_ensembl', '_oma')
+        ) %>%
+        full_join(
+            uniprot_o %>%
+            rename(
+                uniprot_code = code,
+                latin_name_synonym = synonym,
+                latin_name_uniprot = latin_name,
+                common_name_uniprot = common_name
+            ),
+            by = 'ncbi_tax_id'
+        )
+
+    .log_df(taxons_table)
+
 
     # # ------------------  Check Input ------------------- ##
     # HelperFunction `check_param`
