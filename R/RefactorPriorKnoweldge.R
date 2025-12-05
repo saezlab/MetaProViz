@@ -439,92 +439,8 @@ equivalent_id <- function(
     # NSE vs. R CMD check workaround
     InputID <- AdditionalID <- fromList <-
         PotentialAdditionalIDs <- AllIDs <- AllIDs.x <- AllIDs.y <- NULL
-    # NSE variables in debugging code for `OmnipathR::taxon_names_table`
-    # issue specific to BioC single package builder
-    code <- synonym <- latin_name <- common_name <- genome_source <-
-        genome_version <- .optrace <- compact_repr <- cache_lates <-
-        omnipath_cache_latest_or_new <- omnipath_cache_ensure_key <-
-        ensure_key <- omnipathr.env <- omnipath_get_cachedir <-
-        mtime <- name_time <- cache_clean <- omnipath_cache_clean_db <- NULL
 
-    (OmnipathR %:::% .optrace)()
     metaproviz_init()
-    log_warn("OmnipathR version: %s", packageVersion("OmnipathR"))
-
-    compact_repr <- (OmnipathR %:::% compact_repr)
-    cache_latest <- (OmnipathR %:::% omnipath_cache_latest_or_new)
-    ensure_key <- (OmnipathR %:::% omnipath_cache_ensure_key)
-    oma_url <- (OmnipathR %:::% omnipathr.env)$urls$oma_species
-    cache_dir <- (OmnipathR %:::% omnipath_get_cachedir)()
-    cache_clean <- (OmnipathR %:::% omnipath_cache_clean_db)
-
-    cache_item <- cache_latest(ensure_key(url = oma_url), url = oma_url, ext = "rds")
-
-    log_warn("Cache item for `OMA organisms table`: %s", compact_repr(cache_item))
-
-    log_warn("=== === ===")
-    log_warn("Complete cache content:")
-
-    list.files(cache_dir, full.names = TRUE) %>%
-    file.info() %>%
-    mutate(name_time = sprintf('%s (%s)', rownames(.), format(mtime, format = "%Y-%m-%d %H:%M%z"))) %>%
-    pull(name_time) %>%
-    compact_repr() %>%
-    log_warn("Cache content: %s", .)
-
-    log_warn("=== === ===")
-
-    if (!file.exists(cache_item$path)) {
-        cache_clean()
-    }
-
-    ensembl_o <- ensembl_organisms()
-    uniprot_o <- uniprot_organisms()
-    oma_o <- oma_organisms()
-
-    .log_df(ensembl_o)
-    .log_df(uniprot_o)
-    .log_df(oma_o)
-
-    if (file.exists(cache_item$path)) {
-
-        log_warn("Removing OMA organisms table from cache (%s)", cache_item$path)
-        file.remove(cache_item$path)
-        cache_clean()
-
-    } else {
-
-        log_warn("OMA organisms table not found in cache (%s)", cache_item$path)
-
-    }
-
-    oma_o <- oma_organisms()
-    log_warn("Data frame after fresh download:")
-
-    .log_df(oma_o)
-
-    taxons_table <-
-        ensembl_o %>%
-        rename(common_name_ensembl = common_name) %>%
-        full_join(
-            oma_o %>%
-            select(-genome_source, -genome_version),
-            by = 'ncbi_tax_id',
-            suffix = c('_ensembl', '_oma')
-        ) %>%
-        full_join(
-            uniprot_o %>%
-            rename(
-                uniprot_code = code,
-                latin_name_synonym = synonym,
-                latin_name_uniprot = latin_name,
-                common_name_uniprot = common_name
-            ),
-            by = 'ncbi_tax_id'
-        )
-
-    .log_df(taxons_table)
-
 
     # # ------------------  Check Input ------------------- ##
     # HelperFunction `check_param`
@@ -908,10 +824,6 @@ equivalent_id <- function(
         core = FALSE,
         print_plot = FALSE
     )
-
-    msg <- "Interrupting R CMD check to see stderr in BioC SPB."
-    log_error(msg)
-    stop(msg)
 
     return(invisible(OutputDF))
 }
