@@ -4,11 +4,11 @@
 
 #' Cluster terms in prior knowledge by set overlap
 #'
-#' @param data Long data frame with one ID per row; must contain columns for the
-#'     target IDs and the grouping term.
-#' @param metadata_info List with entries `InputID` (ID column) and
-#'     `grouping_variable` (term column). Defaults to
-#'     `c(InputID = "MetaboliteID", grouping_variable = "term")`.
+#' @param data Long data frame with one ID per row, or enrichment-style table
+#'     with a delimited metabolite list per term (see input_format).
+#' @param metadata_info List with entries `metabolite_column` (metabolite ID
+#'     column or delimited list column) and `pathway_column` (term column).
+#'     Defaults to `c(metabolite_column = "MetaboliteID", pathway_column = "term")`.
 #' @param similarity Similarity measure between term ID sets. Options:
 #'     "jaccard" (default), "overlap_coefficient", or "correlation".
 #'     Jaccard similarity is |A ∩ B| / |A ∪ B|. Overlap coefficient is
@@ -16,6 +16,11 @@
 #'     overlap_coefficient is more permissive for nested sets.
 #' @param correlation_method Correlation method when `similarity = "correlation"`.
 #'     One of "pearson", "spearman", "kendall". Ignored otherwise.
+#' @param input_format Input format of `data`. Use "long" for one ID per row
+#'     (default) or "enrichment" for one term per row with a delimited ID list.
+#'     The `metabolite_column` entry in metadata_info is interpreted accordingly.
+#' @param delimiter Delimiter for metabolite ID lists when input_format =
+#'     "enrichment". Ignored for input_format = "long". Default = "/".
 #' @param threshold Similarity cutoff for keeping edges (applies to all
 #'     clustering modes). Default = 0.5.
 #' @param clust Clustering strategy: "components" (connected components on
@@ -23,18 +28,20 @@
 #'     weighted graph), or "hierarchical" (hclust on distance = 1 - similarity).
 #' @param hclust_method Linkage method for hierarchical clustering. One of
 #'     "average" (default), "single", "complete", "ward.D", "ward.D2",
-#'     "mcquitty", "median", "centroid".
+#'     "mcquitty", "median", "centroid". Used only when clust = "hierarchical".
 #' @param min Minimum cluster size; smaller clusters are relabeled to "None".
 #'     Default = 2.
 #' @param plot_name \emph{Optional: } String added to output files of the plot.
 #'     Default = "ClusterGraph".
 #' @param max_nodes \emph{Optional: } Maximum nodes for plotting. If set,
 #'     keeps nodes from the largest component up to this limit (by degree).
+#'     Used only for the graph plot. Default = 10000.
 #' @param min_degree \emph{Optional: } Minimum degree filter for graph plotting.
+#'     Used only for the graph plot. Default = 1.
 #' @param save_plot \emph{Optional: } Select the file type of output plots.
 #'     Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #' @param print_plot \emph{Optional: } If TRUE prints an overview of resulting
-#'     plots. \strong{Default = TRUE}
+#'     plots. \strong{Default = FALSE}
 #' @param path {Optional:} String which is added to the resulting folder name.
 #'     \strong{default: NULL}
 #'
@@ -48,17 +55,19 @@
 #' @importFrom dplyr across n distinct filter tibble arrange
 #' @importFrom igraph graph_from_adjacency_matrix components cluster_louvain
 #' @importFrom stats cor as.dist hclust cutree
-#' @importFrom rlang sym !!
+#' @importFrom rlang sym !! .data
 #' @importFrom logger log_trace log_warn
 #' @noRd
 cluster_pk <- function(
     data,
     metadata_info = c(
-        InputID = "MetaboliteID",
-        grouping_variable = "term"
+        metabolite_column = "MetaboliteID",
+        pathway_column = "term"
     ),
     similarity = c("jaccard", "overlap_coefficient", "correlation"),
     correlation_method = "pearson",
+    input_format = c("long", "enrichment"),
+    delimiter = "/",
     threshold = 0.5,
     clust = c("components", "community", "hierarchical"),
     hclust_method = "average",
@@ -72,10 +81,11 @@ cluster_pk <- function(
 ) {
 
     # NSE vs. R CMD check workaround
-    cluster <- NULL
+    cluster <- .data <- NULL
 
     # ---- Input checks ----------------------------------------------------
     similarity <- match.arg(similarity)
+    input_format <- match.arg(input_format)
     clust <- match.arg(clust)
 
     if (clust == "hierarchical") {
@@ -93,18 +103,28 @@ cluster_pk <- function(
         stop("`data` must be a data frame.")
     }
 
-    if (!all(c("InputID", "grouping_variable") %in% names(metadata_info))) {
-        stop("metadata_info must contain InputID and grouping_variable.")
+    if (!all(c("metabolite_column", "pathway_column") %in% names(metadata_info))) {
+        stop("metadata_info must contain metabolite_column and pathway_column.")
     }
 
-    id_col <- metadata_info[["InputID"]]
-    term_col <- metadata_info[["grouping_variable"]]
+    id_col <- metadata_info[["metabolite_column"]]
+    term_col <- metadata_info[["pathway_column"]]
 
-    if (!id_col %in% colnames(data)) {
-        stop(sprintf("Column %s (InputID) not found in data.", id_col))
+    if (input_format == "long") {
+        if (!id_col %in% colnames(data)) {
+            stop(sprintf("Column %s (metabolite_column) not found in data.", id_col))
+        }
     }
     if (!term_col %in% colnames(data)) {
-        stop(sprintf("Column %s (grouping_variable) not found in data.", term_col))
+        stop(sprintf("Column %s (pathway_column) not found in data.", term_col))
+    }
+    if (input_format == "enrichment") {
+        if (!id_col %in% colnames(data)) {
+            stop(sprintf("Column %s (metabolite_column) not found in data.", id_col))
+        }
+        if (!is.character(delimiter) || length(delimiter) != 1L) {
+            stop("`delimiter` must be a single character string.")
+        }
     }
 
     if (!is.numeric(threshold) || length(threshold) != 1L || is.na(threshold)) {
@@ -124,34 +144,70 @@ cluster_pk <- function(
             match.arg(correlation_method, c("pearson", "spearman", "kendall"))
     }
 
-    # Drop duplicated term-ID rows to avoid inflating overlaps
-    data <- distinct(data, !!sym(term_col), !!sym(id_col), .keep_all = TRUE)
-
-    # Warn if terms have no IDs
-    empty_terms <-
-        data %>%
-        group_by(!!sym(term_col)) %>%
-        summarize(
-            n_ids = sum(!is.na(!!sym(id_col)) & !!sym(id_col) != ""),
-            .groups = "drop"
-        ) %>%
-        filter(n_ids == 0L)
-    if (nrow(empty_terms) > 0L) {
-        log_warn(
-            "Terms with no IDs will be dropped: %s",
-            paste(empty_terms[[term_col]], collapse = ", ")
-        )
-    }
-
     # ---- Build term -> ID list ------------------------------------------
-    term_metabolites <-
-        data %>%
-        filter(!is.na(!!sym(id_col)), !!sym(id_col) != "") %>%
-        group_by(!!sym(term_col)) %>%
-        summarize(
-            MetaboliteIDs = list(unique(!!sym(id_col))),
-            .groups = "drop"
-        )
+    if (input_format == "long") {
+        # Drop duplicated term-ID rows to avoid inflating overlaps
+        data <- dplyr::distinct(data, !!sym(term_col), !!sym(id_col), .keep_all = TRUE)
+
+        # Warn if terms have no IDs
+        empty_terms <-
+            data %>%
+            dplyr::group_by(!!sym(term_col)) %>%
+            dplyr::summarize(
+                n_ids = sum(!is.na(!!sym(id_col)) & !!sym(id_col) != ""),
+                .groups = "drop"
+            ) %>%
+            dplyr::filter(n_ids == 0L)
+        if (nrow(empty_terms) > 0L) {
+            log_warn(
+                "Terms with no IDs will be dropped: %s",
+                paste(empty_terms[[term_col]], collapse = ", ")
+            )
+        }
+
+        term_metabolites <-
+            data %>%
+            dplyr::filter(!is.na(!!sym(id_col)), !!sym(id_col) != "") %>%
+            dplyr::group_by(!!sym(term_col)) %>%
+            dplyr::summarize(
+                MetaboliteIDs = list(unique(!!sym(id_col))),
+                .groups = "drop"
+            )
+    } else {
+        # Enrichment input: split delimited metabolite IDs per term
+        term_metabolites <-
+            data %>%
+            dplyr::mutate(
+                MetaboliteIDs = strsplit(
+                    as.character(.data[[id_col]]),
+                    delimiter,
+                    fixed = TRUE
+                )
+            ) %>%
+            dplyr::mutate(
+                MetaboliteIDs = lapply(
+                    MetaboliteIDs,
+                    function(x) {
+                        x <- trimws(x)
+                        x[x != ""]
+                    }
+                )
+            ) %>%
+            dplyr::group_by(!!sym(term_col)) %>%
+            dplyr::summarize(
+                MetaboliteIDs = list(unique(unlist(MetaboliteIDs))),
+                .groups = "drop"
+            )
+
+        empty_terms <- term_metabolites[lengths(term_metabolites$MetaboliteIDs) == 0L, , drop = FALSE]
+        if (nrow(empty_terms) > 0L) {
+            log_warn(
+                "Terms with no IDs will be dropped: %s",
+                paste(empty_terms[[term_col]], collapse = ", ")
+            )
+        }
+        term_metabolites <- term_metabolites[lengths(term_metabolites$MetaboliteIDs) > 0L, , drop = FALSE]
+    }
 
     terms <- term_metabolites[[term_col]]
     n_terms <- length(terms)
@@ -275,17 +331,17 @@ cluster_pk <- function(
     term_metabolites$cluster <- cluster_labels[term_metabolites[[term_col]]]
     df <-
         data %>%
-        left_join(
-            term_metabolites %>% select(!!sym(term_col), cluster),
+        dplyr::left_join(
+            term_metabolites %>% dplyr::select(!!sym(term_col), cluster),
             by = term_col
         )
 
     # ---- Summary ---------------------------------------------------------
     cluster_summary <-
         term_metabolites %>%
-        group_by(cluster) %>%
-        summarize(n_terms = dplyr::n(), .groups = "drop") %>%
-        mutate(pct_terms = 100 * n_terms / sum(n_terms))
+        dplyr::group_by(cluster) %>%
+        dplyr::summarize(n_terms = dplyr::n(), .groups = "drop") %>%
+        dplyr::mutate(pct_terms = 100 * n_terms / sum(n_terms))
 
     # ---- Graph plot ------------------------------------------------------
     graph_plot <- viz_graph(
