@@ -10,7 +10,7 @@
 #'     `grouping_variable` (term column). Defaults to
 #'     `c(InputID = "MetaboliteID", grouping_variable = "term")`.
 #' @param similarity Similarity measure between term ID sets. Options:
-#'     "jaccard" (default), "overlap" (overlap coefficient), or "correlation"
+#'     "jaccard" (default), "overlap_coefficient", or "correlation"
 #'     (applied to the binary term-by-ID matrix using `matrix`).
 #' @param correlation_method Correlation method when `similarity = "correlation"`.
 #'     One of "pearson", "spearman", "kendall". Ignored otherwise.
@@ -28,6 +28,8 @@
 #'     Default = 2.
 #' @param drop_negative If TRUE, negative correlations are set to zero before
 #'     thresholding. Default = TRUE.
+#' @param debug If TRUE, print cluster counts before and after min filtering.
+#'     Default = FALSE.
 #' @return A list with:
 #'     \item{data}{Input data with a `cluster` column added.}
 #'     \item{similarity_matrix}{Term-by-term similarity matrix.}
@@ -58,14 +60,15 @@ cluster_pk <- function(
         InputID = "MetaboliteID",
         grouping_variable = "term"
     ),
-    similarity = c("jaccard", "overlap", "correlation"),
+    similarity = c("jaccard", "overlap_coefficient", "correlation"),
     correlation_method = "pearson",
     threshold = 0.5,
     clust = c("components", "community", "hierarchical"),
     hclust_method = "average",
     k = NULL,
     min = 2,
-    drop_negative = TRUE
+    drop_negative = TRUE,
+    debug = FALSE
 ) {
     
     # NSE vs. R CMD check workaround
@@ -123,6 +126,10 @@ cluster_pk <- function(
         stop("`min` must be a single integer >= 1.")
     }
     min <- as.integer(min)
+
+    if (!is.logical(debug) || length(debug) != 1L) {
+        stop("`debug` must be TRUE or FALSE.")
+    }
     
     if (similarity == "correlation") {
         correlation_method <-
@@ -173,7 +180,7 @@ cluster_pk <- function(
             dimnames = list(terms, terms)
         )
     
-    if (similarity %in% c("jaccard", "overlap")) {
+    if (similarity %in% c("jaccard", "overlap_coefficient")) {
         combs <- combn(seq_len(n_terms), 2L)
         for (j in seq_len(ncol(combs))) {
             i1 <- combs[1, j]
@@ -239,6 +246,9 @@ cluster_pk <- function(
             weighted = NULL
         )
         mem <- components(g)$membership
+        if (is.null(names(mem))) {
+            names(mem) <- igraph::V(g)$name
+        }
         clusters[names(mem)] <- mem
         hclust_obj <- NULL
     } else if (clust == "community") {
@@ -249,6 +259,9 @@ cluster_pk <- function(
             weighted = TRUE
         )
         mem <- cluster_louvain(g)$membership
+        if (is.null(names(mem))) {
+            names(mem) <- igraph::V(g)$name
+        }
         clusters[names(mem)] <- mem
         hclust_obj <- NULL
     } else if (clust == "hierarchical") {
@@ -259,15 +272,26 @@ cluster_pk <- function(
             cut_height <- 1 - threshold
             mem <- cutree(hc, h = cut_height)
         }
+        if (is.null(names(mem))) {
+            names(mem) <- terms
+        }
         clusters[names(mem)] <- mem
         hclust_obj <- hc
     }
-    
+
+    if (debug) {
+        pre_tab <- sort(table(clusters, useNA = "ifany"), decreasing = TRUE)
+        log_trace(paste0(
+            "Cluster counts before min filtering (top 20): ",
+            paste(head(names(pre_tab), 20), head(pre_tab, 20), sep = "=", collapse = ", ")
+        ))
+    }
+
     # ---- Apply minimum size filter --------------------------------------
     cluster_sizes <- table(clusters, useNA = "no")
     small <- names(cluster_sizes[cluster_sizes < min])
     clusters[as.character(clusters) %in% small] <- NA_integer_
-    
+
     # Label clusters
     cluster_labels <- ifelse(
         is.na(clusters),
@@ -275,6 +299,14 @@ cluster_pk <- function(
         paste0("cluster", clusters)
     )
     names(cluster_labels) <- terms
+
+    if (debug) {
+        post_tab <- sort(table(cluster_labels, useNA = "ifany"), decreasing = TRUE)
+        log_trace(paste0(
+            "Cluster counts after min filtering (top 20): ",
+            paste(head(names(post_tab), 20), head(post_tab, 20), sep = "=", collapse = ", ")
+        ))
+    }
     
     # Merge back to data
     term_metabolites$cluster <- cluster_labels[term_metabolites[[term_col]]]

@@ -16,7 +16,38 @@ source("cluster_pk/helper_plots_cluster_pk.R")
 d <- metsigdb_kegg()
 
 # Run clustering
-r <- cluster_pk(d, threshold = 0.2, clust = "components", min = 2)
+r <- cluster_pk(d, threshold = 0.2, clust = "community", min = 1)
+r <- cluster_pk(d, threshold = 0.2, clust = "community", min = 1, debug = TRUE)
+
+
+r <- cluster_pk(d, threshold = 0.2, clust = "community", min = 2, debug = TRUE)
+
+r <- cluster_pk(d, threshold = 0.2, clust = "components", min = 2, debug = TRUE)
+
+
+
+
+
+
+
+r <- cluster_pk(d, clust = "hierarchical", threshold = 0.2, hclust_method = "average", min = 2)
+plots3 <- helper_plots_cluster_pk(r, min_degree = 2)
+plots3$graph
+
+
+clusters <- r$clusters
+cluster_summary <- r$cluster_summary
+data <- r$data
+
+
+
+
+
+
+
+
+
+
 
 # Generate plots
 plots <- helper_plots_cluster_pk(r)
