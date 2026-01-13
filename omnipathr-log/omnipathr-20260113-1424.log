@@ -40,3 +40,19 @@
 [2026-01-13 14:25:44] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/conv/compound/pubchem`.
 [2026-01-13 14:25:44] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/df48f267c99a2d8dd3cb7ed031941afbedc22d48-1.rds`.
 [2026-01-13 14:25:44] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 19384 records from cache
+[2026-01-13 16:16:36] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-01-13 16:16:36] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/link/compound/pathway`.
+[2026-01-13 16:16:36] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/c6ff89c85308605f76b13b8b7eef2efc510fca11-1.rds`.
+[2026-01-13 16:16:36] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 19315 records from cache
+[2026-01-13 16:16:37] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-01-13 16:16:37] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/list/pathway`.
+[2026-01-13 16:16:37] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/0bd054860c052a2ac0d7a3849b304d085f377df0-1.rds`.
+[2026-01-13 16:16:37] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 580 records from cache
+[2026-01-13 16:16:37] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-01-13 16:16:37] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/list/compound`.
+[2026-01-13 16:16:37] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/855597ce84b494f3ef3ac5750c407848569a7f66-1.rds`.
+[2026-01-13 16:16:37] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 19514 records from cache
+[2026-01-13 16:16:37] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-01-13 16:16:37] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/conv/compound/pubchem`.
+[2026-01-13 16:16:37] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/df48f267c99a2d8dd3cb7ed031941afbedc22d48-1.rds`.
+[2026-01-13 16:16:37] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 19384 records from cache

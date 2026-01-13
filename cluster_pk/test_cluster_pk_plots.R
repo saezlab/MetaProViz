@@ -1,96 +1,44 @@
-# Simple test script for cluster_pk and helper_plots_cluster_pk
+# Simple test script for cluster_pk with graph plotting
 
 library(MetaProViz)
 library(dplyr)
-library(pheatmap)
 library(ggplot2)
-library(treemapify)
-library(ggraph)
-library(igraph)
 library(logger)
+library(igraph)
+library(ggraph)
+devtools::load_all()
 
+
+source("R/VizGraph.R")
 source("cluster_pk/cluster_pk.R")
-source("cluster_pk/helper_plots_cluster_pk.R")
 
 # Load example data
 d <- metsigdb_kegg()
 
-# Run clustering
-r <- cluster_pk(d, threshold = 0.2, clust = "community", min = 1)
-r <- cluster_pk(d, threshold = 0.2, clust = "community", min = 1, debug = TRUE)
+# Run clustering with graph plotting
+r <- cluster_pk(
+    d,
+    metadata_info = c(
+        InputID = "MetaboliteID",
+        grouping_variable = "term"
+    ),
+    similarity = "jaccard",
+    threshold = 0.5,
+    clust = "hierarchical",
+    min = 2,
+    debug = TRUE,
+    save_plot = "png",
+    min_degree = 1,
+    max_nodes = 1000
+) 
 
-
-r <- cluster_pk(d, threshold = 0.2, clust = "community", min = 2, debug = TRUE)
-
-r <- cluster_pk(d, threshold = 0.2, clust = "components", min = 2, debug = TRUE)
-
-
-
-
-
-
-
-r <- cluster_pk(d, clust = "hierarchical", threshold = 0.2, hclust_method = "average", min = 2)
-plots3 <- helper_plots_cluster_pk(r, min_degree = 2)
-plots3$graph
-
-
-clusters <- r$clusters
-cluster_summary <- r$cluster_summary
-data <- r$data
-
-
-
-
-
-
-
-
-
-
-
-# Generate plots
-plots <- helper_plots_cluster_pk(r)
-plots2 <- helper_plots_cluster_pk(r, min_degree = 2)
-
-# Print summaries
 print(head(r$cluster_summary))
-
-## create new dir in MetaProViz/cluster_pk/ to save plots
-## if dir does not exist yet
-output_dir <- "cluster_pk/plots_output"
-if (!dir.exists(output_dir)) {
-    dir.create(output_dir)
-}
-
-png(filename = file.path(output_dir, "similarity_heatmap.png"), width = 10000, height = 4000, res = 300)
-plots$heatmap
-dev.off()
-
-png(filename = file.path(output_dir, "cluster_bar.png"), width = 10000, height = 4000, res = 300)
-plots$cluster_bar
-dev.off()
-
-png(filename = file.path(output_dir, "cluster_treemap.png"), width = 10000, height = 4000, res = 300)
-plots$cluster_treemap
-dev.off()
-
-png(filename = file.path(output_dir, "similarity_distribution.png"), width = 10000, height = 4000, res = 300)
-plots$sim_distribution
-dev.off()
-
-png(filename = file.path(output_dir, "graph.png"), width = 10000, height = 4000, res = 300)
-plots$graph
-dev.off()
-
-png(filename = file.path(output_dir, "graph_min_degree_2.png"), width = 10000, height = 4000, res = 300)
-plots2$graph
-dev.off()
+print(r$graph_plot)
 
 
-png(filename = file.path(output_dir, "dendrogram.png"), width = 10000, height = 4000, res = 300)
-plots$dendrogram
-dev.off()
+
+
+
 
 
 

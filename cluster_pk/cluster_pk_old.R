@@ -10,10 +10,8 @@
 #'     `grouping_variable` (term column). Defaults to
 #'     `c(InputID = "MetaboliteID", grouping_variable = "term")`.
 #' @param similarity Similarity measure between term ID sets. Options:
-#'     "jaccard" (default), "overlap_coefficient", or "correlation".
-#'     Jaccard similarity is |A ∩ B| / |A ∪ B|. Overlap coefficient is
-#'     |A ∩ B| / min(|A|, |B|). Jaccard is stricter for large sets, while
-#'     overlap_coefficient is more permissive for nested sets.
+#'     "jaccard" (default), "overlap_coefficient", or "correlation"
+#'     (applied to the binary term-by-ID matrix using `matrix`).
 #' @param correlation_method Correlation method when `similarity = "correlation"`.
 #'     One of "pearson", "spearman", "kendall". Ignored otherwise.
 #' @param threshold Similarity cutoff for keeping edges (applies to all
@@ -21,28 +19,23 @@
 #' @param clust Clustering strategy: "components" (connected components on
 #'     thresholded unweighted graph), "community" (Louvain on thresholded
 #'     weighted graph), or "hierarchical" (hclust on distance = 1 - similarity).
-#' @param hclust_method Linkage method for hierarchical clustering. One of
+#' @param hclust_method Linkage method for hierarchical c lustering. One of
 #'     "average" (default), "single", "complete", "ward.D", "ward.D2",
 #'     "mcquitty", "median", "centroid".
+#' @param k Optional number of clusters for hierarchical clustering. If NULL,
+#'     dendrogram is cut at height = 1 - threshold.
 #' @param min Minimum cluster size; smaller clusters are relabeled to "None".
 #'     Default = 2.
-#' @param plot_name \emph{Optional: } String added to output files of the plot.
-#'     Default = "ClusterGraph".
-#' @param max_nodes \emph{Optional: } Maximum nodes for plotting. If set,
-#'     keeps nodes from the largest component up to this limit (by degree).
-#' @param min_degree \emph{Optional: } Minimum degree filter for graph plotting.
-#' @param save_plot \emph{Optional: } Select the file type of output plots.
-#'     Options are svg, pdf, png or NULL. \strong{Default = "svg"}
-#' @param print_plot \emph{Optional: } If TRUE prints an overview of resulting
-#'     plots. \strong{Default = TRUE}
-#' @param path {Optional:} String which is added to the resulting folder name.
-#'     \strong{default: NULL}
-#'
+#' @param drop_negative If TRUE, negative correlations are set to zero before
+#'     thresholding. Default = TRUE.
+#' @param debug If TRUE, print cluster counts before and after min filtering.
+#'     Default = FALSE.
 #' @return A list with:
 #'     \item{data}{Input data with a `cluster` column added.}
+#'     \item{similarity_matrix}{Term-by-term similarity matrix.}
+#'     \item{distance_matrix}{Term-by-term distance matrix (1 - similarity).}
 #'     \item{cluster_summary}{Summary of cluster sizes and percentages.}
 #'     \item{clusters}{Named vector of term -> cluster assignment.}
-#'     \item{graph_plot}{Graph plot returned by viz_graph.}
 #'
 #' @importFrom dplyr group_by summarize ungroup mutate select left_join
 #' @importFrom dplyr across n distinct filter tibble arrange
@@ -50,6 +43,16 @@
 #' @importFrom stats cor as.dist hclust cutree
 #' @importFrom rlang sym !!
 #' @importFrom logger log_trace log_warn
+#' 
+#' @examples 
+#' 
+#' data <- metsigdb_kegg()
+#' 
+#' res <- cluster_pk(data, threshold = 0.2, clust = "components", min = 1)
+#' table(res$data$cluster, useNA = "ifany") %>% sort(decreasing = TRUE) %>% head(10)
+#' res$cluster_summary %>% arrange(desc(n_terms)) %>% head(10)
+#' ## add plotting into example
+#' 
 #' @noRd
 cluster_pk <- function(
     data,
@@ -62,22 +65,20 @@ cluster_pk <- function(
     threshold = 0.5,
     clust = c("components", "community", "hierarchical"),
     hclust_method = "average",
+    k = NULL,
     min = 2,
-    plot_name = "ClusterGraph",
-    max_nodes = 10000,
-    min_degree = 1,
-    save_plot = "svg",
-    print_plot = FALSE,
-    path = NULL
+    drop_negative = TRUE,
+    debug = FALSE
 ) {
-
+    
     # NSE vs. R CMD check workaround
     cluster <- NULL
-
+    
     # ---- Input checks ----------------------------------------------------
+    ## move these to Helper functions probably
     similarity <- match.arg(similarity)
     clust <- match.arg(clust)
-
+    
     if (clust == "hierarchical") {
         hclust_method <- match.arg(
             hclust_method,
@@ -88,45 +89,56 @@ cluster_pk <- function(
             )
         )
     }
-
+    
     if (!is.data.frame(data)) {
         stop("`data` must be a data frame.")
     }
-
+    
     if (!all(c("InputID", "grouping_variable") %in% names(metadata_info))) {
         stop("metadata_info must contain InputID and grouping_variable.")
     }
-
+    
     id_col <- metadata_info[["InputID"]]
     term_col <- metadata_info[["grouping_variable"]]
-
+    
     if (!id_col %in% colnames(data)) {
         stop(sprintf("Column %s (InputID) not found in data.", id_col))
     }
     if (!term_col %in% colnames(data)) {
         stop(sprintf("Column %s (grouping_variable) not found in data.", term_col))
     }
-
+    
     if (!is.numeric(threshold) || length(threshold) != 1L || is.na(threshold)) {
         stop("`threshold` must be a single numeric value.")
     }
     if (threshold < 0 || threshold > 1) {
         stop("`threshold` must be between 0 and 1 (similarity scale).")
     }
-
+    
+    if (!is.null(k)) {
+        if (!is.numeric(k) || length(k) != 1L || k < 1) {
+            stop("`k` must be NULL or a single positive integer.")
+        }
+        k <- as.integer(k)
+    }
+    
     if (!is.numeric(min) || length(min) != 1L || min < 1) {
         stop("`min` must be a single integer >= 1.")
     }
     min <- as.integer(min)
 
+    if (!is.logical(debug) || length(debug) != 1L) {
+        stop("`debug` must be TRUE or FALSE.")
+    }
+    
     if (similarity == "correlation") {
         correlation_method <-
             match.arg(correlation_method, c("pearson", "spearman", "kendall"))
     }
-
+    
     # Drop duplicated term-ID rows to avoid inflating overlaps
     data <- distinct(data, !!sym(term_col), !!sym(id_col), .keep_all = TRUE)
-
+    
     # Warn if terms have no IDs
     empty_terms <-
         data %>%
@@ -142,7 +154,7 @@ cluster_pk <- function(
             paste(empty_terms[[term_col]], collapse = ", ")
         )
     }
-
+    
     # ---- Build term -> ID list ------------------------------------------
     term_metabolites <-
         data %>%
@@ -152,13 +164,13 @@ cluster_pk <- function(
             MetaboliteIDs = list(unique(!!sym(id_col))),
             .groups = "drop"
         )
-
+    
     terms <- term_metabolites[[term_col]]
     n_terms <- length(terms)
     if (n_terms == 0L) {
         stop("No terms with non-missing IDs after filtering.")
     }
-
+    
     # ---- Similarity matrix ----------------------------------------------
     similarity_matrix <-
         matrix(
@@ -167,7 +179,7 @@ cluster_pk <- function(
             ncol = n_terms,
             dimnames = list(terms, terms)
         )
-
+    
     if (similarity %in% c("jaccard", "overlap_coefficient")) {
         combs <- combn(seq_len(n_terms), 2L)
         for (j in seq_len(ncol(combs))) {
@@ -201,61 +213,78 @@ cluster_pk <- function(
             binary_matrix[i, colnames(binary_matrix) %in% ids] <- 1
         }
         corr <- cor(t(binary_matrix), method = correlation_method)
-        corr[corr < 0] <- 0
+        if (drop_negative) {
+            corr[corr < 0] <- 0
+        }
         diag(corr) <- 1
         similarity_matrix <- corr
     }
-
+    
     # Distance matrix
     distance_matrix <- 1 - similarity_matrix
     diag(distance_matrix) <- 0
-
+    
     # Thresholded versions
     similarity_thr <- similarity_matrix
     similarity_thr[similarity_thr < threshold] <- 0
     diag(similarity_thr) <- 0
-
+    
     distance_thr <- distance_matrix
     distance_thr[similarity_thr == 0] <- 1
     diag(distance_thr) <- 0
-
+    
     # ---- Clustering ------------------------------------------------------
     clusters <- rep(NA_integer_, n_terms)
     names(clusters) <- terms
-
+    
     if (clust == "components") {
         adj <- similarity_thr
         adj[adj > 0] <- 1
-        g <- igraph::graph_from_adjacency_matrix(
+        g <- graph_from_adjacency_matrix(
             adj,
             mode = "undirected",
             weighted = NULL
         )
-        mem <- igraph::components(g)$membership
+        mem <- components(g)$membership
         if (is.null(names(mem))) {
             names(mem) <- igraph::V(g)$name
         }
         clusters[names(mem)] <- mem
+        hclust_obj <- NULL
     } else if (clust == "community") {
         adj <- similarity_thr
-        g <- igraph::graph_from_adjacency_matrix(
+        g <- graph_from_adjacency_matrix(
             adj,
             mode = "undirected",
             weighted = TRUE
         )
-        mem <- igraph::cluster_louvain(g)$membership
+        mem <- cluster_louvain(g)$membership
         if (is.null(names(mem))) {
             names(mem) <- igraph::V(g)$name
         }
         clusters[names(mem)] <- mem
+        hclust_obj <- NULL
     } else if (clust == "hierarchical") {
         hc <- hclust(as.dist(distance_thr), method = hclust_method)
-        cut_height <- 1 - threshold
-        mem <- cutree(hc, h = cut_height)
+        if (!is.null(k)) {
+            mem <- cutree(hc, k = k)
+        } else {
+            cut_height <- 1 - threshold
+            mem <- cutree(hc, h = cut_height)
+        }
         if (is.null(names(mem))) {
             names(mem) <- terms
         }
         clusters[names(mem)] <- mem
+        hclust_obj <- hc
+    }
+
+    if (debug) {
+        pre_tab <- sort(table(clusters, useNA = "ifany"), decreasing = TRUE)
+        log_trace(paste0(
+            "Cluster counts before min filtering (top 20): ",
+            paste(head(names(pre_tab), 20), head(pre_tab, 20), sep = "=", collapse = ", ")
+        ))
     }
 
     # ---- Apply minimum size filter --------------------------------------
@@ -271,6 +300,14 @@ cluster_pk <- function(
     )
     names(cluster_labels) <- terms
 
+    if (debug) {
+        post_tab <- sort(table(cluster_labels, useNA = "ifany"), decreasing = TRUE)
+        log_trace(paste0(
+            "Cluster counts after min filtering (top 20): ",
+            paste(head(names(post_tab), 20), head(post_tab, 20), sep = "=", collapse = ", ")
+        ))
+    }
+    
     # Merge back to data
     term_metabolites$cluster <- cluster_labels[term_metabolites[[term_col]]]
     df <-
@@ -279,41 +316,30 @@ cluster_pk <- function(
             term_metabolites %>% select(!!sym(term_col), cluster),
             by = term_col
         )
-
+    
     # ---- Summary ---------------------------------------------------------
     cluster_summary <-
         term_metabolites %>%
         group_by(cluster) %>%
         summarize(n_terms = dplyr::n(), .groups = "drop") %>%
         mutate(pct_terms = 100 * n_terms / sum(n_terms))
-
-    # ---- Graph plot ------------------------------------------------------
-    graph_plot <- viz_graph(
-        similarity_matrix = similarity_matrix,
-        clusters = cluster_labels,
-        threshold = threshold,
-        plot_name = plot_name,
-        max_nodes = max_nodes,
-        min_degree = min_degree,
-        save_plot = save_plot,
-        print_plot = print_plot,
-        path = path
-    )
-
+    
     out <- list(
         data = df,
+        similarity_matrix = similarity_matrix,
+        distance_matrix = distance_matrix,
         cluster_summary = cluster_summary,
         clusters = cluster_labels,
-        graph_plot = graph_plot
+        hclust = hclust_obj,
+        hclust_method = hclust_method,
+        threshold = threshold
     )
-
-    log_trace(paste0(
-        "cluster_pk completed with ",
+    
+    log_trace(
+        "cluster_pk completed with %s clustering; %i clusters (including None).",
         clust,
-        " clustering; ",
-        length(unique(cluster_labels)),
-        " clusters (including None)."
-    ))
-
+        length(unique(cluster_labels))
+    )
+    
     return(out)
 }
