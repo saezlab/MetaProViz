@@ -31,7 +31,7 @@
 #' @importFrom ggplot2 theme geom_vline guides guide_legend
 #' @importFrom treemapify geom_treemap geom_treemap_text
 #' @importFrom dplyr mutate arrange desc
-#' @importFrom igraph graph_from_adjacency_matrix clusters degree induced_subgraph
+#' @importFrom igraph graph_from_adjacency_matrix components degree induced_subgraph
 #' @importFrom ggraph ggraph geom_edge_link geom_node_point geom_node_text
 #' @importFrom ggraph theme_graph
 #' @importFrom stats as.dist hclust
@@ -62,7 +62,7 @@ helper_plots_cluster_pk <- function(
 
     sim <- res$similarity_matrix
     dist_mat <- res$distance_matrix
-    clusters <- res$clusters
+    cluster_labels <- res$clusters
 
     # ---- Similarity heatmap with dendrograms ----------------------------
     heatmap_plot <-
@@ -154,7 +154,7 @@ helper_plots_cluster_pk <- function(
 
     # If max_nodes is set, keep nodes from largest component up to the limit
     if (!is.null(max_nodes) && vcount(g) > max_nodes) {
-        comps <- clusters(g)
+        comps <- components(g)
         largest_comp <- which.max(comps$csize)
         comp_nodes <- which(comps$membership == largest_comp)
         # order by degree within the component
@@ -163,10 +163,13 @@ helper_plots_cluster_pk <- function(
         g <- induced_subgraph(g, vids = keep_nodes)
     }
 
+    # Attach cluster labels to nodes for stable color mapping
+    igraph::V(g)$cluster <- cluster_labels[igraph::V(g)$name]
+
     graph_plot <-
         ggraph(g, layout = "fr") +
         geom_edge_link(aes(edge_alpha = weight), show.legend = FALSE) +
-        geom_node_point(aes(color = clusters[name]), size = 3) +
+        geom_node_point(aes(color = cluster), size = 3) +
         geom_node_text(aes(label = name), repel = TRUE, size = 3) +
         labs(title = "Graph view (thresholded similarity)") +
         theme_graph()

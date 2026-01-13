@@ -12,10 +12,10 @@
 #' @param similarity Similarity measure between term ID sets. Options:
 #'     "jaccard" (default), "overlap" (overlap coefficient), or "correlation"
 #'     (applied to the binary term-by-ID matrix using `matrix`).
-#' @param matrix Correlation method when `similarity = "correlation"`.
+#' @param correlation_method Correlation method when `similarity = "correlation"`.
 #'     One of "pearson", "spearman", "kendall". Ignored otherwise.
 #' @param threshold Similarity cutoff for keeping edges (applies to all
-#'     clustering modes). Default = 0.7.
+#'     clustering modes). Default = 0.5.
 #' @param clust Clustering strategy: "components" (connected components on
 #'     thresholded unweighted graph), "community" (Louvain on thresholded
 #'     weighted graph), or "hierarchical" (hclust on distance = 1 - similarity).
@@ -59,8 +59,8 @@ cluster_pk <- function(
         grouping_variable = "term"
     ),
     similarity = c("jaccard", "overlap", "correlation"),
-    matrix = "pearson",
-    threshold = 0.7,
+    correlation_method = "pearson",
+    threshold = 0.5,
     clust = c("components", "community", "hierarchical"),
     hclust_method = "average",
     k = NULL,
@@ -125,7 +125,8 @@ cluster_pk <- function(
     min <- as.integer(min)
     
     if (similarity == "correlation") {
-        matrix <- match.arg(matrix, c("pearson", "spearman", "kendall"))
+        correlation_method <-
+            match.arg(correlation_method, c("pearson", "spearman", "kendall"))
     }
     
     # Drop duplicated term-ID rows to avoid inflating overlaps
@@ -204,7 +205,7 @@ cluster_pk <- function(
             ids <- term_metabolites$MetaboliteIDs[[i]]
             binary_matrix[i, colnames(binary_matrix) %in% ids] <- 1
         }
-        corr <- cor(t(binary_matrix), method = matrix)
+        corr <- cor(t(binary_matrix), method = correlation_method)
         if (drop_negative) {
             corr[corr < 0] <- 0
         }

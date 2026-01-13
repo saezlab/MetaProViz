@@ -16,7 +16,7 @@ source("cluster_pk/helper_plots_cluster_pk.R")
 d <- metsigdb_kegg()
 
 # Run clustering
-r <- cluster_pk(d, threshold = 0.2, clust = "components", min = 1)
+r <- cluster_pk(d, threshold = 0.2, clust = "components", min = 2)
 
 # Generate plots
 plots <- helper_plots_cluster_pk(r)
