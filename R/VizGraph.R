@@ -95,7 +95,7 @@
 #' @importFrom ggrepel geom_text_repel
 #' @importFrom ggplot2 labs
 #' @importFrom logger log_info log_trace
-#' @noRd
+#' @export
 viz_graph <- function(
     similarity_matrix,
     clusters,

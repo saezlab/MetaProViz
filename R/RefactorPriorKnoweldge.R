@@ -2318,7 +2318,7 @@ checkmatch_pk_to_data <- function(
 #' @importFrom stats cor as.dist hclust cutree
 #' @importFrom rlang sym !! .data
 #' @importFrom logger log_trace log_warn
-#' @noRd
+#' @export
 cluster_pk <- function(
     data,
     metadata_info = c(
