@@ -31,6 +31,12 @@
 #' @param max_nodes \emph{Optional: } Maximum nodes for plotting. If set,
 #'     keeps nodes from the largest component up to this limit (by degree).
 #' @param min_degree \emph{Optional: } Minimum degree filter for graph plotting.
+#' @param node_sizes \emph{Optional: } Named numeric vector of node sizes,
+#'     with names matching term IDs. Values are scaled for plotting.
+#' @param show_density \emph{Optional: } If TRUE, add a hull background per
+#'     cluster. Default = FALSE.
+#' @param seed \emph{Optional: } Random seed for graph layout reproducibility.
+#'     Default = NULL.
 #' @param save_plot \emph{Optional: } Select the file type of output plots.
 #'     Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #' @param print_plot \emph{Optional: } If TRUE prints an overview of resulting
@@ -54,6 +60,9 @@ viz_graph <- function(
     plot_name = "ClusterGraph",
     max_nodes = NULL,
     min_degree = NULL,
+    node_sizes = NULL,
+    show_density = FALSE,
+    seed = NULL,
     save_plot = "svg",
     print_plot = TRUE,
     path = NULL
@@ -63,48 +72,18 @@ viz_graph <- function(
     log_info("viz_graph: Graph plot visualization")
 
     # ---- Input checks ----------------------------------------------------
-    if (!is.matrix(similarity_matrix)) {
-        stop("similarity_matrix must be a numeric matrix.")
-    }
-    if (is.null(rownames(similarity_matrix)) || is.null(colnames(similarity_matrix))) {
-        stop("similarity_matrix must have row and column names.")
-    }
-    if (!is.numeric(similarity_matrix)) {
-        stop("similarity_matrix must be numeric.")
-    }
-    if (any(rownames(similarity_matrix) != colnames(similarity_matrix))) {
-        stop("similarity_matrix must be square with matching row/column names.")
-    }
-    if (is.null(names(clusters))) {
-        stop("clusters must be a named vector with term names.")
-    }
-    if (!all(rownames(similarity_matrix) %in% names(clusters))) {
-        stop("All similarity_matrix terms must be present in clusters.")
-    }
-    if (!is.numeric(threshold) || length(threshold) != 1L || is.na(threshold)) {
-        stop("threshold must be a single numeric value.")
-    }
-    if (threshold < 0 || threshold > 1) {
-        stop("threshold must be between 0 and 1.")
-    }
-    if (!is.null(max_nodes) && (!is.numeric(max_nodes) || max_nodes < 1)) {
-        stop("max_nodes must be NULL or a positive integer.")
-    }
-    if (!is.null(min_degree) && (!is.numeric(min_degree) || min_degree < 0)) {
-        stop("min_degree must be NULL or a non-negative integer.")
-    }
-    if (!is.logical(print_plot) || length(print_plot) != 1L) {
-        stop("print_plot must be TRUE or FALSE.")
-    }
-
-    save_plot_options <- c("svg", "pdf", "png")
-    if (!is.null(save_plot) && !(save_plot %in% save_plot_options)) {
-        stop(
-            "save_plot must be one of: ",
-            paste(save_plot_options, collapse = ", "),
-            ", or NULL."
-        )
-    }
+    check_param_VizGraph(
+        similarity_matrix = similarity_matrix,
+        clusters = clusters,
+        threshold = threshold,
+        max_nodes = max_nodes,
+        min_degree = min_degree,
+        node_sizes = node_sizes,
+        show_density = show_density,
+        print_plot = print_plot,
+        save_plot = save_plot,
+        seed = seed
+    )
 
     # ---- Create adjacency ------------------------------------------------
     adj <- similarity_matrix
@@ -137,13 +116,80 @@ viz_graph <- function(
     # Attach cluster labels to nodes for stable color mapping
     igraph::V(g)$cluster <- clusters[igraph::V(g)$name]
 
-    graph_plot <-
-        ggraph(g, layout = "fr") +
-        geom_edge_link(aes(edge_alpha = weight), show.legend = FALSE) +
-        geom_node_point(aes(color = cluster), size = 3) +
-        geom_node_text(aes(label = name), repel = TRUE, size = 3) +
-        labs(title = plot_name) +
-        theme_graph()
+    if (!is.null(seed)) {
+        set.seed(seed)
+    }
+    layout <- ggraph::create_layout(g, layout = "fr")
+
+    node_size_vec <- NULL
+    node_size_label <- NULL
+    if (!is.null(node_sizes)) {
+        node_size_vec <- node_sizes[igraph::V(g)$name]
+        node_size_label <- attr(node_sizes, "label")
+        if (!all(is.na(node_size_vec))) {
+            med <- stats::median(node_size_vec, na.rm = TRUE)
+            node_size_vec[is.na(node_size_vec)] <- med
+        } else {
+            node_size_vec <- NULL
+        }
+    }
+    if (!is.null(node_size_vec)) {
+        layout$node_size <- node_size_vec[layout$name]
+    }
+
+    hull_layer <- NULL
+    if (isTRUE(show_density)) {
+        hull_data <- layout[layout$cluster != "None", , drop = FALSE]
+        hull_list <- lapply(
+            split(hull_data, hull_data$cluster),
+            function(df) {
+                if (nrow(df) < 3) {
+                    return(NULL)
+                }
+                idx <- chull(df$x, df$y)
+                df <- df[idx, , drop = FALSE]
+                rbind(df, df[1, , drop = FALSE])
+            }
+        )
+        hull_df <- do.call(rbind, hull_list)
+        if (!is.null(hull_df) && nrow(hull_df) > 0) {
+            hull_layer <- ggplot2::geom_polygon(
+                data = hull_df,
+                aes(x = x, y = y, fill = cluster, group = cluster),
+                alpha = 0.15,
+                color = NA,
+                show.legend = FALSE
+            )
+        }
+    }
+
+    if (is.null(node_size_vec)) {
+        graph_plot <-
+            ggraph(layout) +
+            hull_layer +
+            geom_edge_link(aes(edge_alpha = weight, edge_width = weight)) +
+            ggraph::scale_edge_width(range = c(0.2, 1.2), name = "Edge weight (similarity)") +
+            ggraph::scale_edge_alpha(range = c(0.2, 0.8), guide = "none") +
+            geom_node_point(aes(color = cluster), size = 3) +
+            geom_node_text(aes(label = name), repel = TRUE, size = 3) +
+            labs(title = plot_name) +
+            theme_graph()
+    } else {
+        graph_plot <-
+            ggraph(layout) +
+            hull_layer +
+            geom_edge_link(aes(edge_alpha = weight, edge_width = weight)) +
+            ggraph::scale_edge_width(range = c(0.2, 1.2), name = "Edge weight (similarity)") +
+            ggraph::scale_edge_alpha(range = c(0.2, 0.8), guide = "none") +
+            geom_node_point(aes(color = cluster, size = node_size)) +
+            ggplot2::scale_size(
+                range = c(1, 8),
+                name = ifelse(is.null(node_size_label), "Node size", node_size_label)
+            ) +
+            geom_node_text(aes(label = name), repel = TRUE, size = 3) +
+            labs(title = plot_name) +
+            theme_graph()
+    }
 
     # ---- Save and return -------------------------------------------------
     folder <- NULL
@@ -164,8 +210,8 @@ viz_graph <- function(
         file_name = plot_name,
         core = FALSE,
         print_plot = FALSE,
-        plot_height = 3000,
-        plot_width = 9000,
+        plot_height = 5000,
+        plot_width = 12000,
         plot_unit = "px"
     )
 
