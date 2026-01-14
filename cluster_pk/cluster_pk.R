@@ -38,6 +38,13 @@
 #'     Used only for the graph plot. Default = 10000.
 #' @param min_degree \emph{Optional: } Minimum degree filter for graph plotting.
 #'     Used only for the graph plot. Default = 1.
+#' @param node_size_column \emph{Optional: } Numeric column name from `data`
+#'     used to scale node sizes in the graph. Aggregated per term (mean) when
+#'     multiple rows map to the same term. Default = NULL.
+#' @param show_density \emph{Optional: } If TRUE, add a hull background per
+#'     cluster to the graph. Default = FALSE.
+#' @param seed \emph{Optional: } Random seed for graph layout reproducibility.
+#'     Default = NULL.
 #' @param save_plot \emph{Optional: } Select the file type of output plots.
 #'     Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #' @param print_plot \emph{Optional: } If TRUE prints an overview of resulting
@@ -49,6 +56,8 @@
 #'     \item{data}{Input data with a `cluster` column added.}
 #'     \item{cluster_summary}{Summary of cluster sizes and percentages.}
 #'     \item{clusters}{Named vector of term -> cluster assignment.}
+#'     \item{similarity_matrix}{Term-by-term similarity matrix.}
+#'     \item{distance_matrix}{Term-by-term distance matrix (1 - similarity).}
 #'     \item{graph_plot}{Graph plot returned by viz_graph.}
 #'
 #' @importFrom dplyr group_by summarize ungroup mutate select left_join
@@ -75,7 +84,10 @@ cluster_pk <- function(
     plot_name = "ClusterGraph",
     max_nodes = 10000,
     min_degree = 1,
-    save_plot = "svg",
+    node_size_column = NULL,
+    show_density = FALSE,
+    seed = NULL,
+    save_plot = "png",
     print_plot = FALSE,
     path = NULL
 ) {
@@ -99,44 +111,20 @@ cluster_pk <- function(
         )
     }
 
-    if (!is.data.frame(data)) {
-        stop("`data` must be a data frame.")
-    }
-
-    if (!all(c("metabolite_column", "pathway_column") %in% names(metadata_info))) {
-        stop("metadata_info must contain metabolite_column and pathway_column.")
-    }
+    check_param_cluster_pk(
+        data = data,
+        metadata_info = metadata_info,
+        input_format = input_format,
+        delimiter = delimiter,
+        threshold = threshold,
+        min = min,
+        node_size_column = node_size_column,
+        show_density = show_density,
+        seed = seed
+    )
 
     id_col <- metadata_info[["metabolite_column"]]
     term_col <- metadata_info[["pathway_column"]]
-
-    if (input_format == "long") {
-        if (!id_col %in% colnames(data)) {
-            stop(sprintf("Column %s (metabolite_column) not found in data.", id_col))
-        }
-    }
-    if (!term_col %in% colnames(data)) {
-        stop(sprintf("Column %s (pathway_column) not found in data.", term_col))
-    }
-    if (input_format == "enrichment") {
-        if (!id_col %in% colnames(data)) {
-            stop(sprintf("Column %s (metabolite_column) not found in data.", id_col))
-        }
-        if (!is.character(delimiter) || length(delimiter) != 1L) {
-            stop("`delimiter` must be a single character string.")
-        }
-    }
-
-    if (!is.numeric(threshold) || length(threshold) != 1L || is.na(threshold)) {
-        stop("`threshold` must be a single numeric value.")
-    }
-    if (threshold < 0 || threshold > 1) {
-        stop("`threshold` must be between 0 and 1 (similarity scale).")
-    }
-
-    if (!is.numeric(min) || length(min) != 1L || min < 1) {
-        stop("`min` must be a single integer >= 1.")
-    }
     min <- as.integer(min)
 
     if (similarity == "correlation") {
@@ -343,6 +331,23 @@ cluster_pk <- function(
         dplyr::summarize(n_terms = dplyr::n(), .groups = "drop") %>%
         dplyr::mutate(pct_terms = 100 * n_terms / sum(n_terms))
 
+    # ---- Node sizes ------------------------------------------------------
+    node_sizes <- NULL
+    if (!is.null(node_size_column)) {
+        node_size_df <-
+            data %>%
+            dplyr::group_by(!!sym(term_col)) %>%
+            dplyr::summarize(
+                node_size = mean(.data[[node_size_column]], na.rm = TRUE),
+                .groups = "drop"
+            )
+        node_size_df$node_size[is.nan(node_size_df$node_size)] <- NA_real_
+        node_sizes <- node_size_df$node_size
+        names(node_sizes) <- node_size_df[[term_col]]
+        node_sizes <- node_sizes[terms]
+        attr(node_sizes, "label") <- node_size_column
+    }
+
     # ---- Graph plot ------------------------------------------------------
     graph_plot <- viz_graph(
         similarity_matrix = similarity_matrix,
@@ -351,6 +356,9 @@ cluster_pk <- function(
         plot_name = plot_name,
         max_nodes = max_nodes,
         min_degree = min_degree,
+        node_sizes = node_sizes,
+        show_density = show_density,
+        seed = seed,
         save_plot = save_plot,
         print_plot = print_plot,
         path = path
@@ -360,6 +368,8 @@ cluster_pk <- function(
         data = df,
         cluster_summary = cluster_summary,
         clusters = cluster_labels,
+        similarity_matrix = similarity_matrix,
+        distance_matrix = distance_matrix,
         graph_plot = graph_plot
     )
 
