@@ -1611,4 +1611,180 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
     }
 }
 
+#' Check input parameters for cluster_pk
+#'
+#' @param data Data frame for clustering.
+#' @param metadata_info Named vector with metabolite_column and pathway_column.
+#' @param input_format Input format of data ("long" or "enrichment").
+#' @param delimiter Delimiter for enrichment format.
+#' @param threshold Similarity threshold.
+#' @param min Minimum cluster size.
+#' @param node_size_column Optional numeric column name for node sizing.
+#' @param show_density Logical flag to draw hull background.
+#' @param seed Optional seed for reproducibility.
+#'
+#' @return Invisible TRUE if checks pass.
+#'
+#' @noRd
+check_param_cluster_pk <- function(
+    data,
+    metadata_info,
+    input_format,
+    delimiter,
+    threshold,
+    min,
+    node_size_column,
+    show_density,
+    seed
+) {
+    if (!is.data.frame(data)) {
+        stop("`data` must be a data frame.")
+    }
+
+    if (!all(c("metabolite_column", "pathway_column") %in% names(metadata_info))) {
+        stop("metadata_info must contain metabolite_column and pathway_column.")
+    }
+
+    id_col <- metadata_info[["metabolite_column"]]
+    term_col <- metadata_info[["pathway_column"]]
+
+    if (input_format == "long") {
+        if (!id_col %in% colnames(data)) {
+            stop(sprintf("Column %s (metabolite_column) not found in data.", id_col))
+        }
+    }
+    if (!term_col %in% colnames(data)) {
+        stop(sprintf("Column %s (pathway_column) not found in data.", term_col))
+    }
+    if (input_format == "enrichment") {
+        if (!id_col %in% colnames(data)) {
+            stop(sprintf("Column %s (metabolite_column) not found in data.", id_col))
+        }
+        if (!is.character(delimiter) || length(delimiter) != 1L) {
+            stop("`delimiter` must be a single character string.")
+        }
+    }
+
+    if (!is.numeric(threshold) || length(threshold) != 1L || is.na(threshold)) {
+        stop("`threshold` must be a single numeric value.")
+    }
+    if (threshold < 0 || threshold > 1) {
+        stop("`threshold` must be between 0 and 1 (similarity scale).")
+    }
+
+    if (!is.numeric(min) || length(min) != 1L || min < 1) {
+        stop("`min` must be a single integer >= 1.")
+    }
+
+    if (!is.null(node_size_column)) {
+        if (!is.character(node_size_column) || length(node_size_column) != 1L) {
+            stop("`node_size_column` must be a single character string or NULL.")
+        }
+        if (!node_size_column %in% colnames(data)) {
+            stop(sprintf("Column %s (node_size_column) not found in data.", node_size_column))
+        }
+        if (!is.numeric(data[[node_size_column]])) {
+            stop("`node_size_column` must refer to a numeric column in data.")
+        }
+    }
+
+    if (!is.logical(show_density) || length(show_density) != 1L) {
+        stop("`show_density` must be TRUE or FALSE.")
+    }
+
+    if (!is.null(seed) && (!is.numeric(seed) || length(seed) != 1L || is.na(seed))) {
+        stop("`seed` must be a single numeric value or NULL.")
+    }
+
+    invisible(TRUE)
+}
+
+#' Check input parameters for viz_graph
+#'
+#' @param similarity_matrix Numeric matrix of similarities.
+#' @param clusters Named vector of cluster labels.
+#' @param threshold Similarity threshold.
+#' @param max_nodes Maximum nodes for plotting.
+#' @param min_degree Minimum degree filter.
+#' @param node_sizes Named numeric vector of node sizes.
+#' @param show_density Logical flag to draw hull background.
+#' @param print_plot Logical flag for printing.
+#' @param save_plot File extension or NULL.
+#' @param seed Optional seed for reproducibility.
+#'
+#' @return Invisible TRUE if checks pass.
+#'
+#' @noRd
+check_param_VizGraph <- function(
+    similarity_matrix,
+    clusters,
+    threshold,
+    max_nodes,
+    min_degree,
+    node_sizes,
+    show_density,
+    print_plot,
+    save_plot,
+    seed
+) {
+    if (!is.matrix(similarity_matrix)) {
+        stop("similarity_matrix must be a numeric matrix.")
+    }
+    if (is.null(rownames(similarity_matrix)) || is.null(colnames(similarity_matrix))) {
+        stop("similarity_matrix must have row and column names.")
+    }
+    if (!is.numeric(similarity_matrix)) {
+        stop("similarity_matrix must be numeric.")
+    }
+    if (any(rownames(similarity_matrix) != colnames(similarity_matrix))) {
+        stop("similarity_matrix must be square with matching row/column names.")
+    }
+    if (is.null(names(clusters))) {
+        stop("clusters must be a named vector with term names.")
+    }
+    if (!all(rownames(similarity_matrix) %in% names(clusters))) {
+        stop("All similarity_matrix terms must be present in clusters.")
+    }
+    if (!is.numeric(threshold) || length(threshold) != 1L || is.na(threshold)) {
+        stop("threshold must be a single numeric value.")
+    }
+    if (threshold < 0 || threshold > 1) {
+        stop("threshold must be between 0 and 1.")
+    }
+    if (!is.null(max_nodes) && (!is.numeric(max_nodes) || max_nodes < 1)) {
+        stop("max_nodes must be NULL or a positive integer.")
+    }
+    if (!is.null(min_degree) && (!is.numeric(min_degree) || min_degree < 0)) {
+        stop("min_degree must be NULL or a non-negative integer.")
+    }
+    if (!is.logical(print_plot) || length(print_plot) != 1L) {
+        stop("print_plot must be TRUE or FALSE.")
+    }
+    if (!is.null(node_sizes)) {
+        if (!is.numeric(node_sizes)) {
+            stop("node_sizes must be a numeric vector or NULL.")
+        }
+        if (is.null(names(node_sizes))) {
+            stop("node_sizes must be a named vector with term names.")
+        }
+    }
+    if (!is.logical(show_density) || length(show_density) != 1L) {
+        stop("show_density must be TRUE or FALSE.")
+    }
+    if (!is.null(seed) && (!is.numeric(seed) || length(seed) != 1L || is.na(seed))) {
+        stop("seed must be a single numeric value or NULL.")
+    }
+
+    save_plot_options <- c("svg", "pdf", "png")
+    if (!is.null(save_plot) && !(save_plot %in% save_plot_options)) {
+        stop(
+            "save_plot must be one of: ",
+            paste(save_plot_options, collapse = ", "),
+            ", or NULL."
+        )
+    }
+
+    invisible(TRUE)
+}
+
 
