@@ -84,8 +84,8 @@
 #'     node_sizes = NULL,
 #'     show_density = TRUE,
 #'     seed = 123,
-#'     save_plot = "png",
-#'     print_plot = TRUE,
+#'     save_plot = NULL,
+#'     print_plot = FALSE,
 #'     path = NULL
 #' )
 #'
