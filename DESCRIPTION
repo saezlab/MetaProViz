@@ -54,6 +54,7 @@ Imports:
     gtools,
     hash,
     igraph,
+    ggraph,
     inflection,
     limma,
     logger,
