@@ -59,6 +59,36 @@
 #'     \item{similarity_matrix}{Term-by-term similarity matrix.}
 #'     \item{distance_matrix}{Term-by-term distance matrix (1 - similarity).}
 #'     \item{graph_plot}{Graph plot returned by viz_graph.}
+#' 
+#' @examples
+#' 
+#' # Load example data
+#' d <- metsigdb_kegg()
+#' 
+#' # Run clustering with graph plotting
+#' r <- cluster_pk(
+#'     d,
+#'     metadata_info = c(
+#'         metabolite_column = "MetaboliteID",
+#'         pathway_column = "term"
+#'     ),
+#'     input_format = "long",
+#'     similarity = "jaccard",
+#'     threshold = 0.2,
+#'     clust = "community",
+#'     min = 2,
+#'     plot_name = "GraphExample_long_format",
+#'     save_plot = "png",
+#'     min_degree = 1,
+#'     seed = 123,
+#'     show_density = TRUE,
+#'     max_nodes = 1000
+#' ) 
+#' 
+#' print(head(r$cluster_summary))
+#' print(r$graph_plot)
+#' 
+#' ## add an example for an enrichment format result
 #'
 #' @importFrom dplyr group_by summarize ungroup mutate select left_join
 #' @importFrom dplyr across n distinct filter tibble arrange

@@ -45,6 +45,49 @@
 #'     \strong{default: NULL}
 #'
 #' @return Graph plot as a ggplot object.
+#' 
+#' @examples
+#' 
+#' # Load example data
+#' d <- metsigdb_kegg()
+#' 
+#' # Run clustering with graph plotting
+#' 
+#' # Run clustering with graph plotting
+#' r <- cluster_pk(
+#'     d,
+#'     metadata_info = c(
+#'         metabolite_column = "MetaboliteID",
+#'         pathway_column = "term"
+#'     ),
+#'     input_format = "long",
+#'     similarity = "jaccard",
+#'     threshold = 0.2,
+#'     clust = "community",
+#'     min = 2,
+#'     plot_name = "GraphExample_long_format",
+#'     save_plot = "png",
+#'     min_degree = 1,
+#'     seed = 123,
+#'     show_density = FALSE,
+#'     max_nodes = 1000
+#' ) 
+#' 
+#' # run graph plotting separately from clustering output but without node_sizes
+#' viz_graph(
+#'     r$similarity_matrix,
+#'     r$clusters,
+#'     threshold = 0.5,
+#'     plot_name = "ClusterGraph",
+#'     max_nodes = NULL,
+#'     min_degree = NULL,
+#'     node_sizes = NULL,
+#'     show_density = TRUE,
+#'     seed = 123,
+#'     save_plot = "png",
+#'     print_plot = TRUE,
+#'     path = NULL
+#' )
 #'
 #' @importFrom igraph graph_from_adjacency_matrix components degree induced_subgraph
 #' @importFrom ggraph ggraph geom_edge_link geom_node_point geom_node_text
@@ -210,8 +253,8 @@ viz_graph <- function(
         file_name = plot_name,
         core = FALSE,
         print_plot = FALSE,
-        plot_height = 5000,
-        plot_width = 12000,
+        plot_height = 3000,
+        plot_width = 8000,
         plot_unit = "px"
     )
 
