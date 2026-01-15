@@ -52,8 +52,6 @@
 #' d <- metsigdb_kegg()
 #' 
 #' # Run clustering with graph plotting
-#' 
-#' # Run clustering with graph plotting
 #' r <- cluster_pk(
 #'     d,
 #'     metadata_info = c(
@@ -94,6 +92,7 @@
 #' @importFrom ggraph theme_graph
 #' @importFrom ggrepel geom_text_repel
 #' @importFrom ggplot2 labs
+#' @importFrom grDevices chull
 #' @importFrom logger log_info log_trace
 #' @export
 viz_graph <- function(
@@ -110,6 +109,9 @@ viz_graph <- function(
     print_plot = TRUE,
     path = NULL
 ) {
+    # NSE vs. R CMD check workaround
+    cluster <- name <- node_size <- weight <- x <- y <- .data <- NULL
+
     # # ------------ Create log file ----------- ##
     # metaproviz_init()
     log_info("viz_graph: Graph plot visualization")
@@ -231,7 +233,7 @@ viz_graph <- function(
             ) +
             geom_node_text(aes(label = name), repel = TRUE, size = 3) +
             labs(title = plot_name) +
-            theme_graph()
+            theme_graph(base_family = "sans")
     }
 
     # ---- Save and return -------------------------------------------------

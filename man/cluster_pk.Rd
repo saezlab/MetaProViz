@@ -123,15 +123,15 @@ r <- cluster_pk(
     clust = "community",
     min = 2,
     plot_name = "GraphExample_long_format",
-    save_plot = "png",
+    save_plot = NULL,
     min_degree = 1,
+    print_plot = FALSE,
     seed = 123,
     show_density = TRUE,
     max_nodes = 1000
 ) 
 
 print(head(r$cluster_summary))
-print(r$graph_plot)
 
 ## add an example for an enrichment format result
 

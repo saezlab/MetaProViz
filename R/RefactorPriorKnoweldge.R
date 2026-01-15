@@ -2345,7 +2345,10 @@ cluster_pk <- function(
 ) {
 
     # NSE vs. R CMD check workaround
-    cluster <- .data <- NULL
+    .data <- cluster <- MetaboliteIDs <- n_ids <- n_terms <- node_size <- x <- y <- weight <- NULL
+
+    ## initialize log file
+    metaproviz_init()
 
     # ---- Input checks ----------------------------------------------------
     similarity <- match.arg(similarity)
