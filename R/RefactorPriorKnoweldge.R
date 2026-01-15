@@ -2369,13 +2369,21 @@ cluster_pk <- function(
     check_param_cluster_pk(
         data = data,
         metadata_info = metadata_info,
+        similarity = similarity,
+        correlation_method = correlation_method,
         input_format = input_format,
         delimiter = delimiter,
         threshold = threshold,
+        clust = clust,
+        hclust_method = hclust_method,
         min = min,
+        max_nodes = max_nodes,
+        min_degree = min_degree,
         node_size_column = node_size_column,
         show_density = show_density,
-        seed = seed
+        seed = seed,
+        save_plot = save_plot,
+        print_plot = print_plot
     )
 
     id_col <- metadata_info[["metabolite_column"]]

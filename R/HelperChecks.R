@@ -1615,13 +1615,21 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
 #'
 #' @param data Data frame for clustering.
 #' @param metadata_info Named vector with metabolite_column and pathway_column.
+#' @param similarity Similarity method.
+#' @param correlation_method Correlation method (if similarity is correlation).
 #' @param input_format Input format of data ("long" or "enrichment").
 #' @param delimiter Delimiter for enrichment format.
 #' @param threshold Similarity threshold.
+#' @param clust Clustering method.
+#' @param hclust_method Hierarchical clustering method.
 #' @param min Minimum cluster size.
+#' @param max_nodes Maximum nodes for plotting.
+#' @param min_degree Minimum degree filter for graph plotting.
 #' @param node_size_column Optional numeric column name for node sizing.
 #' @param show_density Logical flag to draw hull background.
 #' @param seed Optional seed for reproducibility.
+#' @param save_plot File extension or NULL.
+#' @param print_plot Logical flag for printing.
 #'
 #' @return Invisible TRUE if checks pass.
 #'
@@ -1629,13 +1637,21 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
 check_param_cluster_pk <- function(
     data,
     metadata_info,
+    similarity,
+    correlation_method,
     input_format,
     delimiter,
     threshold,
+    clust,
+    hclust_method,
     min,
+    max_nodes,
+    min_degree,
     node_size_column,
     show_density,
-    seed
+    seed,
+    save_plot,
+    print_plot
 ) {
     if (!is.data.frame(data)) {
         stop("`data` must be a data frame.")
@@ -1665,6 +1681,19 @@ check_param_cluster_pk <- function(
         }
     }
 
+    if (!is.character(similarity) || length(similarity) != 1L) {
+        stop("`similarity` must be a single character string.")
+    }
+    if (!is.character(correlation_method) || length(correlation_method) != 1L) {
+        stop("`correlation_method` must be a single character string.")
+    }
+    if (!is.character(clust) || length(clust) != 1L) {
+        stop("`clust` must be a single character string.")
+    }
+    if (!is.character(hclust_method) || length(hclust_method) != 1L) {
+        stop("`hclust_method` must be a single character string.")
+    }
+
     if (!is.numeric(threshold) || length(threshold) != 1L || is.na(threshold)) {
         stop("`threshold` must be a single numeric value.")
     }
@@ -1674,6 +1703,13 @@ check_param_cluster_pk <- function(
 
     if (!is.numeric(min) || length(min) != 1L || min < 1) {
         stop("`min` must be a single integer >= 1.")
+    }
+
+    if (!is.null(max_nodes) && (!is.numeric(max_nodes) || max_nodes < 1)) {
+        stop("`max_nodes` must be NULL or a positive integer.")
+    }
+    if (!is.null(min_degree) && (!is.numeric(min_degree) || min_degree < 0)) {
+        stop("`min_degree` must be NULL or a non-negative integer.")
     }
 
     if (!is.null(node_size_column)) {
@@ -1694,6 +1730,19 @@ check_param_cluster_pk <- function(
 
     if (!is.null(seed) && (!is.numeric(seed) || length(seed) != 1L || is.na(seed))) {
         stop("`seed` must be a single numeric value or NULL.")
+    }
+
+    save_plot_options <- c("svg", "pdf", "png")
+    if (!is.null(save_plot) && !(save_plot %in% save_plot_options)) {
+        stop(
+            "save_plot must be one of: ",
+            paste(save_plot_options, collapse = ", "),
+            ", or NULL."
+        )
+    }
+
+    if (!is.logical(print_plot) || length(print_plot) != 1L) {
+        stop("`print_plot` must be TRUE or FALSE.")
     }
 
     invisible(TRUE)
