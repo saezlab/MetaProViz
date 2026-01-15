@@ -218,7 +218,7 @@ viz_graph <- function(
             geom_node_point(aes(color = cluster), size = 3) +
             geom_node_text(aes(label = name), repel = TRUE, size = 3) +
             labs(title = plot_name) +
-            theme_graph()
+            theme_graph(base_family = "sans")
     } else {
         graph_plot <-
             ggraph(layout) +
