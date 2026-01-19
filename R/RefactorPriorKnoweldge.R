@@ -2496,6 +2496,7 @@ cluster_pk <- function(
         }
     } else { # correlation
         metabolites <- unique(unlist(term_metabolites$MetaboliteIDs))
+        metabolites <- metabolites[!is.na(metabolites) & metabolites != ""]
         binary_matrix <-
             matrix(
                 0,
@@ -2505,9 +2506,19 @@ cluster_pk <- function(
             )
         for (i in seq_len(n_terms)) {
             ids <- term_metabolites$MetaboliteIDs[[i]]
+            ids <- ids[!is.na(ids) & ids != ""]
             binary_matrix[i, colnames(binary_matrix) %in% ids] <- 1
         }
+        
         corr <- cor(t(binary_matrix), method = correlation_method)
+        if (anyNA(corr)) {
+            # This typically happens when one or more term vectors are constant (sd = 0)
+            # Set NA similarities to 0 so igraph never sees NA in adjacency.
+            log_warn(
+                "Correlation similarity produced NA values (likely due to zero-variance term vectors). Setting NA similarities to 0."
+            )
+            corr[is.na(corr)] <- 0
+        }
         corr[corr < 0] <- 0
         diag(corr) <- 1
         similarity_matrix <- corr
