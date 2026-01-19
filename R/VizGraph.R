@@ -107,7 +107,10 @@ viz_graph <- function(
     seed = NULL,
     save_plot = "svg",
     print_plot = TRUE,
-    path = NULL
+    path = NULL,
+    plot_width = 3000,
+    plot_height = 2000,
+    plot_unit = "px"
 ) {
     # NSE vs. R CMD check workaround
     cluster <- name <- node_size <- weight <- x <- y <- .data <- NULL
@@ -255,9 +258,9 @@ viz_graph <- function(
         file_name = plot_name,
         core = FALSE,
         print_plot = FALSE,
-        plot_height = 3000,
-        plot_width = 8000,
-        plot_unit = "px"
+        plot_height = plot_height,
+        plot_width = plot_width,
+        plot_unit = plot_unit
     )
 
     if (print_plot) {
