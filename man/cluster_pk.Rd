@@ -12,6 +12,7 @@ cluster_pk(
   input_format = c("long", "enrichment"),
   delimiter = "/",
   threshold = 0.5,
+  plot_threshold = 0,
   clust = c("components", "community", "hierarchical"),
   hclust_method = "average",
   min = 2,
@@ -52,6 +53,9 @@ The \code{metabolite_column} entry in metadata_info is interpreted accordingly.}
 
 \item{threshold}{Similarity cutoff for keeping edges (applies to all
 clustering modes). Default = 0.5.}
+
+\item{plot_threshold}{Similarity cutoff for plotting edges in viz_graph.
+Default = 0 (plot all edges with similarity > 0).}
 
 \item{clust}{Clustering strategy: "components" (connected components on
 thresholded unweighted graph), "community" (Louvain on thresholded
@@ -100,6 +104,7 @@ A list with:
 \item{clusters}{Named vector of term -> cluster assignment.}
 \item{similarity_matrix}{Term-by-term similarity matrix.}
 \item{distance_matrix}{Term-by-term distance matrix (1 - similarity).}
+\item{node_sizes}{Named numeric vector of node sizes used in plotting (or NULL).}
 \item{graph_plot}{Graph plot returned by viz_graph.}
 }
 \description{

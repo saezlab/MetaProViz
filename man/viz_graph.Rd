@@ -7,7 +7,7 @@
 viz_graph(
   similarity_matrix,
   clusters,
-  threshold = 0.5,
+  plot_threshold = 0.5,
   plot_name = "ClusterGraph",
   max_nodes = NULL,
   min_degree = NULL,
@@ -16,7 +16,10 @@ viz_graph(
   seed = NULL,
   save_plot = "svg",
   print_plot = TRUE,
-  path = NULL
+  path = NULL,
+  plot_width = 3000,
+  plot_height = 2000,
+  plot_unit = "px"
 )
 }
 \arguments{
@@ -25,7 +28,7 @@ Row/column names must match \code{clusters} names.}
 
 \item{clusters}{Named vector of cluster labels for each term (e.g., "cluster1").}
 
-\item{threshold}{Similarity threshold used to define edges. Values below the
+\item{plot_threshold}{Similarity threshold used to define edges. Values below the
 threshold are removed. Default = 0.5.}
 
 \item{plot_name}{\emph{Optional: } String added to output files of the plot.
@@ -66,8 +69,6 @@ Graph visualization for clustered terms
 d <- metsigdb_kegg()
 
 # Run clustering with graph plotting
-
-# Run clustering with graph plotting
 r <- cluster_pk(
     d,
     metadata_info = c(
@@ -91,7 +92,7 @@ r <- cluster_pk(
 viz_graph(
     r$similarity_matrix,
     r$clusters,
-    threshold = 0.5,
+    plot_threshold = 0.5,
     plot_name = "ClusterGraph",
     max_nodes = NULL,
     min_degree = NULL,
