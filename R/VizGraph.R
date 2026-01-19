@@ -24,7 +24,7 @@
 #' @param similarity_matrix Square numeric matrix of term similarity values.
 #'     Row/column names must match `clusters` names.
 #' @param clusters Named vector of cluster labels for each term (e.g., "cluster1").
-#' @param threshold Similarity threshold used to define edges. Values below the
+#' @param plot_threshold Similarity threshold used to define edges. Values below the
 #'     threshold are removed. Default = 0.5.
 #' @param plot_name \emph{Optional: } String added to output files of the plot.
 #'     Default = "ClusterGraph".
@@ -75,7 +75,7 @@
 #' viz_graph(
 #'     r$similarity_matrix,
 #'     r$clusters,
-#'     threshold = 0.5,
+#'     plot_threshold = 0.5,
 #'     plot_name = "ClusterGraph",
 #'     max_nodes = NULL,
 #'     min_degree = NULL,
@@ -98,7 +98,7 @@
 viz_graph <- function(
     similarity_matrix,
     clusters,
-    threshold = 0.5,
+    plot_threshold = 0.5,
     plot_name = "ClusterGraph",
     max_nodes = NULL,
     min_degree = NULL,
@@ -123,7 +123,7 @@ viz_graph <- function(
     check_param_VizGraph(
         similarity_matrix = similarity_matrix,
         clusters = clusters,
-        threshold = threshold,
+        plot_threshold = plot_threshold,
         max_nodes = max_nodes,
         min_degree = min_degree,
         node_sizes = node_sizes,
@@ -135,7 +135,7 @@ viz_graph <- function(
 
     # ---- Create adjacency ------------------------------------------------
     adj <- similarity_matrix
-    adj[adj < threshold] <- 0
+    adj[adj < plot_threshold] <- 0
     diag(adj) <- 0
 
     g <- graph_from_adjacency_matrix(
@@ -211,6 +211,13 @@ viz_graph <- function(
         }
     }
 
+    cluster_levels <- sort(unique(layout$cluster))
+    cluster_palette <- grDevices::hcl.colors(length(cluster_levels), "Dynamic")
+    names(cluster_palette) <- cluster_levels
+    if ("None" %in% cluster_levels) {
+        cluster_palette["None"] <- "grey70"
+    }
+
     if (is.null(node_size_vec)) {
         graph_plot <-
             ggraph(layout) +
@@ -219,6 +226,8 @@ viz_graph <- function(
             ggraph::scale_edge_width(range = c(0.2, 1.2), name = "Edge weight (similarity)") +
             ggraph::scale_edge_alpha(range = c(0.2, 0.8), guide = "none") +
             geom_node_point(aes(color = cluster), size = 3) +
+            ggplot2::scale_color_manual(values = cluster_palette, drop = FALSE) +
+            ggplot2::scale_fill_manual(values = cluster_palette, drop = FALSE) +
             geom_node_text(aes(label = name), repel = TRUE, size = 3) +
             labs(title = plot_name) +
             theme_graph(base_family = "sans")
@@ -230,6 +239,8 @@ viz_graph <- function(
             ggraph::scale_edge_width(range = c(0.2, 1.2), name = "Edge weight (similarity)") +
             ggraph::scale_edge_alpha(range = c(0.2, 0.8), guide = "none") +
             geom_node_point(aes(color = cluster, size = node_size)) +
+            ggplot2::scale_color_manual(values = cluster_palette, drop = FALSE) +
+            ggplot2::scale_fill_manual(values = cluster_palette, drop = FALSE) +
             ggplot2::scale_size(
                 range = c(1, 8),
                 name = ifelse(is.null(node_size_label), "Node size", node_size_label)

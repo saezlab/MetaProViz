@@ -1620,6 +1620,7 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
 #' @param input_format Input format of data ("long" or "enrichment").
 #' @param delimiter Delimiter for enrichment format.
 #' @param threshold Similarity threshold.
+#' @param plot_threshold Similarity threshold used for plotting.
 #' @param clust Clustering method.
 #' @param hclust_method Hierarchical clustering method.
 #' @param min Minimum cluster size.
@@ -1642,6 +1643,7 @@ check_param_cluster_pk <- function(
     input_format,
     delimiter,
     threshold,
+    plot_threshold,
     clust,
     hclust_method,
     min,
@@ -1700,6 +1702,12 @@ check_param_cluster_pk <- function(
     if (threshold < 0 || threshold > 1) {
         stop("`threshold` must be between 0 and 1 (similarity scale).")
     }
+    if (!is.numeric(plot_threshold) || length(plot_threshold) != 1L || is.na(plot_threshold)) {
+        stop("`plot_threshold` must be a single numeric value.")
+    }
+    if (plot_threshold < 0 || plot_threshold > 1) {
+        stop("`plot_threshold` must be between 0 and 1 (similarity scale).")
+    }
 
     if (!is.numeric(min) || length(min) != 1L || min < 1) {
         stop("`min` must be a single integer >= 1.")
@@ -1752,7 +1760,7 @@ check_param_cluster_pk <- function(
 #'
 #' @param similarity_matrix Numeric matrix of similarities.
 #' @param clusters Named vector of cluster labels.
-#' @param threshold Similarity threshold.
+#' @param plot_threshold Similarity threshold.
 #' @param max_nodes Maximum nodes for plotting.
 #' @param min_degree Minimum degree filter.
 #' @param node_sizes Named numeric vector of node sizes.
@@ -1767,7 +1775,7 @@ check_param_cluster_pk <- function(
 check_param_VizGraph <- function(
     similarity_matrix,
     clusters,
-    threshold,
+    plot_threshold,
     max_nodes,
     min_degree,
     node_sizes,
@@ -1794,11 +1802,11 @@ check_param_VizGraph <- function(
     if (!all(rownames(similarity_matrix) %in% names(clusters))) {
         stop("All similarity_matrix terms must be present in clusters.")
     }
-    if (!is.numeric(threshold) || length(threshold) != 1L || is.na(threshold)) {
-        stop("threshold must be a single numeric value.")
+    if (!is.numeric(plot_threshold) || length(plot_threshold) != 1L || is.na(plot_threshold)) {
+        stop("plot_threshold must be a single numeric value.")
     }
-    if (threshold < 0 || threshold > 1) {
-        stop("threshold must be between 0 and 1.")
+    if (plot_threshold < 0 || plot_threshold > 1) {
+        stop("plot_threshold must be between 0 and 1.")
     }
     if (!is.null(max_nodes) && (!is.numeric(max_nodes) || max_nodes < 1)) {
         stop("max_nodes must be NULL or a positive integer.")

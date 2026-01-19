@@ -2245,6 +2245,8 @@ checkmatch_pk_to_data <- function(
 #'     "enrichment". Ignored for input_format = "long". Default = "/".
 #' @param threshold Similarity cutoff for keeping edges (applies to all
 #'     clustering modes). Default = 0.5.
+#' @param plot_threshold Similarity cutoff for plotting edges in viz_graph.
+#'     Default = 0 (plot all edges with similarity > 0).
 #' @param clust Clustering strategy: "components" (connected components on
 #'     thresholded unweighted graph), "community" (Louvain on thresholded
 #'     weighted graph), or "hierarchical" (hclust on distance = 1 - similarity).
@@ -2280,6 +2282,7 @@ checkmatch_pk_to_data <- function(
 #'     \item{clusters}{Named vector of term -> cluster assignment.}
 #'     \item{similarity_matrix}{Term-by-term similarity matrix.}
 #'     \item{distance_matrix}{Term-by-term distance matrix (1 - similarity).}
+#'     \item{node_sizes}{Named numeric vector of node sizes used in plotting (or NULL).}
 #'     \item{graph_plot}{Graph plot returned by viz_graph.}
 #' 
 #' @examples
@@ -2330,6 +2333,7 @@ cluster_pk <- function(
     input_format = c("long", "enrichment"),
     delimiter = "/",
     threshold = 0.5,
+    plot_threshold = 0,
     clust = c("components", "community", "hierarchical"),
     hclust_method = "average",
     min = 2,
@@ -2374,6 +2378,7 @@ cluster_pk <- function(
         input_format = input_format,
         delimiter = delimiter,
         threshold = threshold,
+        plot_threshold = plot_threshold,
         clust = clust,
         hclust_method = hclust_method,
         min = min,
@@ -2626,7 +2631,7 @@ cluster_pk <- function(
     graph_plot <- viz_graph(
         similarity_matrix = similarity_matrix,
         clusters = cluster_labels,
-        threshold = threshold,
+        plot_threshold = plot_threshold,
         plot_name = plot_name,
         max_nodes = max_nodes,
         min_degree = min_degree,
@@ -2644,6 +2649,7 @@ cluster_pk <- function(
         clusters = cluster_labels,
         similarity_matrix = similarity_matrix,
         distance_matrix = distance_matrix,
+        node_sizes = node_sizes,
         graph_plot = graph_plot
     )
 
