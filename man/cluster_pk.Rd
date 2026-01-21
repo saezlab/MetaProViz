@@ -150,7 +150,7 @@ RES <- standard_ora(
     input_pathway = kegg_pathways
 )
 
-enrichment_result_filtered <- RES$ClusterGosummary \%>\% dplyr::filterfilter(p.adjust < 0.5)
+enrichment_result_filtered <- RES$ClusterGosummary \%>\% dplyr::filter(p.adjust < 0.5)
 
 res <- cluster_pk(
    enrichment_result_filtered,
