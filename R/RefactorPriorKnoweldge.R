@@ -2288,11 +2288,11 @@ checkmatch_pk_to_data <- function(
 #' @examples
 #' 
 #' # Load example data
-#' d <- metsigdb_kegg()
+#' kegg_pathways <- metsigdb_kegg()
 #' 
 #' # Run clustering with graph plotting
 #' r <- cluster_pk(
-#'     d,
+#'     kegg_pathways,
 #'     metadata_info = c(
 #'         metabolite_column = "MetaboliteID",
 #'         pathway_column = "term"
@@ -2313,7 +2313,40 @@ checkmatch_pk_to_data <- function(
 #' 
 #' print(head(r$cluster_summary))
 #' 
-#' ## add an example for an enrichment format result
+#' ## example for an enrichment format result
+#' 
+#' data(intracell_dma) # loads the object into your environment
+#' DMAres <- intracell_dma %>%
+#'     dplyr::filter(!is.na(KEGGCompound)) %>%
+#'     tibble::column_to_rownames("KEGGCompound") %>%
+#'     dplyr::select(-"Metabolite")
+#' RES <- standard_ora(
+#'     data = DMAres,
+#'     input_pathway = kegg_pathways
+#' )
+#' 
+#' enrichment_result_filtered <- RES$ClusterGosummary %>% dplyr::filterfilter(p.adjust < 0.5)
+#' 
+#' res <- cluster_pk(
+#'    enrichment_result_filtered,
+#'    metadata_info = c(
+#'        metabolite_column = "Metabolites_in_pathway",
+#'        pathway_column = "ID"
+#'    ),
+#'    input_format = "enrichment",
+#'    similarity = "jaccard",
+#'    threshold = 0.4,
+#'    clust = "community",
+#'    min = 1,
+#'    node_size_column = "percentage_of_Pathway_detected",
+#'    save_plot = NULL,
+#'    plot_name = "GraphExample_enrichment_format",
+#'    print_plot = FALSE,
+#'    min_degree = 0,
+#'    seed = 42,
+#'    show_density = TRUE,
+#'    max_nodes = 1000
+#')
 #'
 #' @importFrom dplyr group_by summarize ungroup mutate select left_join
 #' @importFrom dplyr across n distinct filter tibble arrange
