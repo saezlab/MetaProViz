@@ -344,6 +344,30 @@ translate_id <- function(
 # Find additional potential IDs
 #
 
+
+#' @importFrom rlang exec !!!
+#' @importFrom purrr map pmap_chr
+#' @importFrom logger log_warn
+#' @noRd
+.log_df <- function(d) {
+
+    match.call() %>% {deparse(.$d)} %>% log_warn('DF: %s', .)
+
+    d %>% dim %>% {exec(log_warn, 'DF of size %i x %i', !!!.)}
+
+    d %>%
+    map(class) %>%
+    sprintf('%s <%s>', names(.), .) %>%
+    paste0(collapse = ', ') %>%
+    log_warn('Columns: %s', .)
+
+    log_warn('First 3 rows:')
+
+    d %>% head(3L) %>% pmap_chr(~paste0(c(...), collapse = '|')) %>% log_warn()
+
+}
+
+
 #' Find additional potential IDs for  "kegg", "pubchem", "chebi", "hmdb"
 #'
 #' @param data dataframe with at least one column with the detected metabolite IDs (one
@@ -374,7 +398,8 @@ translate_id <- function(
 #' @importFrom purrr map_chr map_lgl map_int
 #' @importFrom tidyselect all_of starts_with
 #' @importFrom rlang !!! !! := sym syms
-#' @importFrom OmnipathR id_types translate_ids
+#' @importFrom OmnipathR id_types translate_ids ensembl_organisms
+#' @importFrom OmnipathR uniprot_organisms oma_organisms
 #' @importFrom logger log_warn log_trace
 #' @importFrom stringr str_to_lower str_split
 #' @importFrom utils data
@@ -799,7 +824,6 @@ equivalent_id <- function(
         core = FALSE,
         print_plot = FALSE
     )
-
 
     return(invisible(OutputDF))
 }
@@ -2196,272 +2220,484 @@ checkmatch_pk_to_data <- function(
     invisible(return(ResList))
 }
 
+##
+## Cluster prior knowledge by pathway overlap
+##
 
-#
-# cluster Prior Knowledge
-#
-
-#' Deal with pathway overlap in prior knowledge
+#' Cluster terms in prior knowledge by set overlap
 #'
-#' @param data dataframe with at least one column with the target (e.g. metabolite) and
-#'     a column source (e.g. term).
-#' @param metadata_info = c(InputID="MetaboliteID", grouping_variable="term"),
+#' @param data Long data frame with one ID per row, or enrichment-style table
+#'     with a delimited metabolite list per term (see input_format).
+#' @param metadata_info List with entries `metabolite_column` (metabolite ID
+#'     column or delimited list column) and `pathway_column` (term column).
+#'     Defaults to `c(metabolite_column = "MetaboliteID", pathway_column = "term")`.
+#' @param similarity Similarity measure between term ID sets. Options:
+#'     "jaccard" (default), "overlap_coefficient", or "correlation".
+#'     Jaccard similarity is |A ∩ B| / |A ∪ B|. Overlap coefficient is
+#'     |A ∩ B| / min(|A|, |B|). Jaccard is stricter for large sets, while
+#'     overlap_coefficient is more permissive for nested sets.
+#' @param correlation_method Correlation method when `similarity = "correlation"`.
+#'     One of "pearson", "spearman", "kendall". Ignored otherwise.
+#' @param input_format Input format of `data`. Use "long" for one ID per row
+#'     (default) or "enrichment" for one term per row with a delimited ID list.
+#'     The `metabolite_column` entry in metadata_info is interpreted accordingly.
+#' @param delimiter Delimiter for metabolite ID lists when input_format =
+#'     "enrichment". Ignored for input_format = "long". Default = "/".
+#' @param threshold Similarity cutoff for keeping edges (applies to all
+#'     clustering modes). Default = 0.5.
+#' @param plot_threshold Similarity cutoff for plotting edges in viz_graph.
+#'     Default = 0 (plot all edges with similarity > 0).
+#' @param clust Clustering strategy: "components" (connected components on
+#'     thresholded unweighted graph), "community" (Louvain on thresholded
+#'     weighted graph), or "hierarchical" (hclust on distance = 1 - similarity).
+#' @param hclust_method Linkage method for hierarchical clustering. One of
+#'     "average" (default), "single", "complete", "ward.D", "ward.D2",
+#'     "mcquitty", "median", "centroid". Used only when clust = "hierarchical".
+#' @param min Minimum cluster size; smaller clusters are relabeled to "None".
+#'     Default = 2.
+#' @param plot_name \emph{Optional: } String added to output files of the plot.
+#'     Default = "ClusterGraph".
+#' @param max_nodes \emph{Optional: } Maximum nodes for plotting. If set,
+#'     keeps nodes from the largest component up to this limit (by degree).
+#'     Used only for the graph plot. Default = 10000.
+#' @param min_degree \emph{Optional: } Minimum degree filter for graph plotting.
+#'     Used only for the graph plot. Default = 1.
+#' @param node_size_column \emph{Optional: } Numeric column name from `data`
+#'     used to scale node sizes in the graph. Aggregated per term (mean) when
+#'     multiple rows map to the same term. Default = NULL.
+#' @param show_density \emph{Optional: } If TRUE, add a hull background per
+#'     cluster to the graph. Default = FALSE.
+#' @param seed \emph{Optional: } Random seed for graph layout reproducibility.
+#'     Default = NULL.
+#' @param save_plot \emph{Optional: } Select the file type of output plots.
+#'     Options are svg, pdf, png or NULL. \strong{Default = "svg"}
+#' @param print_plot \emph{Optional: } If TRUE prints an overview of resulting
+#'     plots. \strong{Default = FALSE}
+#' @param path {Optional:} String which is added to the resulting folder name.
+#'     \strong{default: NULL}
 #'
+#' @return A list with:
+#'     \item{data}{Input data with a `cluster` column added.}
+#'     \item{cluster_summary}{Summary of cluster sizes and percentages.}
+#'     \item{clusters}{Named vector of term -> cluster assignment.}
+#'     \item{similarity_matrix}{Term-by-term similarity matrix.}
+#'     \item{distance_matrix}{Term-by-term distance matrix (1 - similarity).}
+#'     \item{node_sizes}{Named numeric vector of node sizes used in plotting (or NULL).}
+#'     \item{graph_plot}{Graph plot returned by viz_graph.}
+#' 
 #' @examples
-#' metsigdb_kegg()
+#' 
+#' # Load example data
+#' kegg_pathways <- metsigdb_kegg()
+#' 
+#' # Run clustering with graph plotting
+#' r <- cluster_pk(
+#'     kegg_pathways,
+#'     metadata_info = c(
+#'         metabolite_column = "MetaboliteID",
+#'         pathway_column = "term"
+#'     ),
+#'     input_format = "long",
+#'     similarity = "jaccard",
+#'     threshold = 0.2,
+#'     clust = "community",
+#'     min = 2,
+#'     plot_name = "GraphExample_long_format",
+#'     save_plot = NULL,
+#'     min_degree = 1,
+#'     print_plot = FALSE,
+#'     seed = 123,
+#'     show_density = TRUE,
+#'     max_nodes = 1000
+#' ) 
+#' 
+#' print(head(r$cluster_summary))
+#' 
+#' ## example for an enrichment format result
+#' 
+#' data(intracell_dma) # loads the object into your environment
+#' DMAres <- intracell_dma %>%
+#'     dplyr::filter(!is.na(KEGGCompound)) %>%
+#'     tibble::column_to_rownames("KEGGCompound") %>%
+#'     dplyr::select(-"Metabolite")
+#' RES <- standard_ora(
+#'     data = DMAres,
+#'     input_pathway = kegg_pathways
+#' )
+#' 
+#' enrichment_result_filtered <- RES$ClusterGosummary %>% dplyr::filter(p.adjust < 0.5)
+#' 
+#' res <- cluster_pk(
+#'    enrichment_result_filtered,
+#'    metadata_info = c(
+#'        metabolite_column = "Metabolites_in_pathway",
+#'        pathway_column = "ID"
+#'    ),
+#'    input_format = "enrichment",
+#'    similarity = "jaccard",
+#'    threshold = 0.4,
+#'    clust = "community",
+#'    min = 1,
+#'    node_size_column = "percentage_of_Pathway_detected",
+#'    save_plot = NULL,
+#'    plot_name = "GraphExample_enrichment_format",
+#'    print_plot = FALSE,
+#'    min_degree = 0,
+#'    seed = 42,
+#'    show_density = TRUE,
+#'    max_nodes = 1000
+#')
 #'
-#' @importFrom dplyr bind_rows filter group_by left_join mutate
-#' @importFrom dplyr select summarize ungroup
-#' @importFrom igraph graph_from_adjacency_matrix components
-#' @importFrom stats cor as.dist cutree hclust
-#' @noRd
+#' @importFrom dplyr group_by summarize ungroup mutate select left_join
+#' @importFrom dplyr across n distinct filter tibble arrange
+#' @importFrom igraph graph_from_adjacency_matrix components cluster_louvain
+#' @importFrom stats cor as.dist hclust cutree
+#' @importFrom rlang sym !! .data
+#' @importFrom logger log_trace log_warn
+#' @export
 cluster_pk <- function(
-        data,
-        metadata_info = c(
-            InputID = "MetaboliteID",
-            grouping_variable = "term"
-            ),
-        clust = "Graph",
-        matrix = "percentage",
-        min = 2
-    ) {
-    # Notes about function arguments
-    # # data:    This can be either the original PK (e.g. KEGG pathways), but it
-    # #          can also be the output of enrichment results (--> meaning here
-    # #          we would cluster based on detection!)
-    # # clust:   Options: "Graph", "Hierarchical",
-    # # matrix:  Choose "pearson", "spearman", "kendall", or "percentage"
-    # # min:     # minimum pathways per cluster
-
-
-    # cluster PK before running enrichment analysis --> add another column that
-    # groups the data based on the pathway overlap:
-    # provide different options for clustering (e.g. % of overlap, semantics
-    # similarity) --> Ramp uses % of overlap, semnatics similarity:
-    # https://yulab-smu.top/biomedical-knowledge-mining-book/GOSemSim.html
+    data,
+    metadata_info = c(
+        metabolite_column = "MetaboliteID",
+        pathway_column = "term"
+    ),
+    similarity = c("jaccard", "overlap_coefficient", "correlation"),
+    correlation_method = "pearson",
+    input_format = c("long", "enrichment"),
+    delimiter = "/",
+    threshold = 0.5,
+    plot_threshold = 0,
+    clust = c("components", "community", "hierarchical"),
+    hclust_method = "average",
+    min = 2,
+    plot_name = "ClusterGraph",
+    max_nodes = 10000,
+    min_degree = 1,
+    node_size_column = NULL,
+    show_density = FALSE,
+    seed = NULL,
+    save_plot = "png",
+    print_plot = FALSE,
+    path = NULL
+) {
 
     # NSE vs. R CMD check workaround
-    Overlap <- Term1 <- Term2 <- distance_matrix <- cluster <- Type <- NULL
+    .data <- cluster <- MetaboliteIDs <- n_ids <- n_terms <- node_size <- x <- y <- weight <- NULL
 
+    ## initialize log file
+    metaproviz_init()
 
-    # # ------------------ Check Input ------------------- ##
+    # ---- Input checks ----------------------------------------------------
+    similarity <- match.arg(similarity)
+    input_format <- match.arg(input_format)
+    clust <- match.arg(clust)
 
-    # # ------------------ Create output folders and path ------------------- ##
-
-    # ###########################################################################
-    # # ------------------ cluster the data ------------------- ##
-    # 1. Create a list of unique MetaboliteIDs for each term
-    term_metabolites <-
-        data %>%
-        group_by(
-            !!sym(metadata_info[["grouping_variable"]])
-        ) %>%
-        summarize(
-            MetaboliteIDs = list(
-                unique(
-                    !!sym(metadata_info[["InputID"]])
-                )
+    if (clust == "hierarchical") {
+        hclust_method <- match.arg(
+            hclust_method,
+            c(
+                "average", "single", "complete",
+                "ward.D", "ward.D2",
+                "mcquitty", "median", "centroid"
             )
-        ) %>%
-        ungroup()
+        )
+    }
 
-    # 2. Create the overlap matrix based on different methods:
-    if (matrix == "percentage") {
-        # Compute pairwise overlaps
-        term_overlap <-
-            combn(
-                term_metabolites[[metadata_info[["grouping_variable"]]]],
-                2,
-                function(terms) {
-                    term1_ids <-
-                        term_metabolites$MetaboliteIDs[
-                            term_metabolites[[
-                                metadata_info[["grouping_variable"]]
-                            ]] == terms[1]
-                        ][[1]]
-                    term2_ids <-
-                        term_metabolites$MetaboliteIDs[
-                            term_metabolites[[
-                                metadata_info[["grouping_variable"]]
-                            ]] == terms[2]
-                        ][[1]]
+    check_param_cluster_pk(
+        data = data,
+        metadata_info = metadata_info,
+        similarity = similarity,
+        correlation_method = correlation_method,
+        input_format = input_format,
+        delimiter = delimiter,
+        threshold = threshold,
+        plot_threshold = plot_threshold,
+        clust = clust,
+        hclust_method = hclust_method,
+        min = min,
+        max_nodes = max_nodes,
+        min_degree = min_degree,
+        node_size_column = node_size_column,
+        show_density = show_density,
+        seed = seed,
+        save_plot = save_plot,
+        print_plot = print_plot
+    )
 
-                    overlap <-
-                        length(
-                            intersect(term1_ids, term2_ids)
-                        ) / length(union(term1_ids, term2_ids))
-                    data.frame(
-                        Term1 = terms[1],
-                        Term2 = terms[2],
-                        Overlap = overlap
-                    )
-                },
-                simplify = FALSE
+    id_col <- metadata_info[["metabolite_column"]]
+    term_col <- metadata_info[["pathway_column"]]
+    min <- as.integer(min)
+
+    if (similarity == "correlation") {
+        correlation_method <-
+            match.arg(correlation_method, c("pearson", "spearman", "kendall"))
+    }
+
+    # ---- Build term -> ID list ------------------------------------------
+    if (input_format == "long") {
+        # Drop duplicated term-ID rows to avoid inflating overlaps
+        data <- dplyr::distinct(data, !!sym(term_col), !!sym(id_col), .keep_all = TRUE)
+
+        # Warn if terms have no IDs
+        empty_terms <-
+            data %>%
+            dplyr::group_by(!!sym(term_col)) %>%
+            dplyr::summarize(
+                n_ids = sum(!is.na(!!sym(id_col)) & !!sym(id_col) != ""),
+                .groups = "drop"
             ) %>%
-            bind_rows()
-
-        # Create overlap matrix: An overlap matrix is typically used to quantify
-        # the degree of overlap between two sets or groups.
-        # overlap coefficient (or Jaccard Index) Overlap(A,B)= ∣A∪B∣ / ∣A∩B
-        # The overlap matrix measures the similarity between sets or groups
-        # based on common elements.
-        terms <-
-            unique(
-                c(
-                    term_overlap$Term1,
-                    term_overlap$Term2
-                )
+            dplyr::filter(n_ids == 0L)
+        if (nrow(empty_terms) > 0L) {
+            log_warn(
+                "Terms with no IDs will be dropped: %s",
+                paste(empty_terms[[term_col]], collapse = ", ")
             )
-        overlap_matrix <-
-            matrix(
-                1,
-                nrow = length(terms),
-                ncol = length(terms),
-                dimnames = list(terms, terms)
-            )
-        for (i in seq_len(nrow(term_overlap))) {
-            t1 <- term_overlap$Term1[i]
-            t2 <- term_overlap$Term2[i]
-            overlap_matrix[t1, t2] <- 1 - term_overlap$Overlap[i]
-            overlap_matrix[t2, t1] <- 1 - term_overlap$Overlap[i]
         }
-    } else {
-        # Create a binary matrix for correlation methods
-        terms <-
-            term_metabolites[[metadata_info[["grouping_variable"]]]]
-        metabolites <-
-            unique(
-                unlist(
-                    term_metabolites$MetaboliteIDs
-                )
-            )
-        # [[metadata_info[["InputID"]]]]
 
+        term_metabolites <-
+            data %>%
+            dplyr::filter(!is.na(!!sym(id_col)), !!sym(id_col) != "") %>%
+            dplyr::group_by(!!sym(term_col)) %>%
+            dplyr::summarize(
+                MetaboliteIDs = list(unique(!!sym(id_col))),
+                .groups = "drop"
+            )
+    } else {
+        # Enrichment input: split delimited metabolite IDs per term
+        term_metabolites <-
+            data %>%
+            dplyr::mutate(
+                MetaboliteIDs = strsplit(
+                    as.character(.data[[id_col]]),
+                    delimiter,
+                    fixed = TRUE
+                )
+            ) %>%
+            dplyr::mutate(
+                MetaboliteIDs = lapply(
+                    MetaboliteIDs,
+                    function(x) {
+                        x <- trimws(x)
+                        x[x != ""]
+                    }
+                )
+            ) %>%
+            dplyr::group_by(!!sym(term_col)) %>%
+            dplyr::summarize(
+                MetaboliteIDs = list(unique(unlist(MetaboliteIDs))),
+                .groups = "drop"
+            )
+
+        empty_terms <- term_metabolites[lengths(term_metabolites$MetaboliteIDs) == 0L, , drop = FALSE]
+        if (nrow(empty_terms) > 0L) {
+            log_warn(
+                "Terms with no IDs will be dropped: %s",
+                paste(empty_terms[[term_col]], collapse = ", ")
+            )
+        }
+        term_metabolites <- term_metabolites[lengths(term_metabolites$MetaboliteIDs) > 0L, , drop = FALSE]
+    }
+
+    terms <- term_metabolites[[term_col]]
+    n_terms <- length(terms)
+    if (n_terms == 0L) {
+        stop("No terms with non-missing IDs after filtering.")
+    }
+
+    # ---- Similarity matrix ----------------------------------------------
+    similarity_matrix <-
+        matrix(
+            1,
+            nrow = n_terms,
+            ncol = n_terms,
+            dimnames = list(terms, terms)
+        )
+
+    if (similarity %in% c("jaccard", "overlap_coefficient")) {
+        combs <- combn(seq_len(n_terms), 2L)
+        for (j in seq_len(ncol(combs))) {
+            i1 <- combs[1, j]
+            i2 <- combs[2, j]
+            set1 <- term_metabolites$MetaboliteIDs[[i1]]
+            set2 <- term_metabolites$MetaboliteIDs[[i2]]
+            inter <- length(intersect(set1, set2))
+            if (similarity == "jaccard") {
+                denom <- length(union(set1, set2))
+            } else { # overlap coefficient
+                denom <- min(length(set1), length(set2))
+            }
+            sim <- if (denom == 0) 0 else inter / denom
+            t1 <- terms[i1]
+            t2 <- terms[i2]
+            similarity_matrix[t1, t2] <- sim
+            similarity_matrix[t2, t1] <- sim
+        }
+    } else { # correlation
+        metabolites <- unique(unlist(term_metabolites$MetaboliteIDs))
+        metabolites <- metabolites[!is.na(metabolites) & metabolites != ""]
         binary_matrix <-
             matrix(
                 0,
-                nrow = length(terms),
+                nrow = n_terms,
                 ncol = length(metabolites),
                 dimnames = list(terms, metabolites)
             )
-        for (i in seq_along(terms)) {
-            metabolites_for_term <-
-                term_metabolites$MetaboliteIDs[[i]]
-            # [[metadata_info[["InputID"]]]]
-            binary_matrix[i, colnames(binary_matrix) %in% metabolites_for_term] <- 1
+        for (i in seq_len(n_terms)) {
+            ids <- term_metabolites$MetaboliteIDs[[i]]
+            ids <- ids[!is.na(ids) & ids != ""]
+            binary_matrix[i, colnames(binary_matrix) %in% ids] <- 1
         }
-
-        # Compute correlation matrix: square matrix used to represent the
-        # pairwise correlation coefficients between variables or terms
-        # correlation matrix 𝐶 C is an 𝑛 × 𝑛 n×n matrix where each element 𝐶 𝑖 𝑗
-        # C ij  is the correlation coefficient between the variables 𝑋𝑖 Xi  and
-        # 𝑋 𝑗 X j
-        # The correlation matrix measures the strength and direction of linear
-        # relationships between variables.
-        correlation_matrix <-
-            cor(
-                t(binary_matrix),
-                method = matrix
+        
+        corr <- cor(t(binary_matrix), method = correlation_method)
+        if (anyNA(corr)) {
+            # This typically happens when one or more term vectors are constant (sd = 0)
+            # Set NA similarities to 0 so igraph never sees NA in adjacency.
+            log_warn(
+                "Correlation similarity produced NA values (likely due to zero-variance term vectors). Setting NA similarities to 0."
             )
-
-        # Convert to distance matrix
-        overlap_matrix <-
-            1 - correlation_matrix
+            corr[is.na(corr)] <- 0
+        }
+        corr[corr < 0] <- 0
+        diag(corr) <- 1
+        similarity_matrix <- corr
     }
-    # 3. cluster terms based on overlap threshold
-    threshold <- 0.7  # Define similarity threshold
 
-    term_clusters <-
-        term_overlap %>%
-        filter(
-            Overlap >= threshold
-        ) %>%
-        select(
-            Term1,
-            Term2
+    # Distance matrix
+    distance_matrix <- 1 - similarity_matrix
+    diag(distance_matrix) <- 0
+
+    # Thresholded versions
+    similarity_thr <- similarity_matrix
+    similarity_thr[similarity_thr < threshold] <- 0
+    diag(similarity_thr) <- 0
+
+    distance_thr <- distance_matrix
+    distance_thr[similarity_thr == 0] <- 1
+    diag(distance_thr) <- 0
+
+    # ---- Clustering ------------------------------------------------------
+    clusters <- rep(NA_integer_, n_terms)
+    names(clusters) <- terms
+
+    if (clust == "components") {
+        adj <- similarity_thr
+        adj[adj > 0] <- 1
+        g <- igraph::graph_from_adjacency_matrix(
+            adj,
+            mode = "undirected",
+            weighted = NULL
         )
-
-    # 4. clustering
-    if (clust == "Graph") {  # Use Graph-based clustering
-        # Here we need the distance matrix:
-        overlap_matrix <-
-            1 - correlation_matrix
-
-        # An adjacency matrix represents a graph structure and encodes the
-        # relationships between nodes (vertices)
-        # Add weight (can also represent unweighted graphs)
-
-        # Applying Gaussian kernel to convert distance into similarity
-        adjacency_matrix <-
-            exp(-overlap_matrix^2)
-
-        # Create a graph from the adjacency matrix
-        g <-
-            graph_from_adjacency_matrix(
-                adjacency_matrix,
-                mode = "undirected",
-                weighted = TRUE
-            )
-        initial_clusters <-
-            components(g)$membership
-        term_metabolites$cluster <-
-            initial_clusters[
-                match(
-                    term_metabolites[[metadata_info[["grouping_variable"]]]],
-                    names(initial_clusters)
-                )
-            ]
-    } else if (clust == "Hierarchical") {
-        # Hierarchical clustering
-        hclust_result <-
-            hclust(
-                as.dist(overlap_matrix),
-                method = "average"
-            )
-        # make methods into parameters!
-        num_clusters <- 4
-        term_clusters_hclust <-
-            cutree(
-                hclust_result,
-                k = num_clusters
-            )
-
-        term_metabolites$cluster <-
-            paste0(
-                "cluster",
-                term_clusters_hclust[match(terms, names(term_clusters_hclust))]
-            )
-    # term_metabolites$cluster <- clusters[...] (refer to previous block) ... ) names(clusters))]
-    } else {
-        stop("Invalid clustering method specified in clust parameter.")
+        mem <- igraph::components(g)$membership
+        if (is.null(names(mem))) {
+            names(mem) <- igraph::V(g)$name
+        }
+        clusters[names(mem)] <- mem
+    } else if (clust == "community") {
+        adj <- similarity_thr
+        g <- igraph::graph_from_adjacency_matrix(
+            adj,
+            mode = "undirected",
+            weighted = TRUE
+        )
+        mem <- igraph::cluster_louvain(g)$membership
+        if (is.null(names(mem))) {
+            names(mem) <- igraph::V(g)$name
+        }
+        clusters[names(mem)] <- mem
+    } else if (clust == "hierarchical") {
+        hc <- hclust(as.dist(distance_thr), method = hclust_method)
+        cut_height <- 1 - threshold
+        mem <- cutree(hc, h = cut_height)
+        if (is.null(names(mem))) {
+            names(mem) <- terms
+        }
+        clusters[names(mem)] <- mem
     }
 
-    # 5. Merge cluster group information back to the original data
+    # ---- Apply minimum size filter --------------------------------------
+    cluster_sizes <- table(clusters, useNA = "no")
+    small <- names(cluster_sizes[cluster_sizes < min])
+    clusters[as.character(clusters) %in% small] <- NA_integer_
+
+    # Label clusters
+    cluster_labels <- ifelse(
+        is.na(clusters),
+        "None",
+        paste0("cluster", clusters)
+    )
+    names(cluster_labels) <- terms
+
+    # Merge back to data
+    term_metabolites$cluster <- cluster_labels[term_metabolites[[term_col]]]
     df <-
         data %>%
-        left_join(
-            term_metabolites %>%
-            select(
-                !!sym(metadata_info[["grouping_variable"]]),
-                cluster
-            ),
-            by = metadata_info[["grouping_variable"]]
-        ) %>%
-        mutate(
-            cluster = ifelse(
-                is.na(cluster),
-                "None",
-                paste0(
-                    "cluster",
-                    cluster
-                )  # Convert numeric IDs to descriptive labels
-            )
+        dplyr::left_join(
+            term_metabolites %>% dplyr::select(!!sym(term_col), cluster),
+            by = term_col
         )
 
-# 6. Summarize the clustering results
+    # ---- Summary ---------------------------------------------------------
+    cluster_summary <-
+        term_metabolites %>%
+        dplyr::group_by(cluster) %>%
+        dplyr::summarize(n_terms = dplyr::n(), .groups = "drop") %>%
+        dplyr::mutate(pct_terms = 100 * n_terms / sum(n_terms))
 
-# # ------------------ Save and return ------------------- ##
+    # ---- Node sizes ------------------------------------------------------
+    node_sizes <- NULL
+    if (!is.null(node_size_column)) {
+        node_size_df <-
+            data %>%
+            dplyr::group_by(!!sym(term_col)) %>%
+            dplyr::summarize(
+                node_size = mean(.data[[node_size_column]], na.rm = TRUE),
+                .groups = "drop"
+            )
+        node_size_df$node_size[is.nan(node_size_df$node_size)] <- NA_real_
+        node_sizes <- node_size_df$node_size
+        names(node_sizes) <- node_size_df[[term_col]]
+        node_sizes <- node_sizes[terms]
+        attr(node_sizes, "label") <- node_size_column
+    }
+
+    # ---- Graph plot ------------------------------------------------------
+    graph_plot <- viz_graph(
+        similarity_matrix = similarity_matrix,
+        clusters = cluster_labels,
+        plot_threshold = plot_threshold,
+        plot_name = plot_name,
+        max_nodes = max_nodes,
+        min_degree = min_degree,
+        node_sizes = node_sizes,
+        show_density = show_density,
+        seed = seed,
+        save_plot = save_plot,
+        print_plot = print_plot,
+        path = path
+    )
+
+    out <- list(
+        data = df,
+        cluster_summary = cluster_summary,
+        clusters = cluster_labels,
+        similarity_matrix = similarity_matrix,
+        distance_matrix = distance_matrix,
+        node_sizes = node_sizes,
+        graph_plot = graph_plot
+    )
+
+    log_trace(paste0(
+        "cluster_pk completed with ",
+        clust,
+        " clustering; ",
+        length(unique(cluster_labels)),
+        " clusters (including None)."
+    ))
+
+    return(out)
 }
+
+
 
 #
 # Helper function to add term information to Enrichment Results

@@ -1,7 +1,7 @@
 Package: MetaProViz
 Type: Package
 Title: METabolomics pre-PRocessing, functiOnal analysis and VIZualisation
-Version: 3.99.26
+Version: 3.99.32
 Authors@R: c(
     person("Christina", "Schmidt",
            email = "christina.schmidt.science@gmail.com",
@@ -29,7 +29,7 @@ Description: MetaProViz can analyse standard metabolomics and
 URL: https://saezlab.github.io/MetaProViz
 BugReports: https://github.com/saezlab/MetaProViz/issues
 biocViews: Clustering, Metabolomics, Pathways, QualityControl, Software, SystemsBiology, Visualization
-License: GPL-3 + file LICENSE
+License: BSD_3_clause + file LICENSE
 Encoding: UTF-8
 VignetteBuilder: knitr
 Roxygen: list(markdown = TRUE)
@@ -54,6 +54,7 @@ Imports:
     gtools,
     hash,
     igraph,
+    ggraph,
     inflection,
     limma,
     logger,
