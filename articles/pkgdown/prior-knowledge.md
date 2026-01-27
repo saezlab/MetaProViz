@@ -442,7 +442,7 @@ clearly.
     #> ℹ See also `vignette("ggplot2-in-packages")` for more information.
     #> ℹ The deprecated feature was likely used in the MetaProViz package.
     #>   Please report the issue at <https://github.com/saezlab/MetaProViz/issues>.
-    #> This warning is displayed once every 8 hours.
+    #> This warning is displayed once per session.
     #> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
     #> generated.
     #> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
@@ -450,7 +450,7 @@ clearly.
     #> ℹ The deprecated feature was likely used in the ComplexUpset package.
     #>   Please report the issue at
     #>   <https://github.com/krassowski/complex-upset/issues>.
-    #> This warning is displayed once every 8 hours.
+    #> This warning is displayed once per session.
     #> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
     #> generated.
     #> Warning: themes$intersections_matrix is not a valid theme.
@@ -871,16 +871,16 @@ to = c("hmdb", "pubchem"))
 
   
 
-| Description | MetaboliteID | term                              | Metabolite                                | pubchem                            | compound_names | hmdb                                                                         |
-|:------------|:-------------|:----------------------------------|:------------------------------------------|:-----------------------------------|:---------------|:-----------------------------------------------------------------------------|
-| map00010    | C00022       | Glycolysis / Gluconeogenesis      | Pyruvate                                  | 1060, 107735                       | Pyruvate….     | HMDB0000243                                                                  |
-| map00010    | C00024       | Glycolysis / Gluconeogenesis      | Acetyl-CoA                                | 444493, 181                        | Acetyl-C….     | HMDB0001206, HMDB0247926                                                     |
-| map00010    | C00031       | Glycolysis / Gluconeogenesis      | D-Glucose                                 | 64689, 5793, 107526                | D-Glucos….     | HMDB0000122, HMDB0304632, HMDB0000516, HMDB0003340, HMDB0006564, HMDB0062170 |
-| map00053    | C15926       | Ascorbate and aldarate metabolism | beta-L-Galactose 1-phosphate              |                                    | beta-L-G….     |                                                                              |
-| map00053    | C15930       | Ascorbate and aldarate metabolism | L-Galactonate                             | 604                                | L-Galact….     | HMDB0253886                                                                  |
-| map00120    | C13550       | Primary bile acid biosynthesis    | Cerebrosterol                             | 121948                             | Cerebros….     | HMDB0001419                                                                  |
-| map00120    | C15518       | Primary bile acid biosynthesis    | (24S)-Cholest-5-ene-3beta,7alpha,24-triol | 11954196                           | (24S)-Ch….     | HMDB0060136                                                                  |
-| map00120    | C15519       | Primary bile acid biosynthesis    | 25-Hydroxycholesterol                     | 53477807, 65094, 3247051, 42608393 | 25-Hydro….     | HMDB0006247                                                                  |
+| Description | MetaboliteID | term                              | Metabolite                     | pubchem             | compound_names | hmdb                                                                         |
+|:------------|:-------------|:----------------------------------|:-------------------------------|:--------------------|:---------------|:-----------------------------------------------------------------------------|
+| map00010    | C00022       | Glycolysis / Gluconeogenesis      | Pyruvate                       | 1060, 107735        | Pyruvate….     | HMDB0000243                                                                  |
+| map00010    | C00024       | Glycolysis / Gluconeogenesis      | Acetyl-CoA                     | 444493, 181         | Acetyl-C….     | HMDB0001206, HMDB0247926                                                     |
+| map00010    | C00031       | Glycolysis / Gluconeogenesis      | D-Glucose                      | 64689, 5793, 107526 | D-Glucos….     | HMDB0000122, HMDB0304632, HMDB0000516, HMDB0003340, HMDB0006564, HMDB0062170 |
+| map00053    | C15924       | Ascorbate and aldarate metabolism | L-Gulose 1-phosphate           |                     | L-Gulose….     |                                                                              |
+| map00053    | C15925       | Ascorbate and aldarate metabolism | GDP-L-gulose                   |                     | GDP-L-gu….     |                                                                              |
+| map00120    | C05468       | Primary bile acid biosynthesis    | 5beta-Cyprinolsulfate          | 53477904, 23657882  | 5beta-Cy….     | HMDB0006888                                                                  |
+| map00120    | C06341       | Primary bile acid biosynthesis    | 7alpha,27-Dihydroxycholesterol | 440985              | 7alpha,2….     | HMDB0006281                                                                  |
+| map00120    | C13550       | Primary bile acid biosynthesis    | Cerebrosterol                  | 121948              | Cerebros….     | HMDB0001419                                                                  |
 
 Translation of KEGG IDs in KEGG pathways to HMDB & pubchem IDs
 
@@ -1149,47 +1149,48 @@ Tissue_TvsN_Young <- tissue_dma_young
     #> [1] stats     graphics  grDevices utils     datasets  methods   base     
     #> 
     #> other attached packages:
-    #> [1] tibble_3.3.0       stringr_1.6.0      dplyr_1.1.4        purrr_1.2.0        rlang_1.1.6        magrittr_2.0.4    
-    #> [7] MetaProViz_3.99.26 BiocStyle_2.38.0  
+    #> [1] tibble_3.3.1       stringr_1.6.0      dplyr_1.1.4        purrr_1.2.1        rlang_1.1.7        magrittr_2.0.4    
+    #> [7] MetaProViz_3.99.32 BiocStyle_2.38.0  
     #> 
     #> loaded via a namespace (and not attached):
-    #>   [1] RColorBrewer_1.1-3          rstudioapi_0.17.1           jsonlite_2.0.0              ggbeeswarm_0.7.2           
-    #>   [5] farver_2.1.2                rmarkdown_2.30              fs_1.6.6                    ragg_1.5.0                 
-    #>   [9] vctrs_0.6.5                 memoise_2.0.1               rstatix_0.7.3               htmltools_0.5.8.1          
-    #>  [13] S4Arrays_1.10.0             progress_1.2.3              curl_7.0.0                  ComplexUpset_1.3.3         
-    #>  [17] decoupleR_2.16.0            broom_1.0.10                cellranger_1.1.0            SparseArray_1.10.2         
-    #>  [21] Formula_1.2-5               sass_0.4.10                 parallelly_1.45.1           bslib_0.9.0                
-    #>  [25] htmlwidgets_1.6.4           desc_1.4.3                  CARNIVAL_2.20.0             plyr_1.8.9                 
-    #>  [29] httr2_1.2.1                 lubridate_1.9.4             cachem_1.1.0                igraph_2.2.1               
-    #>  [33] lifecycle_1.0.4             pkgconfig_2.0.3             Matrix_1.7-4                R6_2.6.1                   
-    #>  [37] fastmap_1.2.0               MatrixGenerics_1.22.0       selectr_0.5-0               digest_0.6.39              
-    #>  [41] colorspace_2.1-2            patchwork_1.3.2             S4Vectors_0.48.0            textshaping_1.0.4          
-    #>  [45] GenomicRanges_1.62.0        RSQLite_2.4.4               ggpubr_0.6.2                labeling_0.4.3             
-    #>  [49] timechange_0.3.0            httr_1.4.7                  abind_1.4-8                 compiler_4.5.2             
-    #>  [53] bit64_4.6.0-1               withr_3.0.2                 S7_0.2.1                    backports_1.5.0            
-    #>  [57] BiocParallel_1.44.0         carData_3.0-5               DBI_1.2.3                   logger_0.4.1               
-    #>  [61] OmnipathR_3.19.2            R.utils_2.13.0              ggsignif_0.6.4              cosmosR_1.18.0             
-    #>  [65] MASS_7.3-65                 rappdirs_0.3.3              DelayedArray_0.36.0         sessioninfo_1.2.3          
-    #>  [69] rjson_0.2.23                scatterplot3d_0.3-44        gtools_3.9.5                tools_4.5.2                
-    #>  [73] vipor_0.4.7                 beeswarm_0.4.0              qcc_2.7                     zip_2.3.3                  
-    #>  [77] R.oo_1.27.1                 glue_1.8.0                  grid_4.5.2                  checkmate_2.3.3            
-    #>  [81] reshape2_1.4.5              lpSolve_5.6.23              generics_0.1.4              gtable_0.3.6               
-    #>  [85] tzdb_0.5.0                  R.methodsS3_1.8.2           tidyr_1.3.1                 hms_1.1.4                  
-    #>  [89] xml2_1.5.0                  car_3.1-3                   XVector_0.50.0              BiocGenerics_0.56.0        
-    #>  [93] ggrepel_0.9.6               pillar_1.11.1               vroom_1.6.6                 limma_3.66.0               
-    #>  [97] later_1.4.4                 splines_4.5.2               lattice_0.22-7              bit_4.6.0                  
-    #> [101] tidyselect_1.2.1            knitr_1.50                  gridExtra_2.3               bookdown_0.45              
-    #> [105] IRanges_2.44.0              Seqinfo_1.0.0               SummarizedExperiment_1.40.0 svglite_2.2.2              
-    #> [109] stats4_4.5.2                xfun_0.54                   Biobase_2.70.0              statmod_1.5.1              
-    #> [113] factoextra_1.0.7            matrixStats_1.5.0           pheatmap_1.0.13             stringi_1.8.7              
-    #> [117] yaml_2.3.10                 kableExtra_1.4.0            evaluate_1.0.5              codetools_0.2-20           
-    #> [121] tcltk_4.5.2                 qvalue_2.42.0               hash_2.2.6.3                BiocManager_1.30.27        
-    #> [125] Polychrome_1.5.4            cli_3.6.5                   systemfonts_1.3.1           jquerylib_0.1.4            
-    #> [129] EnhancedVolcano_1.13.2      Rcpp_1.1.0                  readxl_1.4.5                XML_3.99-0.20              
-    #> [133] parallel_4.5.2              ggfortify_0.4.19            pkgdown_2.2.0               ggplot2_4.0.1              
-    #> [137] readr_2.1.6                 blob_1.2.4                  prettyunits_1.2.0           viridisLite_0.4.2          
-    #> [141] scales_1.4.0                writexl_1.5.4               inflection_1.3.7            crayon_1.5.3               
-    #> [145] rvest_1.0.5
+    #>   [1] splines_4.5.2               later_1.4.5                 R.oo_1.27.1                 cellranger_1.1.0           
+    #>   [5] polyclip_1.10-7             XML_3.99-0.20               factoextra_1.0.7            lifecycle_1.0.5            
+    #>   [9] httr2_1.2.2                 tcltk_4.5.2                 rstatix_0.7.3               lattice_0.22-7             
+    #>  [13] vroom_1.6.7                 MASS_7.3-65                 backports_1.5.0             limma_3.66.0               
+    #>  [17] sass_0.4.10                 rmarkdown_2.30              jquerylib_0.1.4             yaml_2.3.12                
+    #>  [21] otel_0.2.0                  zip_2.3.3                   sessioninfo_1.2.3           EnhancedVolcano_1.29.1     
+    #>  [25] qcc_2.7                     DBI_1.2.3                   RColorBrewer_1.1-3          lubridate_1.9.4            
+    #>  [29] abind_1.4-8                 rvest_1.0.5                 GenomicRanges_1.62.1        R.utils_2.13.0             
+    #>  [33] ggraph_2.2.2                BiocGenerics_0.56.0         hash_2.2.6.4                tweenr_2.0.3               
+    #>  [37] rappdirs_0.3.4              IRanges_2.44.0              S4Vectors_0.48.0            ggrepel_0.9.6              
+    #>  [41] pheatmap_1.0.13             parallelly_1.46.1           pkgdown_2.2.0               svglite_2.2.2              
+    #>  [45] codetools_0.2-20            DelayedArray_0.36.0         xml2_1.5.2                  ggforce_0.5.0              
+    #>  [49] tidyselect_1.2.1            farver_2.1.2                viridis_0.6.5               ComplexUpset_1.3.3         
+    #>  [53] matrixStats_1.5.0           stats4_4.5.2                Seqinfo_1.0.0               jsonlite_2.0.0             
+    #>  [57] tidygraph_1.3.1             Formula_1.2-5               systemfonts_1.3.1           tools_4.5.2                
+    #>  [61] progress_1.2.3              ragg_1.5.0                  Rcpp_1.1.1                  glue_1.8.0                 
+    #>  [65] gridExtra_2.3               SparseArray_1.10.8          xfun_0.56                   decoupleR_2.16.0           
+    #>  [69] qvalue_2.42.0               MatrixGenerics_1.22.0       ggfortify_0.4.19            withr_3.0.2                
+    #>  [73] BiocManager_1.30.27         fastmap_1.2.0               digest_0.6.39               timechange_0.3.0           
+    #>  [77] R6_2.6.1                    textshaping_1.0.4           colorspace_2.1-2            lpSolve_5.6.23             
+    #>  [81] gtools_3.9.5                RSQLite_2.4.5               R.methodsS3_1.8.2           tidyr_1.3.2                
+    #>  [85] generics_0.1.4              prettyunits_1.2.0           graphlayouts_1.2.2          httr_1.4.7                 
+    #>  [89] htmlwidgets_1.6.4           S4Arrays_1.10.1             scatterplot3d_0.3-44        inflection_1.3.7           
+    #>  [93] pkgconfig_2.0.3             gtable_0.3.6                blob_1.3.0                  S7_0.2.1                   
+    #>  [97] XVector_0.50.0              OmnipathR_3.19.6            htmltools_0.5.9             carData_3.0-5              
+    #> [101] bookdown_0.46               scales_1.4.0                kableExtra_1.4.0            Biobase_2.70.0             
+    #> [105] knitr_1.51                  rstudioapi_0.18.0           rjson_0.2.23                tzdb_0.5.0                 
+    #> [109] reshape2_1.4.5              checkmate_2.3.3             curl_7.0.0                  cachem_1.1.0               
+    #> [113] Polychrome_1.5.4            parallel_4.5.2              vipor_0.4.7                 cosmosR_1.18.0             
+    #> [117] desc_1.4.3                  pillar_1.11.1               grid_4.5.2                  logger_0.4.1               
+    #> [121] vctrs_0.7.1                 ggpubr_0.6.2                car_3.1-3                   beeswarm_0.4.0             
+    #> [125] evaluate_1.0.5              readr_2.1.6                 cli_3.6.5                   compiler_4.5.2             
+    #> [129] crayon_1.5.3                ggsignif_0.6.4              labeling_0.4.3              plyr_1.8.9                 
+    #> [133] fs_1.6.6                    ggbeeswarm_0.7.3            writexl_1.5.4               stringi_1.8.7              
+    #> [137] viridisLite_0.4.2           BiocParallel_1.44.0         Matrix_1.7-4                hms_1.1.4                  
+    #> [141] patchwork_1.3.2             bit64_4.6.0-1               ggplot2_4.0.1               statmod_1.5.1              
+    #> [145] SummarizedExperiment_1.40.0 CARNIVAL_2.20.0             igraph_2.2.1                broom_1.0.11               
+    #> [149] memoise_2.0.1               bslib_0.10.0                bit_4.6.0                   readxl_1.4.5
 
 ## Bibliography
 

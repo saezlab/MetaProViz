@@ -180,6 +180,8 @@ Integration Reveals Mechanisms of Phenotype Regulation in Renal Cancer.”
   summarize relationship between prixor knowledge to measured
 - [`cluster_ora()`](cluster_ora.md) : Overrepresentation analysis by
   cluster
+- [`cluster_pk()`](cluster_pk.md) : Cluster terms in prior knowledge by
+  set overlap
 - [`compare_pk()`](compare_pk.md) : Compare Prior Knowledge Resources
   and/or Columns within a Single Resource
 - [`count_id()`](count_id.md) : Count Entries and Generate a Histogram
@@ -244,6 +246,8 @@ Integration Reveals Mechanisms of Phenotype Regulation in Renal Cancer.”
 - [`tissue_tvn_rnaseq`](tissue_tvn_rnaseq.md) : tissue_tvn_rnaseq
 - [`translate_id()`](translate_id.md) : Translate IDs to/from KEGG,
   PubChem, Chebi, HMDB
+- [`viz_graph()`](viz_graph.md) : Graph visualization for clustered
+  terms
 - [`viz_heatmap()`](viz_heatmap.md) : Heatmap visualization
 - [`viz_pca()`](viz_pca.md) : This script allows you to perform PCA plot
   visualization using the results of the MetaProViz analysis

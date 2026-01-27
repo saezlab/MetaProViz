@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.99.26</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.99.32</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -549,7 +549,7 @@ drivers that separate patients based on their demographics.<br><br></p>
 <span>cutoff_stat<span class="op">=</span> <span class="fl">0.05</span>,</span>
 <span>cutoff_variance <span class="op">=</span> <span class="fl">1</span><span class="op">)</span></span>
 <span><span class="co">#&gt; The column names of the 'metadata_sample' contain special character that where removed.</span></span></code></pre></div>
-<img src="sample-metadata_files/figure-html/code-3-1.png" class="r-plt" width="700"><br>
+<img src="sample-metadata_files/figure-html/code-3-1.png" class="r-plt" alt="" width="700"><br>
 Ultimately, this is leading to clusters of metabolites that are driving
 the separation of the different demographics.<br><br>
 We generated the general anova output DF:<br><table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
@@ -958,7 +958,7 @@ TISSUE_TYPE
 <span>metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color_Sample <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"TISSUE_TYPE"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>scale <span class="op">=</span><span class="st">"column"</span>,</span>
 <span>plot_name <span class="op">=</span> <span class="st">"MainDrivers"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sample-metadata_files/figure-html/viz-heatmap-1.png" class="r-plt" width="960" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="sample-metadata_files/figure-html/viz-heatmap-1.png" class="r-plt" alt="" width="960" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <div class="section level3">
 <h3 id="dma">DMA<a class="anchor" aria-label="anchor" href="#dma"></a>
@@ -1019,19 +1019,19 @@ Normal: Subset of <code>Old</code> patients<br><div class="vscroll-plot">
 <span><span class="op">}</span></span>
 <span><span class="co">#&gt; Running dma for TissueType</span></span>
 <span><span class="co">#&gt; There are no NA/0 values</span></span></code></pre></div>
-<p><img src="sample-metadata_files/figure-html/Run_not_Display-1.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="sample-metadata_files/figure-html/Run_not_Display-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"></p>
 <pre><code><span><span class="co">#&gt; Running dma for EarlyStage</span></span>
 <span><span class="co">#&gt; There are no NA/0 values</span></span></code></pre>
-<p><img src="sample-metadata_files/figure-html/Run_not_Display-2.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="sample-metadata_files/figure-html/Run_not_Display-2.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"></p>
 <pre><code><span><span class="co">#&gt; Running dma for LateStage</span></span>
 <span><span class="co">#&gt; There are no NA/0 values</span></span></code></pre>
-<p><img src="sample-metadata_files/figure-html/Run_not_Display-3.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="sample-metadata_files/figure-html/Run_not_Display-3.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"></p>
 <pre><code><span><span class="co">#&gt; Running dma for Old</span></span>
 <span><span class="co">#&gt; There are no NA/0 values</span></span></code></pre>
-<p><img src="sample-metadata_files/figure-html/Run_not_Display-4.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="sample-metadata_files/figure-html/Run_not_Display-4.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"></p>
 <pre><code><span><span class="co">#&gt; Running dma for Young</span></span>
 <span><span class="co">#&gt; There are no NA/0 values</span></span></code></pre>
-<p><img src="sample-metadata_files/figure-html/Run_not_Display-5.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="sample-metadata_files/figure-html/Run_not_Display-5.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <p><br><br><br></p>
 <p>We can see from the different Volcano plots have smaller p.adjusted
@@ -1047,7 +1047,7 @@ Normal of young and old patients:<br></p>
 <span>name_comparison<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>data<span class="op">=</span><span class="st">"EarlyStage"</span>, data2<span class="op">=</span> <span class="st">"LateStage"</span><span class="op">)</span>,</span>
 <span>plot_name<span class="op">=</span> <span class="st">"EarlyStage-TUMOR_vs_NORMAL compared to LateStage-TUMOR_vs_NORMAL"</span>,</span>
 <span>subtitle<span class="op">=</span> <span class="st">"Results of dma"</span> <span class="op">)</span></span></code></pre></div>
-<p><img src="sample-metadata_files/figure-html/viz-volcano-1.png" class="r-plt" width="700"></p>
+<p><img src="sample-metadata_files/figure-html/viz-volcano-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Young versus Old</span></span>
@@ -1057,7 +1057,7 @@ Normal of young and old patients:<br></p>
 <span>name_comparison<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>data<span class="op">=</span><span class="st">"Young"</span>, data2<span class="op">=</span> <span class="st">"Old"</span><span class="op">)</span>,</span>
 <span>plot_name<span class="op">=</span> <span class="st">"Young-TUMOR_vs_NORMAL compared to Old-TUMOR_vs_NORMAL"</span>,</span>
 <span>subtitle<span class="op">=</span> <span class="st">"Results of dma"</span> <span class="op">)</span></span></code></pre></div>
-<p><img src="sample-metadata_files/figure-html/viz-volcano-2.png" class="r-plt" width="700"><br>
+<p><img src="sample-metadata_files/figure-html/viz-volcano-2.png" class="r-plt" alt="" width="700"><br>
 Here we can observe that Tumour versus Normal has lower significance
 values for the Young patients compared to the Old patients. This can be
 due to higher variance in the metabolite measurements from Young
@@ -1084,7 +1084,7 @@ Normal.<br></p>
 <span>Bottom <span class="op">=</span> <span class="va">bottom_entries</span>,</span>
 <span>TissueTypeList <span class="op">=</span> <span class="va">TissueTypeList</span><span class="op">)</span><span class="op">)</span><span class="op">+</span></span>
 <span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html" class="external-link">scale_fill_gradient</a></span><span class="op">(</span>low <span class="op">=</span> <span class="st">"blue"</span>, high <span class="op">=</span> <span class="st">"red"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sample-metadata_files/figure-html/viz-volcano-2-1.png" class="r-plt" width="700"></p>
+<p><img src="sample-metadata_files/figure-html/viz-volcano-2-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span></span>
@@ -1101,7 +1101,7 @@ Normal.<br></p>
 <span>metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"MainDriver_Term"</span><span class="op">)</span>,</span>
 <span>plot_name<span class="op">=</span> <span class="st">"TISSUE_TYPE-TUMOR_vs_NORMAL"</span>,</span>
 <span>subtitle<span class="op">=</span> <span class="st">"Results of dma"</span> <span class="op">)</span></span></code></pre></div>
-<p><img src="sample-metadata_files/figure-html/viz-volcano-2-2.png" class="r-plt" width="700"></p>
+<p><img src="sample-metadata_files/figure-html/viz-volcano-2-2.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="metabolite-id-qc">Metabolite ID QC<a class="anchor" aria-label="anchor" href="#metabolite-id-qc"></a>
@@ -1114,7 +1114,7 @@ an overview plot:</p>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> See also `vignette("ggplot2-in-packages")` for more information.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> The deprecated feature was likely used in the <span style="color: #0000BB;">MetaProViz</span> package.</span></span>
 <span><span class="co">#&gt;   Please report the issue at <span style="color: #0000BB; font-style: italic;">&lt;https://github.com/saezlab/MetaProViz/issues&gt;</span>.</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once every 8 hours.</span></span></span>
+<span><span class="co">#&gt; <span style="color: #555555;">This warning is displayed once per session.</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">Call `lifecycle::last_lifecycle_warnings()` to see where this warning was</span></span></span>
 <span><span class="co">#&gt; <span style="color: #555555;">generated.</span></span></span>
 <span><span class="co">#&gt; Warning: themes$intersections_matrix is not a valid theme.</span></span>
@@ -1143,7 +1143,7 @@ only have a pubchem ID, yet no HMDB or KEGG ID. Next, we will try to
 understand the missing IDs focusing on HMDb as an example:</p>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Plot1_HMDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">MetaboliteIDs</span>, <span class="st">"HMDB"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sample-metadata_files/figure-html/code-6-1.png" class="r-plt" width="700"><br>
+<p><img src="sample-metadata_files/figure-html/code-6-1.png" class="r-plt" alt="" width="700"><br>
 Over 200 metabolites have no HMDB ID and if there is a HMDB ID assigned,
 we only have one HMDB ID. Here we assume the experimental setup does not
 account for stereoisomers and that other IDs are with different degrees
@@ -1170,7 +1170,7 @@ us to assign additional potential HMDB IDs per feature.</p>
 <span></span>
 <span><span class="co"># Plot 2 after equivalent IDs where added</span></span>
 <span><span class="va">Plot2_HMDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">tissue_meta_AddIDs_HMDB</span>, <span class="st">"AllIDs"</span><span class="op">)</span></span></code></pre></div>
-<img src="sample-metadata_files/figure-html/data-prep-1.png" class="r-plt" width="700"><br>
+<img src="sample-metadata_files/figure-html/data-prep-1.png" class="r-plt" alt="" width="700"><br>
 Additionally, for the metabolites without HMDB ID we can check if a HMDB
 ID is available using the other ID types. First we check if we have
 cases in which we do have no HMDB ID, but other available IDs:
@@ -1236,7 +1236,7 @@ Both_Not_NA
 <span></span>
 <span><span class="co"># Plot 3:</span></span>
 <span><span class="va">Plot3_HMDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">Tissue_MetaData_HMDB</span>, <span class="st">"hmdb_combined"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sample-metadata_files/figure-html/data-prep-3-1.png" class="r-plt" width="700"><br>
+<p><img src="sample-metadata_files/figure-html/data-prep-3-1.png" class="r-plt" alt="" width="700"><br>
 If we inspect the tables we can check that for example,
 16-hydroxypalmitate certainly has an HMDB ID, yet was missing from the
 original metadata table. We can check the structures associated to it on
@@ -1247,7 +1247,7 @@ under the ID <a href="https://hmdb.ca/metabolites/HMDB0006294" class="external-l
 We can of course do the same for other IDs, such as the KEGG IDs:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Plot1_KEGG</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">MetaboliteIDs</span>, <span class="st">"KEGG"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sample-metadata_files/figure-html/data-prep-4-1.png" class="r-plt" width="700"></p>
+<p><img src="sample-metadata_files/figure-html/data-prep-4-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">##################################################################################################################</span></span>
@@ -1271,7 +1271,7 @@ We can of course do the same for other IDs, such as the KEGG IDs:</p>
 <span>all.x<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">Plot2_KEGG</span> <span class="op">&lt;-</span>  <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">tissue_meta_AddIDs_KEGG</span>, <span class="st">"AllIDs"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sample-metadata_files/figure-html/data-prep-4-2.png" class="r-plt" width="700"></p>
+<p><img src="sample-metadata_files/figure-html/data-prep-4-2.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">###################################################################################################################</span></span>
@@ -1303,7 +1303,7 @@ We can of course do the same for other IDs, such as the KEGG IDs:</p>
 <span></span>
 <span><span class="co"># Lets see the count now:</span></span>
 <span><span class="va">Plot3_KEGG</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">Tissue_MetaData_KEGG</span>, <span class="st">"KEGG"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sample-metadata_files/figure-html/data-prep-4-3.png" class="r-plt" width="700"><br>
+<p><img src="sample-metadata_files/figure-html/data-prep-4-3.png" class="r-plt" alt="" width="700"><br>
 Lastly, we will have the new metadata table, which we can use for
 enrichment analysis:</p>
 <pre><code><span><span class="co">#&gt; Warning: themes$intersections_matrix is not a valid theme.</span></span>
@@ -1360,7 +1360,7 @@ entries in the KEGG pathway-metabolite sets:</p>
 <span><span class="co">#&gt; KEGG_Pathways, : 8 duplicated IDs were removed from column KEGG</span></span>
 <span><span class="co">#&gt; data has multiple IDs per measurement = TRUE. input_pk has multiple IDs per entry = FALSE.</span></span>
 <span><span class="co">#&gt; data has 318 unique entries with 328 unique KEGG IDs. Of those IDs, 249 match, which is 75.9146341463415%.</span></span>
-<span><span class="co">#&gt; input_pk has 6541 unique entries with 6541 unique MetaboliteID IDs. Of those IDs, 249 are detected in the data, which is 3.80675737654793%.</span></span>
+<span><span class="co">#&gt; input_pk has 6583 unique entries with 6583 unique MetaboliteID IDs. Of those IDs, 249 are detected in the data, which is 3.78246999848094%.</span></span>
 <span><span class="co">#&gt; Warning in checkmatch_pk_to_data(data = Tissue_MetaData_Extended, input_pk =</span></span>
 <span><span class="co">#&gt; KEGG_Pathways, : There are cases where multiple detected IDs match to multiple</span></span>
 <span><span class="co">#&gt; prior knowledge IDs of the same category</span></span>
@@ -1401,10 +1401,10 @@ C00221, C00031
 2
 </td>
 <td style="text-align:left;">
-C00221
+C00031
 </td>
 <td style="text-align:left;">
-Pentose phosphate pathway
+Metabolic pathways
 </td>
 </tr>
 <tr>
@@ -1418,10 +1418,10 @@ C00221, C00031
 2
 </td>
 <td style="text-align:left;">
-C00221
+C00031
 </td>
 <td style="text-align:left;">
-Biosynthesis of secondary metabolites
+Pentose phosphate pathway
 </td>
 </tr>
 <tr>
@@ -1456,6 +1456,40 @@ C00221
 </td>
 <td style="text-align:left;">
 Glycolysis / Gluconeogenesis
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C00221, C00031
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+C00031
+</td>
+<td style="text-align:left;">
+Biosynthesis of secondary metabolites
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C00221, C00031
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+C00221
+</td>
+<td style="text-align:left;">
+Pentose phosphate pathway
 </td>
 </tr>
 <tr>
@@ -1486,7 +1520,7 @@ C00221, C00031
 2
 </td>
 <td style="text-align:left;">
-C00031
+C00221
 </td>
 <td style="text-align:left;">
 Biosynthesis of secondary metabolites
@@ -1494,7 +1528,7 @@ Biosynthesis of secondary metabolites
 </tr>
 <tr>
 <td style="text-align:left;">
-C00221, C00031
+C03460, C03722
 </td>
 <td style="text-align:right;">
 2
@@ -1503,24 +1537,7 @@ C00221, C00031
 2
 </td>
 <td style="text-align:left;">
-C00031
-</td>
-<td style="text-align:left;">
-Pentose phosphate pathway
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-C00221, C00031
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-C00031
+C03722
 </td>
 <td style="text-align:left;">
 Metabolic pathways
@@ -1545,23 +1562,6 @@ Metabolic pathways
 </tr>
 <tr>
 <td style="text-align:left;">
-C03460, C03722
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-C03722
-</td>
-<td style="text-align:left;">
-Metabolic pathways
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
 C17737, C00695
 </td>
 <td style="text-align:right;">
@@ -1571,7 +1571,7 @@ C17737, C00695
 2
 </td>
 <td style="text-align:left;">
-C17737
+C00695
 </td>
 <td style="text-align:left;">
 Secondary bile acid biosynthesis
@@ -1588,7 +1588,7 @@ C17737, C00695
 2
 </td>
 <td style="text-align:left;">
-C00695
+C17737
 </td>
 <td style="text-align:left;">
 Secondary bile acid biosynthesis
@@ -1710,8 +1710,8 @@ NA
 C00221, C00031
 </td>
 <td style="text-align:left;">
-None || Pentose phosphate pathway || Biosynthesis of secondary
-metabolites || Glycolysis / Gluconeogenesis || Metabolic pathways
+Metabolic pathways || None || Pentose phosphate pathway || Glycolysis /
+Gluconeogenesis || Biosynthesis of secondary metabolites
 </td>
 <td style="text-align:left;">
 Check
@@ -1867,7 +1867,7 @@ NA
 C17737, C00695
 </td>
 <td style="text-align:left;">
-Secondary bile acid biosynthesis || None
+None || Secondary bile acid biosynthesis
 </td>
 <td style="text-align:left;">
 Check
@@ -2047,11 +2047,11 @@ the feature metadata provided as part of the data in <span class="citation">(Hak
 <span>metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>individual <span class="op">=</span> <span class="st">"SUB_PATHWAY"</span>,</span>
 <span>                                        color <span class="op">=</span> <span class="st">"RG2_Significant"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <br><div class="vscroll-plot">
-<p><img src="sample-metadata_files/figure-html/viz-volcano-5-1.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-2.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-3.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-4.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-5.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-6.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-7.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-8.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="sample-metadata_files/figure-html/viz-volcano-5-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-2.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-3.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-4.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-5.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-6.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-7.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-8.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"></p>
 <pre><code><span><span class="co">#&gt; Skipping viz_volcano compare plot for 'NA' because no rows are available after filtering.</span></span></code></pre>
-<p><img src="sample-metadata_files/figure-html/viz-volcano-5-9.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-10.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-11.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-12.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-13.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-14.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-15.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-16.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-17.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-18.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-19.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-20.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-21.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-22.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-23.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-24.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-25.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-26.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-27.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-28.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-29.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-30.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-31.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-32.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-33.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-34.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-35.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-36.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-37.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-38.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-39.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-40.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-41.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-42.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-43.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-44.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-45.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-46.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-47.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-48.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-49.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-50.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-51.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-52.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-53.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-54.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-55.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-56.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-57.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-58.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-59.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-60.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-61.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-62.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-63.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-64.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-65.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="sample-metadata_files/figure-html/viz-volcano-5-9.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-10.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-11.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-12.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-13.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-14.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-15.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-16.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-17.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-18.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-19.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-20.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-21.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-22.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-23.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-24.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-25.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-26.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-27.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-28.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-29.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-30.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-31.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-32.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-33.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-34.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-35.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-36.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-37.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-38.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-39.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-40.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-41.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-42.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-43.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-44.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-45.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-46.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-47.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-48.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-49.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-50.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-51.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-52.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-53.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-54.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-55.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-56.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-57.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-58.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-59.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-60.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-61.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-62.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-63.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-64.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-65.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"></p>
 <pre><code><span><span class="co">#&gt; Skipping viz_volcano compare plot for 'NA' because no rows are available after filtering.</span></span></code></pre>
-<p><img src="sample-metadata_files/figure-html/viz-volcano-5-66.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-67.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-68.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-69.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-70.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-71.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-72.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-73.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-74.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-75.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-76.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-77.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="sample-metadata_files/figure-html/viz-volcano-5-66.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-67.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-68.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-69.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-70.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-71.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-72.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-73.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-74.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-75.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-76.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-5-77.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <p><br><br><br></p>
 </div>
@@ -2117,7 +2117,7 @@ using KEGG pathways for each comparison.<br></p>
 <span>        <span class="op">}</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <br><div class="vscroll-plot">
-<p><img src="sample-metadata_files/figure-html/viz-volcano-7-1.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-2.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-3.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-4.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-5.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-6.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-7.png" class="r-plt" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="sample-metadata_files/figure-html/viz-volcano-7-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-2.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-3.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-4.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-5.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-6.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-7.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <p><br><br><br></p>
 <div class="progress progress-striped active">
@@ -2150,46 +2150,48 @@ using KEGG pathways for each comparison.<br></p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] stringr_1.6.0      tibble_3.3.0       tidyr_1.3.1        rlang_1.1.6        dplyr_1.1.4        magrittr_2.0.4    </span></span>
-<span><span class="co">#&gt; [7] MetaProViz_3.99.26 BiocStyle_2.38.0  </span></span>
+<span><span class="co">#&gt; [1] stringr_1.6.0      tibble_3.3.1       tidyr_1.3.2        rlang_1.1.7        dplyr_1.1.4        magrittr_2.0.4    </span></span>
+<span><span class="co">#&gt; [7] MetaProViz_3.99.32 BiocStyle_2.38.0  </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
-<span><span class="co">#&gt;   [1] RColorBrewer_1.1-3          rstudioapi_0.17.1           jsonlite_2.0.0              ggbeeswarm_0.7.2           </span></span>
+<span><span class="co">#&gt;   [1] RColorBrewer_1.1-3          rstudioapi_0.18.0           jsonlite_2.0.0              ggbeeswarm_0.7.3           </span></span>
 <span><span class="co">#&gt;   [5] farver_2.1.2                rmarkdown_2.30              fs_1.6.6                    ragg_1.5.0                 </span></span>
-<span><span class="co">#&gt;   [9] vctrs_0.6.5                 memoise_2.0.1               rstatix_0.7.3               htmltools_0.5.8.1          </span></span>
-<span><span class="co">#&gt;  [13] S4Arrays_1.10.0             progress_1.2.3              curl_7.0.0                  ComplexUpset_1.3.3         </span></span>
-<span><span class="co">#&gt;  [17] decoupleR_2.16.0            broom_1.0.10                cellranger_1.1.0            SparseArray_1.10.2         </span></span>
-<span><span class="co">#&gt;  [21] Formula_1.2-5               sass_0.4.10                 parallelly_1.45.1           bslib_0.9.0                </span></span>
-<span><span class="co">#&gt;  [25] htmlwidgets_1.6.4           desc_1.4.3                  plyr_1.8.9                  httr2_1.2.1                </span></span>
-<span><span class="co">#&gt;  [29] lubridate_1.9.4             cachem_1.1.0                igraph_2.2.1                lifecycle_1.0.4            </span></span>
+<span><span class="co">#&gt;   [9] vctrs_0.7.1                 memoise_2.0.1               rstatix_0.7.3               htmltools_0.5.9            </span></span>
+<span><span class="co">#&gt;  [13] S4Arrays_1.10.1             progress_1.2.3              curl_7.0.0                  ComplexUpset_1.3.3         </span></span>
+<span><span class="co">#&gt;  [17] decoupleR_2.16.0            broom_1.0.11                cellranger_1.1.0            SparseArray_1.10.8         </span></span>
+<span><span class="co">#&gt;  [21] Formula_1.2-5               sass_0.4.10                 parallelly_1.46.1           bslib_0.10.0               </span></span>
+<span><span class="co">#&gt;  [25] htmlwidgets_1.6.4           desc_1.4.3                  plyr_1.8.9                  httr2_1.2.2                </span></span>
+<span><span class="co">#&gt;  [29] lubridate_1.9.4             cachem_1.1.0                igraph_2.2.1                lifecycle_1.0.5            </span></span>
 <span><span class="co">#&gt;  [33] pkgconfig_2.0.3             Matrix_1.7-4                R6_2.6.1                    fastmap_1.2.0              </span></span>
-<span><span class="co">#&gt;  [37] MatrixGenerics_1.22.0       selectr_0.5-0               digest_0.6.39               colorspace_2.1-2           </span></span>
-<span><span class="co">#&gt;  [41] patchwork_1.3.2             S4Vectors_0.48.0            textshaping_1.0.4           GenomicRanges_1.62.0       </span></span>
-<span><span class="co">#&gt;  [45] RSQLite_2.4.4               ggpubr_0.6.2                labeling_0.4.3              timechange_0.3.0           </span></span>
+<span><span class="co">#&gt;  [37] MatrixGenerics_1.22.0       digest_0.6.39               colorspace_2.1-2            patchwork_1.3.2            </span></span>
+<span><span class="co">#&gt;  [41] S4Vectors_0.48.0            textshaping_1.0.4           GenomicRanges_1.62.1        RSQLite_2.4.5              </span></span>
+<span><span class="co">#&gt;  [45] ggpubr_0.6.2                labeling_0.4.3              timechange_0.3.0            polyclip_1.10-7            </span></span>
 <span><span class="co">#&gt;  [49] httr_1.4.7                  abind_1.4-8                 compiler_4.5.2              bit64_4.6.0-1              </span></span>
 <span><span class="co">#&gt;  [53] withr_3.0.2                 S7_0.2.1                    backports_1.5.0             BiocParallel_1.44.0        </span></span>
-<span><span class="co">#&gt;  [57] carData_3.0-5               DBI_1.2.3                   logger_0.4.1                OmnipathR_3.19.2           </span></span>
-<span><span class="co">#&gt;  [61] R.utils_2.13.0              ggsignif_0.6.4              cosmosR_1.18.0              MASS_7.3-65                </span></span>
-<span><span class="co">#&gt;  [65] rappdirs_0.3.3              DelayedArray_0.36.0         sessioninfo_1.2.3           scatterplot3d_0.3-44       </span></span>
-<span><span class="co">#&gt;  [69] gtools_3.9.5                tools_4.5.2                 vipor_0.4.7                 beeswarm_0.4.0             </span></span>
-<span><span class="co">#&gt;  [73] qcc_2.7                     zip_2.3.3                   R.oo_1.27.1                 glue_1.8.0                 </span></span>
-<span><span class="co">#&gt;  [77] grid_4.5.2                  checkmate_2.3.3             reshape2_1.4.5              generics_0.1.4             </span></span>
-<span><span class="co">#&gt;  [81] gtable_0.3.6                tzdb_0.5.0                  R.methodsS3_1.8.2           ggVennDiagram_1.5.4        </span></span>
-<span><span class="co">#&gt;  [85] hms_1.1.4                   xml2_1.5.0                  car_3.1-3                   XVector_0.50.0             </span></span>
-<span><span class="co">#&gt;  [89] BiocGenerics_0.56.0         ggrepel_0.9.6               pillar_1.11.1               vroom_1.6.6                </span></span>
-<span><span class="co">#&gt;  [93] limma_3.66.0                later_1.4.4                 splines_4.5.2               lattice_0.22-7             </span></span>
-<span><span class="co">#&gt;  [97] bit_4.6.0                   tidyselect_1.2.1            knitr_1.50                  gridExtra_2.3              </span></span>
-<span><span class="co">#&gt; [101] bookdown_0.45               IRanges_2.44.0              Seqinfo_1.0.0               SummarizedExperiment_1.40.0</span></span>
-<span><span class="co">#&gt; [105] svglite_2.2.2               stats4_4.5.2                xfun_0.54                   Biobase_2.70.0             </span></span>
-<span><span class="co">#&gt; [109] statmod_1.5.1               factoextra_1.0.7            matrixStats_1.5.0           pheatmap_1.0.13            </span></span>
-<span><span class="co">#&gt; [113] stringi_1.8.7               yaml_2.3.10                 kableExtra_1.4.0            evaluate_1.0.5             </span></span>
-<span><span class="co">#&gt; [117] codetools_0.2-20            tcltk_4.5.2                 qvalue_2.42.0               hash_2.2.6.3               </span></span>
-<span><span class="co">#&gt; [121] BiocManager_1.30.27         Polychrome_1.5.4            cli_3.6.5                   systemfonts_1.3.1          </span></span>
-<span><span class="co">#&gt; [125] jquerylib_0.1.4             EnhancedVolcano_1.13.2      Rcpp_1.1.0                  readxl_1.4.5               </span></span>
-<span><span class="co">#&gt; [129] XML_3.99-0.20               parallel_4.5.2              ggfortify_0.4.19            pkgdown_2.2.0              </span></span>
-<span><span class="co">#&gt; [133] ggplot2_4.0.1               readr_2.1.6                 blob_1.2.4                  prettyunits_1.2.0          </span></span>
-<span><span class="co">#&gt; [137] viridisLite_0.4.2           scales_1.4.0                writexl_1.5.4               inflection_1.3.7           </span></span>
-<span><span class="co">#&gt; [141] purrr_1.2.0                 crayon_1.5.3                rvest_1.0.5</span></span></code></pre>
+<span><span class="co">#&gt;  [57] viridis_0.6.5               carData_3.0-5               DBI_1.2.3                   logger_0.4.1               </span></span>
+<span><span class="co">#&gt;  [61] OmnipathR_3.19.6            ggforce_0.5.0               R.utils_2.13.0              ggsignif_0.6.4             </span></span>
+<span><span class="co">#&gt;  [65] cosmosR_1.18.0              MASS_7.3-65                 rappdirs_0.3.4              DelayedArray_0.36.0        </span></span>
+<span><span class="co">#&gt;  [69] sessioninfo_1.2.3           scatterplot3d_0.3-44        gtools_3.9.5                tools_4.5.2                </span></span>
+<span><span class="co">#&gt;  [73] vipor_0.4.7                 otel_0.2.0                  qcc_2.7                     beeswarm_0.4.0             </span></span>
+<span><span class="co">#&gt;  [77] zip_2.3.3                   R.oo_1.27.1                 glue_1.8.0                  grid_4.5.2                 </span></span>
+<span><span class="co">#&gt;  [81] checkmate_2.3.3             reshape2_1.4.5              generics_0.1.4              gtable_0.3.6               </span></span>
+<span><span class="co">#&gt;  [85] tzdb_0.5.0                  R.methodsS3_1.8.2           ggVennDiagram_1.5.7         hms_1.1.4                  </span></span>
+<span><span class="co">#&gt;  [89] tidygraph_1.3.1             xml2_1.5.2                  car_3.1-3                   XVector_0.50.0             </span></span>
+<span><span class="co">#&gt;  [93] BiocGenerics_0.56.0         ggrepel_0.9.6               pillar_1.11.1               vroom_1.6.7                </span></span>
+<span><span class="co">#&gt;  [97] limma_3.66.0                later_1.4.5                 splines_4.5.2               tweenr_2.0.3               </span></span>
+<span><span class="co">#&gt; [101] lattice_0.22-7              bit_4.6.0                   tidyselect_1.2.1            knitr_1.51                 </span></span>
+<span><span class="co">#&gt; [105] gridExtra_2.3               bookdown_0.46               IRanges_2.44.0              Seqinfo_1.0.0              </span></span>
+<span><span class="co">#&gt; [109] SummarizedExperiment_1.40.0 svglite_2.2.2               stats4_4.5.2                xfun_0.56                  </span></span>
+<span><span class="co">#&gt; [113] graphlayouts_1.2.2          Biobase_2.70.0              statmod_1.5.1               factoextra_1.0.7           </span></span>
+<span><span class="co">#&gt; [117] matrixStats_1.5.0           pheatmap_1.0.13             stringi_1.8.7               yaml_2.3.12                </span></span>
+<span><span class="co">#&gt; [121] kableExtra_1.4.0            evaluate_1.0.5              codetools_0.2-20            tcltk_4.5.2                </span></span>
+<span><span class="co">#&gt; [125] ggraph_2.2.2                qvalue_2.42.0               hash_2.2.6.4                BiocManager_1.30.27        </span></span>
+<span><span class="co">#&gt; [129] Polychrome_1.5.4            cli_3.6.5                   systemfonts_1.3.1           jquerylib_0.1.4            </span></span>
+<span><span class="co">#&gt; [133] EnhancedVolcano_1.29.1      Rcpp_1.1.1                  readxl_1.4.5                XML_3.99-0.20              </span></span>
+<span><span class="co">#&gt; [137] parallel_4.5.2              ggfortify_0.4.19            pkgdown_2.2.0               ggplot2_4.0.1              </span></span>
+<span><span class="co">#&gt; [141] readr_2.1.6                 blob_1.3.0                  prettyunits_1.2.0           viridisLite_0.4.2          </span></span>
+<span><span class="co">#&gt; [145] scales_1.4.0                writexl_1.5.4               inflection_1.3.7            purrr_1.2.1                </span></span>
+<span><span class="co">#&gt; [149] crayon_1.5.3                rvest_1.0.5</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="bibliography">Bibliography<a class="anchor" aria-label="anchor" href="#bibliography"></a>

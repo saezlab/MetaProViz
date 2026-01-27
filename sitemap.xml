@@ -17,6 +17,7 @@
 <url><loc>/reference/cellular_meta.html</loc></url>
 <url><loc>/reference/checkmatch_pk_to_data.html</loc></url>
 <url><loc>/reference/cluster_ora.html</loc></url>
+<url><loc>/reference/cluster_pk.html</loc></url>
 <url><loc>/reference/compare_pk.html</loc></url>
 <url><loc>/reference/count_id.html</loc></url>
 <url><loc>/reference/dma.html</loc></url>
@@ -61,6 +62,7 @@
 <url><loc>/reference/tissue_tvn_proteomics.html</loc></url>
 <url><loc>/reference/tissue_tvn_rnaseq.html</loc></url>
 <url><loc>/reference/translate_id.html</loc></url>
+<url><loc>/reference/viz_graph.html</loc></url>
 <url><loc>/reference/viz_heatmap.html</loc></url>
 <url><loc>/reference/viz_pca.html</loc></url>
 <url><loc>/reference/viz_superplot.html</loc></url>
