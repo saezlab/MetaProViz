@@ -56,6 +56,13 @@ plots. \strong{Default = TRUE}}
 
 \item{path}{{Optional:} String which is added to the resulting folder name.
 \strong{default: NULL}}
+
+\item{plot_width}{\emph{Optional: } Plot width passed to \code{save_res}. Default = 3000.}
+
+\item{plot_height}{\emph{Optional: } Plot height passed to \code{save_res}. Default = 2000.}
+
+\item{plot_unit}{\emph{Optional: } Unit for plot dimensions passed to \code{save_res}.
+Default = "px".}
 }
 \value{
 Graph plot as a ggplot object.

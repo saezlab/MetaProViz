@@ -43,6 +43,10 @@
 #'     plots. \strong{Default = TRUE}
 #' @param path {Optional:} String which is added to the resulting folder name.
 #'     \strong{default: NULL}
+#' @param plot_width \emph{Optional: } Plot width passed to `save_res`. Default = 3000.
+#' @param plot_height \emph{Optional: } Plot height passed to `save_res`. Default = 2000.
+#' @param plot_unit \emph{Optional: } Unit for plot dimensions passed to `save_res`.
+#'     Default = "px".
 #'
 #' @return Graph plot as a ggplot object.
 #' 
