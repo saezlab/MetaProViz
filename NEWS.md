@@ -1,4 +1,4 @@
-# MetaProViz 3.99.34 (2026-02-16)
+# MetaProViz 3.99.35 (2026-02-16)
 
 - New `cluster_pk()` function for clustering prior knowledge terms by
   metabolite overlap, with network graph visualization via `viz_graph()`
