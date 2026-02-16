@@ -45,9 +45,6 @@ with names matching term IDs. Values are scaled for plotting.}
 \item{show_density}{\emph{Optional: } If TRUE, add a hull background per
 cluster. Default = FALSE.}
 
-\item{seed}{\emph{Optional: } Random seed for graph layout reproducibility.
-Default = NULL.}
-
 \item{save_plot}{\emph{Optional: } Select the file type of output plots.
 Options are svg, pdf, png or NULL. \strong{Default = "svg"}}
 
@@ -93,7 +90,7 @@ r <- cluster_pk(
     seed = 123,
     show_density = FALSE,
     max_nodes = 1000
-) 
+)
 
 # run graph plotting separately from clustering output but without node_sizes
 viz_graph(
