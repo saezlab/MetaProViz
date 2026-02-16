@@ -128,8 +128,7 @@ viz_graph <- function(
         node_sizes = node_sizes,
         show_density = show_density,
         print_plot = print_plot,
-        save_plot = save_plot,
-        seed = seed
+        save_plot = save_plot
     )
 
     # ---- Create adjacency ------------------------------------------------

@@ -2267,8 +2267,6 @@ checkmatch_pk_to_data <- function(
 #'     multiple rows map to the same term. Default = NULL.
 #' @param show_density \emph{Optional: } If TRUE, add a hull background per
 #'     cluster to the graph. Default = FALSE.
-#' @param seed \emph{Optional: } Random seed for graph layout reproducibility.
-#'     Default = NULL.
 #' @param save_plot \emph{Optional: } Select the file type of output plots.
 #'     Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #' @param print_plot \emph{Optional: } If TRUE prints an overview of resulting
@@ -2284,12 +2282,12 @@ checkmatch_pk_to_data <- function(
 #'     \item{distance_matrix}{Term-by-term distance matrix (1 - similarity).}
 #'     \item{node_sizes}{Named numeric vector of node sizes used in plotting (or NULL).}
 #'     \item{graph_plot}{Graph plot returned by viz_graph.}
-#' 
+#'
 #' @examples
-#' 
+#'
 #' # Load example data
 #' kegg_pathways <- metsigdb_kegg()
-#' 
+#'
 #' # Run clustering with graph plotting
 #' r <- cluster_pk(
 #'     kegg_pathways,
@@ -2306,15 +2304,14 @@ checkmatch_pk_to_data <- function(
 #'     save_plot = NULL,
 #'     min_degree = 1,
 #'     print_plot = FALSE,
-#'     seed = 123,
 #'     show_density = TRUE,
 #'     max_nodes = 1000
-#' ) 
-#' 
+#' )
+#'
 #' print(head(r$cluster_summary))
-#' 
+#'
 #' ## example for an enrichment format result
-#' 
+#'
 #' data(intracell_dma) # loads the object into your environment
 #' DMAres <- intracell_dma %>%
 #'     dplyr::filter(!is.na(KEGGCompound)) %>%
@@ -2324,9 +2321,9 @@ checkmatch_pk_to_data <- function(
 #'     data = DMAres,
 #'     input_pathway = kegg_pathways
 #' )
-#' 
+#'
 #' enrichment_result_filtered <- RES$ClusterGosummary %>% dplyr::filter(p.adjust < 0.5)
-#' 
+#'
 #' res <- cluster_pk(
 #'    enrichment_result_filtered,
 #'    metadata_info = c(
@@ -2343,7 +2340,6 @@ checkmatch_pk_to_data <- function(
 #'    plot_name = "GraphExample_enrichment_format",
 #'    print_plot = FALSE,
 #'    min_degree = 0,
-#'    seed = 42,
 #'    show_density = TRUE,
 #'    max_nodes = 1000
 #')
@@ -2375,7 +2371,6 @@ cluster_pk <- function(
     min_degree = 1,
     node_size_column = NULL,
     show_density = FALSE,
-    seed = NULL,
     save_plot = "png",
     print_plot = FALSE,
     path = NULL
@@ -2419,7 +2414,6 @@ cluster_pk <- function(
         min_degree = min_degree,
         node_size_column = node_size_column,
         show_density = show_density,
-        seed = seed,
         save_plot = save_plot,
         print_plot = print_plot
     )
@@ -2547,7 +2541,7 @@ cluster_pk <- function(
             ids <- ids[!is.na(ids) & ids != ""]
             binary_matrix[i, colnames(binary_matrix) %in% ids] <- 1
         }
-        
+
         corr <- cor(t(binary_matrix), method = correlation_method)
         if (anyNA(corr)) {
             # This typically happens when one or more term vectors are constant (sd = 0)
@@ -2670,7 +2664,6 @@ cluster_pk <- function(
         min_degree = min_degree,
         node_sizes = node_sizes,
         show_density = show_density,
-        seed = seed,
         save_plot = save_plot,
         print_plot = print_plot,
         path = path
