@@ -13,7 +13,6 @@ viz_graph(
   min_degree = NULL,
   node_sizes = NULL,
   show_density = FALSE,
-  seed = NULL,
   save_plot = "svg",
   print_plot = TRUE,
   path = NULL,
@@ -87,7 +86,6 @@ r <- cluster_pk(
     plot_name = "GraphExample_long_format",
     save_plot = "png",
     min_degree = 1,
-    seed = 123,
     show_density = FALSE,
     max_nodes = 1000
 )
@@ -102,7 +100,6 @@ viz_graph(
     min_degree = NULL,
     node_sizes = NULL,
     show_density = TRUE,
-    seed = 123,
     save_plot = NULL,
     print_plot = FALSE,
     path = NULL
