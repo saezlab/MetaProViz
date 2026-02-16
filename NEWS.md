@@ -1,3 +1,20 @@
+# MetaProViz 3.99.34 (2026-02-16)
+
+- New `cluster_pk()` function for clustering prior knowledge terms by
+  metabolite overlap, with network graph visualization via `viz_graph()`
+- New `viz_graph()` function for network graph visualization of prior
+  knowledge term similarity
+- SummarizedExperiment support extended to `viz_superplot()`
+- Bug fixes in `processing()`, `viz_volcano()`, `dma()`, and ORA functions
+- NA handling improvements for correlation analysis and metabolites without
+  assigned pathways
+- License changed from GPLv3 to BSD 3-clause
+- Code quality improvements: removed `SuppressWarnings`/`SuppressMessages`
+  calls, replaced `paste` in condition signals, replaced `1:...` with
+  `seq_len()`
+- Added `ggraph` dependency
+- Updated documentation and argument descriptions throughout
+
 # MetaProViz 3.99.10 (2025-10-28)
 
 - SummarizedExperiment support:
