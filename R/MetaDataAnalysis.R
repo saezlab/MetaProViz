@@ -244,7 +244,7 @@ metadata_analysis <- function(
     Stat_results %<>% merge(prop_var_ex, by = "PC", all.x = TRUE)
 
     # ##############################################################################################################################################################################################################
-    # # ---------- top/Bottom ------------##
+    # # ---------- top_bottom ------------##
     # Add top/bottom related features to this
     # # Create a data frame for top and bottom features for each PC
     topBottom_Features <- lapply(2:ncol(PCA.res_Loadings), function(i) {

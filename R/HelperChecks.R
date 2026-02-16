@@ -955,7 +955,7 @@ check_param_dma <- function(
 #' @param cutoff_stat \emph{Optional: } p-adjusted value cutoff from ORA results. Must be a
 #'     numeric value. \strong{default: 0.05}
 #' @param cutoff_percentage \emph{Optional: } percentage cutoff of metabolites that should be
-#'     considered for ORA. Selects top/Bottom % of selected percentageColumn,
+#'     considered for ORA. Selects top_bottom % of selected percentageColumn,
 #'     usually t.val or Log2FC \strong{default: 10}
 #' @param input_pathway DF that must include column "term" with the pathway name, column
 #'     "Metabolite" with the Metabolite name or ID and column "Description"
