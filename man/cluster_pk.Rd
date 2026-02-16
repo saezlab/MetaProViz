@@ -21,7 +21,6 @@ cluster_pk(
   min_degree = 1,
   node_size_column = NULL,
   show_density = FALSE,
-  seed = NULL,
   save_plot = "png",
   print_plot = FALSE,
   path = NULL
@@ -85,9 +84,6 @@ multiple rows map to the same term. Default = NULL.}
 \item{show_density}{\emph{Optional: } If TRUE, add a hull background per
 cluster to the graph. Default = FALSE.}
 
-\item{seed}{\emph{Optional: } Random seed for graph layout reproducibility.
-Default = NULL.}
-
 \item{save_plot}{\emph{Optional: } Select the file type of output plots.
 Options are svg, pdf, png or NULL. \strong{Default = "svg"}}
 
@@ -131,10 +127,9 @@ r <- cluster_pk(
     save_plot = NULL,
     min_degree = 1,
     print_plot = FALSE,
-    seed = 123,
     show_density = TRUE,
     max_nodes = 1000
-) 
+)
 
 print(head(r$cluster_summary))
 
@@ -168,7 +163,6 @@ res <- cluster_pk(
    plot_name = "GraphExample_enrichment_format",
    print_plot = FALSE,
    min_degree = 0,
-   seed = 42,
    show_density = TRUE,
    max_nodes = 1000
 )
