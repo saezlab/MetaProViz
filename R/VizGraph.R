@@ -35,8 +35,6 @@
 #'     with names matching term IDs. Values are scaled for plotting.
 #' @param show_density \emph{Optional: } If TRUE, add a hull background per
 #'     cluster. Default = FALSE.
-#' @param seed \emph{Optional: } Random seed for graph layout reproducibility.
-#'     Default = NULL.
 #' @param save_plot \emph{Optional: } Select the file type of output plots.
 #'     Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #' @param print_plot \emph{Optional: } If TRUE prints an overview of resulting
@@ -49,12 +47,12 @@
 #'     Default = "px".
 #'
 #' @return Graph plot as a ggplot object.
-#' 
+#'
 #' @examples
-#' 
+#'
 #' # Load example data
 #' d <- metsigdb_kegg()
-#' 
+#'
 #' # Run clustering with graph plotting
 #' r <- cluster_pk(
 #'     d,
@@ -73,8 +71,8 @@
 #'     seed = 123,
 #'     show_density = FALSE,
 #'     max_nodes = 1000
-#' ) 
-#' 
+#' )
+#'
 #' # run graph plotting separately from clustering output but without node_sizes
 #' viz_graph(
 #'     r$similarity_matrix,
@@ -168,9 +166,6 @@ viz_graph <- function(
     # Attach cluster labels to nodes for stable color mapping
     igraph::V(g)$cluster <- clusters[igraph::V(g)$name]
 
-    if (!is.null(seed)) {
-        set.seed(seed)
-    }
     layout <- ggraph::create_layout(g, layout = "fr")
 
     node_size_vec <- NULL
@@ -279,7 +274,7 @@ viz_graph <- function(
     )
 
     if (print_plot) {
-        print(graph_plot)
+        plot(graph_plot)
     }
 
     return(graph_plot)
