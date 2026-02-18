@@ -57,13 +57,16 @@
 #'     results, results summary
 #'
 #' @examples
-#' data(tissue_norm_se)
-#' Res <- metadata_analysis(data = tissue_norm_se)
-#'
 #' data(tissue_norm)
+#' d <- tissue_norm[1:100, -c(2:14)] %>% tibble::column_to_rownames("Code")
+#' d <- d[, vapply(d, function(x) length(unique(x)) > 1, logical(1))]
 #' Res <- metadata_analysis(
-#'     data = tissue_norm[, -c(2:14)] %>% tibble::column_to_rownames("Code"),
-#'     metadata_sample = tissue_norm[, c(1, 3, 5:6, 13:14)] %>% tibble::column_to_rownames("Code")
+#'     data = d,
+#'     metadata_sample = tissue_norm[1:100, c(1, 5:6)] %>%
+#'         tibble::column_to_rownames("Code"),
+#'     save_plot = NULL,
+#'     save_table = NULL,
+#'     print_plot = FALSE
 #' )
 #'
 #' @importFrom dplyr filter bind_rows rename mutate ungroup group_by summarise
