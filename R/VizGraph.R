@@ -49,42 +49,27 @@
 #' @return Graph plot as a ggplot object.
 #'
 #' @examples
-#'
-#' # Load example data
-#' d <- metsigdb_kegg()
-#'
-#' # Run clustering with graph plotting
-#' r <- cluster_pk(
-#'     d,
-#'     metadata_info = c(
-#'         metabolite_column = "MetaboliteID",
-#'         pathway_column = "term"
-#'     ),
-#'     input_format = "long",
-#'     similarity = "jaccard",
-#'     threshold = 0.2,
-#'     clust = "community",
-#'     min = 2,
-#'     plot_name = "GraphExample_long_format",
-#'     save_plot = "png",
-#'     min_degree = 1,
-#'     show_density = FALSE,
-#'     max_nodes = 1000
+#' # Create toy similarity matrix and clusters
+#' sim <- matrix(
+#'     c(1, 0.8, 0.3, 0.1,
+#'       0.8, 1, 0.2, 0.1,
+#'       0.3, 0.2, 1, 0.7,
+#'       0.1, 0.1, 0.7, 1),
+#'     nrow = 4,
+#'     dimnames = list(
+#'         c("Pathway_A", "Pathway_B", "Pathway_C", "Pathway_D"),
+#'         c("Pathway_A", "Pathway_B", "Pathway_C", "Pathway_D")
+#'     )
 #' )
-#'
-#' # run graph plotting separately from clustering output but without node_sizes
+#' clusters <- c(
+#'     Pathway_A = "1", Pathway_B = "1",
+#'     Pathway_C = "2", Pathway_D = "2"
+#' )
 #' viz_graph(
-#'     r$similarity_matrix,
-#'     r$clusters,
-#'     plot_threshold = 0.5,
-#'     plot_name = "ClusterGraph",
-#'     max_nodes = NULL,
-#'     min_degree = NULL,
-#'     node_sizes = NULL,
-#'     show_density = TRUE,
+#'     sim, clusters,
+#'     plot_threshold = 0.2,
 #'     save_plot = NULL,
-#'     print_plot = FALSE,
-#'     path = NULL
+#'     print_plot = FALSE
 #' )
 #'
 #' @importFrom igraph graph_from_adjacency_matrix components degree induced_subgraph
