@@ -2233,8 +2233,8 @@ checkmatch_pk_to_data <- function(
 #'     Defaults to `c(metabolite_column = "MetaboliteID", pathway_column = "term")`.
 #' @param similarity Similarity measure between term ID sets. Options:
 #'     "jaccard" (default), "overlap_coefficient", or "correlation".
-#'     Jaccard similarity is |A ∩ B| / |A ∪ B|. Overlap coefficient is
-#'     |A ∩ B| / min(|A|, |B|). Jaccard is stricter for large sets, while
+#'     Jaccard similarity is |A intersect B| / |A union B|. Overlap coefficient is
+#'     |A intersect B| / min(|A|, |B|). Jaccard is stricter for large sets, while
 #'     overlap_coefficient is more permissive for nested sets.
 #' @param correlation_method Correlation method when `similarity = "correlation"`.
 #'     One of "pearson", "spearman", "kendall". Ignored otherwise.
