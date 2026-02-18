@@ -333,3 +333,21 @@ When investigating specific functionality, refer to these key files:
 - Save/export logic: `R/HelperSave.R`
 - Package state: `R/aaa_MetaProViz_Env.R`
 - Example data: `R/ToyData.R`
+
+## Saezlab Architecture Repository (saezverse)
+
+This package is part of the saezlab software portfolio. The architecture
+repository at `../saezverse/` (https://github.com/saezlab/saezverse) is a
+central knowledge base for cross-package coordination. It contains:
+
+- **Package descriptions** (`human/packages/`) — including `metaproviz.md`
+- **Coding guidelines** (`human/guidelines/`) — R coding style, R/Bioc
+  development workflow
+- **Architecture decisions** (`human/decisions/`) — ADRs for group-wide
+  decisions
+- **Plans** (`human/plans/`) — roadmaps and specifications
+
+When working on MetaProViz, consult the saezverse repo for:
+- R coding style conventions: `../saezverse/human/guidelines/r-coding-style.md`
+- R/Bioc development workflow: `../saezverse/human/guidelines/r-bioc-package-workflow.md`
+- Cross-package dependencies and how MetaProViz fits in the ecosystem
