@@ -728,3 +728,91 @@ metsigdb_metalinks <- function(
 
 # This is needed to remove ions, xenobiotics, cofactors, etc. from the metabolite list for any of the functions above.
 
+
+
+
+
+
+
+
+
+
+#' Retrieve Reactome metabolite sets suitable for ORA.
+#' 
+#' Queries the OmniPath resource through OmniPathR to obtail Reactome pathway
+#' level metabolite sets.
+#'
+#' @param species String. Optionally specify pathways to query from a species
+#' via full name or three letter code. Default = "Homo sapiens". NULL for all species.
+#' @param pathway_ids String vector. Optionally provide pathway_ids to query. Default NULL to query all pathways.
+#' @param out_path String. Optionally save results as csv into out_path. Default NULL.
+#' 
+#' @return 
+#' A tibble in long format containing one row per metabolite for the Reactome pathways.
+#' 
+#' @examples 
+#' \dontrun{
+#' df <- metsigdb_reactome()
+#' head(df)
+#' }
+#' 
+#' @importFrom OmnipathR get_reactome
+#' @importFrom magrittr %>%
+#' @importFrom tidyr separate_rows
+#' @importFrom dplyr mutate
+#' 
+#' @export
+metsigdb_reactome <- function(
+    species = "Homo sapiens"
+){
+    
+    pathway_df <- OmnipathR::get_reactome(
+        species = species,
+        pathway_ids = NULL,
+        out_path = NULL
+    )
+    
+    pathway_df_long <- pathway_df %>%
+        separate_rows(chebi_ids, sep = ", ") %>%
+        mutate(chebi_ids = trimws(chebi_ids)) %>%
+        rename(chebi_id = chebi_ids)
+    
+    pathway_df_long
+    
+}
+
+
+#' Retrieve WikiPathways metabolite mapping suitable for ORA.
+#'
+#' Retrieves pathway to metabolite mappings from WikiPathways (via
+#' `get_wikipathways_metabolites_sparql()`) via OmnipathR and returns a long-format table with
+#' one metabolite identifier per row.
+#'
+#' @param species Character. Species name. Default is `"Homo sapiens"`.
+#'
+#' @return A tibble in long format with columns `pathway_id`, `pathway_name`,
+#'   `pathway_url`, `n_metabolites_in_pathway`, and `metabolite_id`.
+#'
+#' @importFrom dplyr mutate rename
+#' @importFrom tidyr separate_rows
+#' @importFrom stringr str_trim
+#' @importFrom magrittr %>%
+#'
+#' @examples
+#' df <- metsigdb_wikipathways()
+#' head(df)
+#' @export
+metsigdb_wikipathways <- function(
+    species = "Homo sapiens"
+) {
+    
+    pathway_df <- get_wikipathways_metabolites_sparql(species = species)
+    
+    pathway_df_long <- pathway_df %>%
+        tidyr::separate_rows(metabolites, sep = ";\\s*") %>%
+        dplyr::mutate(metabolites = stringr::str_trim(metabolites)) %>%
+        dplyr::rename(metabolite_id = metabolites)
+    
+    pathway_df_long
+    
+}
