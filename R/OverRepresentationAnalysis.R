@@ -259,8 +259,8 @@ cluster_ora <- function(
 #' @param cutoff_stat \emph{Optional: } p-adjusted value cutoff from ORA results. Must be a
 #'     numeric value. \strong{default: 0.05}
 #' @param cutoff_percentage \emph{Optional: } percentage cutoff of metabolites that should be
-#'     considered for ORA. Selects top/Bottom % of selected percentage Column,
-#'     usually t.val or Log2FC \strong{default: 10}
+#'     considered for ORA. Selects top and bottom percentage of selected
+#'     numeric variable, usually t.val or Log2FC \strong{default: 10}
 #' @param input_pathway DF that must include column "term" with the pathway name, column
 #'     "Metabolite" with the Metabolite name or ID and column "Description"
 #'     with pathway description that will be depicted on the plots.
@@ -303,11 +303,12 @@ standard_ora <- function(
 ) {
 
     # NSE vs. R CMD check workaround
-    Cluster_ChangedMetabolites <- Description <- term <- Metabolites_in_Pathway <- NULL
+    Cluster_ChangedMetabolites <- Description <- term <-
+        Metabolites_in_Pathway <- top_bottom <- NULL
     ## ------------ Create log file ----------- ##
     metaproviz_init()
 
-## ------------ Check Input files ----------- ##
+    ## ------------ Check Input files ----------- ##
     Pathways <- check_param_ora(
         data = data,
         metadata_info = metadata_info,
@@ -343,29 +344,29 @@ standard_ora <- function(
     # rank by t.val
     allMetabolites_DF <- data[order(data[[metadata_info[["percentageColumn"]]]]), ]
     selectMetabolites_DF <- allMetabolites_DF[c(seq_len(ceiling(value * nrow(allMetabolites_DF))), (nrow(allMetabolites_DF)-(ceiling(value * nrow(allMetabolites_DF)))):(nrow(allMetabolites_DF))), ]
-    selectMetabolites_DF$`top/Bottom` <- "TRUE"
+    selectMetabolites_DF$top_bottom <- "TRUE"  # why??
     selectMetabolites_DF <-
         merge(
             allMetabolites_DF,
-            selectMetabolites_DF[, c("Metabolite", "top/Bottom")],
+            selectMetabolites_DF[, c("Metabolite", "top_bottom")],
             by = "Metabolite",
             all.x = TRUE
         )
 
     InputSelection <- selectMetabolites_DF %>%
     mutate(
-        `top/Bottom_percentage` = (`top/Bottom` == "TRUE")
+        top_bottom_percentage = (top_bottom == "TRUE")
     ) %>%
     mutate(
         Significant = get(metadata_info[["pvalColumn"]]) <= cutoff_stat,
         Cluster_ChangedMetabolites = case_when(
-            Significant & `top/Bottom_percentage` ~ TRUE,
+            Significant & top_bottom_percentage ~ TRUE,
             TRUE ~ FALSE
         )
     )
-    
+
     # remove column as its not needed for output
-    InputSelection$`top/Bottom` <- NULL
+    InputSelection$top_bottom <- NULL
 
     selectMetabolites <- InputSelection %>%
         subset(Cluster_ChangedMetabolites)

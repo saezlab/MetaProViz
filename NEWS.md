@@ -1,10 +1,18 @@
+# MetaProViz 3.99.40 (2026-02-18)
+
+- New cluster_pk() function for clustering prior knowledge terms
+- New viz_graph() function for network graph visualization
+- SummarizedExperiment support extended to viz_superplot()
+- Bug fixes in processing(), viz_volcano(), dma(), and ORA functions
+- NA handling improvements for correlation analysis
+- License changed from GPLv3 to BSD 3-clause
+- Code quality improvements for Bioconductor compliance
+- Added ggraph dependency
+- Updated documentation and argument descriptions
+
 # MetaProViz 3.99.10 (2025-10-28)
 
-- SummarizedExperiment support:
-  - Implemention of se objects support as default input for `processing()`, `replicate_sum()`, `pool_estimation()`, `dma()`, `metadata_analysis()`, `meta_pk()`, `viz_heatmap()` and `viz_pca()`#
-  - Implemention of se object output for `processing()`, `replicate_sum()` and `pool_estimation()`
-  - Generation of example data se objects `intracell_raw_se.rda` and `tissue_norm_se.rda` in /data folder
-
+- SummarizedExperiment support as default input and output
 - First candidate for Bioconductor submission
 
 # MetaProViz 3.99.1 (2025-10-08)

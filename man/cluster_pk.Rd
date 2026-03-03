@@ -21,7 +21,6 @@ cluster_pk(
   min_degree = 1,
   node_size_column = NULL,
   show_density = FALSE,
-  seed = NULL,
   save_plot = "png",
   print_plot = FALSE,
   path = NULL
@@ -37,8 +36,8 @@ Defaults to \code{c(metabolite_column = "MetaboliteID", pathway_column = "term")
 
 \item{similarity}{Similarity measure between term ID sets. Options:
 "jaccard" (default), "overlap_coefficient", or "correlation".
-Jaccard similarity is |A ∩ B| / |A ∪ B|. Overlap coefficient is
-|A ∩ B| / min(|A|, |B|). Jaccard is stricter for large sets, while
+Jaccard similarity is |A intersect B| / |A union B|. Overlap coefficient is
+|A intersect B| / min(|A|, |B|). Jaccard is stricter for large sets, while
 overlap_coefficient is more permissive for nested sets.}
 
 \item{correlation_method}{Correlation method when \code{similarity = "correlation"}.
@@ -85,9 +84,6 @@ multiple rows map to the same term. Default = NULL.}
 \item{show_density}{\emph{Optional: } If TRUE, add a hull background per
 cluster to the graph. Default = FALSE.}
 
-\item{seed}{\emph{Optional: } Random seed for graph layout reproducibility.
-Default = NULL.}
-
 \item{save_plot}{\emph{Optional: } Select the file type of output plots.
 Options are svg, pdf, png or NULL. \strong{Default = "svg"}}
 
@@ -111,66 +107,25 @@ A list with:
 Cluster terms in prior knowledge by set overlap
 }
 \examples{
+# Create toy pathway data in long format
+toy_pw <- data.frame(
+    MetaboliteID = c("C1", "C2", "C3", "C1", "C2", "C4", "C3", "C4", "C5"),
+    term = c("pA", "pA", "pA", "pB", "pB", "pB", "pC", "pC", "pC")
+)
 
-# Load example data
-kegg_pathways <- metsigdb_kegg()
-
-# Run clustering with graph plotting
 r <- cluster_pk(
-    kegg_pathways,
+    toy_pw,
     metadata_info = c(
         metabolite_column = "MetaboliteID",
         pathway_column = "term"
     ),
     input_format = "long",
     similarity = "jaccard",
-    threshold = 0.2,
+    threshold = 0.1,
     clust = "community",
-    min = 2,
-    plot_name = "GraphExample_long_format",
+    min = 1,
     save_plot = NULL,
-    min_degree = 1,
-    print_plot = FALSE,
-    seed = 123,
-    show_density = TRUE,
-    max_nodes = 1000
-) 
-
-print(head(r$cluster_summary))
-
-## example for an enrichment format result
-
-data(intracell_dma) # loads the object into your environment
-DMAres <- intracell_dma \%>\%
-    dplyr::filter(!is.na(KEGGCompound)) \%>\%
-    tibble::column_to_rownames("KEGGCompound") \%>\%
-    dplyr::select(-"Metabolite")
-RES <- standard_ora(
-    data = DMAres,
-    input_pathway = kegg_pathways
-)
-
-enrichment_result_filtered <- RES$ClusterGosummary \%>\% dplyr::filter(p.adjust < 0.5)
-
-res <- cluster_pk(
-   enrichment_result_filtered,
-   metadata_info = c(
-       metabolite_column = "Metabolites_in_pathway",
-       pathway_column = "ID"
-   ),
-   input_format = "enrichment",
-   similarity = "jaccard",
-   threshold = 0.4,
-   clust = "community",
-   min = 1,
-   node_size_column = "percentage_of_Pathway_detected",
-   save_plot = NULL,
-   plot_name = "GraphExample_enrichment_format",
-   print_plot = FALSE,
-   min_degree = 0,
-   seed = 42,
-   show_density = TRUE,
-   max_nodes = 1000
+    print_plot = FALSE
 )
 
 }

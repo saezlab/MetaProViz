@@ -941,38 +941,21 @@ mca_2cond <- function(
 #'     information of each metabolites in the clusters.
 #'
 #' @examples
-#' data(medium_raw)
-#' Media <- medium_raw %>% tibble::column_to_rownames("Code")
-#' ResM <- processing(
-#'     data = Media[-c(40:45), -c(1:3)],
-#'     metadata_sample = Media[-c(40:45), c(1:3)],
-#'     metadata_info = c(
-#'         Conditions = "Conditions",
-#'         Biological_Replicates = "Biological_Replicates",
-#'         core_norm_factor = "GrowthFactor",
-#'         core_media = "blank"
-#'     ),
-#'     core = TRUE
-#' )
-#'
-#' MediaDMA <- dma(
-#'     data = ResM[["DF"]][["Preprocessing_output"]][, -c(1:4)],
-#'     metadata_sample = ResM[["DF"]][["Preprocessing_output"]][, c(1:4)],
-#'     metadata_info = c(
-#'         Conditions = "Conditions",
-#'         Numerator = NULL,
-#'         Denominator = "HK2"
-#'     ),
-#'     pval = "aov",
-#'     core = TRUE
-#' )
-#'
 #' data(intracell_dma)
-#' IntraDMA <- intracell_dma
+#'
+#' # Create mock CoRe DMA results with required columns
+#' core_dma <- data.frame(
+#'     Metabolite = intracell_dma$Metabolite[1:50],
+#'     `Log2(Distance)` = runif(50, -2, 2),
+#'     p.adj = runif(50, 0, 0.1),
+#'     core = sample(c("Consumption", "Release"), 50, replace = TRUE),
+#'     check.names = FALSE
+#' )
 #'
 #' Res <- mca_core(
-#'     data_intra = as.data.frame(IntraDMA),
-#'     data_core = as.data.frame(MediaDMA[["dma"]][[1]])
+#'     data_intra = as.data.frame(intracell_dma),
+#'     data_core = core_dma,
+#'     save_table = NULL
 #' )
 #'
 #' @importFrom dplyr rename mutate case_when mutate_at count distinct group_by
