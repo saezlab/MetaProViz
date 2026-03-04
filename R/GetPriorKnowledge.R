@@ -768,6 +768,9 @@ metsigdb_reactome <- function(
     out_path = NULL
 ){
     
+    # NSE vs. R CMD check workaround
+    chebi_ids <- pathway_df <- pathway_df_long <- NULL
+    
     pathway_df <- OmnipathR::get_reactome(
         species = species,
         pathway_ids = NULL,
@@ -808,6 +811,9 @@ metsigdb_reactome <- function(
 metsigdb_wikipathways <- function(
     species = "Homo sapiens"
 ) {
+    
+    # NSE vs. R CMD check workaround
+    metabolites <- pathway_df <- pathway_df_long <- NULL
     
     pathway_df <- get_wikipathways_metabolites_sparql(species = species)
     
