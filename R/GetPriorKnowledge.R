@@ -763,7 +763,9 @@ metsigdb_metalinks <- function(
 #' 
 #' @export
 metsigdb_reactome <- function(
-    species = "Homo sapiens"
+    species = "Homo sapiens",
+    pathway_ids = NULL,
+    out_path = NULL
 ){
     
     pathway_df <- OmnipathR::get_reactome(
@@ -797,6 +799,7 @@ metsigdb_reactome <- function(
 #' @importFrom tidyr separate_rows
 #' @importFrom stringr str_trim
 #' @importFrom magrittr %>%
+#' @importFrom OmnipathR get_wikipathways_metabolites_sparql
 #'
 #' @examples
 #' df <- metsigdb_wikipathways()
