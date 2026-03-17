@@ -1,0 +1,253 @@
+---
+title: "Comparison to other tools"
+author:
+  - name: Christina Schmidt
+    affiliation:
+    - Heidelberg University
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_float: true
+    toc_depth: 5
+    code_folding: show
+vignette: >
+  %\VignetteIndexEntry{Standard Metabolomics}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+bibliography: bibliography.bib
+editor_options:
+  chunk_output_type: console
+---
+
+<style>
+.vscroll-plot {
+    width: 850px;
+    height: 500px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+</style>
+
+```{r chunk_setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+load the libraries:
+```{r, message=FALSE, warning=FALSE}
+# 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
+# 2. Install the latest development version from GitHub using devtools
+# devtools::install_github("https://github.com/saezlab/MetaProViz")
+
+library(MetaProViz)
+
+# dependencies that need to be loaded:
+library(magrittr)
+library(dplyr)
+library(tibble)
+library(rlang)
+library(ggfortify)
+library(stringr)
+library(tibble)
+
+# Metaboanalyst R
+
+```
+
+
+# Task
+MetaboAnalyst already offers some overlapping functionality with MetaProViz, a more explicit comparison between the two tools would help readers fully understand the unique advantages and improvements provided by MetaProViz.\
+We will create a table including the different modules and methods of MetaProViz and compare them to the functionality offered by MetaboAnalyst. This will help readers to understand the unique advantages and improvements provided by MetaProViz.In order to do this we will also test the performance for the overlapping tasks here. 
+
+# Table
+There was an effort to summarize all freely-available software tools for metabolomics analysis (https://pubmed.ncbi.nlm.nih.gov/28890673/): "In this review software are classified into the following
+categories based on their major functionality: Preprocessing,Annotation, Post-processing, Statistical analysis, Workflows and Other tools. [...] Software that provide Preprocessing, Annotation and Statistical analysis are classified as Workflows." \
+Therefore, we classify both MetaboAnalyst and MetaProViz as workflows. 
+
+```{r}
+comparison_table <- data.frame(
+  Feature = c(
+    "Raw spectral processing",#1
+    "Raw spectral processing",#1
+    "Processing",#2
+    "Processing",
+    "Processing",
+    "Processing",
+    "Processing",
+    "Processing",
+    "Differential Analysis",#3
+    "Differential Analysis",
+    "Differential Analysis",
+    "Differential Analysis",
+    "Prior Knowledge Access",#4
+    "Prior Knowledge Access",
+    "Prior Knowledge Access",
+    "Prior Knowledge Access",
+    "Prior Knowledge Access",
+    "Prior Knowledge Integration",#5
+    "Prior Knowledge Integration",#5
+    "Prior Knowledge Integration",#5
+    "Functional Analysis",#6
+    "Functional Analysis",#6
+    "Functional Analysis",#6
+    "Visualisation", #7
+    "Visualisation", #7
+    "Visualisation", #7
+    "Visualisation", #7
+    "Visualisation", #7
+    "Visualisation", #7
+    "Visualisation", #7
+    "Visualisation", #7
+    "R-package",#8
+    "R-package",#8
+    "R-package",#8
+    "R-package",#8
+    "R-package",#8
+    "R-package",#8
+    "R-package"#8
+  ),
+  SubFeature = c(
+    "Peak integration",#1
+    "Peak annotation",#1
+    "Feature filtering",#2
+    "Missing Value Imputation",#2
+    "Normalisation",#2
+    "Outlier Detection",#2
+    "Pool Sample QC", #2
+    "Consumption-Release Calculation",#2
+    "Data distribution check",#3
+    "Statistical tests for normally distributed data",#3
+    "Statistical tests for not-normally distributed data",#3
+    "Consumption-Release",#3
+    "Metabolite-Pathway sets",#4
+    "Metabolite-Transporter sets",#4
+    "Metabolite-receptor sets",#4
+    "Metabolite-structre sets",#4
+    "Gene-metabolite sets",#4
+    "Metabolite ID translation",#5
+    "Metabolite ID addition",#5
+    "Metabolite ambiguity quantification",#5
+    "Sample Metadata analysis",#6
+    "Biological Regulatory Clustering", #6,
+    "Enrichment Analysis", #6
+    "QC plots",#7
+    "PCA",#7
+    "UpSet plots",#7
+    "Volcano plots",#7
+    "Heatmaps",#7
+    "violin plots",#7
+    "Bar graphs",#7
+    "Box plots", #7
+    "PK saved?",#8
+    "Logger function",#8
+    "User messages", #8
+    "reproducibilty...",#8
+    "Bioconductor", #8
+    "Publication ready figures", #8
+    "Publication ready data tables" #8
+  ),
+  MetaProViz = c(
+    "No",
+    "No",
+    "Yes",
+    "Limited",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes"
+  ),
+  MetaProViz_Details = c(
+    "",
+  ),
+  MetaboAnalyst = c(
+    "No",
+    "No",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "No",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes",
+    "Yes"
+  ),
+  MetaboAnalyst_Details = c(
+   "D"
+  )
+)
+
+```
+
+
+
+
+
+
+
+
+
+# Session information
+
+```{r session_info, echo=FALSE}
+options(width = 120)
+sessionInfo()
+```
