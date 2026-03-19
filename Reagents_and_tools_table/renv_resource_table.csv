@@ -1,0 +1,262 @@
+﻿Reagent/Resource,Reference or Source,Identifier or Catalog Number,LoadedBy_run_pipeline.sh,MetaProViz_Dependency
+MetaProViz,https://github.com/saezlab/MetaProViz,GitHub; saezlab/MetaProViz 3.0.3,TRUE,FALSE
+dplyr,https://dplyr.tidyverse.org,CRAN; dplyr 1.1.4,TRUE,TRUE
+easyalluvial,https://github.com/erblast/easyalluvial/,CRAN; easyalluvial 0.3.2,TRUE,FALSE
+ggfortify,https://github.com/sinhrks/ggfortify,CRAN; ggfortify 0.4.19,TRUE,TRUE
+magrittr,https://magrittr.tidyverse.org,CRAN; magrittr 2.0.3,TRUE,TRUE
+purrr,https://purrr.tidyverse.org/,CRAN; purrr 1.1.0,TRUE,TRUE
+rlang,https://rlang.r-lib.org,CRAN; rlang 1.1.6,TRUE,TRUE
+rmarkdown,https://github.com/rstudio/rmarkdown,CRAN; rmarkdown 2.29,TRUE,FALSE
+stringr,https://stringr.tidyverse.org,CRAN; stringr 1.5.1,TRUE,TRUE
+tibble,https://tibble.tidyverse.org/,CRAN; tibble 3.3.0,TRUE,TRUE
+tidyr,https://tidyr.tidyverse.org,CRAN; tidyr 1.3.1,TRUE,TRUE
+tidyverse,https://tidyverse.tidyverse.org,CRAN; tidyverse 2.0.0,TRUE,FALSE
+R,https://www.r-project.org,R 4.4.3,FALSE,FALSE
+AnnotationDbi,https://bioconductor.org/packages/AnnotationDbi,Bioconductor 3.20; AnnotationDbi 1.68.0,FALSE,FALSE
+BH,https://github.com/eddelbuettel/bh,CRAN; BH 1.87.0-1,FALSE,FALSE
+Biobase,https://bioconductor.org/packages/Biobase,Bioconductor 3.20; Biobase 2.66.0,FALSE,FALSE
+BiocGenerics,https://bioconductor.org/packages/BiocGenerics,Bioconductor 3.20; BiocGenerics 0.52.0,FALSE,FALSE
+BiocManager,https://bioconductor.github.io/BiocManager/,CRAN; BiocManager 1.30.26,FALSE,FALSE
+BiocParallel,https://github.com/Bioconductor/BiocParallel,Bioconductor 3.20; BiocParallel 1.40.2,FALSE,FALSE
+BiocVersion,https://bioconductor.org/packages/BiocVersion,Bioconductor 3.20; BiocVersion 3.20.0,FALSE,FALSE
+Biostrings,https://bioconductor.org/packages/Biostrings,Bioconductor 3.20; Biostrings 2.74.1,FALSE,FALSE
+CARNIVAL,https://github.com/saezlab/CARNIVAL,Bioconductor 3.20; CARNIVAL 2.16.0,FALSE,FALSE
+ComplexUpset,https://github.com/krassowski/complex-upset,CRAN; ComplexUpset 1.3.3,FALSE,TRUE
+DBI,https://dbi.r-dbi.org,CRAN; DBI 1.2.3,FALSE,TRUE
+DT,https://github.com/rstudio/DT,CRAN; DT 0.33,FALSE,FALSE
+Deriv,https://cran.r-project.org/package=Deriv,CRAN; Deriv 4.1.6,FALSE,FALSE
+EnhancedVolcano,https://github.com/kevinblighe/EnhancedVolcano,Bioconductor 3.20; EnhancedVolcano 1.24.0,FALSE,TRUE
+FactoMineR,http://factominer.free.fr,CRAN; FactoMineR 2.11,FALSE,FALSE
+Formula,https://cran.r-project.org/package=Formula,CRAN; Formula 1.2-5,FALSE,FALSE
+GSEABase,https://bioconductor.org/packages/GSEABase,Bioconductor 3.20; GSEABase 1.68.0,FALSE,FALSE
+GenomeInfoDb,https://bioconductor.org/packages/GenomeInfoDb,Bioconductor 3.20; GenomeInfoDb 1.42.3,FALSE,FALSE
+GenomeInfoDbData,https://bioconductor.org/packages/GenomeInfoDbData,Bioconductor 3.20; GenomeInfoDbData 1.2.13,FALSE,FALSE
+IRanges,https://bioconductor.org/packages/IRanges,Bioconductor 3.20; IRanges 2.40.1,FALSE,FALSE
+KEGGREST,https://bioconductor.org/packages/KEGGREST,Bioconductor 3.20; KEGGREST 1.46.0,FALSE,FALSE
+KernSmooth,https://cran.r-project.org/package=KernSmooth,CRAN; KernSmooth 2.23-26,FALSE,FALSE
+MASS,http://www.stats.ox.ac.uk/pub/MASS4/,CRAN; MASS 7.3-65,FALSE,FALSE
+Matrix,https://Matrix.R-forge.R-project.org,CRAN; Matrix 1.7-3,FALSE,FALSE
+MatrixModels,https://Matrix.R-forge.R-project.org/,CRAN; MatrixModels 0.5-4,FALSE,FALSE
+OmnipathR,https://github.com/saezlab/OmnipathR,GitHub; saezlab/OmnipathR 3.15.12,FALSE,TRUE
+Polychrome,http://oompa.r-forge.r-project.org/,CRAN; Polychrome 1.5.4,FALSE,TRUE
+R.methodsS3,https://github.com/HenrikBengtsson/R.methodsS3,CRAN; R.methodsS3 1.8.2,FALSE,FALSE
+R.oo,https://henrikbengtsson.github.io/R.oo/,CRAN; R.oo 1.27.1,FALSE,FALSE
+R.utils,https://henrikbengtsson.github.io/R.utils/,CRAN; R.utils 2.13.0,FALSE,FALSE
+R6,https://r6.r-lib.org,CRAN; R6 2.6.1,FALSE,FALSE
+RColorBrewer,https://cran.r-project.org/package=RColorBrewer,CRAN; RColorBrewer 1.1-3,FALSE,FALSE
+RSQLite,https://rsqlite.r-dbi.org,CRAN; RSQLite 2.4.1,FALSE,FALSE
+Rcpp,https://www.rcpp.org,CRAN; Rcpp 1.0.14,FALSE,FALSE
+RcppEigen,https://github.com/RcppCore/RcppEigen,CRAN; RcppEigen 0.3.4.0.2,FALSE,FALSE
+Rdpack,https://geobosh.github.io/Rdpack/ (doc),CRAN; Rdpack 2.6.4,FALSE,FALSE
+S4Vectors,https://bioconductor.org/packages/S4Vectors,Bioconductor 3.20; S4Vectors 0.44.0,FALSE,FALSE
+SQUAREM,https://coah.jhu.edu/people/Faculty_personal_Pages/Varadhan.html,CRAN; SQUAREM 2021.1,FALSE,FALSE
+SparseM,http://www.econ.uiuc.edu/~roger/research/sparse/sparse.html,CRAN; SparseM 1.84-2,FALSE,FALSE
+UCSC.utils,https://bioconductor.org/packages/UCSC.utils,Bioconductor 3.20; UCSC.utils 1.2.0,FALSE,FALSE
+XML,https://www.omegahat.net/RSXML/,CRAN; XML 3.99-0.18,FALSE,FALSE
+XVector,https://bioconductor.org/packages/XVector,Bioconductor 3.20; XVector 0.46.0,FALSE,FALSE
+abind,https://cran.r-project.org/package=abind,CRAN; abind 1.4-8,FALSE,FALSE
+admisc,https://github.com/dusadrian/admisc,CRAN; admisc 0.38,FALSE,FALSE
+annotate,https://bioconductor.org/packages/annotate,Bioconductor 3.20; annotate 1.84.0,FALSE,FALSE
+aplot,https://github.com/YuLab-SMU/aplot,CRAN; aplot 0.2.6,FALSE,FALSE
+askpass,https://r-lib.r-universe.dev/askpass,CRAN; askpass 1.2.1,FALSE,FALSE
+backports,https://github.com/r-lib/backports,CRAN; backports 1.5.0,FALSE,FALSE
+base64enc,http://www.rforge.net/base64enc,CRAN; base64enc 0.1-3,FALSE,FALSE
+bcellViper,https://bioconductor.org/packages/bcellViper,Bioconductor 3.20; bcellViper 1.42.0,FALSE,FALSE
+beeswarm,https://github.com/aroneklund/beeswarm,CRAN; beeswarm 0.4.0,FALSE,FALSE
+bit,https://github.com/r-lib/bit,CRAN; bit 4.6.0,FALSE,FALSE
+bit64,https://github.com/r-lib/bit64,CRAN; bit64 4.6.0-1,FALSE,FALSE
+blob,https://blob.tidyverse.org,CRAN; blob 1.2.4,FALSE,FALSE
+boot,https://cran.r-project.org/package=boot,CRAN; boot 1.3-31,FALSE,FALSE
+broom,https://broom.tidymodels.org/,CRAN; broom 1.0.8,FALSE,TRUE
+bslib,https://rstudio.github.io/bslib/,CRAN; bslib 0.9.0,FALSE,FALSE
+cachem,https://cachem.r-lib.org/,CRAN; cachem 1.1.0,FALSE,FALSE
+callr,https://callr.r-lib.org,CRAN; callr 3.7.6,FALSE,FALSE
+car,https://r-forge.r-project.org/projects/car/,CRAN; car 3.1-3,FALSE,FALSE
+carData,https://r-forge.r-project.org/projects/car/,CRAN; carData 3.0-5,FALSE,FALSE
+cellranger,https://github.com/rsheets/cellranger,CRAN; cellranger 1.1.0,FALSE,FALSE
+checkmate,https://mllg.github.io/checkmate/,CRAN; checkmate 2.3.2,FALSE,FALSE
+class,http://www.stats.ox.ac.uk/pub/MASS4/,CRAN; class 7.3-23,FALSE,FALSE
+cli,https://cli.r-lib.org,CRAN; cli 3.6.4,FALSE,FALSE
+clipr,https://github.com/mdlincoln/clipr,CRAN; clipr 0.8.0,FALSE,FALSE
+clock,https://clock.r-lib.org,CRAN; clock 0.7.3,FALSE,FALSE
+cluster,https://svn.r-project.org/R-packages/trunk/cluster/,CRAN; cluster 2.1.8.1,FALSE,FALSE
+codetools,https://gitlab.com/luke-tierney/codetools,CRAN; codetools 0.2-20,FALSE,FALSE
+colorspace,https://colorspace.R-Forge.R-project.org/,CRAN; colorspace 2.1-1,FALSE,FALSE
+conflicted,https://conflicted.r-lib.org/,CRAN; conflicted 1.2.0,FALSE,FALSE
+corrplot,https://github.com/taiyun/corrplot,CRAN; corrplot 0.95,FALSE,FALSE
+cosmosR,https://github.com/saezlab/COSMOSR,Bioconductor 3.20; cosmosR 1.14.0,FALSE,TRUE
+cowplot,https://wilkelab.org/cowplot/,CRAN; cowplot 1.1.3,FALSE,FALSE
+cpp11,https://cpp11.r-lib.org,CRAN; cpp11 0.5.2,FALSE,FALSE
+crayon,https://r-lib.github.io/crayon/,CRAN; crayon 1.5.3,FALSE,FALSE
+crosstalk,https://rstudio.github.io/crosstalk/,CRAN; crosstalk 1.2.1,FALSE,FALSE
+curl,https://jeroen.r-universe.dev/curl,CRAN; curl 6.3.0,FALSE,FALSE
+data.table,https://r-datatable.com,CRAN; data.table 1.17.6,FALSE,FALSE
+dbplyr,https://dbplyr.tidyverse.org/,CRAN; dbplyr 2.5.0,FALSE,FALSE
+decoupleR,https://github.com/saezlab/decoupleR,GitHub; saezlab/decoupleR 2.9.7,FALSE,FALSE
+dendextend,https://talgalili.github.io/dendextend/,CRAN; dendextend 1.19.0,FALSE,FALSE
+diagram,https://cran.r-project.org/package=diagram,CRAN; diagram 1.6.5,FALSE,FALSE
+digest,https://github.com/eddelbuettel/digest,CRAN; digest 0.6.37,FALSE,FALSE
+doBy,https://github.com/hojsgaard/doBy,CRAN; doBy 4.6.27,FALSE,FALSE
+dorothea,https://saezlab.github.io/dorothea/,Bioconductor 3.20; dorothea 1.18.0,FALSE,FALSE
+dtplyr,https://dtplyr.tidyverse.org,CRAN; dtplyr 1.3.1,FALSE,FALSE
+ellipse,https://github.com/dmurdoch/ellipse,CRAN; ellipse 0.5.0,FALSE,FALSE
+emmeans,https://rvlenth.github.io/emmeans/,CRAN; emmeans 1.11.1,FALSE,FALSE
+estimability,https://github.com/rvlenth/estimability,CRAN; estimability 1.5.1,FALSE,FALSE
+evaluate,https://evaluate.r-lib.org/,CRAN; evaluate 1.0.4,FALSE,FALSE
+factoextra,http://www.sthda.com/english/rpkgs/factoextra,CRAN; factoextra 1.0.7,FALSE,TRUE
+farver,https://farver.data-imaginist.com,CRAN; farver 2.1.2,FALSE,FALSE
+fastmap,https://r-lib.github.io/fastmap/,CRAN; fastmap 1.2.0,FALSE,FALSE
+flashClust,https://cran.r-project.org/package=flashClust,CRAN; flashClust 1.01-2,FALSE,FALSE
+fontawesome,https://github.com/rstudio/fontawesome,CRAN; fontawesome 0.5.3,FALSE,FALSE
+forcats,https://forcats.tidyverse.org/,CRAN; forcats 1.0.0,FALSE,FALSE
+formatR,https://github.com/yihui/formatR,CRAN; formatR 1.14,FALSE,FALSE
+fs,https://fs.r-lib.org,CRAN; fs 1.6.6,FALSE,FALSE
+futile.logger,https://cran.r-project.org/package=futile.logger,CRAN; futile.logger 1.4.3,FALSE,FALSE
+futile.options,https://cran.r-project.org/package=futile.options,CRAN; futile.options 1.0.1,FALSE,FALSE
+future,https://future.futureverse.org,CRAN; future 1.58.0,FALSE,FALSE
+future.apply,https://future.apply.futureverse.org,CRAN; future.apply 1.20.0,FALSE,FALSE
+gargle,https://gargle.r-lib.org,CRAN; gargle 1.5.2,FALSE,FALSE
+generics,https://generics.r-lib.org,CRAN; generics 0.1.4,FALSE,FALSE
+ggVennDiagram,https://github.com/gaospecial/ggVennDiagram,CRAN; ggVennDiagram 1.5.2,FALSE,TRUE
+ggalluvial,http://corybrunson.github.io/ggalluvial/,CRAN; ggalluvial 0.12.5,FALSE,FALSE
+ggbeeswarm,https://github.com/eclarke/ggbeeswarm,CRAN; ggbeeswarm 0.7.2,FALSE,TRUE
+ggfun,https://github.com/YuLab-SMU/ggfun,CRAN; ggfun 0.1.8,FALSE,FALSE
+ggplot2,https://ggplot2.tidyverse.org,CRAN; ggplot2 3.5.2,FALSE,TRUE
+ggplotify,https://github.com/GuangchuangYu/ggplotify,CRAN; ggplotify 0.1.2,FALSE,FALSE
+ggpubr,https://rpkgs.datanovia.com/ggpubr/,CRAN; ggpubr 0.6.0,FALSE,TRUE
+ggrepel,https://ggrepel.slowkow.com/,CRAN; ggrepel 0.9.6,FALSE,TRUE
+ggridges,https://wilkelab.org/ggridges/,CRAN; ggridges 0.5.6,FALSE,FALSE
+ggsci,https://nanx.me/ggsci/,CRAN; ggsci 3.2.0,FALSE,FALSE
+ggsignif,https://const-ae.github.io/ggsignif/,CRAN; ggsignif 0.6.4,FALSE,FALSE
+globals,https://globals.futureverse.org,CRAN; globals 0.18.0,FALSE,FALSE
+glue,https://glue.tidyverse.org/,CRAN; glue 1.8.0,FALSE,FALSE
+googledrive,https://googledrive.tidyverse.org,CRAN; googledrive 2.1.1,FALSE,FALSE
+googlesheets4,https://googlesheets4.tidyverse.org,CRAN; googlesheets4 1.1.1,FALSE,FALSE
+gower,https://github.com/markvanderloo/gower,CRAN; gower 1.0.2,FALSE,FALSE
+graph,https://bioconductor.org/packages/graph,Bioconductor 3.20; graph 1.84.1,FALSE,FALSE
+gridExtra,https://cran.r-project.org/package=gridExtra,CRAN; gridExtra 2.3,FALSE,TRUE
+gridGraphics,https://github.com/pmur002/gridgraphics,CRAN; gridGraphics 0.5-1,FALSE,FALSE
+gtable,https://gtable.r-lib.org,CRAN; gtable 0.3.6,FALSE,FALSE
+gtools,https://github.com/r-gregmisc/gtools,CRAN; gtools 3.9.5,FALSE,TRUE
+hardhat,https://github.com/tidymodels/hardhat,CRAN; hardhat 1.4.1,FALSE,FALSE
+hash,http://www.johnhughes.org,CRAN; hash 2.2.6.3,FALSE,TRUE
+haven,https://haven.tidyverse.org,CRAN; haven 2.5.5,FALSE,FALSE
+highr,https://github.com/yihui/highr,CRAN; highr 0.11,FALSE,FALSE
+hms,https://hms.tidyverse.org/,CRAN; hms 1.1.3,FALSE,FALSE
+htmltools,https://github.com/rstudio/htmltools,CRAN; htmltools 0.5.8.1,FALSE,FALSE
+htmlwidgets,https://github.com/ramnathv/htmlwidgets,CRAN; htmlwidgets 1.6.4,FALSE,FALSE
+httpuv,https://github.com/rstudio/httpuv,CRAN; httpuv 1.6.16,FALSE,FALSE
+httr,https://httr.r-lib.org/,CRAN; httr 1.4.7,FALSE,FALSE
+httr2,https://httr2.r-lib.org,CRAN; httr2 1.1.2,FALSE,FALSE
+ids,https://github.com/richfitz/ids,CRAN; ids 1.0.1,FALSE,FALSE
+igraph,https://r.igraph.org/,CRAN; igraph 2.1.4,FALSE,TRUE
+inflection,https://CRAN.R-project.org/package=inflection,CRAN; inflection 1.3.6,FALSE,TRUE
+ipred,https://cran.r-project.org/package=ipred,CRAN; ipred 0.9-15,FALSE,FALSE
+isoband,https://isoband.r-lib.org,CRAN; isoband 0.2.7,FALSE,FALSE
+jquerylib,https://cran.r-project.org/package=jquerylib,CRAN; jquerylib 0.1.4,FALSE,FALSE
+jsonlite,https://jeroen.r-universe.dev/jsonlite https://arxiv.org/abs/1403.2805,CRAN; jsonlite 2.0.0,FALSE,FALSE
+kableExtra,http://haozhu233.github.io/kableExtra/,CRAN; kableExtra 1.4.0,FALSE,TRUE
+knitr,https://yihui.org/knitr/,CRAN; knitr 1.50,FALSE,TRUE
+labeling,https://cran.r-project.org/package=labeling,CRAN; labeling 0.4.3,FALSE,FALSE
+lambda.r,https://cran.r-project.org/package=lambda.r,CRAN; lambda.r 1.2.4,FALSE,FALSE
+later,https://r-lib.github.io/later/,CRAN; later 1.4.2,FALSE,FALSE
+lattice,https://lattice.r-forge.r-project.org/,CRAN; lattice 0.22-7,FALSE,FALSE
+lava,https://kkholst.github.io/lava/,CRAN; lava 1.8.1,FALSE,FALSE
+lazyeval,https://cran.r-project.org/package=lazyeval,CRAN; lazyeval 0.2.2,FALSE,FALSE
+leaps,https://cran.r-project.org/package=leaps,CRAN; leaps 3.2,FALSE,FALSE
+lifecycle,https://lifecycle.r-lib.org/,CRAN; lifecycle 1.0.4,FALSE,FALSE
+limma,https://bioinf.wehi.edu.au/limma/,Git; limma 3.65.1,FALSE,TRUE
+listenv,https://listenv.futureverse.org,CRAN; listenv 0.9.1,FALSE,FALSE
+lme4,https://github.com/lme4/lme4/,CRAN; lme4 1.1-37,FALSE,FALSE
+logger,https://daroczig.github.io/logger/,CRAN; logger 0.4.0,FALSE,TRUE
+lpSolve,https://github.com/gaborcsardi/lpSolve,CRAN; lpSolve 5.6.23,FALSE,FALSE
+lubridate,https://lubridate.tidyverse.org,CRAN; lubridate 1.9.4,FALSE,FALSE
+memoise,https://memoise.r-lib.org,CRAN; memoise 2.0.1,FALSE,FALSE
+mgcv,https://cran.r-project.org/package=mgcv,CRAN; mgcv 1.9-3,FALSE,FALSE
+microbenchmark,https://github.com/joshuaulrich/microbenchmark/,CRAN; microbenchmark 1.5.0,FALSE,FALSE
+mime,https://github.com/yihui/mime,CRAN; mime 0.13,FALSE,FALSE
+minqa,http://optimizer.r-forge.r-project.org,CRAN; minqa 1.2.8,FALSE,FALSE
+modelr,https://modelr.tidyverse.org,CRAN; modelr 0.1.11,FALSE,FALSE
+multcompView,https://cran.r-project.org/package=multcompView,CRAN; multcompView 0.1-10,FALSE,FALSE
+mvtnorm,http://mvtnorm.R-forge.R-project.org,CRAN; mvtnorm 1.3-3,FALSE,FALSE
+nlme,https://svn.r-project.org/R-packages/trunk/nlme/,CRAN; nlme 3.1-168,FALSE,FALSE
+nloptr,https://github.com/astamm/nloptr,CRAN; nloptr 2.2.1,FALSE,FALSE
+nnet,http://www.stats.ox.ac.uk/pub/MASS4/,CRAN; nnet 7.3-20,FALSE,FALSE
+numDeriv,http://optimizer.r-forge.r-project.org/,CRAN; numDeriv 2016.8-1.1,FALSE,FALSE
+openssl,https://jeroen.r-universe.dev/openssl,CRAN; openssl 2.3.3,FALSE,FALSE
+parallelly,https://parallelly.futureverse.org,CRAN; parallelly 1.45.0,FALSE,FALSE
+patchwork,https://patchwork.data-imaginist.com,CRAN; patchwork 1.3.0,FALSE,TRUE
+pbkrtest,https://people.math.aau.dk/~sorenh/software/pbkrtest/,CRAN; pbkrtest 0.5.4,FALSE,FALSE
+pheatmap,https://cran.r-project.org/package=pheatmap,CRAN; pheatmap 1.0.13,FALSE,TRUE
+pillar,https://pillar.r-lib.org/,CRAN; pillar 1.10.2,FALSE,FALSE
+pkgconfig,https://github.com/r-lib/pkgconfig#readme,CRAN; pkgconfig 2.0.3,FALSE,FALSE
+plogr,https://github.com/krlmlr/plogr#readme,CRAN; plogr 0.2.0,FALSE,FALSE
+plyr,http://had.co.nz/plyr,CRAN; plyr 1.8.9,FALSE,FALSE
+png,http://www.rforge.net/png/,CRAN; png 0.1-8,FALSE,FALSE
+polynom,https://cran.r-project.org/package=polynom,CRAN; polynom 1.4-1,FALSE,FALSE
+prettyunits,https://github.com/r-lib/prettyunits,CRAN; prettyunits 1.2.0,FALSE,FALSE
+processx,https://processx.r-lib.org,CRAN; processx 3.8.6,FALSE,FALSE
+prodlim,https://cran.r-project.org/package=prodlim,CRAN; prodlim 2025.04.28,FALSE,FALSE
+progress,https://github.com/r-lib/progress#readme,CRAN; progress 1.2.3,FALSE,FALSE
+progressr,https://progressr.futureverse.org,CRAN; progressr 0.15.1,FALSE,FALSE
+promises,https://rstudio.github.io/promises/,CRAN; promises 1.3.3,FALSE,FALSE
+ps,https://github.com/r-lib/ps,CRAN; ps 1.9.1,FALSE,FALSE
+qcc,https://github.com/luca-scr/qcc,CRAN; qcc 2.7,FALSE,TRUE
+quantreg,https://www.r-project.org,CRAN; quantreg 6.1,FALSE,FALSE
+qvalue,http://github.com/jdstorey/qvalue,Bioconductor 3.20; qvalue 2.38.0,FALSE,TRUE
+ragg,https://ragg.r-lib.org,CRAN; ragg 1.4.0,FALSE,FALSE
+randomForest,https://www.stat.berkeley.edu/~breiman/RandomForests/,CRAN; randomForest 4.7-1.2,FALSE,FALSE
+rappdirs,https://rappdirs.r-lib.org,CRAN; rappdirs 0.3.3,FALSE,TRUE
+rbibutils,https://geobosh.github.io/rbibutils/ (doc),CRAN; rbibutils 2.3,FALSE,FALSE
+readr,https://readr.tidyverse.org,CRAN; readr 2.1.5,FALSE,TRUE
+readxl,https://readxl.tidyverse.org,CRAN; readxl 1.4.5,FALSE,FALSE
+recipes,https://github.com/tidymodels/recipes,CRAN; recipes 1.3.1,FALSE,FALSE
+reformulas,https://github.com/bbolker/reformulas,CRAN; reformulas 0.4.1,FALSE,FALSE
+rematch,https://github.com/gaborcsardi/rematch,CRAN; rematch 2.0.0,FALSE,FALSE
+rematch2,https://github.com/r-lib/rematch2#readme,CRAN; rematch2 2.1.2,FALSE,FALSE
+renv,https://rstudio.github.io/renv/,CRAN; renv 1.1.5,FALSE,FALSE
+reprex,https://reprex.tidyverse.org,CRAN; reprex 2.1.1,FALSE,FALSE
+reshape2,https://github.com/hadley/reshape,CRAN; reshape2 1.4.4,FALSE,FALSE
+rjson,https://github.com/alexcb/rjson,CRAN; rjson 0.2.23,FALSE,FALSE
+rpart,https://github.com/bethatkinson/rpart,CRAN; rpart 4.1.24,FALSE,FALSE
+rstatix,https://rpkgs.datanovia.com/rstatix/,CRAN; rstatix 0.7.2,FALSE,TRUE
+rstudioapi,https://rstudio.github.io/rstudioapi/,CRAN; rstudioapi 0.17.1,FALSE,FALSE
+rvest,https://rvest.tidyverse.org/,CRAN; rvest 1.0.4,FALSE,FALSE
+sass,https://rstudio.github.io/sass/,CRAN; sass 0.4.10,FALSE,FALSE
+scales,https://scales.r-lib.org,CRAN; scales 1.4.0,FALSE,FALSE
+scatterplot3d,https://cran.r-project.org/package=scatterplot3d,CRAN; scatterplot3d 0.3-44,FALSE,FALSE
+selectr,https://sjp.co.nz/projects/selectr,CRAN; selectr 0.4-2,FALSE,FALSE
+sessioninfo,https://github.com/r-lib/sessioninfo#readme,CRAN; sessioninfo 1.2.3,FALSE,FALSE
+shape,https://cran.r-project.org/package=shape,CRAN; shape 1.4.6.1,FALSE,FALSE
+snow,https://cran.r-project.org/package=snow,CRAN; snow 0.4-4,FALSE,FALSE
+sparsevctrs,https://github.com/r-lib/sparsevctrs,CRAN; sparsevctrs 0.3.4,FALSE,FALSE
+statmod,https://cran.r-project.org/package=statmod,CRAN; statmod 1.5.0,FALSE,FALSE
+stringi,https://stringi.gagolewski.com/,CRAN; stringi 1.8.7,FALSE,FALSE
+survival,https://github.com/therneau/survival,CRAN; survival 3.8-3,FALSE,FALSE
+svglite,https://svglite.r-lib.org,CRAN; svglite 2.2.1,FALSE,TRUE
+sys,https://jeroen.r-universe.dev/sys,CRAN; sys 3.4.3,FALSE,FALSE
+systemfonts,https://github.com/r-lib/systemfonts,CRAN; systemfonts 1.2.3,FALSE,FALSE
+textshaping,https://github.com/r-lib/textshaping,CRAN; textshaping 1.0.1,FALSE,FALSE
+tidyselect,https://tidyselect.r-lib.org,CRAN; tidyselect 1.2.1,FALSE,TRUE
+timeDate,https://geobosh.github.io/timeDateDoc/ (doc),CRAN; timeDate 4041.110,FALSE,FALSE
+timechange,https://github.com/vspinu/timechange/,CRAN; timechange 0.3.0,FALSE,FALSE
+tinytex,https://github.com/rstudio/tinytex,CRAN; tinytex 0.57,FALSE,FALSE
+tzdb,https://tzdb.r-lib.org,CRAN; tzdb 0.5.0,FALSE,FALSE
+utf8,https://krlmlr.github.io/utf8/,CRAN; utf8 1.2.6,FALSE,FALSE
+uuid,https://www.rforge.net/uuid,CRAN; uuid 1.2-1,FALSE,FALSE
+vctrs,https://vctrs.r-lib.org/,CRAN; vctrs 0.6.5,FALSE,FALSE
+venn,https://github.com/dusadrian/venn,CRAN; venn 1.12,FALSE,FALSE
+vipor,https://cran.r-project.org/package=vipor,CRAN; vipor 0.4.7,FALSE,FALSE
+viridis,https://sjmgarnier.github.io/viridis/,CRAN; viridis 0.6.5,FALSE,FALSE
+viridisLite,https://sjmgarnier.github.io/viridisLite/,CRAN; viridisLite 0.4.2,FALSE,FALSE
+visNetwork,https://datastorm-open.github.io/visNetwork/,CRAN; visNetwork 2.1.2,FALSE,FALSE
+vroom,https://vroom.r-lib.org,CRAN; vroom 1.6.5,FALSE,FALSE
+withr,https://withr.r-lib.org,CRAN; withr 3.0.2,FALSE,FALSE
+writexl,https://ropensci.r-universe.dev/writexl https://docs.ropensci.org/writexl/,CRAN; writexl 1.5.4,FALSE,TRUE
+xfun,https://github.com/yihui/xfun,CRAN; xfun 0.52,FALSE,FALSE
+xml2,https://xml2.r-lib.org,CRAN; xml2 1.3.8,FALSE,FALSE
+xtable,http://xtable.r-forge.r-project.org/,CRAN; xtable 1.8-4,FALSE,FALSE
+yaml,https://github.com/vubiostat/r-yaml/,CRAN; yaml 2.3.10,FALSE,FALSE
+yulab.utils,https://yulab-smu.top/,CRAN; yulab.utils 0.2.0,FALSE,FALSE
+zip,https://github.com/r-lib/zip,CRAN; zip 2.3.3,FALSE,FALSE
+zlibbioc,https://bioconductor.org/packages/zlibbioc,Bioconductor 3.20; zlibbioc 1.52.0,FALSE,FALSE
