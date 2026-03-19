@@ -60,7 +60,7 @@ Imports:
     logger,
     magrittr,
     methods,
-    OmnipathR (>= 3.17.4),
+    OmnipathR (>= 3.17.7),
     patchwork,
     pheatmap,
     Polychrome,
