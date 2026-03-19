@@ -36,8 +36,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-# <img src="Hexagon_MetaProViz.png" align="right" width="200" />
-
 First if you have not done yet, install the required dependencies and load the libraries:
 ```{r load_libraries, message=FALSE, warning=FALSE}
 # 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
