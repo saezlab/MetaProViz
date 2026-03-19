@@ -37,7 +37,7 @@
 #' @export
 metsigdb_kegg <- function() {
 
-    # NSE vs. R CMD check workaround
+    # NSE vs. R CMD check workaround 
     name.x <- name.y <- id_a <- compound_name <- compound_names <- pathway_name <- compound <- pathway <- NULL
     ## ------------ Create log file ----------- ##
     metaproviz_init()
