@@ -1,0 +1,246 @@
+---
+title: "SourceDataTable"
+author:
+  - name: Christina Schmidt
+    affiliation:
+    - Heidelberg University
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_float: true
+    toc_depth: 5
+    code_folding: show
+vignette: >
+  %\VignetteIndexEntry{Standard Metabolomics}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+bibliography: bibliography.bib
+editor_options:
+  chunk_output_type: console
+---
+
+<style>
+.vscroll-plot {
+    width: 850px;
+    height: 500px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+</style>
+
+```{r chunk_setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+install the required dependencies and load the libraries:
+```{r, message=FALSE, warning=FALSE}
+#dependencies that need to be loaded:
+library(dplyr)
+library(readxl)
+
+```
+
+# Compile the source data tables for the figures
+
+```{r}
+#Create output folder
+Output_folder <- file.path(getwd(), "SourceData")
+if (!dir.exists(Output_folder)) {dir.create(Output_folder)} # Make Results folder
+```
+
+## Figure 1
+Not applicable as Schematics.
+
+## Figure 2
+Not applicable to Fig 2D-E as Schmatics
+```{r}
+# Create needed output folders
+Fig2 <- file.path(Output_folder, "Figure 2")
+if (!dir.exists(Fig2)) {dir.create(Fig2)} 
+
+Fig2A <- file.path(Fig2 , "2A")
+if (!dir.exists(Fig2A)) {dir.create(Fig2A)}  
+
+Fig2B <- file.path(Fig2 , "2B")
+if (!dir.exists(Fig2B)) {dir.create(Fig2B)}  
+
+Fig2C <- file.path(Fig2 , "2C")
+if (!dir.exists(Fig2C)) {dir.create(Fig2C)}  
+
+
+#---------------------------------------------------------------------------------
+# Add Figure Source data and save as .csv files within the respective folders:
+
+## Fig2A = ExtendedDataTable 1, sheet 2 "Feature metadata"
+
+## Fig2B = ExtendedDataTable 2, sheet 2 "Alanine IDs"
+
+## Fig2C = ExtendedDataTable 2, sheet 3 "Mapping ambiguities"
+
+```
+
+## Figure 3
+Not applicable to Fig 3A as Schmatics
+```{r}
+# Create needed output folders
+Fig3 <- file.path(Output_folder, "Figure 3")
+if (!dir.exists(Fig3)) {dir.create(Fig3)} 
+
+Fig3B <- file.path(Fig3 , "3B")
+if (!dir.exists(Fig3B)) {dir.create(Fig3B)}  
+
+Fig3C <- file.path(Fig3 , "3C")
+if (!dir.exists(Fig3C)) {dir.create(Fig3C)}  
+
+Fig3D <- file.path(Fig3 , "3D")
+if (!dir.exists(Fig3D)) {dir.create(Fig3D)}
+
+Fig3E <- file.path(Fig3 , "3E")
+if (!dir.exists(Fig3E)) {dir.create(Fig3E)}
+
+Fig3F <- file.path(Fig3 , "3F")
+if (!dir.exists(Fig3F)) {dir.create(Fig3F)}
+
+Fig3G <- file.path(Fig3 , "3G")
+if (!dir.exists(Fig3G)) {dir.create(Fig3G)}
+
+#---------------------------------------------------------------------------------
+# Add Figure Source data and save as .csv files within the respective folders:
+
+## Fig3B = ExtendedDataTable 3, sheet  1 "Raw data." --> needs data wrangling
+CellPlot_Intra <- intracell_raw%>%
+  column_to_rownames("Code")%>%
+  filter(Conditions != "Pool")%>%
+   mutate(Celltype = case_when(Conditions=="HK2" ~ 'Healthy',
+                               Conditions=="786-O" ~ 'PrimaryTumour',
+                               TRUE ~ 'MetastaticTumour'))
+
+CellPlot_Intra$Count <- 1
+CellPlot_Intra$CelltypeFactor <- factor(CellPlot_Intra$Celltype, levels = c("Healthy","PrimaryTumour", "MetastaticTumour"))
+
+#--> Add those info to extended data table 3 as sheet 1 about sample infos! Do the same for the other sample data (intra), patients have this already
+
+
+## Fig3C = ExtendedDataTable 3, sheet ""
+
+## Fig3D
+
+## Fig3E
+
+## Fig3F
+```
+
+## Figure 4
+```{r}
+# Create needed output folders
+Fig4 <- file.path(Output_folder, "Figure 4")
+if (!dir.exists(Fig4)) {dir.create(Fig4)} 
+
+Fig4A <- file.path(Fig4 , "4A")
+if (!dir.exists(Fig4A)) {dir.create(Fig4A)}
+
+Fig4B <- file.path(Fig4 , "4B")
+if (!dir.exists(Fig4B)) {dir.create(Fig4B)}  
+
+Fig4C <- file.path(Fig4 , "4C")
+if (!dir.exists(Fig4C)) {dir.create(Fig4C)}  
+
+Fig4D <- file.path(Fig4 , "4D")
+if (!dir.exists(Fig4D)) {dir.create(Fig4D)}
+
+Fig4E <- file.path(Fig4 , "4E")
+if (!dir.exists(Fig4E)) {dir.create(Fig4E)}
+
+Fig4F <- file.path(Fig4 , "4F")
+if (!dir.exists(Fig4F)) {dir.create(Fig4F)}
+
+Fig4G <- file.path(Fig4 , "4G")
+if (!dir.exists(Fig4G)) {dir.create(Fig4G)}
+
+Fig4H <- file.path(Fig4 , "4H")
+if (!dir.exists(Fig4H)) {dir.create(Fig4H)}
+
+#---------------------------------------------------------------------------------
+# Add Figure Source data and save as .csv files within the respective folders:
+
+## Fig4A =
+
+## Fig4B = ExtendedDataTable 4, sheet  1 "Raw data." --> needs data wrangling
+
+## Fig4C = ExtendedDataTable 4, sheet ""
+
+## Fig4D
+
+## Fig4E
+
+## Fig4F
+```
+
+## Figure 5
+```{r}
+# Create needed output folders
+Fig5 <- file.path(Output_folder, "Figure 5")
+if (!dir.exists(Fig5)) {dir.create(Fig5)} 
+
+Fig5A <- file.path(Fig5 , "5A")
+if (!dir.exists(Fig5A)) {dir.create(Fig5A)}
+
+Fig5B <- file.path(Fig5 , "5B")
+if (!dir.exists(Fig5B)) {dir.create(Fig5B)}  
+
+Fig5C <- file.path(Fig5 , "5C")
+if (!dir.exists(Fig5C)) {dir.create(Fig5C)}  
+
+Fig5D <- file.path(Fig5 , "5D")
+if (!dir.exists(Fig5D)) {dir.create(Fig5D)}
+
+Fig5E <- file.path(Fig5 , "5E")
+if (!dir.exists(Fig5E)) {dir.create(Fig5E)}
+
+Fig5F <- file.path(Fig5 , "5F")
+if (!dir.exists(Fig5F)) {dir.create(Fig5F)}
+
+#-----------------------------------------------------------------------------
+# Add Figure Source data and save as .csv files within the respective folders:
+
+## Fig5A =
+
+## Fig5B = ExtendedDataTable 5, sheet  1 "Raw data." --> needs data wrangling
+
+## Fig5C = ExtendedDataTable 5, sheet ""
+
+## Fig5D 
+
+## Fig5E
+
+## Fig5F
+```
+
+
+
+## EV Figure 1
+Not applicable as Schematics.
+
+## EV Figure 2
+
+## EV Figure 3
+
+
+
+
+
+
+
+
+
+
+# Session information
+
+```{r session_info, echo=FALSE}
+options(width = 120)
+sessionInfo()
+```
