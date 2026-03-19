@@ -39,11 +39,11 @@ knitr::opts_chunk$set(
 install the required dependencies and load the libraries:
 ```{r, message=FALSE, warning=FALSE}
 #dependencies that need to be loaded:
+library(MetaProViz)
 library(magrittr)
 library(dplyr)
 library(tidyr)
 library(tibble)
-library(dplyr)
 library(readxl)
 
 # Convert All Text to UTF-8
@@ -125,7 +125,8 @@ Merged <- PoolCV %>%
   arrange(desc(removed))
 ```
 
-Export the updated Extended Data Table:
+
+# Export the updated Extended Data Table
 `Extended Data Table 3_Cells-Exometabolomics.xlsx`:\
 - Sheet 1: Raw data.\
 - Sheet 2: Pool estimation.\
