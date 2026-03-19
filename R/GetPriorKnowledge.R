@@ -21,7 +21,221 @@
 # Get KEGG prior knowledge
 #
 
+#' Metabolites excluded from prior knowledge resources
+#'
+#' Builds an exclusion table from hard-coded seed identifiers and translates
+#' them across ID systems (HMDB, KEGG, CHEBI, PUBCHEM).
+#'
+#' @return A data frame with columns `metabolite_id`, `class`, and `id_type`.
+#'
+#' @examples
+#' \dontrun{
+#' get_exclusion_metabolites()
+#' }
+#'
+#' @export
+get_exclusion_metabolites <- function() {
+
+    seed_df <- rbind(
+        data.frame(  ## imaginary test set
+            seed_id = c(
+                "HMDB0000094", "HMDB0001165", "HMDB0001405", "HMDB0001272"
+            ),
+            class = "ions",
+            seed_type = "HMDB",
+            stringsAsFactors = FALSE
+        ),
+        data.frame(  ## imaginary test set
+            seed_id = c(
+                "C00533", "C00027", "C00704", "C00001", "C00011", "C00544",
+                "C00014", "C00288", "C00007", "C00013", "C00088", "C00244",
+                "C00282", "C19909"
+            ),
+            class = "small_molecules",
+            seed_type = "KEGG",
+            stringsAsFactors = FALSE
+        ),
+        data.frame(   ## imaginary test set
+            seed_id = c(
+                "CHEBI:16236", "CHEBI:16856", "CHEBI:17754", "CHEBI:16716"
+            ),
+            class = "xenobiotics",
+            seed_type = "CHEBI",
+            stringsAsFactors = FALSE
+        ),
+        data.frame(  ## previously hard-coded ones
+            seed_id = c(
+                "C00076", "C00238", "C01330", "C00080", "C00698", 
+                "C00162", "C00704", "C00001", "C00011", "C00070", 
+                "C14818", "C00038", "C00291", "C01342"
+            ),
+            class = "ions",
+            seed_type = "KEGG",
+            stringsAsFactors = FALSE
+        ),
+        data.frame(  ## previously hard-coded ones
+            seed_id = c(
+                "C00533", "C00027", "C00704", "C00001", "C00011",
+                "C16844", "C00014", "C00288", "C00007", "C00013", 
+                "C22381", "C00088", "C00244", "C00282", "C01322",
+                "C00703"
+            ),
+            class = "small_molecules",
+            seed_type = "KEGG",
+            stringsAsFactors = FALSE
+        )
+    )
+
+    target_types <- c("hmdb", "kegg", "chebi", "pubchem")
+
+    extract_ids <- function(x) {
+        if (is.list(x)) {
+            x <- unlist(x, use.names = FALSE)
+        }
+        x <- as.character(x)
+        unique(x[!is.na(x) & x != "" & x != "0"])
+    }
+
+    translated_rows <- list()
+
+    for (source_type in unique(seed_df$seed_type)) {
+        source_type_lower <- tolower(source_type)
+        source_targets <- setdiff(target_types, source_type_lower)
+
+        input_df <- seed_df[
+            seed_df$seed_type == source_type,
+            c("seed_id", "class", "seed_type"),
+            drop = FALSE
+        ]
+
+        translated <- tryCatch(
+            translate_ids(
+                input_df,
+                !!sym("seed_id") := !!sym(source_type_lower),
+                !!!syms(source_targets),
+                ramp = TRUE,
+                expand = FALSE,
+                quantify_ambiguity = FALSE,
+                qualify_ambiguity = FALSE
+            ),
+            error = function(e) input_df
+        )
+
+        for (target in source_targets) {
+            if (!(target %in% colnames(translated))) {
+                next
+            }
+
+            out <- lapply(seq_len(nrow(translated)), function(i) {
+                ids <- extract_ids(translated[[target]][i])
+                if (length(ids) == 0L) {
+                    return(NULL)
+                }
+                data.frame(
+                    metabolite_id = ids,
+                    class = translated$class[i],
+                    id_type = toupper(target),
+                    stringsAsFactors = FALSE
+                )
+            })
+
+            out <- out[!vapply(out, is.null, logical(1))]
+            if (length(out) > 0L) {
+                translated_rows[[paste(source_type, target, sep = "_to_")]] <-
+                    do.call(rbind, out)
+            }
+        }
+    }
+
+    seed_rows <- data.frame(
+        metabolite_id = seed_df$seed_id,
+        class = seed_df$class,
+        id_type = seed_df$seed_type,
+        stringsAsFactors = FALSE
+    )
+
+    if (length(translated_rows) > 0L) {
+        translation_df <- do.call(rbind, translated_rows)
+        exclusion_df <- rbind(seed_rows, translation_df)
+    } else {
+        exclusion_df <- seed_rows
+    }
+
+    exclusion_df <- unique(
+        exclusion_df[, c("metabolite_id", "class", "id_type"), drop = FALSE]
+    )
+    rownames(exclusion_df) <- NULL
+    exclusion_df
+}
+
+
+# Helper: normalize and validate exclusion classes.
+.resolve_exclusion_classes <- function(exclude_metabolites) {
+    valid_classes <- c("ions", "small_molecules", "xenobiotics")
+
+    if (is.null(exclude_metabolites)) {
+        return(character(0))
+    }
+
+    if (!is.character(exclude_metabolites)) {
+        stop(
+            "`exclude_metabolites` must be NULL, \"all\", or a character vector ",
+            "with values from: ", paste(valid_classes, collapse = ", "), "."
+        )
+    }
+
+    if (length(exclude_metabolites) == 1L && identical(exclude_metabolites, "all")) {
+        return(valid_classes)
+    }
+
+    invalid_values <- setdiff(exclude_metabolites, valid_classes)
+    if (length(invalid_values) > 0L) {
+        stop(
+            "Invalid `exclude_metabolites` value(s): ",
+            paste(invalid_values, collapse = ", "),
+            ". Allowed values are: NULL, \"all\", or any of: ",
+            paste(valid_classes, collapse = ", "), "."
+        )
+    }
+
+    unique(exclude_metabolites)
+}
+
+
+# Helper: apply exclusion table by ID column and ID type.
+.apply_metabolite_exclusion <- function(
+    df,
+    id_column,
+    id_type,
+    exclude_metabolites
+) {
+    selected_classes <- .resolve_exclusion_classes(exclude_metabolites)
+    if (length(selected_classes) == 0L) {
+        return(df)
+    }
+
+    if (!(id_column %in% colnames(df))) {
+        stop("Column `", id_column, "` not found in data.")
+    }
+
+    exclusion_df <- get_exclusion_metabolites()
+    exclude_ids <- unique(exclusion_df$metabolite_id[
+        exclusion_df$class %in% selected_classes &
+        exclusion_df$id_type == id_type
+    ])
+
+    if (length(exclude_ids) == 0L) {
+        return(df)
+    }
+
+    df[!(as.character(df[[id_column]]) %in% exclude_ids), , drop = FALSE]
+}
+
 #' KEGG pathways
+#'
+#' @param exclude_metabolites Optional metabolite classes to exclude:
+#'     NULL (exclude nothing), "all" (default), or any combination of
+#'     c("ions", "small_molecules", "xenobiotics").
 #'
 #' @return A data frame containing the KEGG pathways suitable for ORA.
 #'
@@ -35,26 +249,16 @@
 #' @importFrom stringr str_replace str_split
 #' @importFrom tidyselect everything
 #' @export
-metsigdb_kegg <- function() {
+metsigdb_kegg <- function(
+    exclude_metabolites = "all"
+) {
 
-    # NSE vs. R CMD check workaround 
+    # NSE vs. R CMD check workaround
     name.x <- name.y <- id_a <- compound_name <- compound_names <- pathway_name <- compound <- pathway <- NULL
     ## ------------ Create log file ----------- ##
     metaproviz_init()
 
     log_info("Load KEGG.")
-
-    # ------------------------------------------------------------------
-    # Remove Metabolites
-    to_remove <-
-    list(
-        # # # 1. Ions should be removed
-        Remove_Ions = c("Calcium cation", "Potassium cation", "Sodium cation", "H+", "Cl-", "Fatty acid", "Superoxide", "H2O", "CO2", "Copper", "Fe2+", "Magnesium cation", "Fe3+", "Zinc cation", "Nickel", "NH4+"),
-        # # # 2. Unspecific small molecules
-        Remove_Small = c("Nitric oxide", "Hydrogen peroxide", "Superoxide", "H2O", "CO2", "Hydroxyl radical", "Ammonia", "HCO3-", "Oxygen", "Diphosphate", "Reactive oxygen species", "Nitrite", "Nitrate", "Hydrogen", "RX", "Hg")
-    ) %>%
-    unlist()
-
 
     # install_github("saezlab/OmnipathR@devel")
     KEGG_H <- kegg_link('compound', 'pathway') %>%
@@ -72,21 +276,20 @@ metsigdb_kegg <- function() {
         compound_names = str_split(compound_name, '; '),
         compound_name = map_chr(compound_names, ~extract(.x, 1L))
     ) %>%
-    filter(
-        map_lgl(
-        compound_names,
-        ~intersect(.x, to_remove) %>% length() == 0
-    )
-    ) %>%
     rename(
         term = pathway_name,
         Metabolite = compound_name,
         MetaboliteID = compound,
         Description = pathway
-    )  # Update vignettes and remove rename
+    )
 
+    KEGG_H <- .apply_metabolite_exclusion(
+        df = KEGG_H,
+        id_column = "MetaboliteID",
+        id_type = "KEGG",
+        exclude_metabolites = exclude_metabolites
+    )
 
-    # Return into environment
     return(KEGG_H)
 
 }
@@ -104,6 +307,9 @@ metsigdb_kegg <- function() {
 #'     "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} String which is added to the resulting folder name
 #'     \strong{default: NULL}
+#' @param exclude_metabolites Optional metabolite classes to exclude:
+#'     NULL (exclude nothing), "all" (default), or any combination of
+#'     c("ions", "small_molecules", "xenobiotics").
 #'
 #' @return A data frame containing the Prior Knowledge.
 #'
@@ -119,7 +325,8 @@ metsigdb_kegg <- function() {
 metsigdb_chemicalclass <- function(
     version = "2.5.4",
     save_table = "csv",
-    path = NULL
+    path = NULL,
+    exclude_metabolites = "all"
 ) {
 
     # NSE vs. R CMD check workaround
@@ -199,6 +406,13 @@ metsigdb_chemicalclass <- function(
         )
 
     }
+
+    HMDB_ChemicalClass <- .apply_metabolite_exclusion(
+        df = HMDB_ChemicalClass,
+        id_column = "class_source_id",
+        id_type = "HMDB",
+        exclude_metabolites = exclude_metabolites
+    )
 
     # # -------------- Save and return
     DF_List <- list("ChemicalClass_MetabSet" = HMDB_ChemicalClass)
@@ -428,6 +642,9 @@ make_gene_metab_set <- function(
 #'     "xlsx", "txt". \strong{Default = "csv"}
 #' @param path \emph{Optional:} Path to the folder the results should be saved at.
 #'     \strong{default: NULL}
+#' @param exclude_metabolites Optional metabolite classes to exclude:
+#'     NULL (exclude nothing), "all" (default), or any combination of
+#'     c("ions", "small_molecules", "xenobiotics").
 #'
 #' @return A data frame of metabolite-protein interactions from MetalinksDB.
 #'
@@ -450,7 +667,8 @@ metsigdb_metalinks <- function(
     hmdb_ids = NULL,
     uniprot_ids = NULL,
     save_table = "csv",
-    path = NULL
+    path = NULL,
+    exclude_metabolites = "all"
 ) {
 
     # NSE vs. R CMD check workaround
@@ -701,6 +919,12 @@ metsigdb_metalinks <- function(
         )
         )
         )
+    MetalinksDB <- .apply_metabolite_exclusion(
+        df = MetalinksDB,
+        id_column = "hmdb",
+        id_type = "HMDB",
+        exclude_metabolites = exclude_metabolites
+    )
 
     # ------------------------------------------------------------------
     # Save results in folder
@@ -746,6 +970,9 @@ metsigdb_metalinks <- function(
 #' via full name or three letter code. Default = "Homo sapiens". NULL for all species.
 #' @param pathway_ids String vector. Optionally provide pathway_ids to query. Default NULL to query all pathways.
 #' @param out_path String. Optionally save results as csv into out_path. Default NULL.
+#' @param exclude_metabolites Optional metabolite classes to exclude:
+#'     NULL (exclude nothing), "all" (default), or any combination of
+#'     c("ions", "small_molecules", "xenobiotics").
 #' 
 #' @return 
 #' A tibble in long format containing one row per metabolite for the Reactome pathways.
@@ -759,31 +986,39 @@ metsigdb_metalinks <- function(
 #' @importFrom OmnipathR get_reactome
 #' @importFrom magrittr %>%
 #' @importFrom tidyr separate_rows
-#' @importFrom dplyr mutate
+#' @importFrom dplyr mutate rename
 #' 
 #' @export
 metsigdb_reactome <- function(
     species = "Homo sapiens",
     pathway_ids = NULL,
-    out_path = NULL
+    out_path = NULL,
+    exclude_metabolites = "all"
 ){
-    
+
     # NSE vs. R CMD check workaround
     chebi_ids <- pathway_df <- pathway_df_long <- NULL
-    
+
     pathway_df <- OmnipathR::get_reactome(
         species = species,
-        pathway_ids = NULL,
-        out_path = NULL
+        pathway_ids = pathway_ids,
+        out_path = out_path
     )
-    
+
     pathway_df_long <- pathway_df %>%
         separate_rows(chebi_ids, sep = ", ") %>%
         mutate(chebi_ids = trimws(chebi_ids)) %>%
         rename(chebi_id = chebi_ids)
-    
+
+    pathway_df_long <- .apply_metabolite_exclusion(
+        df = pathway_df_long,
+        id_column = "chebi_id",
+        id_type = "CHEBI",
+        exclude_metabolites = exclude_metabolites
+    )
+
     pathway_df_long
-    
+
 }
 
 
@@ -794,6 +1029,9 @@ metsigdb_reactome <- function(
 #' one metabolite identifier per row.
 #'
 #' @param species Character. Species name. Default is `"Homo sapiens"`.
+#' @param exclude_metabolites Optional metabolite classes to exclude:
+#'     NULL (exclude nothing), "all" (default), or any combination of
+#'     c("ions", "small_molecules", "xenobiotics").
 #'
 #' @return A tibble in long format with columns `pathway_id`, `pathway_name`,
 #'   `pathway_url`, `n_metabolites_in_pathway`, and `metabolite_id`.
@@ -809,19 +1047,27 @@ metsigdb_reactome <- function(
 #' head(df)
 #' @export
 metsigdb_wikipathways <- function(
-    species = "Homo sapiens"
+    species = "Homo sapiens",
+    exclude_metabolites = "all"
 ) {
-    
+
     # NSE vs. R CMD check workaround
     metabolites <- pathway_df <- pathway_df_long <- NULL
-    
+
     pathway_df <- get_wikipathways_metabolites_sparql(species = species)
-    
+
     pathway_df_long <- pathway_df %>%
         tidyr::separate_rows(metabolites, sep = ";\\s*") %>%
         dplyr::mutate(metabolites = stringr::str_trim(metabolites)) %>%
         dplyr::rename(metabolite_id = metabolites)
-    
+
+    pathway_df_long <- .apply_metabolite_exclusion(
+        df = pathway_df_long,
+        id_column = "metabolite_id",
+        id_type = "CHEBI",
+        exclude_metabolites = exclude_metabolites
+    )
+
     pathway_df_long
-    
+
 }

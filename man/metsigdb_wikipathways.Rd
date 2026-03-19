@@ -4,10 +4,14 @@
 \alias{metsigdb_wikipathways}
 \title{Retrieve WikiPathways metabolite mapping suitable for ORA.}
 \usage{
-metsigdb_wikipathways(species = "Homo sapiens")
+metsigdb_wikipathways(species = "Homo sapiens", exclude_metabolites = "all")
 }
 \arguments{
 \item{species}{Character. Species name. Default is \code{"Homo sapiens"}.}
+
+\item{exclude_metabolites}{Optional metabolite classes to exclude:
+NULL (exclude nothing), "all" (default), or any combination of
+c("ions", "small_molecules", "xenobiotics").}
 }
 \value{
 A tibble in long format with columns \code{pathway_id}, \code{pathway_name},

@@ -4,7 +4,12 @@
 \alias{metsigdb_kegg}
 \title{KEGG pathways}
 \usage{
-metsigdb_kegg()
+metsigdb_kegg(exclude_metabolites = "all")
+}
+\arguments{
+\item{exclude_metabolites}{Optional metabolite classes to exclude:
+NULL (exclude nothing), "all" (default), or any combination of
+c("ions", "small_molecules", "xenobiotics").}
 }
 \value{
 A data frame containing the KEGG pathways suitable for ORA.

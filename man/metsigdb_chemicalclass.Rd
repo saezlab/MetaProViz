@@ -4,7 +4,12 @@
 \alias{metsigdb_chemicalclass}
 \title{Metabolite chemical classes from RaMP DB}
 \usage{
-metsigdb_chemicalclass(version = "2.5.4", save_table = "csv", path = NULL)
+metsigdb_chemicalclass(
+  version = "2.5.4",
+  save_table = "csv",
+  path = NULL,
+  exclude_metabolites = "all"
+)
 }
 \arguments{
 \item{version}{\emph{Optional: } Version of the RaMP database loaded from OmniPathR.
@@ -15,6 +20,10 @@ metsigdb_chemicalclass(version = "2.5.4", save_table = "csv", path = NULL)
 
 \item{path}{{Optional:} String which is added to the resulting folder name
 \strong{default: NULL}}
+
+\item{exclude_metabolites}{Optional metabolite classes to exclude:
+NULL (exclude nothing), "all" (default), or any combination of
+c("ions", "small_molecules", "xenobiotics").}
 }
 \value{
 A data frame containing the Prior Knowledge.

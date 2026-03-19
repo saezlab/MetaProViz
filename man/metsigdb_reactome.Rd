@@ -7,7 +7,8 @@
 metsigdb_reactome(
   species = "Homo sapiens",
   pathway_ids = NULL,
-  out_path = NULL
+  out_path = NULL,
+  exclude_metabolites = "all"
 )
 }
 \arguments{
@@ -17,6 +18,10 @@ via full name or three letter code. Default = "Homo sapiens". NULL for all speci
 \item{pathway_ids}{String vector. Optionally provide pathway_ids to query. Default NULL to query all pathways.}
 
 \item{out_path}{String. Optionally save results as csv into out_path. Default NULL.}
+
+\item{exclude_metabolites}{Optional metabolite classes to exclude:
+NULL (exclude nothing), "all" (default), or any combination of
+c("ions", "small_molecules", "xenobiotics").}
 }
 \value{
 A tibble in long format containing one row per metabolite for the Reactome pathways.
