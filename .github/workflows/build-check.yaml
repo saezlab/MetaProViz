@@ -103,7 +103,7 @@ jobs:
         run: |
           Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")'
           Rscript -e 'BiocManager::install()'
-          Rscript -e 'remotes::install_github("saezlab/OmnipathR@devel")'
+          Rscript -e 'remotes::install_github("saezlab/OmnipathR@devel", force=TRUE)'
 
       - name: Install EnhancedVolcano (not yet in Bioc 3.22)
         run: |
