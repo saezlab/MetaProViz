@@ -36,34 +36,38 @@
 #' @export
 get_exclusion_metabolites <- function() {
 
+    # example partial dataframes to exclude more metabolite sets:
+    ## add into the seed_df below:
+    
+    #     data.frame(  ## imaginary test set
+    #         seed_id = c(
+    #             "HMDB0000094", "HMDB0001165", "HMDB0001405", "HMDB0001272"
+    #         ),
+    #         class = "ions",
+    #         seed_type = "HMDB",
+    #         stringsAsFactors = FALSE
+    #     ),
+    # data.frame(  ## imaginary test set
+    #     seed_id = c(
+    #         "C00533", "C00027", "C00704", "C00001", "C00011", "C00544",
+    #         "C00014", "C00288", "C00007", "C00013", "C00088", "C00244",
+    #         "C00282", "C19909"
+    #     ),
+    #     class = "small_molecules",
+    #     seed_type = "KEGG",
+    #     stringsAsFactors = FALSE
+    # ),
+    # data.frame(   ## imaginary test set
+    #     seed_id = c(
+    #         "CHEBI:16236", "CHEBI:16856", "CHEBI:17754", "CHEBI:16716"
+    #     ),
+    #     class = "xenobiotics",
+    #     seed_type = "CHEBI",
+    #     stringsAsFactors = FALSE
+    # )
+        
     seed_df <- rbind(
-        data.frame(  ## imaginary test set
-            seed_id = c(
-                "HMDB0000094", "HMDB0001165", "HMDB0001405", "HMDB0001272"
-            ),
-            class = "ions",
-            seed_type = "HMDB",
-            stringsAsFactors = FALSE
-        ),
-        data.frame(  ## imaginary test set
-            seed_id = c(
-                "C00533", "C00027", "C00704", "C00001", "C00011", "C00544",
-                "C00014", "C00288", "C00007", "C00013", "C00088", "C00244",
-                "C00282", "C19909"
-            ),
-            class = "small_molecules",
-            seed_type = "KEGG",
-            stringsAsFactors = FALSE
-        ),
-        data.frame(   ## imaginary test set
-            seed_id = c(
-                "CHEBI:16236", "CHEBI:16856", "CHEBI:17754", "CHEBI:16716"
-            ),
-            class = "xenobiotics",
-            seed_type = "CHEBI",
-            stringsAsFactors = FALSE
-        ),
-        data.frame(  ## previously hard-coded ones
+        data.frame(  ## KEGG ions
             seed_id = c(
                 "C00076", "C00238", "C01330", "C00080", "C00698", 
                 "C00162", "C00704", "C00001", "C00011", "C00070", 
@@ -73,7 +77,7 @@ get_exclusion_metabolites <- function() {
             seed_type = "KEGG",
             stringsAsFactors = FALSE
         ),
-        data.frame(  ## previously hard-coded ones
+        data.frame(  ## KEGG small molecules
             seed_id = c(
                 "C00533", "C00027", "C00704", "C00001", "C00011",
                 "C16844", "C00014", "C00288", "C00007", "C00013", 
