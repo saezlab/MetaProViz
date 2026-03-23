@@ -44,10 +44,17 @@ Additionally we also added transcriptomics and proteomics data of ccRCC patients
 
 ## Installation
 
-**MetaProViz** is an R package and to install the package, start R and enter:
+**MetaProViz** is an Bioconductor R package. To install the package, start R and enter:
 
 ```r
-devtools::install_github("https://github.com/saezlab/MetaProViz")
+# 1. Install MetaProViz from Bioconductor devel:
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+BiocManager::install(version = "devel")
+BiocManager::install("MetaProViz")
+
+# 2. Install the latest development version from GitHub using devtools
+# Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
+# remotes::install_github("saezlab/MetaProViz")
 ```
 
 Now **MetaProViz** can be imported as:
