@@ -1046,9 +1046,6 @@ metsigdb_reactome <- function(
 #' @importFrom magrittr %>%
 #' @importFrom OmnipathR get_wikipathways_metabolites_sparql
 #'
-#' @examples
-#' df <- metsigdb_wikipathways()
-#' head(df)
 #' @export
 metsigdb_wikipathways <- function(
     species = "Homo sapiens",
