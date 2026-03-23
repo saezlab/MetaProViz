@@ -39,7 +39,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# <img src="Hexagon_MetaProViz.png" align="right" width="200" />
+# <img src="https://raw.githubusercontent.com/saezlab/MetaProViz/main/vignettes/Hexagon_MetaProViz.png" align="right" width="200" />
 \
 A standard metabolomics experiment refers to intracellular extracts (e.g. cell or bacteria culture), to tissue samples (e.g. from animals or patients), to plasma samples (e.g. blood) and many other types of experimental setups.\
 \

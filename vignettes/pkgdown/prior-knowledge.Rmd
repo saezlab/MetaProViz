@@ -43,7 +43,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# <img src="Hexagon_MetaProViz.png" align="right" width="200"/>
+# <img src="https://raw.githubusercontent.com/saezlab/MetaProViz/main/vignettes/Hexagon_MetaProViz.png" align="right" width="200"/>
 
 \
 [In this tutorial we showcase how to use **MetaProViz** prior knowledge]{style="text-decoration:underline"}:\
@@ -489,7 +489,10 @@ MetalinksDB = as.data.frame(MetaLinksDB))
 )
 ```
 ```{r, echo=FALSE}
-knitr::include_graphics("prior-knowledge.Rmd_compare-pk.svg")
+cat(sprintf(
+    '<img src="%s" width="100%%" style="display:block; margin:0 auto;"/>',
+    "https://raw.githubusercontent.com/saezlab/MetaProViz/main/vignettes/pkgdown/prior-knowledge.Rmd_compare-pk.svg"
+))
 ```
 \
 The table includes all features of the three PK resources we decided to compare. Additionally, it includes a column for each PK resource with value 1 if the feature is present in the PK resource and 0 if it is not. The column "Type" specifies with ID type the feature is corresponding to, here either metabolite (HMDB) or gene, which is used for visualisation purposes in the upset plot.\
@@ -551,7 +554,10 @@ plot_name = "Overlap of BioCrates Columns")
 
 ```
 ```{r, echo=FALSE}
-knitr::include_graphics("prior-knowledge.Rmd_compare-pk-2.svg")
+cat(sprintf(
+    '<img src="%s" width="100%%" style="display:block; margin:0 auto;"/>',
+    "https://raw.githubusercontent.com/saezlab/MetaProViz/main/vignettes/pkgdown/prior-knowledge.Rmd_compare-pk-2.svg"
+))
 ```
 \
 
@@ -767,7 +773,10 @@ pk_comp_res_keggtrans <- compare_pk(data = list(kegg_translated = KEGG_Pathways_
                                                 plot_name = "IDs available after KEGG ID Translation")
 ```
 ```{r, echo=FALSE}
-knitr::include_graphics("prior-knowledge.Rmd_compare-pk-3.svg")
+cat(sprintf(
+    '<img src="%s" width="100%%" style="display:block; margin:0 auto;"/>',
+    "https://raw.githubusercontent.com/saezlab/MetaProViz/main/vignettes/pkgdown/prior-knowledge.Rmd_compare-pk-3.svg"
+))
 ```
 \
 We can also note from the previous table that it becomes apparent that the translation of IDs is not a one-to-one mapping, but rather a one-to-many mapping.

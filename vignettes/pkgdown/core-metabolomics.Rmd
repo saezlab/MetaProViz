@@ -39,7 +39,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# <img src="Hexagon_MetaProViz.png" align="right" width="200" />
+# <img src="https://raw.githubusercontent.com/saezlab/MetaProViz/main/vignettes/Hexagon_MetaProViz.png" align="right" width="200" />
 \
 A Consumption-Release (core) metabolomics experiment usually refers to a cell culture experiment where metabolomics is performed on the cell culture media.\
 \
