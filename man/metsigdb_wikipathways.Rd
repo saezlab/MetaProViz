@@ -22,7 +22,3 @@ Retrieves pathway to metabolite mappings from WikiPathways (via
 \code{get_wikipathways_metabolites_sparql()}) via OmnipathR and returns a long-format table with
 one metabolite identifier per row.
 }
-\examples{
-df <- metsigdb_wikipathways()
-head(df)
-}
