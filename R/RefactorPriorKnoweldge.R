@@ -2220,6 +2220,822 @@ checkmatch_pk_to_data <- function(
     invisible(return(ResList))
 }
 
+
+#
+# Traverse metabolite IDs across RaMP mappings
+#
+
+#' Expand metabolite IDs by traversing RaMP ID mappings
+#'
+#' Traverses pairwise RaMP mappings from [OmnipathR::ramp_id_mapping_table()]
+#' across selected metabolite ID types until no new IDs are found.
+#'
+#' @param data Data frame with zero or more of the columns `HMDB`, `KEGG`,
+#'     `CHEBI`, and `PUBCHEM`. Column names are matched case-insensitively
+#'     against these exact names.
+#' @param id_types Character vector of ID types to expand. Choose from `HMDB`,
+#'     `KEGG`, `CHEBI`, and `PUBCHEM`.
+#' @param delimiter Character string indicating whether multiple IDs within one
+#'     cell are separated by semicolons or commas. Accepted values are `";"`,
+#'     `","`, `"semicolon"`, or `"comma"`.
+#' @param save_table \emph{Optional: } File types for the analysis results are:
+#'     `"csv"`, `"xlsx"`, `"txt"`. If `NULL`, no tables are saved.
+#'     \strong{Default = "csv"}
+#' @param path \emph{Optional: } Path to the folder the results should be saved
+#'     at. \strong{Default = NULL}
+#' @param verbose Logical; if `TRUE`, prints pairwise mapping and edge
+#'     construction diagnostics to the console.
+#' @importFrom dplyr arrange bind_cols bind_rows count distinct filter inner_join mutate pull rename row_number select transmute
+#' @importFrom logger log_warn
+#' @importFrom purrr pmap
+#' @importFrom tibble tibble
+#' @importFrom utils combn head
+#' @importFrom OmnipathR ramp_id_mapping_table
+#'
+#' @return Named list with three data frames:
+#' \item{ExpandedDF}{Input data with appended expanded ID columns and QC
+#' summary columns.}
+#' \item{ExpandedIDs_Long}{Long-format table with `row_id`, `type`, `id`, and
+#' `is_seed`.}
+#' \item{IDEdges}{Bidirectional ID edge table used for traversal.}
+#' 
+#' @examples
+#' input_df <- data.frame(
+#'     name = c(
+#'         "Acetone ; Propanal ; acetone",
+#'         "Acetaldehyde oxime ; HMDB01122",
+#'         "acetate",
+#'         "Urea"
+#'     ),
+#'     all_ids = c(
+#'         "HMDB01659 ; HMDB03366 ; C00207",
+#'         "HMDB03656 ; HMDB01122",
+#'         "C00033",
+#'         "C00086"
+#'      ),
+#'      HMDB = c(
+#'         "HMDB01659; HMDB03366",
+#'         "HMDB03656; HMDB01122",
+#'         NA,
+#'         NA
+#'      ),
+#'      KEGG = c(
+#'         "C00207",
+#'         NA,
+#'         "C00033",
+#'         "C00086"
+#'      ),
+#'      CHEBI = NA,
+#'      stringsAsFactors = FALSE
+#' )
+#' 
+#' res <- traverse_ids(input_df)
+#' 
+#' df_translated <- res$ExpandedDF
+#' head(df_translated)
+#'
+#' @export
+traverse_ids <- function(
+    data,
+    id_types = c("HMDB", "KEGG", "CHEBI", "PUBCHEM"),
+    delimiter = c(";", ","),
+    save_table = "csv",
+    path = NULL,
+    verbose = FALSE
+) {
+    
+    # NSE vs. R CMD check workaround
+    row_id <- NULL
+    
+    metaproviz_init()
+    
+    check_param(
+        data = data,
+        data_num = FALSE,
+        save_table = save_table
+    )
+    
+    selected_types <- normalize_id_types(id_types)
+    
+    if (length(selected_types) == 0L) {
+        stop("id_types must contain at least one ID type.", call. = FALSE)
+    }
+    
+    unsupported_types <- setdiff(selected_types, supported_id_types())
+    if (length(unsupported_types) > 0L) {
+        stop(
+            sprintf("Unsupported id_types: %s", paste(unsupported_types, collapse = ", ")),
+            call. = FALSE
+        )
+    }
+    
+    delimiter_value <- normalize_delimiter(delimiter)
+    split_pattern <- delimiter_to_pattern(delimiter_value)
+    
+    prep <- prepare_input_for_traversal(data = data, selected_types = selected_types)
+    
+    if (length(prep$messages) > 0L) {
+        for (msg in prep$messages) {
+            log_warn(msg)
+            warning(msg, call. = FALSE)
+        }
+    }
+    
+    edge_table <- build_id_edges_bidirectional(selected_types, verbose = verbose)
+    
+    expansion <- traverse_all_rows(
+        data_prepared = prep$data_prepared,
+        edge_table = edge_table,
+        selected_types = selected_types,
+        split_pattern = split_pattern
+    )
+    
+    expanded_df <-
+        prep$data_output %>%
+        dplyr::mutate(row_id = dplyr::row_number()) %>%
+        dplyr::bind_cols(expansion$summary)
+    
+    result <- list(
+        ExpandedDF = expanded_df,
+        ExpandedIDs_Long = expansion$expanded_long,
+        IDEdges = edge_table
+    )
+    
+    if (isTRUE(verbose)) {
+        cat(sprintf("[traverse_ids] selected_types: %s\n", paste(selected_types, collapse = ", ")))
+        cat(sprintf(
+            "[traverse_ids] ExpandedDF rows: %d | ExpandedIDs_Long rows: %d | IDEdges rows: %d\n",
+            nrow(result$ExpandedDF),
+            nrow(result$ExpandedIDs_Long),
+            nrow(result$IDEdges)
+        ))
+    }
+    
+    if (!is.null(save_table)) {
+        folder <- save_path(folder_name = "TraverseIDs", path = path)
+        
+        save_res(
+            inputlist_df = result,
+            save_table = save_table,
+            path = folder,
+            file_name = "TraverseIDs",
+            print_plot = FALSE
+        )
+    }
+    
+    result
+}
+
+
+#' @noRd
+supported_id_types <- function() {
+    c("HMDB", "KEGG", "CHEBI", "PUBCHEM")
+}
+
+
+#' @noRd
+normalize_id_types <- function(id_types) {
+    unique(stringr::str_to_upper(as.character(id_types)))
+}
+
+
+#' @noRd
+normalize_delimiter <- function(delimiter) {
+    delimiter <- as.character(delimiter)
+    
+    if (length(delimiter) == 0L) {
+        stop("delimiter must contain at least one value.", call. = FALSE)
+    }
+    
+    delimiter <- tolower(trimws(delimiter[[1]]))
+    
+    if (delimiter %in% c(";", "semicolon")) {
+        return(";")
+    }
+    
+    if (delimiter %in% c(",", "comma")) {
+        return(",")
+    }
+    
+    stop("delimiter must be one of ';', ',', 'semicolon', or 'comma'.", call. = FALSE)
+}
+
+
+#' @noRd
+delimiter_to_pattern <- function(delimiter_value) {
+    if (delimiter_value == ";") {
+        ";\\s*"
+    } else {
+        ",\\s*"
+    }
+}
+
+
+#' @noRd
+empty_edge_table <- function() {
+    tibble::tibble(
+        id1 = character(),
+        type1 = character(),
+        id2 = character(),
+        type2 = character()
+    )
+}
+
+
+#' @noRd
+empty_long_table <- function() {
+    tibble::tibble(
+        row_id = integer(),
+        type = character(),
+        id = character(),
+        is_seed = logical()
+    )
+}
+
+
+#' @noRd
+prepare_input_for_traversal <- function(data, selected_types) {
+    
+    data_output <- data
+    prepared_cols <- list()
+    messages <- character(0)
+    
+    for (id_type in supported_id_types()) {
+        
+        exact_exists <- id_type %in% colnames(data)
+        
+        if (exact_exists) {
+            prepared_cols[[id_type]] <- data[[id_type]]
+        } else {
+            candidates <- which(tolower(colnames(data)) == tolower(id_type))
+            
+            if (length(candidates) > 1L) {
+                stop(
+                    sprintf(
+                        "Multiple columns match '%s' case-insensitively: %s",
+                        id_type,
+                        paste(colnames(data)[candidates], collapse = ", ")
+                    ),
+                    call. = FALSE
+                )
+            }
+            
+            if (length(candidates) == 1L) {
+                matched_col <- colnames(data)[candidates]
+                prepared_cols[[id_type]] <- data[[matched_col]]
+                data_output[[id_type]] <- data[[matched_col]]
+                
+                messages <- c(
+                    messages,
+                    sprintf("Input column '%s' was mapped to canonical '%s'.", matched_col, id_type)
+                )
+            } else {
+                prepared_cols[[id_type]] <- rep(NA_character_, nrow(data))
+                
+                if (id_type %in% selected_types) {
+                    data_output[[id_type]] <- NA_character_
+                    messages <- c(
+                        messages,
+                        sprintf("Selected ID column '%s' not found in data and was created as NA.", id_type)
+                    )
+                }
+            }
+        }
+        
+        if (!(id_type %in% selected_types)) {
+            prepared_cols[[id_type]] <- rep(NA_character_, nrow(data))
+        }
+    }
+    
+    has_selected_col <- vapply(
+        selected_types,
+        function(id_type) {
+            any(tolower(colnames(data)) == tolower(id_type))
+        },
+        logical(1)
+    )
+    
+    if (!any(has_selected_col)) {
+        stop("At least one selected ID column must exist in data.", call. = FALSE)
+    }
+    
+    data_prepared <- tibble::tibble(
+        HMDB = as.character(prepared_cols$HMDB),
+        KEGG = as.character(prepared_cols$KEGG),
+        CHEBI = as.character(prepared_cols$CHEBI),
+        PUBCHEM = as.character(prepared_cols$PUBCHEM)
+    )
+    
+    list(
+        data_output = data_output,
+        data_prepared = data_prepared,
+        messages = messages
+    )
+}
+
+
+#' @noRd
+normalize_hmdb <- function(x) {
+    x <- as.character(x)
+    x <- stringr::str_trim(x)
+    x[x == ""] <- NA_character_
+    x <- stringr::str_to_upper(x)
+    
+    valid <- stringr::str_detect(x, "^HMDB\\d+$")
+    num_part <- stringr::str_extract(x, "\\d+")
+    
+    ifelse(
+        valid & !is.na(num_part),
+        paste0("HMDB", stringr::str_pad(num_part, width = 7, side = "left", pad = "0")),
+        NA_character_
+    )
+}
+
+
+#' @noRd
+normalize_kegg <- function(x) {
+    x <- as.character(x)
+    x <- stringr::str_trim(x)
+    x[x == ""] <- NA_character_
+    x <- stringr::str_to_upper(x)
+    
+    valid <- stringr::str_detect(x, "^C\\d+$")
+    ifelse(valid, x, NA_character_)
+}
+
+
+#' @noRd
+normalize_chebi <- function(x) {
+    x <- as.character(x)
+    x <- stringr::str_trim(x)
+    x[x == ""] <- NA_character_
+    
+    x <- stringr::str_remove(x, "(?i)^CHEBI:")
+    x <- stringr::str_trim(x)
+    
+    valid <- stringr::str_detect(x, "^\\d+$")
+    ifelse(valid, x, NA_character_)
+}
+
+
+#' @noRd
+normalize_pubchem <- function(x) {
+    x <- as.character(x)
+    x <- stringr::str_trim(x)
+    x[x == ""] <- NA_character_
+    
+    x <- stringr::str_remove(x, "(?i)^CID")
+    x <- stringr::str_trim(x)
+    
+    valid <- stringr::str_detect(x, "^\\d+$")
+    ifelse(valid, x, NA_character_)
+}
+
+
+#' @noRd
+normalize_by_type <- function(x, type) {
+    if (type == "HMDB") {
+        return(normalize_hmdb(x))
+    }
+    if (type == "KEGG") {
+        return(normalize_kegg(x))
+    }
+    if (type == "CHEBI") {
+        return(normalize_chebi(x))
+    }
+    if (type == "PUBCHEM") {
+        return(normalize_pubchem(x))
+    }
+    
+    stop(sprintf("Unsupported type: %s", type), call. = FALSE)
+}
+
+
+#' @noRd
+format_output_ids <- function(ids, type) {
+    if (length(ids) == 0L) {
+        return(NA_character_)
+    }
+    
+    if (type == "CHEBI") {
+        ids <- paste0("CHEBI:", ids)
+    }
+    
+    if (type == "PUBCHEM") {
+        ids <- paste0("CID", ids)
+    }
+    
+    paste(ids, collapse = "; ")
+}
+
+
+#' @noRd
+split_ids <- function(x, type = NULL, split_pattern = ";\\s*") {
+    
+    if (length(x) == 0L) {
+        return(character(0))
+    }
+    
+    x <- as.character(x)
+    
+    if (is.na(x) || x == "") {
+        return(character(0))
+    }
+    
+    ids <-
+        x %>%
+        stringr::str_split(pattern = split_pattern) %>%
+        .[[1]] %>%
+        stringr::str_trim()
+    
+    ids <- ids[ids != "" & !is.na(ids)]
+    
+    if (!is.null(type)) {
+        ids <- normalize_by_type(ids, type)
+    }
+    
+    ids <- ids[!is.na(ids) & ids != ""]
+    unique(ids)
+}
+
+
+#' @noRd
+build_pair_mapping <- function(type1, type2, verbose = FALSE) {
+    
+    # NSE vs. R CMD check workaround
+    From <- To <- id1 <- id2 <- NULL
+    
+    raw_forward <- .ramp_id_mapping_table(
+        from = tolower(type1),
+        to = tolower(type2),
+        verbose = verbose
+    )
+    
+    if (isTRUE(verbose)) {
+        cat(sprintf("[traverse_ids] pair %s->%s raw rows: %d\n", type1, type2, nrow(raw_forward)))
+    }
+    
+    raw_map <- raw_forward
+    direction_used <- "forward"
+    
+    if (nrow(raw_forward) == 0L) {
+        raw_reverse <- .ramp_id_mapping_table(
+            from = tolower(type2),
+            to = tolower(type1),
+            verbose = verbose
+        )
+        
+        if (isTRUE(verbose)) {
+            cat(sprintf(
+                "[traverse_ids] pair %s->%s reverse-query %s->%s raw rows: %d\n",
+                type1,
+                type2,
+                type2,
+                type1,
+                nrow(raw_reverse)
+            ))
+        }
+        
+        if (nrow(raw_reverse) > 0L) {
+            raw_map <- raw_reverse %>%
+                dplyr::transmute(
+                    From = To,
+                    To = From
+                )
+            direction_used <- "reverse"
+        }
+    }
+    
+    if (!all(c("From", "To") %in% colnames(raw_map))) {
+        stop(
+            sprintf(
+                "RaMP mapping table for %s->%s is missing required columns `From` and `To`.",
+                type1,
+                type2
+            ),
+            call. = FALSE
+        )
+    }
+    
+    mapping <- raw_map %>%
+        dplyr::transmute(
+            id1 = normalize_by_type(From, type1),
+            type1 = type1,
+            id2 = normalize_by_type(To, type2),
+            type2 = type2
+        ) %>%
+        dplyr::filter(!is.na(id1), !is.na(id2)) %>%
+        dplyr::distinct() %>%
+        dplyr::arrange(id1)
+    
+    if (isTRUE(verbose)) {
+        cat(sprintf(
+            "[traverse_ids] pair %s->%s direction used: %s | normalized edges: %d\n",
+            type1,
+            type2,
+            direction_used,
+            nrow(mapping)
+        ))
+    }
+    
+    mapping
+}
+
+build_id_edges_bidirectional <- function(selected_types, verbose = FALSE) {
+    
+    # NSE vs. R CMD check workaround
+    id1 <- id2 <- type1 <- type2 <- id1_old <- id2_old <- type1_old <- type2_old <- NULL
+    
+    if (length(selected_types) < 2L) {
+        if (isTRUE(verbose)) {
+            cat("[traverse_ids] <2 selected ID types, IDEdges is empty by design.\n")
+        }
+        return(empty_edge_table())
+    }
+    
+    type_pairs <- utils::combn(selected_types, 2, simplify = FALSE)
+    
+    pair_edges <- lapply(
+        type_pairs,
+        function(pair) {
+            build_pair_mapping(pair[[1]], pair[[2]], verbose = verbose)
+        }
+    )
+    
+    if (length(pair_edges) == 0L) {
+        return(empty_edge_table())
+    }
+    
+    id_edges <- dplyr::bind_rows(pair_edges)
+    
+    if (nrow(id_edges) == 0L) {
+        if (isTRUE(verbose)) {
+            cat("[traverse_ids] No forward edges after normalization across all pairs.\n")
+        }
+        return(empty_edge_table())
+    }
+    
+    id_edges_reversed <-
+        id_edges %>%
+        dplyr::rename(
+            id1_old = id1,
+            type1_old = type1,
+            id2_old = id2,
+            type2_old = type2
+        ) %>%
+        dplyr::transmute(
+            id1 = id2_old,
+            type1 = type2_old,
+            id2 = id1_old,
+            type2 = type1_old
+        )
+    
+    edge_table <- dplyr::bind_rows(id_edges, id_edges_reversed) %>%
+        dplyr::distinct() %>%
+        dplyr::filter(!(id1 == id2 & type1 == type2))
+    
+    if (isTRUE(verbose)) {
+        cat(sprintf(
+            "[traverse_ids] total forward edges: %d | bidirectional edges: %d\n",
+            nrow(id_edges),
+            nrow(edge_table)
+        ))
+    }
+    
+    edge_table
+}
+
+
+#' @noRd
+expand_metabolite_ids <- function(
+    hmdb,
+    kegg,
+    chebi,
+    pubchem,
+    edge_table,
+    selected_types,
+    split_pattern
+) {
+    
+    # NSE vs. R CMD check workaround
+    id <- id1 <- id2 <- type <- type1 <- type2 <- n <- NULL
+    
+    seed_tbl <-
+        dplyr::bind_rows(
+            tibble::tibble(
+                id = if ("HMDB" %in% selected_types) split_ids(hmdb, "HMDB", split_pattern) else character(0),
+                type = "HMDB"
+            ),
+            tibble::tibble(
+                id = if ("KEGG" %in% selected_types) split_ids(kegg, "KEGG", split_pattern) else character(0),
+                type = "KEGG"
+            ),
+            tibble::tibble(
+                id = if ("CHEBI" %in% selected_types) split_ids(chebi, "CHEBI", split_pattern) else character(0),
+                type = "CHEBI"
+            ),
+            tibble::tibble(
+                id = if ("PUBCHEM" %in% selected_types) split_ids(pubchem, "PUBCHEM", split_pattern) else character(0),
+                type = "PUBCHEM"
+            )
+        ) %>%
+        dplyr::filter(!is.na(id), id != "") %>%
+        dplyr::distinct()
+    
+    if (nrow(seed_tbl) == 0L) {
+        return(
+            list(
+                summary = tibble::tibble(
+                    HMDB_translated = NA_character_,
+                    KEGG_translated = NA_character_,
+                    CHEBI_translated = NA_character_,
+                    PUBCHEM_translated = NA_character_,
+                    n_seed_ids = 0L,
+                    n_HMDB_translated = 0L,
+                    n_KEGG_translated = 0L,
+                    n_CHEBI_translated = 0L,
+                    n_PUBCHEM_translated = 0L,
+                    mapping_expanded = FALSE,
+                    ambiguous_seed = FALSE,
+                    large_mapping = FALSE
+                ),
+                known_ids = seed_tbl,
+                seed_tbl = seed_tbl
+            )
+        )
+    }
+    
+    known_ids <- seed_tbl
+    changed <- TRUE
+    
+    while (changed) {
+        
+        new_ids <-
+            known_ids %>%
+            dplyr::inner_join(edge_table, by = c("id" = "id1", "type" = "type1")) %>%
+            dplyr::transmute(id = id2, type = type2) %>%
+            dplyr::distinct()
+        
+        updated_ids <- dplyr::bind_rows(known_ids, new_ids) %>% dplyr::distinct()
+        
+        changed <- nrow(updated_ids) > nrow(known_ids)
+        known_ids <- updated_ids
+    }
+    
+    hmdb_out <- known_ids %>% dplyr::filter(type == "HMDB") %>% dplyr::pull(id) %>% .[!is.na(.) & . != ""] %>% sort()
+    kegg_out <- known_ids %>% dplyr::filter(type == "KEGG") %>% dplyr::pull(id) %>% .[!is.na(.) & . != ""] %>% sort()
+    chebi_out <- known_ids %>% dplyr::filter(type == "CHEBI") %>% dplyr::pull(id) %>% .[!is.na(.) & . != ""] %>% sort()
+    pubchem_out <- known_ids %>% dplyr::filter(type == "PUBCHEM") %>% dplyr::pull(id) %>% .[!is.na(.) & . != ""] %>% sort()
+    
+    summary <- tibble::tibble(
+        HMDB_translated = format_output_ids(hmdb_out, "HMDB"),
+        KEGG_translated = format_output_ids(kegg_out, "KEGG"),
+        CHEBI_translated = format_output_ids(chebi_out, "CHEBI"),
+        PUBCHEM_translated = format_output_ids(pubchem_out, "PUBCHEM"),
+        n_seed_ids = nrow(seed_tbl),
+        n_HMDB_translated = length(hmdb_out),
+        n_KEGG_translated = length(kegg_out),
+        n_CHEBI_translated = length(chebi_out),
+        n_PUBCHEM_translated = length(pubchem_out),
+        mapping_expanded = nrow(known_ids) > nrow(seed_tbl),
+        ambiguous_seed = any(dplyr::count(seed_tbl, type)$n > 1),
+        large_mapping = (
+            length(hmdb_out) > 3 ||
+                length(kegg_out) > 3 ||
+                length(chebi_out) > 5 ||
+                length(pubchem_out) > 5
+        )
+    )
+    
+    list(summary = summary, known_ids = known_ids, seed_tbl = seed_tbl)
+}
+
+
+#' @noRd
+traverse_all_rows <- function(data_prepared, edge_table, selected_types, split_pattern) {
+    
+    # NSE vs. R CMD check workaround
+    id <- is_seed <- row_id <- type <- NULL
+    
+    if (nrow(data_prepared) == 0L) {
+        return(
+            list(
+                summary = tibble::tibble(
+                    HMDB_translated = character(),
+                    KEGG_translated = character(),
+                    CHEBI_translated = character(),
+                    PUBCHEM_translated = character(),
+                    n_seed_ids = integer(),
+                    n_HMDB_translated = integer(),
+                    n_KEGG_translated = integer(),
+                    n_CHEBI_translated = integer(),
+                    n_PUBCHEM_translated = integer(),
+                    mapping_expanded = logical(),
+                    ambiguous_seed = logical(),
+                    large_mapping = logical()
+                ),
+                expanded_long = empty_long_table()
+            )
+        )
+    }
+    
+    per_row <- purrr::pmap(
+        list(data_prepared$HMDB, data_prepared$KEGG, data_prepared$CHEBI, data_prepared$PUBCHEM),
+        function(hmdb, kegg, chebi, pubchem) {
+            expand_metabolite_ids(
+                hmdb = hmdb,
+                kegg = kegg,
+                chebi = chebi,
+                pubchem = pubchem,
+                edge_table = edge_table,
+                selected_types = selected_types,
+                split_pattern = split_pattern
+            )
+        }
+    )
+    
+    summary <- dplyr::bind_rows(lapply(per_row, function(x) x$summary))
+    
+    expanded_long_list <- lapply(
+        seq_along(per_row),
+        function(i) {
+            known_ids <- per_row[[i]]$known_ids
+            seed_tbl <- per_row[[i]]$seed_tbl
+            
+            if (nrow(known_ids) == 0L) {
+                return(NULL)
+            }
+            
+            known_ids %>%
+                dplyr::mutate(
+                    row_id = i,
+                    is_seed = paste(type, id, sep = "::") %in% paste(seed_tbl$type, seed_tbl$id, sep = "::")
+                ) %>%
+                dplyr::select(row_id, type, id, is_seed)
+        }
+    )
+    
+    expanded_long <- dplyr::bind_rows(expanded_long_list)
+    
+    if (nrow(expanded_long) == 0L) {
+        expanded_long <- empty_long_table()
+    }
+    
+    list(summary = summary, expanded_long = expanded_long)
+}
+
+
+#' @noRd
+.ramp_id_mapping_table <- function(from, to, verbose = FALSE) {
+    
+    if (isTRUE(verbose)) {
+        cat(sprintf(
+            "[traverse_ids] OmnipathR call requested: ramp_id_mapping_table(from = '%s', to = '%s')\n",
+            from,
+            to
+        ))
+    }
+    
+    ramp_fun <- getExportedValue("OmnipathR", "ramp_id_mapping_table")
+    fn_formals <- names(formals(ramp_fun))
+    
+    call_args <- list(from = from, to = to)
+    
+    # OmnipathR can use caller package context in some internals;
+    # force package context when supported for deterministic behavior.
+    if ("pkg" %in% fn_formals) {
+        call_args$pkg <- "OmnipathR"
+    }
+    
+    if (isTRUE(verbose)) {
+        cat(sprintf(
+            "[traverse_ids] OmnipathR effective call args: %s\n",
+            paste(sprintf("%s=%s", names(call_args), unlist(call_args)), collapse = ", ")
+        ))
+    }
+    
+    out <- do.call(ramp_fun, call_args)
+    
+    if (isTRUE(verbose)) {
+        cat(sprintf(
+            "[traverse_ids] OmnipathR result for %s->%s: rows=%d, cols=%d\n",
+            from,
+            to,
+            nrow(out),
+            ncol(out)
+        ))
+        
+        if (nrow(out) > 0L) {
+            cat("[traverse_ids] OmnipathR result preview:\n")
+            print(utils::head(out, 3))
+        }
+    }
+    
+    out
+}
+
+
+
 ##
 ## Cluster prior knowledge by pathway overlap
 ##
