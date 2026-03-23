@@ -454,6 +454,9 @@ metsigdb_chemicalclass <- function(
 #'     "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} String which is added to the resulting folder name
 #'     \strong{default: NULL}
+#' @param exclude_metabolites Optional metabolite classes to exclude:
+#'     NULL (exclude nothing), "all" (default), or any combination of
+#'     c("ions", "small_molecules", "xenobiotics").
 #'
 #' @return List of two data frames: "GeneMetabSet" and "MetabSet".
 #'
@@ -471,7 +474,8 @@ make_gene_metab_set <- function(
     metadata_info = c(Target = "gene"),
     pk_name = NULL,
     save_table = "csv",
-    path = NULL
+    path = NULL,
+    exclude_metabolites = "all"
 ) {
 
     # NSE vs. R CMD check workaround
@@ -510,7 +514,7 @@ make_gene_metab_set <- function(
     }
 
     ## ------------ folder ----------- ##
-    if (!is.null(save_table)) { 
+    if (!is.null(save_table)) {
         ## in case the user wants to save the results -> save_table is not NULL, folder is created
         folder <- save_path(
             folder_name = "PK",
@@ -578,11 +582,24 @@ make_gene_metab_set <- function(
     # combine with pathways --> File that can be used for combined pathway analysis (metabolites and gene t.vals)
     GeneMetabSet <- unique(as.data.frame(rbind(input_pk %>% dplyr::rename("feature" = metadata_info[["Target"]]), MetabSet[, -1] %>% dplyr::rename("feature" = 1))))
 
+    # Apply metabolite exclusion only on metabolite rows (genes are kept unchanged).
+    gene_rows <- GeneMetabSet[!grepl("^HMDB", GeneMetabSet$feature), , drop = FALSE]
+    metab_rows <- GeneMetabSet[grepl("^HMDB", GeneMetabSet$feature), , drop = FALSE]
+
+    if (nrow(metab_rows) > 0L) {
+        metab_rows <- .apply_metabolite_exclusion(
+            df = metab_rows,
+            id_column = "feature",
+            id_type = "HMDB",
+            exclude_metabolites = exclude_metabolites
+        )
+    }
+
+    GeneMetabSet <- unique(rbind(gene_rows, metab_rows))
 
     # # ------------ Select metabolites only
     MetabSet <- GeneMetabSet %>%
-    filter(grepl("HMDB", feature))
-
+    filter(grepl("^HMDB", feature))
 
     # # -------------- Save and return
     DF_List <- list(
@@ -960,11 +977,6 @@ metsigdb_metalinks <- function(
 
 
 
-
-
-
-
-
 #' Retrieve Reactome metabolite sets suitable for ORA.
 #' 
 #' Queries the OmniPath resource through OmniPathR to obtail Reactome pathway
@@ -1072,3 +1084,5 @@ metsigdb_wikipathways <- function(
     pathway_df_long
 
 }
+
+
