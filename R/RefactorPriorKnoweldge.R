@@ -834,14 +834,10 @@ equivalent_id <- function(
 
 #' Create Mapping Ambiguities between two ID types
 #'
-#' @param data Translated DF from translate_id reults or dataframe with at least one
+#' @param data Translated DF from translate_id results or dataframe with at least one
 #'     column with the target metabolite ID and another MetaboliteID type. One
 #'     of the IDs can only have one ID per row, the other ID can be either
-#'
-# separated
-
-
-#' by comma or a list. Optional: add other columns such as source (e.g. term).
+#'     separated by comma or a list. Optional: add other columns such as source (e.g. term).
 #'
 #' @param to Column name of original metabolite identifier in data. Here should only
 #'     have one ID per row.
@@ -866,7 +862,7 @@ equivalent_id <- function(
 #' @examples
 #' \dontrun{
 #' KEGG_Pathways <- metsigdb_kegg()
-#' InputDF <- translate_id(
+#'InputDF <- translate_id(
 #'     data = KEGG_Pathways,
 #'     metadata_info = c(
 #'         InputID = "MetaboliteID",
