@@ -21,7 +21,7 @@ via full name or three letter code. Default = "Homo sapiens". NULL for all speci
 
 \item{exclude_metabolites}{Optional metabolite classes to exclude:
 NULL (exclude nothing), "all" (default), or any combination of
-c("ions", "small_molecules", "xenobiotics").}
+c("ions", "small_molecules", "xenobiotics", "atoms").}
 }
 \value{
 A tibble in long format containing one row per metabolite for the Reactome pathways.
