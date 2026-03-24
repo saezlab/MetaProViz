@@ -1184,3 +1184,163 @@ metsigdb_wikipathways <- function(
 }
 
 
+
+
+
+#' Retrieve MACDB metabolite-cancer associations.
+#'
+#' Retrieves metabolite-cancer associations from MACDB via OmnipathR and
+#' summarizes them to unique metabolite-cancer associations (by `term` and
+#' `Metabolite_PubchemID`).
+#'
+#' @param exclude_metabolites Optional metabolite classes to exclude:
+#'     NULL (exclude nothing), "all" (default), or any combination of
+#'     c("ions", "small_molecules", "xenobiotics", "atoms").
+#'
+#' @return A data frame with one row per unique metabolite-cancer association,
+#'   collapsed metadata columns, and summary metrics (`evidence_count`,
+#'   `significance_count`, `association_score`).
+#'
+#' @importFrom OmnipathR macdb_metabolite_cancer_associations
+#' @importFrom dplyr mutate
+#'
+#' @export
+metsigdb_macdb <- function(
+    exclude_metabolites = "all"
+) {
+
+    # NSE vs. R CMD check workaround
+    metabolite_pubchem_cid <- metabolite_name <- study_cancer_subtype <- study_cancer_type <- NULL
+
+    macdb_df <- OmnipathR::macdb_metabolite_cancer_associations()
+
+    required_columns <- c(
+        "metabolite_pubchem_cid",
+        "metabolite_name",
+        "study_cancer_type",
+        "study_cancer_subtype",
+        "study_pubmed_id",
+        "association_pvalue"
+    )
+    missing_columns <- setdiff(required_columns, colnames(macdb_df))
+    if (length(missing_columns) > 0L) {
+        stop(
+            "Unexpected MACDB format. Missing required columns: ",
+            paste(missing_columns, collapse = ", ")
+        )
+    }
+
+    macdb_df <- macdb_df %>%
+        dplyr::mutate(
+            term = ifelse(
+                is.na(study_cancer_subtype) | study_cancer_subtype == "",
+                as.character(study_cancer_type),
+                as.character(study_cancer_subtype)
+            ),
+            Metabolite = metabolite_name,
+            Metabolite_PubchemID = as.character(metabolite_pubchem_cid),
+            Description = study_cancer_type
+        )
+
+    macdb_df <- .apply_metabolite_exclusion(
+        df = macdb_df,
+        id_column = "Metabolite_PubchemID",
+        id_type = "PUBCHEM",
+        exclude_metabolites = exclude_metabolites
+    )
+
+    keep_columns <- c(
+        "term",
+        "Description",
+        "Metabolite",
+        "Metabolite_PubchemID",
+        "Cohort_id",
+        "study_trait_onto_id",
+        "study_cancer_doid",
+        "study_tissue",
+        "study_pubmed_id",
+        "association_pvalue",
+        "association_log2fc",
+        "association_case_concentration",
+        "association_control_concentration",
+        "has_pValue",
+        "has_log2FC",
+        "has_caseConcentration",
+        "has_controlConcentration",
+        "has_bothConcentrations"
+    )
+
+    keep_columns <- keep_columns[keep_columns %in% colnames(macdb_df)]
+    macdb_df <- macdb_df[, keep_columns, drop = FALSE]
+
+    .summarize_macdb_associations(macdb_df)
+
+}
+
+
+.summarize_macdb_associations <- function(macdb_df) {
+
+    # NSE vs. R CMD check workaround
+    term <- Metabolite_PubchemID <- study_pubmed_id <- Cohort_id <- association_pvalue <-
+        evidence_count <- significance_count <- association_score <-
+        study_significant <- NULL
+
+    key_columns <- c("term", "Metabolite_PubchemID")
+    missing_key_columns <- setdiff(key_columns, colnames(macdb_df))
+    if (length(missing_key_columns) > 0L) {
+        stop(
+            "Missing key column(s) for MACDB summarization: ",
+            paste(missing_key_columns, collapse = ", ")
+        )
+    }
+    collapse_columns <- setdiff(colnames(macdb_df), key_columns)
+    summarized_df <- macdb_df %>%
+        dplyr::group_by(term, Metabolite_PubchemID) %>%
+        dplyr::summarise(
+            dplyr::across(
+                dplyr::all_of(collapse_columns),
+                function(x) {
+                    x <- as.character(x)
+                    x <- x[!is.na(x) & nzchar(x)]
+                    if (length(x) == 0L) {
+                        return(NA_character_)
+                    }
+                    x <- x[!duplicated(x)]
+                    paste(x, collapse = "; ")
+                }
+            ),
+            .groups = "drop"
+        )
+
+    per_study <- macdb_df %>%
+        dplyr::filter(!is.na(study_pubmed_id)) %>%
+        dplyr::group_by(term, Metabolite_PubchemID, study_pubmed_id) %>%
+        dplyr::summarise(
+            study_significant = any(!is.na(association_pvalue) & association_pvalue <= 0.05),
+            .groups = "drop"
+        )
+
+    counts_df <- per_study %>%
+        dplyr::group_by(term, Metabolite_PubchemID) %>%
+        dplyr::summarise(
+            evidence_count = dplyr::n_distinct(study_pubmed_id),
+            significance_count = sum(study_significant),
+            .groups = "drop"
+        )
+
+    counts_df <- summarized_df %>%
+        dplyr::select(term, Metabolite_PubchemID) %>%
+        dplyr::left_join(counts_df, by = c("term", "Metabolite_PubchemID")) %>%
+        dplyr::mutate(
+            evidence_count = ifelse(is.na(evidence_count), 0L, as.integer(evidence_count)),
+            significance_count = ifelse(is.na(significance_count), 0L, as.integer(significance_count)),
+            association_score = evidence_count + significance_count
+        )
+
+    summarized_df %>%
+        dplyr::left_join(
+            counts_df,
+            by = c("term", "Metabolite_PubchemID")
+        )
+
+}
