@@ -121,6 +121,12 @@ jobs:
       - name: Install ComplexUpset from source
         run: Rscript -e 'install.packages("ComplexUpset", type="source")'
 
+      # Re-install OmnipathR devel last to guarantee this is the version used for build/check
+      - name: Reinstall OmnipathR from devel (final)
+        run: |
+          Rscript -e 'remotes::install_github("saezlab/OmnipathR@devel", force=TRUE, upgrade="never", dependencies=FALSE)'
+          Rscript -e 'cat("OmnipathR version used: ", as.character(packageVersion("OmnipathR")), "\n", sep = "")'
+
       # Install  MetaProViz
       - name: Install MetaProViz from git by remotes
         if: github.ref == 'refs/heads/main'
