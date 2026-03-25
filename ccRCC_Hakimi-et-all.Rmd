@@ -123,18 +123,17 @@ Data_Sample <- merge( MetaData_Sample, Data_Select, by = "row.names")%>%
 Data wrangling
 ```{r, warning=FALSE}
 MetaboliteIDs <- MetaData_Metabolite %>%
-  rownames_to_column("Metabolite") %>%
-  dplyr::rename("HMDB"= "Group_HMDB")%>%
-  slice(1:577) %>%# only keep entries with trivial names
-  dplyr::mutate(PUBCHEM = as.integer(as.numeric(PUBCHEM)))%>%
+  tibble::rownames_to_column("Metabolite") %>%
+  dplyr::rename(HMDB = Group_HMDB) %>%
   dplyr::mutate(
+    PUBCHEM = as.integer(as.numeric(PUBCHEM)),
     KEGG = trimws(KEGG),
-    HMDB = toupper(trimws(HMDB)),   # HMDB often safer uppercase
+    HMDB = toupper(trimws(HMDB)),
     CAS = trimws(CAS)
-  )%>%
+  ) %>%
   tidyr::separate_rows(CAS, sep = ";") %>%
   dplyr::mutate(CAS = trimws(CAS)) %>%
-  dplyr::filter(CAS != "")
+  dplyr::filter(is.na(CAS) | CAS != "")
 
 ```
 \
@@ -240,30 +239,43 @@ MetaboliteIDs_PUBCHEM_FALSE <- MetaboliteIDs_PUBCHEM_FALSE %>%
 ##-------------------------------------------------
 #Add into original table:
 # Add corrected invalid rows back into the original table
-MetaboliteIDs_PUBCHEM <- MetaboliteIDs_PUBCHEM %>%
+MetaboliteIDs_PUBCHEM <- MetaboliteIDs %>%
+  dplyr::mutate(
+    PUBCHEM_valid = !is.na(PUBCHEM) & PUBCHEM %in% RaMP_PubChem$From
+  ) %>%
   dplyr::left_join(
     MetaboliteIDs_PUBCHEM_FALSE %>%
-      dplyr::select(PUBCHEM, PUBCHEM_corrected, PUBCHEM_Correction_Source),
-    by = "PUBCHEM"
+      dplyr::select(Metabolite, PUBCHEM, PUBCHEM_corrected, PUBCHEM_Correction_Source),
+    by = c("Metabolite", "PUBCHEM")
   ) %>%
   dplyr::mutate(
     PUBCHEM = as.character(PUBCHEM),
     PUBCHEM_corrected = dplyr::case_when(
-      PUBCHEM_valid == TRUE ~ NA_character_,
-      !is.na(PUBCHEM_corrected) ~ PUBCHEM_corrected,
+      PUBCHEM_valid ~ NA_character_,                      # valid original, no correction needed
+      !is.na(PUBCHEM_corrected) ~ PUBCHEM_corrected,      # corrected via RaMP/manual
       TRUE ~ NA_character_
     ),
     PUBCHEM_Correction_Source = dplyr::case_when(
-      PUBCHEM_valid == TRUE ~ "None",
+      is.na(PUBCHEM) ~ "NA",                              # no original PubChem in metadata
+      PUBCHEM_valid ~ "None",                             # original ID already valid
       !is.na(PUBCHEM_Correction_Source) ~ PUBCHEM_Correction_Source,
       TRUE ~ "NA"
     ),
-    # final PubChem to use: corrected if available, otherwise original
+    # final PubChem to use
     PUBCHEM_corrected = dplyr::coalesce(PUBCHEM_corrected, PUBCHEM)
   ) %>%
   dplyr::rename(
     `PUBCHEM original` = PUBCHEM,
     PUBCHEM = PUBCHEM_corrected
+  )%>%
+  dplyr::group_by(Metabolite) %>%
+  dplyr::summarise(
+    CAS = paste(unique(stats::na.omit(trimws(CAS))), collapse = "; "),
+    dplyr::across(-CAS, dplyr::first),
+    .groups = "drop"
+  ) %>%
+  dplyr::mutate(
+    CAS = dplyr::na_if(CAS, "")
   )
 ```
 
@@ -292,7 +304,7 @@ n_with_pubchem_final <- MetaboliteIDs_PUBCHEM %>%
   dplyr::summarise(n = sum(!is.na(PUBCHEM) & trimws(PUBCHEM) != "", na.rm = TRUE)) %>%
   dplyr::pull(n)
 
-cat("Total features with PubChem:", n_total, "\n")
+cat("Total features:", n_total, "\n")
 cat("Initially invalid PubChem (PUBCHEM_valid == FALSE):", n_false, "\n")
 cat("Corrected using RaMP-DB:", n_ramp, "\n")
 cat("Corrected manually:", n_manual, "\n")
@@ -307,9 +319,11 @@ Save DF as .csv file
 write.csv(Data_Sample, "Hakimi_ccRCC-Tissue_Data.csv")
 write.csv(MetaboliteIDs_PUBCHEM, "Hakimi_ccRCC-Tissue_FeatureMetaData_Full-Pubchem-Info.csv")
 
-write.csv(MetaboliteIDs_PUBCHEM%>%
-            dplyr::select(1:8,13, 10:11 ), 
-          "Hakimi_ccRCC-Tissue_FeatureMetaData.csv")
+metadata_tissue <- MetaboliteIDs_PUBCHEM %>%
+  dplyr::select(1:8, 13, 10:11)
+
+write.csv(metadata_tissue, "Hakimi_ccRCC-Tissue_FeatureMetaData.csv")
+save(metadata_tissue, file = "metadata_tissue.rda")
 
 ```
 

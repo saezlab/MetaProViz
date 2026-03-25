@@ -1878,18 +1878,17 @@ Merge Data with MetaData_Sample</p>
 <h2>Feature metadata table</h2>
 <p>Data wrangling</p>
 <pre class="r"><code>MetaboliteIDs &lt;- MetaData_Metabolite %&gt;%
-  rownames_to_column(&quot;Metabolite&quot;) %&gt;%
-  dplyr::rename(&quot;HMDB&quot;= &quot;Group_HMDB&quot;)%&gt;%
-  slice(1:577) %&gt;%# only keep entries with trivial names
-  dplyr::mutate(PUBCHEM = as.integer(as.numeric(PUBCHEM)))%&gt;%
+  tibble::rownames_to_column(&quot;Metabolite&quot;) %&gt;%
+  dplyr::rename(HMDB = Group_HMDB) %&gt;%
   dplyr::mutate(
+    PUBCHEM = as.integer(as.numeric(PUBCHEM)),
     KEGG = trimws(KEGG),
-    HMDB = toupper(trimws(HMDB)),   # HMDB often safer uppercase
+    HMDB = toupper(trimws(HMDB)),
     CAS = trimws(CAS)
-  )%&gt;%
+  ) %&gt;%
   tidyr::separate_rows(CAS, sep = &quot;;&quot;) %&gt;%
   dplyr::mutate(CAS = trimws(CAS)) %&gt;%
-  dplyr::filter(CAS != &quot;&quot;)</code></pre>
+  dplyr::filter(is.na(CAS) | CAS != &quot;&quot;)</code></pre>
 <p><br />
 There are PubChem entries in the excel file that are not PubChem IDs. It
 is likely that this is an error caused by excel conversion as it seems
@@ -1992,30 +1991,43 @@ MetaboliteIDs_PUBCHEM_FALSE &lt;- MetaboliteIDs_PUBCHEM_FALSE %&gt;%
 ##-------------------------------------------------
 #Add into original table:
 # Add corrected invalid rows back into the original table
-MetaboliteIDs_PUBCHEM &lt;- MetaboliteIDs_PUBCHEM %&gt;%
+MetaboliteIDs_PUBCHEM &lt;- MetaboliteIDs %&gt;%
+  dplyr::mutate(
+    PUBCHEM_valid = !is.na(PUBCHEM) &amp; PUBCHEM %in% RaMP_PubChem$From
+  ) %&gt;%
   dplyr::left_join(
     MetaboliteIDs_PUBCHEM_FALSE %&gt;%
-      dplyr::select(PUBCHEM, PUBCHEM_corrected, PUBCHEM_Correction_Source),
-    by = &quot;PUBCHEM&quot;
+      dplyr::select(Metabolite, PUBCHEM, PUBCHEM_corrected, PUBCHEM_Correction_Source),
+    by = c(&quot;Metabolite&quot;, &quot;PUBCHEM&quot;)
   ) %&gt;%
   dplyr::mutate(
     PUBCHEM = as.character(PUBCHEM),
     PUBCHEM_corrected = dplyr::case_when(
-      PUBCHEM_valid == TRUE ~ NA_character_,
-      !is.na(PUBCHEM_corrected) ~ PUBCHEM_corrected,
+      PUBCHEM_valid ~ NA_character_,                      # valid original, no correction needed
+      !is.na(PUBCHEM_corrected) ~ PUBCHEM_corrected,      # corrected via RaMP/manual
       TRUE ~ NA_character_
     ),
     PUBCHEM_Correction_Source = dplyr::case_when(
-      PUBCHEM_valid == TRUE ~ &quot;None&quot;,
+      is.na(PUBCHEM) ~ &quot;NA&quot;,                              # no original PubChem in metadata
+      PUBCHEM_valid ~ &quot;None&quot;,                             # original ID already valid
       !is.na(PUBCHEM_Correction_Source) ~ PUBCHEM_Correction_Source,
       TRUE ~ &quot;NA&quot;
     ),
-    # final PubChem to use: corrected if available, otherwise original
+    # final PubChem to use
     PUBCHEM_corrected = dplyr::coalesce(PUBCHEM_corrected, PUBCHEM)
   ) %&gt;%
   dplyr::rename(
     `PUBCHEM original` = PUBCHEM,
     PUBCHEM = PUBCHEM_corrected
+  )%&gt;%
+  dplyr::group_by(Metabolite) %&gt;%
+  dplyr::summarise(
+    CAS = paste(unique(stats::na.omit(trimws(CAS))), collapse = &quot;; &quot;),
+    dplyr::across(-CAS, dplyr::first),
+    .groups = &quot;drop&quot;
+  ) %&gt;%
+  dplyr::mutate(
+    CAS = dplyr::na_if(CAS, &quot;&quot;)
   )</code></pre>
 <p>Some details on how many IDs where affected:</p>
 <pre class="r"><code># Quick counts from your final table
@@ -2041,18 +2053,18 @@ n_with_pubchem_final &lt;- MetaboliteIDs_PUBCHEM %&gt;%
   dplyr::summarise(n = sum(!is.na(PUBCHEM) &amp; trimws(PUBCHEM) != &quot;&quot;, na.rm = TRUE)) %&gt;%
   dplyr::pull(n)
 
-cat(&quot;Total features with PubChem:&quot;, n_total, &quot;\n&quot;)</code></pre>
-<pre><code>## Total features with PubChem: 365</code></pre>
+cat(&quot;Total features:&quot;, n_total, &quot;\n&quot;)</code></pre>
+<pre><code>## Total features: 877</code></pre>
 <pre class="r"><code>cat(&quot;Initially invalid PubChem (PUBCHEM_valid == FALSE):&quot;, n_false, &quot;\n&quot;)</code></pre>
-<pre><code>## Initially invalid PubChem (PUBCHEM_valid == FALSE): 68</code></pre>
+<pre><code>## Initially invalid PubChem (PUBCHEM_valid == FALSE): 572</code></pre>
 <pre class="r"><code>cat(&quot;Corrected using RaMP-DB:&quot;, n_ramp, &quot;\n&quot;)</code></pre>
-<pre><code>## Corrected using RaMP-DB: 61</code></pre>
+<pre><code>## Corrected using RaMP-DB: 60</code></pre>
 <pre class="r"><code>cat(&quot;Corrected manually:&quot;, n_manual, &quot;\n&quot;)</code></pre>
 <pre><code>## Corrected manually: 7</code></pre>
 <pre class="r"><code>cat(&quot;Invalid and still not found:&quot;, n_not_found, &quot;\n&quot;)</code></pre>
 <pre><code>## Invalid and still not found: 0</code></pre>
 <pre class="r"><code>cat(&quot;Features with final PubChem ID:&quot;, n_with_pubchem_final, &quot;\n&quot;)</code></pre>
-<pre><code>## Features with final PubChem ID: 365</code></pre>
+<pre><code>## Features with final PubChem ID: 385</code></pre>
 </div>
 <div id="save" class="section level2">
 <h2>Save</h2>
@@ -2060,15 +2072,17 @@ cat(&quot;Total features with PubChem:&quot;, n_total, &quot;\n&quot;)</code></p
 <pre class="r"><code>write.csv(Data_Sample, &quot;Hakimi_ccRCC-Tissue_Data.csv&quot;)
 write.csv(MetaboliteIDs_PUBCHEM, &quot;Hakimi_ccRCC-Tissue_FeatureMetaData_Full-Pubchem-Info.csv&quot;)
 
-write.csv(MetaboliteIDs_PUBCHEM%&gt;%
-            dplyr::select(1:8,13, 10:11 ), 
-          &quot;Hakimi_ccRCC-Tissue_FeatureMetaData.csv&quot;)</code></pre>
+metadata_tissue &lt;- MetaboliteIDs_PUBCHEM %&gt;%
+  dplyr::select(1:8, 13, 10:11)
+
+write.csv(metadata_tissue, &quot;Hakimi_ccRCC-Tissue_FeatureMetaData.csv&quot;)
+save(metadata_tissue, file = &quot;metadata_tissue.rda&quot;)</code></pre>
 </div>
 </div>
 <div id="information-about-package-used-and-versions" class="section level1">
 <h1>Information about package used and versions</h1>
 <pre><code>## Warning in system2(&quot;quarto&quot;, &quot;-V&quot;, stdout = TRUE, env = paste0(&quot;TMPDIR=&quot;, : running command &#39;&quot;quarto&quot;
-## TMPDIR=C:/Users/chris/AppData/Local/Temp/Rtmp2zLywG/file1c78468b2cda -V&#39; had status 1</code></pre>
+## TMPDIR=C:/Users/chris/AppData/Local/Temp/Rtmp0ezgKs/file822032756c00 -V&#39; had status 1</code></pre>
 <pre><code>## ─ Session info ───────────────────────────────────────────────────────────────────────────────────────────────────────
 ##  setting  value
 ##  version  R version 4.4.3 (2025-02-28 ucrt)
