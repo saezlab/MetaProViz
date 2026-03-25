@@ -41,6 +41,8 @@ knitr::opts_chunk$set(
 # 2. Install the latest development version from GitHub using devtools
 # devtools::install_github("https://github.com/saezlab/MetaProViz")
 
+#remotes::install_github('saezlab/OmnipathR@devel')
+#remotes::install_github("saezlab/MetaProViz@devel")
 library(MetaProViz)
 
 # dependencies that need to be loaded:
@@ -50,30 +52,24 @@ library(rlang)
 library(tidyr)
 library(tibble)
 library(stringr)
-
-# Please install the Biocmanager Dependencies:
-# BiocManager::install("clusterProfiler")
-# BiocManager::install("EnhancedVolcano")
 ```
 
 
 # 1. Loading the data
-Here we choose an example datasets, which is publicly available in the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs [@Hakimi2016]. Metabolomics was done using The company Metabolon, so this is untargeted metabolomics.We have removed unidentified metabolites.\
+Here we choose an example datasets, which is publicly available in the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs [@Hakimi2016]. Metabolomics was done using The company Metabolon, so this is untargeted metabolomics.\
+We have updated the PubChem IDs as there were PubChem entries in the excel file that are not PubChem IDs. It is likely that this is an error caused by excel conversion as it seems in some cases the first part of the ID corresponds to one of the other IDs, so maybe these where multiple potential PubChem IDs.To see details on how this was done check out our example data branch: https://github.com/saezlab/MetaProViz/blob/ExampleData/ccRCC_Hakimi-et-all.html
 
 Load the feature metadata:
 ```{r}
-data(tissue_meta)
+load("C:/Users/chris/OneDrive/docs/Desktop/tissue_meta.rda")
+#data(tissue_meta)
 
-MetaboliteIDs <- tissue_meta%>%
-  dplyr::rename("HMDB"= "Group_HMDB")%>%
-  slice(1:577)# only keep entries with trivial names
-```
-```{r, echo=FALSE}
-# Check how our data looks like:
-MetaboliteIDs[1:5,c(1:2, 7:10)] %>%
-  kableExtra::kbl(caption = "Preview of the DF `Tissue_MetaData` including the trivial metabolite identifiers used in the experiment as well as IDs and pathway information.") %>%
-  kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12) #%>%
-  #kableExtra::scroll_box(width = "100%", height = "200px")
+MetaboliteIDs <- tissue_meta %>%
+  dplyr::filter(!stringr::str_detect(Metabolite, "^X\\s*-\\s*\\d+$"))%>%# only keep entries with trivial names
+   dplyr::mutate(
+    SUPER_PATHWAY = dplyr::coalesce(SUPER_PATHWAY, "None"),
+    SUB_PATHWAY   = dplyr::coalesce(SUB_PATHWAY, "None")
+  )
 ```
 
 # MetaProViz Metabolite ID workflow
@@ -134,13 +130,13 @@ if (!dir.exists("MetaProViz_Results/PK/PK_PUBCHEM/Original")) {
 ## Original Feature Space Exploration
 1. Present metabolite IDs:
 ```{r, warning=FALSE}
+
+
 ccRCC_CompareIDs <- MetaProViz::compare_pk(data = list(Biocft = MetaboliteIDs |> dplyr::rename("Class"="SUPER_PATHWAY")),
                                            name_col = "Metabolite",
-                                           metadata_info = list(Biocft = c("KEGG", "HMDB", "PUBCHEM")),
+                                           metadata_info = list(Biocft = c("KEGG", "HMDB", "PUBCHEM"))
                                            plot_name = "Overlap of ID types in ccRCC data",
                                            path= "MetaProViz_Results/PK/Original")
-
-
 ```
 \
 Here we notice that 76 features have no metabolite ID assigned, yet have a trivial name and a metabolite class assigned. For 135 metabolites we only have a pubchem ID, yet no HMDB or KEGG ID. 
@@ -149,220 +145,53 @@ Here we notice that 76 features have no metabolite ID assigned, yet have a trivi
 2.1. HMDB:
 ```{r}
 Plot1_HMDB <- MetaProViz::count_id(MetaboliteIDs, 
+                                   delimiter =",",
                                    "HMDB",
+                                   fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
+                                   binwidth = 1,
                                    path = "MetaProViz_Results/PK/PK_HMDB/Original")
 ```
 
 2.2. KEGG:
 ```{r}
 Plot1_KEGG <- MetaProViz::count_id(MetaboliteIDs, 
+                                   delimiter =",",
+                                   fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
                                    "KEGG",
                                    path= "MetaProViz_Results/PK/PK_KEGG/Original")
 ```
 
 2.3.: PubChem:
 ```{r}
-Plot1_KEGG <- MetaProViz::count_id(MetaboliteIDs, 
+Plot1_KEGG <- MetaProViz::count_id(MetaboliteIDs,
+                                   delimiter ="; ",
+                                   fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
                                    "PUBCHEM",
                                    path= "MetaProViz_Results/PK/PK_PUBCHEM/Original")
 ```
 
-
-## Fix PubChem feature Space 
-Needs to be moved to data branch and afterwards update example data!
-
-Explanation:
-
-There are PubChem entries in the excel file that are not PubChem IDs. It is likely that this is an error caused by excel conversion as it seems in some cases the first part of the ID corresponds to one of the other IDs, so maybe these where multiple potential PubChem IDs.\
-First we will extract the PubChem IDs that are present in the metadata table and check if they are valid PubChem IDs. We can do this using the `ramp_id_mapping_table` function, which includes all the valid PubChem IDs that are present in RaMP, which is a database that integrates multiple databases including KEGG, HMDB and PubChem.\
+3. Features with no HMDB, KEGG or PubChem ID
 ```{r}
-#Data Formatting:
-MetaboliteIDs <- MetaboliteIDs %>%
-  dplyr::mutate(PUBCHEM = as.integer(as.numeric(PUBCHEM)))%>%
-  dplyr::mutate(
-    KEGG = trimws(KEGG),
-    HMDB = toupper(trimws(HMDB)),   # HMDB often safer uppercase
-    CAS = trimws(CAS)
-  )%>%
-  tidyr::separate_rows(CAS, sep = ";") %>%
-  dplyr::mutate(CAS = trimws(CAS)) %>%
-  dplyr::filter(CAS != "")
-
-##------------------------------------------------------------------------
-#Get RaMP table
-RaMP_PubChem <- OmnipathR::ramp_id_mapping_table(from = "pubchem",
-                                         to= "pubchem")
-# Get RaMP mappings for alternative ID types
-RaMP_KEGG_PubChem <- OmnipathR::ramp_id_mapping_table(from = "kegg", 
-                                                       to = "pubchem")
-RaMP_HMDB_PubChem <- OmnipathR::ramp_id_mapping_table(from = "hmdb", 
-                                                       to = "pubchem")
-RaMP_CAS_PubChem <- OmnipathR::ramp_id_mapping_table(from = "cas", 
-                                                      to = "pubchem")
-
-##------------------------------------------------------------------------
-#Check which PubChem IDs in our metadata are valid:
-MetaboliteIDs_PUBCHEM <- MetaboliteIDs%>%
-  dplyr::filter(!is.na(PUBCHEM)) %>%
-  dplyr::mutate(PUBCHEM_valid = PUBCHEM %in% RaMP_PubChem$From)
-
-MetaboliteIDs_PUBCHEM_FALSE <- MetaboliteIDs_PUBCHEM %>%
-  dplyr::filter(PUBCHEM_valid == FALSE)
-
-
-###------------------------------------------------------------------------
-# Try KEGG first, then HMDB, then CAS as fallback
-MetaboliteIDs_PUBCHEM_FALSE <- MetaboliteIDs_PUBCHEM_FALSE %>%
-  dplyr::left_join(
-    RaMP_KEGG_PubChem %>% 
-      dplyr::select(From, To) %>% 
-      dplyr::rename(KEGG = From, PUBCHEM_from_KEGG = To),
-    by = "KEGG",
-    relationship = "many-to-many"
-  ) %>%
-  dplyr::left_join(
-    RaMP_HMDB_PubChem %>% 
-      dplyr::select(From, To) %>% 
-      dplyr::rename(HMDB = From, PUBCHEM_from_HMDB = To),
-    by = "HMDB",
-    relationship = "many-to-many"
-  ) %>%
-  tidyr::separate_rows(CAS, sep = ";") %>%
-  dplyr::mutate(CAS = trimws(CAS)) %>%
-  dplyr::filter(CAS != "") %>%
-  dplyr::left_join(
-    RaMP_CAS_PubChem %>% 
-      dplyr::select(From, To) %>% 
-      dplyr::rename(CAS = From, PUBCHEM_from_CAS = To),
-    by = "CAS",
-    relationship = "many-to-many"
-  ) %>%
-  dplyr::mutate(
-    PUBCHEM_corrected = as.integer(
-      dplyr::coalesce(PUBCHEM_from_KEGG, PUBCHEM_from_HMDB, PUBCHEM_from_CAS)
-    )
-  ) %>%
-  dplyr::select(-PUBCHEM_from_KEGG, -PUBCHEM_from_HMDB, -PUBCHEM_from_CAS) %>%
-  dplyr::group_by(Metabolite) %>%
-  dplyr::summarise(
-    PUBCHEM_corrected = paste(unique(PUBCHEM_corrected), collapse = "; "),
-    CAS = paste(unique(CAS), collapse = "; "),
-    dplyr::across(-c(PUBCHEM_corrected, CAS), dplyr::first),
-    .groups = "drop"
+# Extract features with No HMDB, KEGG or PubChem ID:
+features_no_ids <- MetaboliteIDs %>%
+  dplyr::filter(
+    (is.na(HMDB)    | trimws(HMDB) %in% c("", "NA")) &
+    (is.na(KEGG)    | trimws(KEGG) %in% c("", "NA")) &
+    (is.na(PUBCHEM) | trimws(PUBCHEM) %in% c("", "NA"))
   )
 
-```
+#Of those some may have a CAS number:
+features_no_ids_with_cas <- features_no_ids %>%
+  dplyr::filter(!(is.na(CAS) | trimws(CAS) %in% c("", "NA")))
 
-For the final PubChem IDs we will check manually:
-1. 64947 = Correct (Via Name and CAS)
-2. 5656 = correct (Via Name and CAS)
-3. 170746 = 6209 (Via CAS)
-4. 761 = 135414246 (Via CAS)
-5. 5999 = 19648 (Via CAS)
-6. 139506 = 139506 (Via Name)
-7. 5057430 = 70590 (Via CAS), 5057430 (Via Name) --> Structurally very similar
-
-```{r}
-# Manual corrections: keyed by the current PUBCHEM_corrected value
-manual_corrections <- tibble::tibble(
-  PUBCHEM = c(64947L, 5656L, 170746L, 761L, 5999L, 139506L, 5057430L),
-  PUBCHEM_manual = c("64947", "5656", "6209", "135414246", "19648", "139506", "70590; 5057430")
-)
-
-MetaboliteIDs_PUBCHEM_FALSE <- MetaboliteIDs_PUBCHEM_FALSE %>%
-  dplyr::left_join(manual_corrections, by = "PUBCHEM") %>%
-  dplyr::mutate(
-    PUBCHEM_corrected = dplyr::case_when(
-      !is.na(PUBCHEM_manual) ~ PUBCHEM_manual,
-      !is.na(PUBCHEM_corrected) ~ as.character(PUBCHEM_corrected),
-      TRUE ~ NA_character_
-    ),
-    PUBCHEM_Correction_Source = dplyr::case_when(
-      !is.na(PUBCHEM_manual) ~ "Manual",
-      !is.na(PUBCHEM_corrected) ~ "RaMP-DB",
-      TRUE ~ "Not found"
-    )
-  ) %>%
-  dplyr::select(-PUBCHEM_manual)
-
-
-##-------------------------------------------------
-#Add into original table:
-# Add corrected invalid rows back into the original table
-MetaboliteIDs_PUBCHEM <- MetaboliteIDs_PUBCHEM %>%
-  dplyr::left_join(
-    MetaboliteIDs_PUBCHEM_FALSE %>%
-      dplyr::select(PUBCHEM, PUBCHEM_corrected, PUBCHEM_Correction_Source),
-    by = "PUBCHEM"
-  ) %>%
-  dplyr::mutate(
-    PUBCHEM = as.character(PUBCHEM),
-    PUBCHEM_corrected = dplyr::case_when(
-      PUBCHEM_valid == TRUE ~ NA_character_,
-      !is.na(PUBCHEM_corrected) ~ PUBCHEM_corrected,
-      TRUE ~ NA_character_
-    ),
-    PUBCHEM_Correction_Source = dplyr::case_when(
-      PUBCHEM_valid == TRUE ~ "None",
-      !is.na(PUBCHEM_Correction_Source) ~ PUBCHEM_Correction_Source,
-      TRUE ~ "NA"
-    ),
-    # final PubChem to use: corrected if available, otherwise original
-    PUBCHEM_corrected = dplyr::coalesce(PUBCHEM_corrected, PUBCHEM)
-  ) %>%
-  dplyr::rename(
-    `PUBCHEM original` = PUBCHEM,
-    PUBCHEM = PUBCHEM_corrected
-  )
-```
-
-Some details on how many IDs where affected:
-```{r}
-# Quick counts from your final table
-n_total <- nrow(MetaboliteIDs_PUBCHEM)
-
-n_false <- MetaboliteIDs_PUBCHEM %>%
-  dplyr::summarise(n = sum(PUBCHEM_valid == FALSE, na.rm = TRUE)) %>%
-  dplyr::pull(n)
-
-n_ramp <- MetaboliteIDs_PUBCHEM %>%
-  dplyr::summarise(n = sum(PUBCHEM_Correction_Source == "RaMP-DB", na.rm = TRUE)) %>%
-  dplyr::pull(n)
-
-n_manual <- MetaboliteIDs_PUBCHEM %>%
-  dplyr::summarise(n = sum(PUBCHEM_Correction_Source == "Manual", na.rm = TRUE)) %>%
-  dplyr::pull(n)
-
-n_not_found <- MetaboliteIDs_PUBCHEM %>%
-  dplyr::summarise(n = sum(PUBCHEM_Correction_Source == "Not found", na.rm = TRUE)) %>%
-  dplyr::pull(n)
-
-n_with_pubchem_final <- MetaboliteIDs_PUBCHEM %>%
-  dplyr::summarise(n = sum(!is.na(PUBCHEM) & trimws(PUBCHEM) != "", na.rm = TRUE)) %>%
-  dplyr::pull(n)
-
-cat("Total features with PubChem:", n_total, "\n")
-cat("Initially invalid PubChem (PUBCHEM_valid == FALSE):", n_false, "\n")
-cat("Corrected using RaMP-DB:", n_ramp, "\n")
-cat("Corrected manually:", n_manual, "\n")
-cat("Invalid and still not found:", n_not_found, "\n")
-cat("Features with final PubChem ID:", n_with_pubchem_final, "\n")
-
+print(paste0("We have ", nrow(features_no_ids_with_cas), " features with CAS number but no other metabolite ID and ", nrow(features_no_ids)- nrow(features_no_ids_with_cas), " features with no CAS number and no other metabolite ID."))
 ```
 
 ## Translate Cas to metabolite ID
 There are some cases in which we have a CAS number, yet no HMDB, PubChem or KEGG ID. We can use the CAS number to check if we can find a metabolite ID for these features.\
 ```{r}
-MetaboliteIDs_CAS <- MetaboliteIDs %>%
-  dplyr::filter(
-    is.na(PUBCHEM),
-    is.na(KEGG),
-    is.na(HMDB),
-    !is.na(CAS),
-    CAS != ""
-  )
 
-print(paste0("We have ", nrow(MetaboliteIDs_CAS), " features with CAS number but no other metabolite ID."))
+
 ```
 
 
