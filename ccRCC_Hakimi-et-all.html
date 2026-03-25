@@ -2072,17 +2072,17 @@ cat(&quot;Total features:&quot;, n_total, &quot;\n&quot;)</code></pre>
 <pre class="r"><code>write.csv(Data_Sample, &quot;Hakimi_ccRCC-Tissue_Data.csv&quot;)
 write.csv(MetaboliteIDs_PUBCHEM, &quot;Hakimi_ccRCC-Tissue_FeatureMetaData_Full-Pubchem-Info.csv&quot;)
 
-metadata_tissue &lt;- MetaboliteIDs_PUBCHEM %&gt;%
+tissue_meta &lt;- MetaboliteIDs_PUBCHEM %&gt;%
   dplyr::select(1:8, 13, 10:11)
 
-write.csv(metadata_tissue, &quot;Hakimi_ccRCC-Tissue_FeatureMetaData.csv&quot;)
-save(metadata_tissue, file = &quot;metadata_tissue.rda&quot;)</code></pre>
+write.csv(tissue_meta, &quot;Hakimi_ccRCC-Tissue_FeatureMetaData.csv&quot;)
+save(tissue_meta, file = &quot;tissue_meta.rda&quot;)</code></pre>
 </div>
 </div>
 <div id="information-about-package-used-and-versions" class="section level1">
 <h1>Information about package used and versions</h1>
 <pre><code>## Warning in system2(&quot;quarto&quot;, &quot;-V&quot;, stdout = TRUE, env = paste0(&quot;TMPDIR=&quot;, : running command &#39;&quot;quarto&quot;
-## TMPDIR=C:/Users/chris/AppData/Local/Temp/Rtmp0ezgKs/file822032756c00 -V&#39; had status 1</code></pre>
+## TMPDIR=C:/Users/chris/AppData/Local/Temp/RtmpySX1Oo/filee05c36f0690c -V&#39; had status 1</code></pre>
 <pre><code>## ─ Session info ───────────────────────────────────────────────────────────────────────────────────────────────────────
 ##  setting  value
 ##  version  R version 4.4.3 (2025-02-28 ucrt)

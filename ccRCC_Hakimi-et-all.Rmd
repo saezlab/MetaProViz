@@ -319,11 +319,11 @@ Save DF as .csv file
 write.csv(Data_Sample, "Hakimi_ccRCC-Tissue_Data.csv")
 write.csv(MetaboliteIDs_PUBCHEM, "Hakimi_ccRCC-Tissue_FeatureMetaData_Full-Pubchem-Info.csv")
 
-metadata_tissue <- MetaboliteIDs_PUBCHEM %>%
+tissue_meta <- MetaboliteIDs_PUBCHEM %>%
   dplyr::select(1:8, 13, 10:11)
 
-write.csv(metadata_tissue, "Hakimi_ccRCC-Tissue_FeatureMetaData.csv")
-save(metadata_tissue, file = "metadata_tissue.rda")
+write.csv(tissue_meta, "Hakimi_ccRCC-Tissue_FeatureMetaData.csv")
+save(tissue_meta, file = "tissue_meta.rda")
 
 ```
 
