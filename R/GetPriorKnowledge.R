@@ -1097,7 +1097,7 @@ metsigdb_metalinks <- function(
 #' head(df)
 #' }
 #' 
-#' @importFrom OmnipathR get_reactome
+#' @importFrom OmnipathR reactome_chebi
 #' @importFrom magrittr %>%
 #' @importFrom tidyr separate_rows
 #' @importFrom dplyr mutate rename
@@ -1113,8 +1113,8 @@ metsigdb_reactome <- function(
     # NSE vs. R CMD check workaround
     chebi_ids <- pathway_df <- pathway_df_long <- NULL
 
-    pathway_df <- OmnipathR::get_reactome(
-        species = species,
+    pathway_df <- OmnipathR::reactome_chebi(
+        organism = species,
         pathway_ids = pathway_ids,
         out_path = out_path
     )
@@ -1139,7 +1139,7 @@ metsigdb_reactome <- function(
 #' Retrieve WikiPathways metabolite mapping suitable for ORA.
 #'
 #' Retrieves pathway to metabolite mappings from WikiPathways (via
-#' `get_wikipathways_metabolites_sparql()`) via OmnipathR and returns a long-format table with
+#' `wikipathways_metabolites_sparql()`) via OmnipathR and returns a long-format table with
 #' one metabolite identifier per row.
 #'
 #' @param species Character. Species name. Default is `"Homo sapiens"`.
@@ -1154,7 +1154,7 @@ metsigdb_reactome <- function(
 #' @importFrom tidyr separate_rows
 #' @importFrom stringr str_trim
 #' @importFrom magrittr %>%
-#' @importFrom OmnipathR get_wikipathways_metabolites_sparql
+#' @importFrom OmnipathR wikipathways_metabolites_sparql
 #'
 #' @export
 metsigdb_wikipathways <- function(
@@ -1165,7 +1165,7 @@ metsigdb_wikipathways <- function(
     # NSE vs. R CMD check workaround
     metabolites <- pathway_df <- pathway_df_long <- NULL
 
-    pathway_df <- get_wikipathways_metabolites_sparql(species = species)
+    pathway_df <- wikipathways_metabolites_sparql(organism = species)
 
     pathway_df_long <- pathway_df %>%
         tidyr::separate_rows(metabolites, sep = ";\\s*") %>%
