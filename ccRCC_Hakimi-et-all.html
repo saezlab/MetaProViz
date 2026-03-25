@@ -1881,12 +1881,13 @@ Merge Data with MetaData_Sample</p>
   tibble::rownames_to_column(&quot;Metabolite&quot;) %&gt;%
   dplyr::rename(HMDB = Group_HMDB) %&gt;%
   dplyr::mutate(
-    PUBCHEM = as.integer(as.numeric(PUBCHEM)),
+    PUBCHEM = trimws(as.character(PUBCHEM)),
+    PUBCHEM = dplyr::na_if(PUBCHEM, &quot;&quot;),
+    PUBCHEM = dplyr::na_if(PUBCHEM, &quot;NA&quot;),
     KEGG = trimws(KEGG),
     HMDB = toupper(trimws(HMDB)),
     CAS = trimws(CAS)
   ) %&gt;%
-  tidyr::separate_rows(CAS, sep = &quot;;&quot;) %&gt;%
   dplyr::mutate(CAS = trimws(CAS)) %&gt;%
   dplyr::filter(is.na(CAS) | CAS != &quot;&quot;)</code></pre>
 <p><br />
@@ -1939,7 +1940,7 @@ MetaboliteIDs_PUBCHEM_FALSE &lt;- MetaboliteIDs_PUBCHEM_FALSE %&gt;%
   ) %&gt;%
   tidyr::separate_rows(CAS, sep = &quot;;&quot;) %&gt;%
   dplyr::mutate(CAS = trimws(CAS)) %&gt;%
-  dplyr::filter(CAS != &quot;&quot;) %&gt;%
+  dplyr::filter(is.na(CAS) | CAS != &quot;&quot;) %&gt;%
   dplyr::left_join(
     RaMP_CAS_PubChem %&gt;% 
       dplyr::select(From, To) %&gt;% 
@@ -1948,9 +1949,7 @@ MetaboliteIDs_PUBCHEM_FALSE &lt;- MetaboliteIDs_PUBCHEM_FALSE %&gt;%
     relationship = &quot;many-to-many&quot;
   ) %&gt;%
   dplyr::mutate(
-    PUBCHEM_corrected = as.integer(
-      dplyr::coalesce(PUBCHEM_from_KEGG, PUBCHEM_from_HMDB, PUBCHEM_from_CAS)
-    )
+    PUBCHEM_corrected =  dplyr::coalesce(as.character(PUBCHEM_from_KEGG), as.character(PUBCHEM_from_HMDB), as.character(PUBCHEM_from_CAS))
   ) %&gt;%
   dplyr::select(-PUBCHEM_from_KEGG, -PUBCHEM_from_HMDB, -PUBCHEM_from_CAS) %&gt;%
   dplyr::group_by(Metabolite) %&gt;%
@@ -1959,17 +1958,109 @@ MetaboliteIDs_PUBCHEM_FALSE &lt;- MetaboliteIDs_PUBCHEM_FALSE %&gt;%
     CAS = paste(unique(CAS), collapse = &quot;; &quot;),
     dplyr::across(-c(PUBCHEM_corrected, CAS), dplyr::first),
     .groups = &quot;drop&quot;
-  )</code></pre>
-<p>For the final PubChem IDs we will check manually: 1. 64947 = Correct
-(Via Name and CAS) 2. 5656 = correct (Via Name and CAS) 3. 170746 = 6209
-(Via CAS) 4. 761 = 135414246 (Via CAS) 5. 5999 = 19648 (Via CAS) 6.
-139506 = 139506 (Via Name) 7. 5057430 = 70590 (Via CAS), 5057430 (Via
-Name) –&gt; Structurally very similar</p>
+  )
+
+# Print out for manual check:
+na_rows &lt;- MetaboliteIDs_PUBCHEM_FALSE %&gt;%
+  dplyr::filter(is.na(PUBCHEM_corrected) | trimws(PUBCHEM_corrected) == &quot;NA&quot; | trimws(PUBCHEM_corrected) == &quot;&quot;)
+
+cat(
+  paste0(
+    seq_len(nrow(na_rows)),
+    &quot;. &quot;,
+    na_rows$PUBCHEM,
+    &quot; = &quot;,
+    na_rows$PUBCHEM_corrected
+  ),
+  sep = &quot;\n&quot;
+)</code></pre>
+<pre><code>## 1. 11988421 = NA
+## 2. 10208382 = NA
+## 3. 2802421 = NA
+## 4. 4651717 = NA
+## 5. 656476 = NA
+## 6. 4173585246008 = NA
+## 7. 259583 = NA
+## 8. 985095242543 = NA
+## 9. 426318 = NA
+## 10. 5723194099800 = NA
+## 11. 137276 = NA
+## 12. 351830 = NA
+## 13. 9815009 = NA
+## 14. 170746 = NA
+## 15. 154934492953 = NA
+## 16. 155134092181 = NA
+## 17. 761 = NA
+## 18. 52460095246010 = NA
+## 19. 5246011435949 = NA
+## 20. 52595895259590 = NA
+## 21. 64947 = NA
+## 22. 52500735233577 = NA
+## 23. 5999 = NA
+## 24. 40997994099798 = NA
+## 25. 54964557020632 = NA
+## 26. 870717009561 = NA
+## 27. 5057430 = NA
+## 28. 70095607009559 = NA
+## 29. 352039 = NA
+## 30. 139506 = NA
+## 31. 5656 = NA</code></pre>
+<p>For the final PubChem IDs we will check manually: 1. 11988421 =
+5280646 (via KEGG) 2. 10208382 = 10208382 (via Name) 3. 2802421 =
+7036275 (via name) 4. 4651717 = 152204 (via name) 5. 656476 = 656476
+(via name) 6. 4173585246008 = 7408079 and 7408079 (via name) 7. 259583 =
+259583 (via name) 8. 985095242543 = 98509 and 5242543 (via name) 9.
+426318 = 426318 (via name) 10. 5723194099800 = 572319 (via name) 11.
+137276 = 137276 (via name) 12. 351830 = 351830 (via name) 13. 9815009 =
+9815009 (via name) 14. 170746 = 6209 (Via CAS) 15. 154934492953 =
+1549344 and 92953 (Via CAS) 16. 155134092181 = 1551340 and 92181 (via
+name) 17. 761 = 135414246 (Via CAS) 18. 52460095246010 = 7009577 (Via
+CAS and name) 19. 5246011435949 = 449407 (Via Cas and name) 20.
+52595895259590 = 5259590 (via name) and 5259589 21. 64947 = Correct (Via
+Name and CAS) 22. 52500735233577 = 5250073 and 5233577 23. 5999 = 19648
+(Via CAS) 24. 40997994099798 = 4099799 and 4099798 25. 54964557020632 =
+5496455 (via cas) and 7020632 26. 870717009561 = 87071 (via cas) and
+7009561 27. 5057430 = 70590 (Via CAS), 5057430 (Via Name) –&gt;
+Structurally very similar 28. 70095607009559 = 7009560 and 7009559 29.
+352039 = 352039 (Via Name) 30. 139506 = 139506 (Via Name) 31. 5656 =
+correct (Via Name and CAS)</p>
 <pre class="r"><code># Manual corrections: keyed by the current PUBCHEM_corrected value
-manual_corrections &lt;- tibble::tibble(
-  PUBCHEM = c(64947L, 5656L, 170746L, 761L, 5999L, 139506L, 5057430L),
-  PUBCHEM_manual = c(&quot;64947&quot;, &quot;5656&quot;, &quot;6209&quot;, &quot;135414246&quot;, &quot;19648&quot;, &quot;139506&quot;, &quot;70590; 5057430&quot;)
-)
+# Manual corrections: key and replacement as character (safe for very large IDs)
+manual_corrections &lt;- tibble::tribble(
+  ~PUBCHEM,          ~PUBCHEM_manual,
+  &quot;11988421&quot;,        &quot;5280646&quot;,
+  &quot;10208382&quot;,        &quot;10208382&quot;,
+  &quot;2802421&quot;,         &quot;7036275&quot;,
+  &quot;4651717&quot;,         &quot;152204&quot;,
+  &quot;656476&quot;,          &quot;656476&quot;,
+  &quot;4173585246008&quot;,   &quot;7408079&quot;,
+  &quot;259583&quot;,          &quot;259583&quot;,
+  &quot;985095242543&quot;,    &quot;98509; 5242543&quot;,
+  &quot;426318&quot;,          &quot;426318&quot;,
+  &quot;5723194099800&quot;,   &quot;572319&quot;,
+  &quot;137276&quot;,          &quot;137276&quot;,
+  &quot;351830&quot;,          &quot;351830&quot;,
+  &quot;9815009&quot;,         &quot;9815009&quot;,
+  &quot;170746&quot;,          &quot;6209&quot;,
+  &quot;154934492953&quot;,    &quot;1549344; 92953&quot;,
+  &quot;155134092181&quot;,    &quot;1551340; 92181&quot;,
+  &quot;761&quot;,             &quot;135414246&quot;,
+  &quot;52460095246010&quot;,  &quot;7009577&quot;,
+  &quot;5246011435949&quot;,   &quot;449407&quot;,
+  &quot;52595895259590&quot;,  &quot;5259590; 5259589&quot;,
+  &quot;64947&quot;,           &quot;64947&quot;,
+  &quot;52500735233577&quot;,  &quot;5250073; 5233577&quot;,
+  &quot;5999&quot;,            &quot;19648&quot;,
+  &quot;40997994099798&quot;,  &quot;4099799; 4099798&quot;,
+  &quot;54964557020632&quot;,  &quot;5496455; 7020632&quot;,
+  &quot;870717009561&quot;,    &quot;87071; 7009561&quot;,
+  &quot;5057430&quot;,         &quot;70590; 5057430&quot;,
+  &quot;70095607009559&quot;,  &quot;7009560; 7009559&quot;,
+  &quot;352039&quot;,          &quot;352039&quot;,
+  &quot;139506&quot;,          &quot;139506&quot;,
+  &quot;5656&quot;,            &quot;5656&quot;
+) %&gt;%
+  dplyr::distinct(PUBCHEM, .keep_all = TRUE)
 
 MetaboliteIDs_PUBCHEM_FALSE &lt;- MetaboliteIDs_PUBCHEM_FALSE %&gt;%
   dplyr::left_join(manual_corrections, by = &quot;PUBCHEM&quot;) %&gt;%
@@ -2058,13 +2149,13 @@ cat(&quot;Total features:&quot;, n_total, &quot;\n&quot;)</code></pre>
 <pre class="r"><code>cat(&quot;Initially invalid PubChem (PUBCHEM_valid == FALSE):&quot;, n_false, &quot;\n&quot;)</code></pre>
 <pre><code>## Initially invalid PubChem (PUBCHEM_valid == FALSE): 572</code></pre>
 <pre class="r"><code>cat(&quot;Corrected using RaMP-DB:&quot;, n_ramp, &quot;\n&quot;)</code></pre>
-<pre><code>## Corrected using RaMP-DB: 60</code></pre>
+<pre><code>## Corrected using RaMP-DB: 121</code></pre>
 <pre class="r"><code>cat(&quot;Corrected manually:&quot;, n_manual, &quot;\n&quot;)</code></pre>
-<pre><code>## Corrected manually: 7</code></pre>
+<pre><code>## Corrected manually: 31</code></pre>
 <pre class="r"><code>cat(&quot;Invalid and still not found:&quot;, n_not_found, &quot;\n&quot;)</code></pre>
 <pre><code>## Invalid and still not found: 0</code></pre>
 <pre class="r"><code>cat(&quot;Features with final PubChem ID:&quot;, n_with_pubchem_final, &quot;\n&quot;)</code></pre>
-<pre><code>## Features with final PubChem ID: 385</code></pre>
+<pre><code>## Features with final PubChem ID: 457</code></pre>
 </div>
 <div id="save" class="section level2">
 <h2>Save</h2>
@@ -2082,7 +2173,7 @@ save(tissue_meta, file = &quot;tissue_meta.rda&quot;)</code></pre>
 <div id="information-about-package-used-and-versions" class="section level1">
 <h1>Information about package used and versions</h1>
 <pre><code>## Warning in system2(&quot;quarto&quot;, &quot;-V&quot;, stdout = TRUE, env = paste0(&quot;TMPDIR=&quot;, : running command &#39;&quot;quarto&quot;
-## TMPDIR=C:/Users/chris/AppData/Local/Temp/RtmpySX1Oo/filee05c36f0690c -V&#39; had status 1</code></pre>
+## TMPDIR=C:/Users/chris/AppData/Local/Temp/Rtmp4cIUvW/file5e5c7c2e7bd0 -V&#39; had status 1</code></pre>
 <pre><code>## ─ Session info ───────────────────────────────────────────────────────────────────────────────────────────────────────
 ##  setting  value
 ##  version  R version 4.4.3 (2025-02-28 ucrt)
@@ -2177,7 +2268,7 @@ save(tissue_meta, file = &quot;tissue_meta.rda&quot;)</code></pre>
 ##  matrixStats            1.5.0     2025-01-07 [1] CRAN (R 4.4.3)
 ##  memoise                2.0.1     2021-11-26 [1] CRAN (R 4.4.1)
 ##  MetaProViz           * 3.99.32   2026-02-17 [1] Github (saezlab/MetaProViz@053ade8)
-##  OmnipathR            * 3.19.1    2025-12-08 [1] Github (saezlab/OmnipathR@a0e107e)
+##  OmnipathR            * 3.19.8    2026-03-25 [1] Github (saezlab/OmnipathR@39263b8)
 ##  otel                   0.2.0     2025-08-29 [1] CRAN (R 4.4.3)
 ##  parallelly             1.45.1    2025-07-24 [1] CRAN (R 4.4.3)
 ##  patchwork              1.3.2     2025-08-25 [1] CRAN (R 4.4.3)

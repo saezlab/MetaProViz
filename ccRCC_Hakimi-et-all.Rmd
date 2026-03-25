@@ -126,12 +126,13 @@ MetaboliteIDs <- MetaData_Metabolite %>%
   tibble::rownames_to_column("Metabolite") %>%
   dplyr::rename(HMDB = Group_HMDB) %>%
   dplyr::mutate(
-    PUBCHEM = as.integer(as.numeric(PUBCHEM)),
+    PUBCHEM = trimws(as.character(PUBCHEM)),
+    PUBCHEM = dplyr::na_if(PUBCHEM, ""),
+    PUBCHEM = dplyr::na_if(PUBCHEM, "NA"),
     KEGG = trimws(KEGG),
     HMDB = toupper(trimws(HMDB)),
     CAS = trimws(CAS)
   ) %>%
-  tidyr::separate_rows(CAS, sep = ";") %>%
   dplyr::mutate(CAS = trimws(CAS)) %>%
   dplyr::filter(is.na(CAS) | CAS != "")
 
@@ -179,7 +180,7 @@ MetaboliteIDs_PUBCHEM_FALSE <- MetaboliteIDs_PUBCHEM_FALSE %>%
   ) %>%
   tidyr::separate_rows(CAS, sep = ";") %>%
   dplyr::mutate(CAS = trimws(CAS)) %>%
-  dplyr::filter(CAS != "") %>%
+  dplyr::filter(is.na(CAS) | CAS != "") %>%
   dplyr::left_join(
     RaMP_CAS_PubChem %>% 
       dplyr::select(From, To) %>% 
@@ -188,9 +189,7 @@ MetaboliteIDs_PUBCHEM_FALSE <- MetaboliteIDs_PUBCHEM_FALSE %>%
     relationship = "many-to-many"
   ) %>%
   dplyr::mutate(
-    PUBCHEM_corrected = as.integer(
-      dplyr::coalesce(PUBCHEM_from_KEGG, PUBCHEM_from_HMDB, PUBCHEM_from_CAS)
-    )
+    PUBCHEM_corrected =  dplyr::coalesce(as.character(PUBCHEM_from_KEGG), as.character(PUBCHEM_from_HMDB), as.character(PUBCHEM_from_CAS))
   ) %>%
   dplyr::select(-PUBCHEM_from_KEGG, -PUBCHEM_from_HMDB, -PUBCHEM_from_CAS) %>%
   dplyr::group_by(Metabolite) %>%
@@ -201,23 +200,93 @@ MetaboliteIDs_PUBCHEM_FALSE <- MetaboliteIDs_PUBCHEM_FALSE %>%
     .groups = "drop"
   )
 
+# Print out for manual check:
+na_rows <- MetaboliteIDs_PUBCHEM_FALSE %>%
+  dplyr::filter(is.na(PUBCHEM_corrected) | trimws(PUBCHEM_corrected) == "NA" | trimws(PUBCHEM_corrected) == "")
+
+cat(
+  paste0(
+    seq_len(nrow(na_rows)),
+    ". ",
+    na_rows$PUBCHEM,
+    " = ",
+    na_rows$PUBCHEM_corrected
+  ),
+  sep = "\n"
+)
 ```
 
 For the final PubChem IDs we will check manually:
-1. 64947 = Correct (Via Name and CAS)
-2. 5656 = correct (Via Name and CAS)
-3. 170746 = 6209 (Via CAS)
-4. 761 = 135414246 (Via CAS)
-5. 5999 = 19648 (Via CAS)
-6. 139506 = 139506 (Via Name)
-7. 5057430 = 70590 (Via CAS), 5057430 (Via Name) --> Structurally very similar
+1. 11988421 = 5280646 (via KEGG)
+2. 10208382 = 10208382 (via Name)
+3. 2802421 = 7036275 (via name)
+4. 4651717 = 152204 (via name)
+5. 656476 = 656476 (via name)
+6. 4173585246008 = 7408079 and 7408079 (via name)
+7. 259583 = 259583 (via name)
+8. 985095242543 = 98509 and 5242543 (via name)
+9. 426318 = 426318 (via name)
+10. 5723194099800 = 572319 (via name) 
+11. 137276 = 137276 (via name) 
+12. 351830 = 351830 (via name) 
+13. 9815009 = 9815009 (via name)
+14. 170746 = 6209 (Via CAS)
+15. 154934492953 = 1549344 and 92953 (Via CAS)
+16. 155134092181 = 1551340 and 92181 (via name)
+17. 761 = 135414246 (Via CAS)
+18. 52460095246010 = 7009577 (Via CAS and name)
+19. 5246011435949 = 449407 (Via Cas and name)
+20. 52595895259590 = 5259590 (via name) and 5259589
+21. 64947 = Correct (Via Name and CAS)
+22. 52500735233577 = 5250073 and 5233577
+23. 5999 = 19648 (Via CAS)
+24. 40997994099798 = 4099799 and 4099798
+25. 54964557020632 = 5496455 (via cas) and 7020632
+26. 870717009561 = 87071 (via cas) and 7009561
+27. 5057430 = 70590 (Via CAS), 5057430 (Via Name) --> Structurally very similar
+28. 70095607009559 = 7009560 and 7009559
+29. 352039 = 352039 (Via Name)
+30. 139506 = 139506 (Via Name)
+31. 5656 = correct (Via Name and CAS)
 
 ```{r}
 # Manual corrections: keyed by the current PUBCHEM_corrected value
-manual_corrections <- tibble::tibble(
-  PUBCHEM = c(64947L, 5656L, 170746L, 761L, 5999L, 139506L, 5057430L),
-  PUBCHEM_manual = c("64947", "5656", "6209", "135414246", "19648", "139506", "70590; 5057430")
-)
+# Manual corrections: key and replacement as character (safe for very large IDs)
+manual_corrections <- tibble::tribble(
+  ~PUBCHEM,          ~PUBCHEM_manual,
+  "11988421",        "5280646",
+  "10208382",        "10208382",
+  "2802421",         "7036275",
+  "4651717",         "152204",
+  "656476",          "656476",
+  "4173585246008",   "7408079",
+  "259583",          "259583",
+  "985095242543",    "98509; 5242543",
+  "426318",          "426318",
+  "5723194099800",   "572319",
+  "137276",          "137276",
+  "351830",          "351830",
+  "9815009",         "9815009",
+  "170746",          "6209",
+  "154934492953",    "1549344; 92953",
+  "155134092181",    "1551340; 92181",
+  "761",             "135414246",
+  "52460095246010",  "7009577",
+  "5246011435949",   "449407",
+  "52595895259590",  "5259590; 5259589",
+  "64947",           "64947",
+  "52500735233577",  "5250073; 5233577",
+  "5999",            "19648",
+  "40997994099798",  "4099799; 4099798",
+  "54964557020632",  "5496455; 7020632",
+  "870717009561",    "87071; 7009561",
+  "5057430",         "70590; 5057430",
+  "70095607009559",  "7009560; 7009559",
+  "352039",          "352039",
+  "139506",          "139506",
+  "5656",            "5656"
+) %>%
+  dplyr::distinct(PUBCHEM, .keep_all = TRUE)
 
 MetaboliteIDs_PUBCHEM_FALSE <- MetaboliteIDs_PUBCHEM_FALSE %>%
   dplyr::left_join(manual_corrections, by = "PUBCHEM") %>%
