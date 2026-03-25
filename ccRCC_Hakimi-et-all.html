@@ -1480,14 +1480,17 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">ccRCC_Tissue</h1>
 <h4 class="author">Christina Schmidt</h4>
-<h4 class="date">July 2024</h4>
+<h4 class="date">March 2026</h4>
 
 </div>
 
 
 <pre class="r"><code>#load the needed:
 library(tidyverse) # used for data manipulation
-library(rmarkdown) # used for paged_table function</code></pre>
+library(rmarkdown) # used for paged_table function
+library(dplyr)
+library(OmnipathR)
+library(MetaProViz)</code></pre>
 <div id="samples" class="section level1">
 <h1>Samples</h1>
 <p>The <a href="https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial">paper</a>
@@ -1501,6 +1504,8 @@ the paper. The median normalisation was done by metaboanalyst.</p>
 </div>
 <div id="the-data" class="section level1">
 <h1>The Data</h1>
+<div id="load-data" class="section level2">
+<h2>Load Data</h2>
 <pre class="r"><code>data &lt;- readxl::read_excel(&quot;Input/Supplementarytable2_mmc2.xlsx&quot;, sheet = &quot;Median Normalized&quot;)</code></pre>
 <pre><code>## New names:
 ## • `` -&gt; `...2`
@@ -1835,8 +1840,10 @@ Data &lt;-  data[-c(1:11),-c(1, 3:12)]%&gt;%
   column_to_rownames(&quot;BIOCHEMICAL NAME&quot;)
 Data &lt;-as.data.frame(t(Data))%&gt;%
   mutate(across(everything(), as.numeric))</code></pre>
-<p><br />
-First we removed metabolites that where not identifiable from the
+</div>
+<div id="patient-sample-and-value-df" class="section level2">
+<h2>Patient sample and value DF</h2>
+<p>First we removed metabolites that where not identifiable from the
 dataset.<br />
 </p>
 <pre class="r"><code>#Remove not identified metabolites:
@@ -1857,25 +1864,214 @@ normal tissue samples cluster and if the different demographics
 separate.<br />
 </p>
 <pre class="r"><code>#Make plot:
-MetaProViz::VizPCA(SettingsInfo= c(color=&quot;TISSUE_TYPE&quot;),
-                   SettingsFile_Sample = MetaData_Sample ,
-                   InputData= Data_Select,
-                   PlotName = &quot;Outlier&quot;,
-                   SaveAs_Plot=NULL)</code></pre>
+MetaProViz::viz_pca(metadata_info= c(color=&quot;TISSUE_TYPE&quot;),
+                   metadata_sample = MetaData_Sample ,
+                   data= Data_Select,
+                   plot_name = &quot;Outlier&quot;,
+                   save_plot=NULL)</code></pre>
 <p><br />
 Merge Data with MetaData_Sample</p>
 <pre class="r"><code>Data_Sample &lt;- merge( MetaData_Sample, Data_Select, by = &quot;row.names&quot;)%&gt;%
   column_to_rownames(&quot;Row.names&quot;)</code></pre>
+</div>
+<div id="feature-metadata-table" class="section level2">
+<h2>Feature metadata table</h2>
+<p>Data wrangling</p>
+<pre class="r"><code>MetaboliteIDs &lt;- MetaData_Metabolite %&gt;%
+  rownames_to_column(&quot;Metabolite&quot;) %&gt;%
+  dplyr::rename(&quot;HMDB&quot;= &quot;Group_HMDB&quot;)%&gt;%
+  slice(1:577) %&gt;%# only keep entries with trivial names
+  dplyr::mutate(PUBCHEM = as.integer(as.numeric(PUBCHEM)))%&gt;%
+  dplyr::mutate(
+    KEGG = trimws(KEGG),
+    HMDB = toupper(trimws(HMDB)),   # HMDB often safer uppercase
+    CAS = trimws(CAS)
+  )%&gt;%
+  tidyr::separate_rows(CAS, sep = &quot;;&quot;) %&gt;%
+  dplyr::mutate(CAS = trimws(CAS)) %&gt;%
+  dplyr::filter(CAS != &quot;&quot;)</code></pre>
 <p><br />
-Save DF as .csv file</p>
+There are PubChem entries in the excel file that are not PubChem IDs. It
+is likely that this is an error caused by excel conversion as it seems
+in some cases the first part of the ID corresponds to one of the other
+IDs, so maybe these where multiple potential PubChem IDs.<br />
+First we will extract the PubChem IDs that are present in the metadata
+table and check if they are valid PubChem IDs. We can do this using the
+<code>ramp_id_mapping_table</code> function, which includes all the
+valid PubChem IDs that are present in RaMP, which is a database that
+integrates multiple databases including KEGG, HMDB and PubChem.<br />
+</p>
+<pre class="r"><code>#Get RaMP table
+RaMP_PubChem &lt;- OmnipathR::ramp_id_mapping_table(from = &quot;pubchem&quot;,
+                                         to= &quot;pubchem&quot;)
+# Get RaMP mappings for alternative ID types
+RaMP_KEGG_PubChem &lt;- OmnipathR::ramp_id_mapping_table(from = &quot;kegg&quot;, 
+                                                       to = &quot;pubchem&quot;)
+RaMP_HMDB_PubChem &lt;- OmnipathR::ramp_id_mapping_table(from = &quot;hmdb&quot;, 
+                                                       to = &quot;pubchem&quot;)
+RaMP_CAS_PubChem &lt;- OmnipathR::ramp_id_mapping_table(from = &quot;cas&quot;, 
+                                                      to = &quot;pubchem&quot;)
+
+##------------------------------------------------------------------------
+#Check which PubChem IDs in our metadata are valid:
+MetaboliteIDs_PUBCHEM &lt;- MetaboliteIDs%&gt;%
+  dplyr::filter(!is.na(PUBCHEM)) %&gt;%
+  dplyr::mutate(PUBCHEM_valid = PUBCHEM %in% RaMP_PubChem$From)
+
+MetaboliteIDs_PUBCHEM_FALSE &lt;- MetaboliteIDs_PUBCHEM %&gt;%
+  dplyr::filter(PUBCHEM_valid == FALSE)
+
+###------------------------------------------------------------------------
+# Try KEGG first, then HMDB, then CAS as fallback
+MetaboliteIDs_PUBCHEM_FALSE &lt;- MetaboliteIDs_PUBCHEM_FALSE %&gt;%
+  dplyr::left_join(
+    RaMP_KEGG_PubChem %&gt;% 
+      dplyr::select(From, To) %&gt;% 
+      dplyr::rename(KEGG = From, PUBCHEM_from_KEGG = To),
+    by = &quot;KEGG&quot;,
+    relationship = &quot;many-to-many&quot;
+  ) %&gt;%
+  dplyr::left_join(
+    RaMP_HMDB_PubChem %&gt;% 
+      dplyr::select(From, To) %&gt;% 
+      dplyr::rename(HMDB = From, PUBCHEM_from_HMDB = To),
+    by = &quot;HMDB&quot;,
+    relationship = &quot;many-to-many&quot;
+  ) %&gt;%
+  tidyr::separate_rows(CAS, sep = &quot;;&quot;) %&gt;%
+  dplyr::mutate(CAS = trimws(CAS)) %&gt;%
+  dplyr::filter(CAS != &quot;&quot;) %&gt;%
+  dplyr::left_join(
+    RaMP_CAS_PubChem %&gt;% 
+      dplyr::select(From, To) %&gt;% 
+      dplyr::rename(CAS = From, PUBCHEM_from_CAS = To),
+    by = &quot;CAS&quot;,
+    relationship = &quot;many-to-many&quot;
+  ) %&gt;%
+  dplyr::mutate(
+    PUBCHEM_corrected = as.integer(
+      dplyr::coalesce(PUBCHEM_from_KEGG, PUBCHEM_from_HMDB, PUBCHEM_from_CAS)
+    )
+  ) %&gt;%
+  dplyr::select(-PUBCHEM_from_KEGG, -PUBCHEM_from_HMDB, -PUBCHEM_from_CAS) %&gt;%
+  dplyr::group_by(Metabolite) %&gt;%
+  dplyr::summarise(
+    PUBCHEM_corrected = paste(unique(PUBCHEM_corrected), collapse = &quot;; &quot;),
+    CAS = paste(unique(CAS), collapse = &quot;; &quot;),
+    dplyr::across(-c(PUBCHEM_corrected, CAS), dplyr::first),
+    .groups = &quot;drop&quot;
+  )</code></pre>
+<p>For the final PubChem IDs we will check manually: 1. 64947 = Correct
+(Via Name and CAS) 2. 5656 = correct (Via Name and CAS) 3. 170746 = 6209
+(Via CAS) 4. 761 = 135414246 (Via CAS) 5. 5999 = 19648 (Via CAS) 6.
+139506 = 139506 (Via Name) 7. 5057430 = 70590 (Via CAS), 5057430 (Via
+Name) –&gt; Structurally very similar</p>
+<pre class="r"><code># Manual corrections: keyed by the current PUBCHEM_corrected value
+manual_corrections &lt;- tibble::tibble(
+  PUBCHEM = c(64947L, 5656L, 170746L, 761L, 5999L, 139506L, 5057430L),
+  PUBCHEM_manual = c(&quot;64947&quot;, &quot;5656&quot;, &quot;6209&quot;, &quot;135414246&quot;, &quot;19648&quot;, &quot;139506&quot;, &quot;70590; 5057430&quot;)
+)
+
+MetaboliteIDs_PUBCHEM_FALSE &lt;- MetaboliteIDs_PUBCHEM_FALSE %&gt;%
+  dplyr::left_join(manual_corrections, by = &quot;PUBCHEM&quot;) %&gt;%
+  dplyr::mutate(
+    PUBCHEM_corrected = dplyr::case_when(
+      !is.na(PUBCHEM_manual) ~ PUBCHEM_manual,
+      !is.na(PUBCHEM_corrected) ~ as.character(PUBCHEM_corrected),
+      TRUE ~ NA_character_
+    ),
+    PUBCHEM_Correction_Source = dplyr::case_when(
+      !is.na(PUBCHEM_manual) ~ &quot;Manual&quot;,
+      !is.na(PUBCHEM_corrected) ~ &quot;RaMP-DB&quot;,
+      TRUE ~ &quot;Not found&quot;
+    )
+  ) %&gt;%
+  dplyr::select(-PUBCHEM_manual)
+
+
+##-------------------------------------------------
+#Add into original table:
+# Add corrected invalid rows back into the original table
+MetaboliteIDs_PUBCHEM &lt;- MetaboliteIDs_PUBCHEM %&gt;%
+  dplyr::left_join(
+    MetaboliteIDs_PUBCHEM_FALSE %&gt;%
+      dplyr::select(PUBCHEM, PUBCHEM_corrected, PUBCHEM_Correction_Source),
+    by = &quot;PUBCHEM&quot;
+  ) %&gt;%
+  dplyr::mutate(
+    PUBCHEM = as.character(PUBCHEM),
+    PUBCHEM_corrected = dplyr::case_when(
+      PUBCHEM_valid == TRUE ~ NA_character_,
+      !is.na(PUBCHEM_corrected) ~ PUBCHEM_corrected,
+      TRUE ~ NA_character_
+    ),
+    PUBCHEM_Correction_Source = dplyr::case_when(
+      PUBCHEM_valid == TRUE ~ &quot;None&quot;,
+      !is.na(PUBCHEM_Correction_Source) ~ PUBCHEM_Correction_Source,
+      TRUE ~ &quot;NA&quot;
+    ),
+    # final PubChem to use: corrected if available, otherwise original
+    PUBCHEM_corrected = dplyr::coalesce(PUBCHEM_corrected, PUBCHEM)
+  ) %&gt;%
+  dplyr::rename(
+    `PUBCHEM original` = PUBCHEM,
+    PUBCHEM = PUBCHEM_corrected
+  )</code></pre>
+<p>Some details on how many IDs where affected:</p>
+<pre class="r"><code># Quick counts from your final table
+n_total &lt;- nrow(MetaboliteIDs_PUBCHEM)
+
+n_false &lt;- MetaboliteIDs_PUBCHEM %&gt;%
+  dplyr::summarise(n = sum(PUBCHEM_valid == FALSE, na.rm = TRUE)) %&gt;%
+  dplyr::pull(n)
+
+n_ramp &lt;- MetaboliteIDs_PUBCHEM %&gt;%
+  dplyr::summarise(n = sum(PUBCHEM_Correction_Source == &quot;RaMP-DB&quot;, na.rm = TRUE)) %&gt;%
+  dplyr::pull(n)
+
+n_manual &lt;- MetaboliteIDs_PUBCHEM %&gt;%
+  dplyr::summarise(n = sum(PUBCHEM_Correction_Source == &quot;Manual&quot;, na.rm = TRUE)) %&gt;%
+  dplyr::pull(n)
+
+n_not_found &lt;- MetaboliteIDs_PUBCHEM %&gt;%
+  dplyr::summarise(n = sum(PUBCHEM_Correction_Source == &quot;Not found&quot;, na.rm = TRUE)) %&gt;%
+  dplyr::pull(n)
+
+n_with_pubchem_final &lt;- MetaboliteIDs_PUBCHEM %&gt;%
+  dplyr::summarise(n = sum(!is.na(PUBCHEM) &amp; trimws(PUBCHEM) != &quot;&quot;, na.rm = TRUE)) %&gt;%
+  dplyr::pull(n)
+
+cat(&quot;Total features with PubChem:&quot;, n_total, &quot;\n&quot;)</code></pre>
+<pre><code>## Total features with PubChem: 365</code></pre>
+<pre class="r"><code>cat(&quot;Initially invalid PubChem (PUBCHEM_valid == FALSE):&quot;, n_false, &quot;\n&quot;)</code></pre>
+<pre><code>## Initially invalid PubChem (PUBCHEM_valid == FALSE): 68</code></pre>
+<pre class="r"><code>cat(&quot;Corrected using RaMP-DB:&quot;, n_ramp, &quot;\n&quot;)</code></pre>
+<pre><code>## Corrected using RaMP-DB: 61</code></pre>
+<pre class="r"><code>cat(&quot;Corrected manually:&quot;, n_manual, &quot;\n&quot;)</code></pre>
+<pre><code>## Corrected manually: 7</code></pre>
+<pre class="r"><code>cat(&quot;Invalid and still not found:&quot;, n_not_found, &quot;\n&quot;)</code></pre>
+<pre><code>## Invalid and still not found: 0</code></pre>
+<pre class="r"><code>cat(&quot;Features with final PubChem ID:&quot;, n_with_pubchem_final, &quot;\n&quot;)</code></pre>
+<pre><code>## Features with final PubChem ID: 365</code></pre>
+</div>
+<div id="save" class="section level2">
+<h2>Save</h2>
+<p>Save DF as .csv file</p>
 <pre class="r"><code>write.csv(Data_Sample, &quot;Hakimi_ccRCC-Tissue_Data.csv&quot;)
-write.csv(MetaData_Metabolite, &quot;Hakimi_ccRCC-Tissue_FeatureMetaData.csv&quot;)</code></pre>
+write.csv(MetaboliteIDs_PUBCHEM, &quot;Hakimi_ccRCC-Tissue_FeatureMetaData_Full-Pubchem-Info.csv&quot;)
+
+write.csv(MetaboliteIDs_PUBCHEM%&gt;%
+            dplyr::select(1:8,13, 10:11 ), 
+          &quot;Hakimi_ccRCC-Tissue_FeatureMetaData.csv&quot;)</code></pre>
+</div>
 </div>
 <div id="information-about-package-used-and-versions" class="section level1">
 <h1>Information about package used and versions</h1>
+<pre><code>## Warning in system2(&quot;quarto&quot;, &quot;-V&quot;, stdout = TRUE, env = paste0(&quot;TMPDIR=&quot;, : running command &#39;&quot;quarto&quot;
+## TMPDIR=C:/Users/chris/AppData/Local/Temp/Rtmp2zLywG/file1c78468b2cda -V&#39; had status 1</code></pre>
 <pre><code>## ─ Session info ───────────────────────────────────────────────────────────────────────────────────────────────────────
 ##  setting  value
-##  version  R version 4.3.2 (2023-10-31 ucrt)
+##  version  R version 4.4.3 (2025-02-28 ucrt)
 ##  os       Windows 10 x64 (build 19045)
 ##  system   x86_64, mingw32
 ##  ui       RTerm
@@ -1883,78 +2079,159 @@ write.csv(MetaData_Metabolite, &quot;Hakimi_ccRCC-Tissue_FeatureMetaData.csv&quo
 ##  collate  English_United Kingdom.utf8
 ##  ctype    English_United Kingdom.utf8
 ##  tz       Europe/Berlin
-##  date     2024-07-30
-##  pandoc   3.1.1 @ C:/Program Files/RStudio/resources/app/bin/quarto/bin/tools/ (via rmarkdown)
+##  date     2026-03-25
+##  pandoc   3.4 @ C:/Program Files/RStudio/resources/app/bin/quarto/bin/tools/ (via rmarkdown)
+##  quarto   NA @ C:\\PROGRA~1\\RStudio\\RESOUR~1\\app\\bin\\quarto\\bin\\quarto.exe
 ## 
 ## ─ Packages ───────────────────────────────────────────────────────────────────────────────────────────────────────────
-##  package     * version date (UTC) lib source
-##  abind         1.4-5   2016-07-21 [1] CRAN (R 4.3.1)
-##  backports     1.4.1   2021-12-13 [1] CRAN (R 4.3.1)
-##  broom         1.0.5   2023-06-09 [1] CRAN (R 4.3.2)
-##  bslib         0.7.0   2024-03-29 [1] CRAN (R 4.3.3)
-##  cachem        1.0.8   2023-05-01 [1] CRAN (R 4.3.2)
-##  car           3.1-2   2023-03-30 [1] CRAN (R 4.3.2)
-##  carData       3.0-5   2022-01-06 [1] CRAN (R 4.3.2)
-##  cellranger    1.1.0   2016-07-27 [1] CRAN (R 4.3.2)
-##  cli           3.6.2   2023-12-11 [1] CRAN (R 4.3.2)
-##  colorspace    2.1-0   2023-01-23 [1] CRAN (R 4.3.2)
-##  digest        0.6.33  2023-07-07 [1] CRAN (R 4.3.2)
-##  dplyr       * 1.1.4   2023-11-17 [1] CRAN (R 4.3.2)
-##  evaluate      0.23    2023-11-01 [1] CRAN (R 4.3.2)
-##  fansi         1.0.6   2023-12-08 [1] CRAN (R 4.3.2)
-##  farver        2.1.1   2022-07-06 [1] CRAN (R 4.3.2)
-##  fastmap       1.1.1   2023-02-24 [1] CRAN (R 4.3.2)
-##  forcats     * 1.0.0   2023-01-29 [1] CRAN (R 4.3.2)
-##  generics      0.1.3   2022-07-05 [1] CRAN (R 4.3.2)
-##  ggfortify   * 0.4.16  2023-03-20 [1] CRAN (R 4.3.2)
-##  ggplot2     * 3.4.4   2023-10-12 [1] CRAN (R 4.3.2)
-##  ggpubr        0.6.0   2023-02-10 [1] CRAN (R 4.3.2)
-##  ggrepel       0.9.4   2023-10-13 [1] CRAN (R 4.3.2)
-##  ggsignif      0.6.4   2022-10-13 [1] CRAN (R 4.3.2)
-##  glue          1.6.2   2022-02-24 [1] CRAN (R 4.3.2)
-##  gridExtra     2.3     2017-09-09 [1] CRAN (R 4.3.2)
-##  gtable        0.3.4   2023-08-21 [1] CRAN (R 4.3.2)
-##  hms           1.1.3   2023-03-21 [1] CRAN (R 4.3.2)
-##  htmltools     0.5.8.1 2024-04-04 [1] CRAN (R 4.3.3)
-##  jquerylib     0.1.4   2021-04-26 [1] CRAN (R 4.3.2)
-##  jsonlite      1.8.8   2023-12-04 [1] CRAN (R 4.3.2)
-##  knitr         1.46    2024-04-06 [1] CRAN (R 4.3.3)
-##  labeling      0.4.3   2023-08-29 [1] CRAN (R 4.3.1)
-##  lifecycle     1.0.4   2023-11-07 [1] CRAN (R 4.3.2)
-##  lubridate   * 1.9.3   2023-09-27 [1] CRAN (R 4.3.2)
-##  magrittr      2.0.3   2022-03-30 [1] CRAN (R 4.3.2)
-##  MetaProViz    2.0.2   2024-06-13 [1] Github (saezlab/MetaProViz@ddbe87c)
-##  munsell       0.5.1   2024-04-01 [1] CRAN (R 4.3.3)
-##  pillar        1.9.0   2023-03-22 [1] CRAN (R 4.3.2)
-##  pkgconfig     2.0.3   2019-09-22 [1] CRAN (R 4.3.2)
-##  purrr       * 1.0.2   2023-08-10 [1] CRAN (R 4.3.2)
-##  R6            2.5.1   2021-08-19 [1] CRAN (R 4.3.2)
-##  Rcpp          1.0.11  2023-07-06 [1] CRAN (R 4.3.2)
-##  readr       * 2.1.4   2023-02-10 [1] CRAN (R 4.3.2)
-##  readxl        1.4.3   2023-07-06 [1] CRAN (R 4.3.2)
-##  rlang         1.1.2   2023-11-04 [1] CRAN (R 4.3.2)
-##  rmarkdown   * 2.26    2024-03-05 [1] CRAN (R 4.3.3)
-##  rstatix       0.7.2   2023-02-01 [1] CRAN (R 4.3.2)
-##  rstudioapi    0.16.0  2024-03-24 [1] CRAN (R 4.3.3)
-##  sass          0.4.9   2024-03-15 [1] CRAN (R 4.3.3)
-##  scales        1.3.0   2023-11-28 [1] CRAN (R 4.3.2)
-##  sessioninfo   1.2.2   2021-12-06 [1] CRAN (R 4.3.2)
-##  stringi       1.8.3   2023-12-11 [1] CRAN (R 4.3.2)
-##  stringr     * 1.5.1   2023-11-14 [1] CRAN (R 4.3.2)
-##  tibble      * 3.2.1   2023-03-20 [1] CRAN (R 4.3.2)
-##  tidyr       * 1.3.0   2023-01-24 [1] CRAN (R 4.3.2)
-##  tidyselect    1.2.1   2024-03-11 [1] CRAN (R 4.3.3)
-##  tidyverse   * 2.0.0   2023-02-22 [1] CRAN (R 4.3.2)
-##  timechange    0.2.0   2023-01-11 [1] CRAN (R 4.3.2)
-##  tzdb          0.4.0   2023-05-12 [1] CRAN (R 4.3.2)
-##  utf8          1.2.4   2023-10-22 [1] CRAN (R 4.3.2)
-##  vctrs         0.6.5   2023-12-01 [1] CRAN (R 4.3.2)
-##  withr         3.0.0   2024-01-16 [1] CRAN (R 4.3.2)
-##  xfun          0.43    2024-03-25 [1] CRAN (R 4.3.3)
-##  yaml          2.3.8   2023-12-11 [1] CRAN (R 4.3.2)
+##  package              * version   date (UTC) lib source
+##  abind                  1.4-8     2024-09-12 [1] CRAN (R 4.4.1)
+##  backports              1.5.0     2024-05-23 [1] CRAN (R 4.4.0)
+##  beeswarm               0.4.0     2021-06-01 [1] CRAN (R 4.4.0)
+##  Biobase                2.66.0    2024-10-29 [1] Bioconductor 3.20 (R 4.4.1)
+##  BiocGenerics           0.52.0    2024-10-29 [1] Bioconductor 3.20 (R 4.4.1)
+##  BiocParallel           1.40.2    2025-06-17 [1] Bioconductor
+##  bit                    4.6.0     2025-03-06 [1] CRAN (R 4.4.3)
+##  bit64                  4.6.0-1   2025-01-16 [1] CRAN (R 4.4.3)
+##  blob                   1.2.4     2023-03-17 [1] CRAN (R 4.4.1)
+##  broom                  1.0.10    2025-09-13 [1] CRAN (R 4.4.3)
+##  bslib                  0.9.0     2025-01-30 [1] CRAN (R 4.4.3)
+##  cachem                 1.1.0     2024-05-16 [1] CRAN (R 4.4.1)
+##  car                    3.1-3     2024-09-27 [1] CRAN (R 4.4.1)
+##  carData                3.0-5     2022-01-06 [1] CRAN (R 4.4.1)
+##  cellranger             1.1.0     2016-07-27 [1] CRAN (R 4.4.1)
+##  checkmate              2.3.3     2025-08-18 [1] CRAN (R 4.4.3)
+##  cli                    3.6.5     2025-04-23 [1] CRAN (R 4.4.3)
+##  codetools              0.2-20    2024-03-31 [2] CRAN (R 4.4.3)
+##  colorspace             2.1-2     2025-09-22 [1] CRAN (R 4.4.3)
+##  ComplexUpset           1.3.3     2021-12-11 [1] CRAN (R 4.4.3)
+##  cosmosR                1.14.0    2024-10-29 [1] Bioconductor 3.20 (R 4.4.1)
+##  crayon                 1.5.3     2024-06-20 [1] CRAN (R 4.4.1)
+##  curl                   7.0.0     2025-08-19 [1] CRAN (R 4.4.3)
+##  DBI                    1.2.3     2024-06-02 [1] CRAN (R 4.4.1)
+##  decoupleR              2.9.7     2025-09-05 [1] Github (saezlab/decoupleR@ee88686)
+##  DelayedArray           0.32.0    2024-10-29 [1] Bioconductor 3.20 (R 4.4.1)
+##  digest                 0.6.37    2024-08-19 [1] CRAN (R 4.4.1)
+##  dplyr                * 1.1.4     2023-11-17 [1] CRAN (R 4.4.1)
+##  EnhancedVolcano        1.24.0    2024-10-29 [1] Bioconductor 3.20 (R 4.4.1)
+##  evaluate               1.0.5     2025-08-27 [1] CRAN (R 4.4.3)
+##  factoextra             1.0.7     2020-04-01 [1] CRAN (R 4.4.1)
+##  farver                 2.1.2     2024-05-13 [1] CRAN (R 4.4.1)
+##  fastmap                1.2.0     2024-05-15 [1] CRAN (R 4.4.1)
+##  forcats              * 1.0.0     2023-01-29 [1] CRAN (R 4.4.1)
+##  Formula                1.2-5     2023-02-24 [1] CRAN (R 4.4.0)
+##  fs                     1.6.6     2025-04-12 [1] CRAN (R 4.4.3)
+##  generics               0.1.4     2025-05-09 [1] CRAN (R 4.4.3)
+##  GenomeInfoDb           1.42.3    2025-01-27 [1] Bioconductor 3.20 (R 4.4.2)
+##  GenomeInfoDbData       1.2.13    2025-04-03 [1] Bioconductor
+##  GenomicRanges          1.58.0    2024-10-29 [1] Bioconductor 3.20 (R 4.4.1)
+##  ggbeeswarm             0.7.2     2023-04-29 [1] CRAN (R 4.4.1)
+##  ggforce                0.5.0     2025-06-18 [1] CRAN (R 4.4.3)
+##  ggfortify              0.4.19    2025-07-27 [1] CRAN (R 4.4.3)
+##  ggplot2              * 4.0.0     2025-09-11 [1] CRAN (R 4.4.3)
+##  ggpubr                 0.6.1     2025-06-27 [1] CRAN (R 4.4.3)
+##  ggraph                 2.2.2     2025-08-24 [1] CRAN (R 4.4.3)
+##  ggrepel                0.9.6     2024-09-07 [1] CRAN (R 4.4.1)
+##  ggsignif               0.6.4     2022-10-13 [1] CRAN (R 4.4.1)
+##  glue                   1.8.0     2024-09-30 [1] CRAN (R 4.4.3)
+##  graphlayouts           1.2.2     2025-01-23 [1] CRAN (R 4.4.3)
+##  gridExtra              2.3       2017-09-09 [1] CRAN (R 4.4.1)
+##  gtable                 0.3.6     2024-10-25 [1] CRAN (R 4.4.2)
+##  gtools                 3.9.5     2023-11-20 [1] CRAN (R 4.4.1)
+##  hash                   2.2.6.3   2023-08-19 [1] CRAN (R 4.4.1)
+##  hms                    1.1.4     2025-10-17 [1] CRAN (R 4.4.3)
+##  htmltools              0.5.8.1   2024-04-04 [1] CRAN (R 4.4.1)
+##  httr                   1.4.7     2023-08-15 [1] CRAN (R 4.4.1)
+##  httr2                  1.2.2     2025-12-08 [1] CRAN (R 4.4.3)
+##  igraph                 2.2.1     2025-10-27 [1] CRAN (R 4.4.3)
+##  inflection             1.3.7     2025-07-17 [1] CRAN (R 4.4.3)
+##  IRanges                2.40.1    2024-12-05 [1] Bioconductor 3.20 (R 4.4.2)
+##  jquerylib              0.1.4     2021-04-26 [1] CRAN (R 4.4.1)
+##  jsonlite               2.0.0     2025-03-27 [1] CRAN (R 4.4.3)
+##  knitr                  1.50      2025-03-16 [1] CRAN (R 4.4.3)
+##  labeling               0.4.3     2023-08-29 [1] CRAN (R 4.4.0)
+##  later                  1.4.4     2025-08-27 [1] CRAN (R 4.4.3)
+##  lattice                0.22-7    2025-04-02 [1] CRAN (R 4.4.3)
+##  lifecycle              1.0.4     2023-11-07 [1] CRAN (R 4.4.1)
+##  limma                  3.65.5    2025-10-07 [1] xgit (https://git.bioconductor.org/packages/limma.git@cc09712)
+##  logger                 0.4.1     2025-09-11 [1] CRAN (R 4.4.3)
+##  lubridate            * 1.9.4     2024-12-08 [1] CRAN (R 4.4.3)
+##  magrittr               2.0.3     2022-03-30 [1] CRAN (R 4.4.1)
+##  MASS                   7.3-65    2025-02-28 [1] CRAN (R 4.4.3)
+##  Matrix                 1.7-4     2025-08-28 [1] CRAN (R 4.4.3)
+##  MatrixGenerics         1.18.1    2025-01-09 [1] Bioconductor 3.20 (R 4.4.2)
+##  matrixStats            1.5.0     2025-01-07 [1] CRAN (R 4.4.3)
+##  memoise                2.0.1     2021-11-26 [1] CRAN (R 4.4.1)
+##  MetaProViz           * 3.99.32   2026-02-17 [1] Github (saezlab/MetaProViz@053ade8)
+##  OmnipathR            * 3.19.1    2025-12-08 [1] Github (saezlab/OmnipathR@a0e107e)
+##  otel                   0.2.0     2025-08-29 [1] CRAN (R 4.4.3)
+##  parallelly             1.45.1    2025-07-24 [1] CRAN (R 4.4.3)
+##  patchwork              1.3.2     2025-08-25 [1] CRAN (R 4.4.3)
+##  pheatmap               1.0.13    2025-06-05 [1] CRAN (R 4.4.3)
+##  pillar                 1.11.1    2025-09-17 [1] CRAN (R 4.4.3)
+##  pkgconfig              2.0.3     2019-09-22 [1] CRAN (R 4.4.1)
+##  plyr                   1.8.9     2023-10-02 [1] CRAN (R 4.4.1)
+##  Polychrome             1.5.4     2025-04-06 [1] CRAN (R 4.4.3)
+##  polyclip               1.10-7    2024-07-23 [1] CRAN (R 4.4.1)
+##  prettyunits            1.2.0     2023-09-24 [1] CRAN (R 4.4.1)
+##  progress               1.2.3     2023-12-06 [1] CRAN (R 4.4.1)
+##  purrr                * 1.0.4     2025-02-05 [1] CRAN (R 4.4.3)
+##  qcc                    2.7       2017-07-11 [1] CRAN (R 4.4.1)
+##  qvalue                 2.38.0    2024-10-29 [1] Bioconductor 3.20 (R 4.4.1)
+##  R.methodsS3            1.8.2     2022-06-13 [1] CRAN (R 4.4.0)
+##  R.oo                   1.27.1    2025-05-02 [1] CRAN (R 4.4.3)
+##  R.utils                2.13.0    2025-02-24 [1] CRAN (R 4.4.3)
+##  R6                     2.6.1     2025-02-15 [1] CRAN (R 4.4.3)
+##  rappdirs               0.3.3     2021-01-31 [1] CRAN (R 4.4.1)
+##  RColorBrewer           1.1-3     2022-04-03 [1] CRAN (R 4.4.0)
+##  Rcpp                   1.1.0     2025-07-02 [1] CRAN (R 4.4.3)
+##  readr                * 2.1.6     2025-11-14 [1] CRAN (R 4.4.3)
+##  readxl                 1.4.5     2025-03-07 [1] CRAN (R 4.4.3)
+##  reshape2               1.4.4     2020-04-09 [1] CRAN (R 4.4.1)
+##  rlang                  1.1.5     2025-01-17 [1] CRAN (R 4.4.3)
+##  rmarkdown            * 2.30      2025-09-28 [1] CRAN (R 4.4.3)
+##  RSQLite                2.4.5     2025-11-30 [1] CRAN (R 4.4.3)
+##  rstatix                0.7.2     2023-02-01 [1] CRAN (R 4.4.1)
+##  rstudioapi             0.17.1    2024-10-22 [1] CRAN (R 4.4.2)
+##  rvest                  1.0.5     2025-08-29 [1] CRAN (R 4.4.3)
+##  S4Arrays               1.6.0     2024-10-29 [1] Bioconductor 3.20 (R 4.4.1)
+##  S4Vectors              0.44.0    2024-10-29 [1] Bioconductor 3.20 (R 4.4.1)
+##  S7                     0.2.0     2024-11-07 [1] CRAN (R 4.4.3)
+##  sass                   0.4.10    2025-04-11 [1] CRAN (R 4.4.3)
+##  scales                 1.4.0     2025-04-24 [1] CRAN (R 4.4.3)
+##  scatterplot3d          0.3-44    2023-05-05 [1] CRAN (R 4.4.0)
+##  sessioninfo            1.2.3     2025-02-05 [1] CRAN (R 4.4.3)
+##  SparseArray            1.6.2     2025-02-20 [1] Bioconductor 3.20 (R 4.4.2)
+##  statmod                1.5.1     2025-10-09 [1] CRAN (R 4.4.3)
+##  stringi                1.8.7     2025-03-27 [1] CRAN (R 4.4.3)
+##  stringr              * 1.6.0     2025-11-04 [1] CRAN (R 4.4.3)
+##  SummarizedExperiment   1.36.0    2024-10-29 [1] Bioconductor 3.20 (R 4.4.1)
+##  tibble               * 3.3.0     2025-06-08 [1] CRAN (R 4.4.3)
+##  tidygraph              1.3.1     2024-01-30 [1] CRAN (R 4.4.1)
+##  tidyr                * 1.3.1     2024-01-24 [1] CRAN (R 4.4.1)
+##  tidyselect             1.2.1     2024-03-11 [1] CRAN (R 4.4.1)
+##  tidyverse            * 2.0.0     2023-02-22 [1] CRAN (R 4.4.1)
+##  timechange             0.3.0     2024-01-18 [1] CRAN (R 4.4.1)
+##  tweenr                 2.0.3     2024-02-26 [1] CRAN (R 4.4.1)
+##  tzdb                   0.5.0     2025-03-15 [1] CRAN (R 4.4.3)
+##  UCSC.utils             1.2.0     2024-10-29 [1] Bioconductor 3.20 (R 4.4.1)
+##  vctrs                  0.6.5     2023-12-01 [1] CRAN (R 4.4.1)
+##  vipor                  0.4.7     2023-12-18 [1] CRAN (R 4.4.1)
+##  viridis                0.6.5     2024-01-29 [1] CRAN (R 4.4.1)
+##  viridisLite            0.4.2     2023-05-02 [1] CRAN (R 4.4.1)
+##  withr                  3.0.2     2024-10-28 [1] CRAN (R 4.4.2)
+##  writexl                1.5.4     2025-04-15 [1] CRAN (R 4.4.3)
+##  xfun                   0.52      2025-04-02 [1] CRAN (R 4.4.1)
+##  XML                    3.99-0.20 2025-11-08 [1] CRAN (R 4.4.3)
+##  xml2                   1.4.0     2025-08-20 [1] CRAN (R 4.4.3)
+##  XVector                0.46.0    2024-10-29 [1] Bioconductor 3.20 (R 4.4.1)
+##  yaml                   2.3.11    2025-11-28 [1] CRAN (R 4.4.3)
+##  zip                    2.3.3     2025-05-13 [1] CRAN (R 4.4.3)
+##  zlibbioc               1.52.0    2024-10-29 [1] Bioconductor 3.20 (R 4.4.1)
 ## 
-##  [1] C:/Users/chris/AppData/Local/R/win-library/4.3
-##  [2] C:/Program Files/R/R-4.3.2/library
+##  [1] C:/Users/chris/AppData/Local/R/win-library/4.4
+##  [2] C:/Program Files/R/R-4.4.3/library
+##  * ── Packages attached to the search path.
 ## 
 ## ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────</code></pre>
 </div>

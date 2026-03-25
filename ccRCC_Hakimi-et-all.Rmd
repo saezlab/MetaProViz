@@ -1,7 +1,7 @@
 ---
 title: "ccRCC_Tissue"
 author: "Christina Schmidt"
-date: "July 2024"
+date: "March 2026"
 output:
   html_document:
     toc: yes
@@ -17,6 +17,9 @@ editor_options:
 #load the needed:
 library(tidyverse) # used for data manipulation
 library(rmarkdown) # used for paged_table function
+library(dplyr)
+library(OmnipathR)
+library(MetaProViz)
 ```
 
 # Samples
@@ -25,6 +28,7 @@ The [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supp
 Here we use the median normalised data from the supplementary table 2 of the paper. The median normalisation was done by metaboanalyst.
 
 # The Data
+## Load Data
 ```{r}
 data <- readxl::read_excel("Input/Supplementarytable2_mmc2.xlsx", sheet = "Median Normalized")
 
@@ -75,7 +79,9 @@ Data <-as.data.frame(t(Data))%>%
   mutate(across(everything(), as.numeric))
 
 ```
-\
+
+
+## Patient sample and value DF
 First we removed metabolites that where not identifiable from the dataset.\
 ```{r, warning=FALSE}
 #Remove not identified metabolites:
@@ -99,11 +105,11 @@ Now we check the clustering via PCA plot:\
 In detail, we want to check for outliers, how the patients samples and normal tissue samples cluster and if the different demographics separate. \
 ```{r, warning=FALSE}
 #Make plot:
-MetaProViz::VizPCA(SettingsInfo= c(color="TISSUE_TYPE"),
-                   SettingsFile_Sample = MetaData_Sample ,
-                   InputData= Data_Select,
-                   PlotName = "Outlier",
-                   SaveAs_Plot=NULL)
+MetaProViz::viz_pca(metadata_info= c(color="TISSUE_TYPE"),
+                   metadata_sample = MetaData_Sample ,
+                   data= Data_Select,
+                   plot_name = "Outlier",
+                   save_plot=NULL)
 ```
 \
 Merge Data with MetaData_Sample
@@ -112,11 +118,199 @@ Data_Sample <- merge( MetaData_Sample, Data_Select, by = "row.names")%>%
   column_to_rownames("Row.names")
 
 ```
+
+## Feature metadata table
+Data wrangling
+```{r, warning=FALSE}
+MetaboliteIDs <- MetaData_Metabolite %>%
+  rownames_to_column("Metabolite") %>%
+  dplyr::rename("HMDB"= "Group_HMDB")%>%
+  slice(1:577) %>%# only keep entries with trivial names
+  dplyr::mutate(PUBCHEM = as.integer(as.numeric(PUBCHEM)))%>%
+  dplyr::mutate(
+    KEGG = trimws(KEGG),
+    HMDB = toupper(trimws(HMDB)),   # HMDB often safer uppercase
+    CAS = trimws(CAS)
+  )%>%
+  tidyr::separate_rows(CAS, sep = ";") %>%
+  dplyr::mutate(CAS = trimws(CAS)) %>%
+  dplyr::filter(CAS != "")
+
+```
 \
+There are PubChem entries in the excel file that are not PubChem IDs. It is likely that this is an error caused by excel conversion as it seems in some cases the first part of the ID corresponds to one of the other IDs, so maybe these where multiple potential PubChem IDs.\
+First we will extract the PubChem IDs that are present in the metadata table and check if they are valid PubChem IDs. We can do this using the `ramp_id_mapping_table` function, which includes all the valid PubChem IDs that are present in RaMP, which is a database that integrates multiple databases including KEGG, HMDB and PubChem.\
+```{r}
+#Get RaMP table
+RaMP_PubChem <- OmnipathR::ramp_id_mapping_table(from = "pubchem",
+                                         to= "pubchem")
+# Get RaMP mappings for alternative ID types
+RaMP_KEGG_PubChem <- OmnipathR::ramp_id_mapping_table(from = "kegg", 
+                                                       to = "pubchem")
+RaMP_HMDB_PubChem <- OmnipathR::ramp_id_mapping_table(from = "hmdb", 
+                                                       to = "pubchem")
+RaMP_CAS_PubChem <- OmnipathR::ramp_id_mapping_table(from = "cas", 
+                                                      to = "pubchem")
+
+##------------------------------------------------------------------------
+#Check which PubChem IDs in our metadata are valid:
+MetaboliteIDs_PUBCHEM <- MetaboliteIDs%>%
+  dplyr::filter(!is.na(PUBCHEM)) %>%
+  dplyr::mutate(PUBCHEM_valid = PUBCHEM %in% RaMP_PubChem$From)
+
+MetaboliteIDs_PUBCHEM_FALSE <- MetaboliteIDs_PUBCHEM %>%
+  dplyr::filter(PUBCHEM_valid == FALSE)
+
+###------------------------------------------------------------------------
+# Try KEGG first, then HMDB, then CAS as fallback
+MetaboliteIDs_PUBCHEM_FALSE <- MetaboliteIDs_PUBCHEM_FALSE %>%
+  dplyr::left_join(
+    RaMP_KEGG_PubChem %>% 
+      dplyr::select(From, To) %>% 
+      dplyr::rename(KEGG = From, PUBCHEM_from_KEGG = To),
+    by = "KEGG",
+    relationship = "many-to-many"
+  ) %>%
+  dplyr::left_join(
+    RaMP_HMDB_PubChem %>% 
+      dplyr::select(From, To) %>% 
+      dplyr::rename(HMDB = From, PUBCHEM_from_HMDB = To),
+    by = "HMDB",
+    relationship = "many-to-many"
+  ) %>%
+  tidyr::separate_rows(CAS, sep = ";") %>%
+  dplyr::mutate(CAS = trimws(CAS)) %>%
+  dplyr::filter(CAS != "") %>%
+  dplyr::left_join(
+    RaMP_CAS_PubChem %>% 
+      dplyr::select(From, To) %>% 
+      dplyr::rename(CAS = From, PUBCHEM_from_CAS = To),
+    by = "CAS",
+    relationship = "many-to-many"
+  ) %>%
+  dplyr::mutate(
+    PUBCHEM_corrected = as.integer(
+      dplyr::coalesce(PUBCHEM_from_KEGG, PUBCHEM_from_HMDB, PUBCHEM_from_CAS)
+    )
+  ) %>%
+  dplyr::select(-PUBCHEM_from_KEGG, -PUBCHEM_from_HMDB, -PUBCHEM_from_CAS) %>%
+  dplyr::group_by(Metabolite) %>%
+  dplyr::summarise(
+    PUBCHEM_corrected = paste(unique(PUBCHEM_corrected), collapse = "; "),
+    CAS = paste(unique(CAS), collapse = "; "),
+    dplyr::across(-c(PUBCHEM_corrected, CAS), dplyr::first),
+    .groups = "drop"
+  )
+
+```
+
+For the final PubChem IDs we will check manually:
+1. 64947 = Correct (Via Name and CAS)
+2. 5656 = correct (Via Name and CAS)
+3. 170746 = 6209 (Via CAS)
+4. 761 = 135414246 (Via CAS)
+5. 5999 = 19648 (Via CAS)
+6. 139506 = 139506 (Via Name)
+7. 5057430 = 70590 (Via CAS), 5057430 (Via Name) --> Structurally very similar
+
+```{r}
+# Manual corrections: keyed by the current PUBCHEM_corrected value
+manual_corrections <- tibble::tibble(
+  PUBCHEM = c(64947L, 5656L, 170746L, 761L, 5999L, 139506L, 5057430L),
+  PUBCHEM_manual = c("64947", "5656", "6209", "135414246", "19648", "139506", "70590; 5057430")
+)
+
+MetaboliteIDs_PUBCHEM_FALSE <- MetaboliteIDs_PUBCHEM_FALSE %>%
+  dplyr::left_join(manual_corrections, by = "PUBCHEM") %>%
+  dplyr::mutate(
+    PUBCHEM_corrected = dplyr::case_when(
+      !is.na(PUBCHEM_manual) ~ PUBCHEM_manual,
+      !is.na(PUBCHEM_corrected) ~ as.character(PUBCHEM_corrected),
+      TRUE ~ NA_character_
+    ),
+    PUBCHEM_Correction_Source = dplyr::case_when(
+      !is.na(PUBCHEM_manual) ~ "Manual",
+      !is.na(PUBCHEM_corrected) ~ "RaMP-DB",
+      TRUE ~ "Not found"
+    )
+  ) %>%
+  dplyr::select(-PUBCHEM_manual)
+
+
+##-------------------------------------------------
+#Add into original table:
+# Add corrected invalid rows back into the original table
+MetaboliteIDs_PUBCHEM <- MetaboliteIDs_PUBCHEM %>%
+  dplyr::left_join(
+    MetaboliteIDs_PUBCHEM_FALSE %>%
+      dplyr::select(PUBCHEM, PUBCHEM_corrected, PUBCHEM_Correction_Source),
+    by = "PUBCHEM"
+  ) %>%
+  dplyr::mutate(
+    PUBCHEM = as.character(PUBCHEM),
+    PUBCHEM_corrected = dplyr::case_when(
+      PUBCHEM_valid == TRUE ~ NA_character_,
+      !is.na(PUBCHEM_corrected) ~ PUBCHEM_corrected,
+      TRUE ~ NA_character_
+    ),
+    PUBCHEM_Correction_Source = dplyr::case_when(
+      PUBCHEM_valid == TRUE ~ "None",
+      !is.na(PUBCHEM_Correction_Source) ~ PUBCHEM_Correction_Source,
+      TRUE ~ "NA"
+    ),
+    # final PubChem to use: corrected if available, otherwise original
+    PUBCHEM_corrected = dplyr::coalesce(PUBCHEM_corrected, PUBCHEM)
+  ) %>%
+  dplyr::rename(
+    `PUBCHEM original` = PUBCHEM,
+    PUBCHEM = PUBCHEM_corrected
+  )
+```
+
+Some details on how many IDs where affected:
+```{r}
+# Quick counts from your final table
+n_total <- nrow(MetaboliteIDs_PUBCHEM)
+
+n_false <- MetaboliteIDs_PUBCHEM %>%
+  dplyr::summarise(n = sum(PUBCHEM_valid == FALSE, na.rm = TRUE)) %>%
+  dplyr::pull(n)
+
+n_ramp <- MetaboliteIDs_PUBCHEM %>%
+  dplyr::summarise(n = sum(PUBCHEM_Correction_Source == "RaMP-DB", na.rm = TRUE)) %>%
+  dplyr::pull(n)
+
+n_manual <- MetaboliteIDs_PUBCHEM %>%
+  dplyr::summarise(n = sum(PUBCHEM_Correction_Source == "Manual", na.rm = TRUE)) %>%
+  dplyr::pull(n)
+
+n_not_found <- MetaboliteIDs_PUBCHEM %>%
+  dplyr::summarise(n = sum(PUBCHEM_Correction_Source == "Not found", na.rm = TRUE)) %>%
+  dplyr::pull(n)
+
+n_with_pubchem_final <- MetaboliteIDs_PUBCHEM %>%
+  dplyr::summarise(n = sum(!is.na(PUBCHEM) & trimws(PUBCHEM) != "", na.rm = TRUE)) %>%
+  dplyr::pull(n)
+
+cat("Total features with PubChem:", n_total, "\n")
+cat("Initially invalid PubChem (PUBCHEM_valid == FALSE):", n_false, "\n")
+cat("Corrected using RaMP-DB:", n_ramp, "\n")
+cat("Corrected manually:", n_manual, "\n")
+cat("Invalid and still not found:", n_not_found, "\n")
+cat("Features with final PubChem ID:", n_with_pubchem_final, "\n")
+
+```
+
+## Save
 Save DF as .csv file
 ```{r}
 write.csv(Data_Sample, "Hakimi_ccRCC-Tissue_Data.csv")
-write.csv(MetaData_Metabolite, "Hakimi_ccRCC-Tissue_FeatureMetaData.csv")
+write.csv(MetaboliteIDs_PUBCHEM, "Hakimi_ccRCC-Tissue_FeatureMetaData_Full-Pubchem-Info.csv")
+
+write.csv(MetaboliteIDs_PUBCHEM%>%
+            dplyr::select(1:8,13, 10:11 ), 
+          "Hakimi_ccRCC-Tissue_FeatureMetaData.csv")
+
 ```
 
 # Information about package used and versions 
