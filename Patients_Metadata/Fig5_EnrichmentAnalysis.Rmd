@@ -1,0 +1,162 @@
+---
+title: "Enrichment Analysis"
+author:
+  - name: Christina Schmidt
+    affiliation:
+    - Heidelberg University
+  - name: Jannik Franken
+    affiliation:
+    - Heidelberg University
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_float: true
+    toc_depth: 5
+    code_folding: show
+vignette: >
+  %\VignetteIndexEntry{Standard Metabolomics}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+bibliography: bibliography.bib
+editor_options:
+  chunk_output_type: console
+---
+
+<style>
+.vscroll-plot {
+    width: 850px;
+    height: 500px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+</style>
+
+```{r chunk_setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+```{r message=FALSE, warning=FALSE}
+# 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
+# 2. Install the latest development version from GitHub using devtools
+# devtools::install_github("https://github.com/saezlab/MetaProViz")
+
+library(MetaProViz)
+
+# dependencies that need to be loaded:
+library(magrittr)
+library(dplyr)
+library(rlang)
+library(tidyr)
+library(tibble)
+library(stringr)
+```
+
+```{r}
+# Make folder for results: @Jannik add folders as needed!
+if (!dir.exists("MetaProViz_Results/Enrichment")) {
+  dir.create("MetaProViz_Results/Enrichment", recursive = TRUE)
+}
+
+
+```
+
+# Load results
+## 1. Loading the Feature metadata
+Result from Fig2_FeatureMetadata, which include the feature metadata table with extended metabolite IDs and solved ambiguity issues for mapping KEGG IDs to KEGG pathways.
+@Jannik, this is not fisnished yet. 
+
+
+## 2. Biological regulated clustering Results 
+@Jannik: Load Extended Data Table 1 , Load Sheet 9 from BiorXiv
+
+
+# Pathway enrichment
+@Jannik: This needs to be rerun --> new sheet 11 and 12
+Below is the previously used code:
+
+
+Next, we perform Over Representation Analysis (`ORA`) using KEGG pathways for each comparison.\
+```{r, warning=FALSE}
+# Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
+DM_ORA_res<- list()
+
+KEGG_Pathways <- MetaProViz::metsigdb_kegg()
+
+for(comparison in names(ResList)){
+  dma_res <- merge(x= Tissue_MetaData_Extended,
+                   y=ResList[[comparison]][["dma"]][["TUMOR_vs_NORMAL"]], 
+                   by="Metabolite", 
+                   all=TRUE)
+  
+  #Ensure unique IDs and full background --> we include measured features that do not have a KEGG ID.
+  dma_res <- dma_res[,c(3,21:25)]%>%
+    dplyr::mutate(InputID_select = if_else(
+      is.na(InputID_select),
+      paste0("NA_", cumsum(is.na(InputID_select))),
+      InputID_select
+      ))%>% #remove duplications and keep the higher Log2FC measurement
+    group_by(InputID_select) %>%
+    slice_max(order_by = Log2FC, n = 1, with_ties = FALSE) %>%
+    ungroup()%>%
+    remove_rownames()%>%
+    tibble::column_to_rownames("InputID_select")
+  
+  
+  #Perform ORA
+  set.seed(100)
+  Res <- MetaProViz::standard_ora(data= dma_res, #Input data requirements: column `t.val` and column `Metabolite`
+                                 metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "MetaboliteID"),
+                                 input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
+                                 pathway_name=paste0("KEGG_", comparison, sep=""),
+                                 min_gssize=3,
+                                 max_gssize=1000,
+                                 cutoff_stat=0.01,
+                                 cutoff_percentage=10)
+
+  DM_ORA_res[[comparison]] <- Res
+
+  #Select to plot:
+  Res_Select <- Res[["ClusterGosummary"]]%>%
+    filter(p.adjust<0.1)%>%
+    #filter(pvalue<0.05)%>%
+    filter(percentage_of_Pathway_detected>10)
+
+  if(is.null(Res_Select)==FALSE){
+      MetaProViz::viz_volcano(plot_types="PEA",
+                       data= dma_res, #Must be the data you have used as an input for the pathway analysis
+                       data2=as.data.frame(Res_Select)%>%dplyr::rename("term"="ID"),
+                       metadata_info= c(PEA_Pathway="term",# Needs to be the same in both, metadata_feature and data2.
+                                       PEA_stat="p.adjust",#Column data2
+                                       PEA_score="GeneRatio",#Column data2
+                                       PEA_Feature="MetaboliteID"),# Column metadata_feature (needs to be the same as row names in data)
+                       metadata_feature= KEGG_Pathways,#Must be the pathways used for pathway analysis
+                       plot_name= paste("KEGG_", comparison, sep=""),
+                       select_label = NULL,
+                       subtitle= "PEA" )
+  }
+}
+```
+
+## Use the results to showcase networks
+@Jannik here would be cluster_pk
+
+
+# Save new Extended Data Table
+@Jannik now you would create the complete new Extended Datatable. We will need to include some of my results too, so we can discuss here once you have the previous order.
+
+
+
+
+
+# Session information
+
+```{r session_info, echo=FALSE}
+options(width = 120)
+sessionInfo()
+```
+
+# Bibliography
