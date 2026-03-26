@@ -2250,7 +2250,8 @@ checkmatch_pk_to_data <- function(
 #'
 #' @return Named list with three data frames:
 #' \item{ExpandedDF}{Input data with appended expanded ID columns and QC
-#' summary columns.}
+#' summary columns, including `all_seed_ids_compatible` (logical flag indicating
+#' whether all seed IDs in each row are mutually reachable through `IDEdges`).}
 #' \item{ExpandedIDs_Long}{Long-format table with `row_id`, `type`, `id`, and
 #' `is_seed`.}
 #' \item{IDEdges}{Bidirectional ID edge table used for traversal.}
@@ -2350,6 +2351,30 @@ traverse_ids <- function(
         prep$data_output %>%
         dplyr::mutate(row_id = dplyr::row_number()) %>%
         dplyr::bind_cols(expansion$summary)
+    
+    incompatible_rows <- expanded_df$row_id[expanded_df$all_seed_ids_compatible %in% FALSE]
+    
+    if (length(incompatible_rows) > 0L) {
+        row_preview <- paste(utils::head(incompatible_rows, 10L), collapse = ", ")
+        if (length(incompatible_rows) > 10L) {
+            row_preview <- paste0(row_preview, ", ...")
+        }
+        
+        warning_msg <- sprintf(
+            paste0(
+                "Detected incompatible seed IDs in %d row(s) (row_id: %s). ",
+                "Not all seed IDs in these rows are mutually reachable through IDEdges, ",
+                "suggesting they may map to different molecules. This can overexpand the ID space ",
+                "during traversal. Please manually remove or correct incompatible seed IDs and rerun ",
+                "traverse_ids() freshly on a clean input table."
+            ),
+            length(incompatible_rows),
+            row_preview
+        )
+        
+        log_warn(warning_msg)
+        warning(warning_msg, call. = FALSE)
+    }
     
     result <- list(
         ExpandedDF = expanded_df,
@@ -2537,8 +2562,13 @@ normalize_hmdb <- function(x) {
     x[x == ""] <- NA_character_
     x <- stringr::str_to_upper(x)
     
+    # Strictly allow only HMDB immediately followed by digits.
     valid <- stringr::str_detect(x, "^HMDB\\d+$")
     num_part <- stringr::str_extract(x, "\\d+")
+    
+    # Canonicalize zero-padding variants (e.g., HMDB01659 -> HMDB0001659).
+    num_part <- ifelse(!is.na(num_part), stringr::str_replace(num_part, "^0+", ""), NA_character_)
+    num_part <- ifelse(!is.na(num_part) & num_part == "", "0", num_part)
     
     ifelse(
         valid & !is.na(num_part),
@@ -2652,6 +2682,73 @@ split_ids <- function(x, type = NULL, split_pattern = ";\\s*") {
     
     ids <- ids[!is.na(ids) & ids != ""]
     unique(ids)
+}
+
+
+#' @noRd
+build_seed_neighbors <- function(edge_table) {
+    
+    # NSE vs. R CMD check workaround
+    from <- to <- NULL
+    
+    if (nrow(edge_table) == 0L) {
+        return(list())
+    }
+    
+    edge_table %>%
+        dplyr::transmute(
+            from = paste(type1, id1, sep = "::"),
+            to = paste(type2, id2, sep = "::")
+        ) %>%
+        dplyr::group_by(from) %>%
+        dplyr::summarise(to = list(unique(to)), .groups = "drop") %>%
+        {
+            stats::setNames(.$to, .$from)
+        }
+}
+
+
+#' @noRd
+reachable_seed_nodes <- function(start_node, neighbors) {
+    
+    visited <- start_node
+    frontier <- start_node
+    
+    while (length(frontier) > 0L) {
+        next_nodes <- unlist(neighbors[frontier], use.names = FALSE)
+        next_nodes <- unique(next_nodes[!is.na(next_nodes) & next_nodes != ""])
+        next_nodes <- setdiff(next_nodes, visited)
+        
+        if (length(next_nodes) == 0L) {
+            break
+        }
+        
+        visited <- c(visited, next_nodes)
+        frontier <- next_nodes
+    }
+    
+    unique(visited)
+}
+
+
+#' @noRd
+all_seed_ids_compatible <- function(seed_tbl, edge_table) {
+    
+    if (nrow(seed_tbl) < 2L) {
+        return(TRUE)
+    }
+    
+    seed_nodes <- unique(paste(seed_tbl$type, seed_tbl$id, sep = "::"))
+    neighbors <- build_seed_neighbors(edge_table)
+    
+    all(vapply(
+        seed_nodes,
+        function(seed_node) {
+            reachable <- reachable_seed_nodes(seed_node, neighbors)
+            all(seed_nodes %in% reachable)
+        },
+        logical(1)
+    ))
 }
 
 
@@ -2853,7 +2950,8 @@ expand_metabolite_ids <- function(
                     n_PUBCHEM_translated = 0L,
                     mapping_expanded = FALSE,
                     ambiguous_seed = FALSE,
-                    large_mapping = FALSE
+                    large_mapping = FALSE,
+                    all_seed_ids_compatible = TRUE
                 ),
                 known_ids = seed_tbl,
                 seed_tbl = seed_tbl
@@ -2900,7 +2998,8 @@ expand_metabolite_ids <- function(
                 length(kegg_out) > 3 ||
                 length(chebi_out) > 5 ||
                 length(pubchem_out) > 5
-        )
+        ),
+        all_seed_ids_compatible = all_seed_ids_compatible(seed_tbl, edge_table)
     )
     
     list(summary = summary, known_ids = known_ids, seed_tbl = seed_tbl)
@@ -2928,7 +3027,8 @@ traverse_all_rows <- function(data_prepared, edge_table, selected_types, split_p
                     n_PUBCHEM_translated = integer(),
                     mapping_expanded = logical(),
                     ambiguous_seed = logical(),
-                    large_mapping = logical()
+                    large_mapping = logical(),
+                    all_seed_ids_compatible = logical()
                 ),
                 expanded_long = empty_long_table()
             )
