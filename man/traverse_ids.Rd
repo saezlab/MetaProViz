@@ -38,7 +38,8 @@ construction diagnostics to the console.}
 \value{
 Named list with three data frames:
 \item{ExpandedDF}{Input data with appended expanded ID columns and QC
-summary columns.}
+summary columns, including \code{all_seed_ids_compatible} (logical flag indicating
+whether all seed IDs in each row are mutually reachable through \code{IDEdges}).}
 \item{ExpandedIDs_Long}{Long-format table with \code{row_id}, \code{type}, \code{id}, and
 \code{is_seed}.}
 \item{IDEdges}{Bidirectional ID edge table used for traversal.}
