@@ -214,7 +214,16 @@ Plot1_PubChem <- MetaProViz::count_id(MetaboliteIDs,
                                    path= "MetaProViz_Results/PK/PK_PUBCHEM/Original")
 ```
 
-3. Features with no HMDB, KEGG or PubChem ID
+3.ID compatibility check
+@Jannik
+```{r}
+
+
+```
+
+
+## Translate Cas to metabolite ID
+Features with no HMDB, KEGG or PubChem ID
 ```{r}
 # Extract features with No HMDB, KEGG or PubChem ID:
 features_no_ids <- MetaboliteIDs %>%
@@ -233,7 +242,6 @@ features_no_ids_with_cas <- features_no_ids %>%
 print(paste0("We have ", nrow(features_no_ids_with_cas), " features with CAS number but no other metabolite ID and ", nrow(features_no_ids)- nrow(features_no_ids_with_cas), " features with no CAS number and no other metabolite ID."))
 ```
 
-## Translate Cas to metabolite ID
 There are some cases in which we have a CAS number, yet no HMDB, PubChem or KEGG ID. We can use the CAS number to check if we can find a metabolite ID for these features.\
 ```{r}
 features_ids_from_cas <- MetaProViz::translate_id(data = features_no_ids_with_cas, 
@@ -375,6 +383,8 @@ CAS_ID_Label_Summary
 
 ## Traverse ID
 Next, we fill the gaps by expanding the metabolite identifiers across HMDB, KEGG and PubChem by building and traversing a metabolite ID graph (see methods for details).  This fills the gaps by iteratively going through the cross-database mappings and collecting all connected IDs whilst additionally adding ChEBI IDs to the features.
+
+@Jannik
 ```{r}
 # Harmonize ID separators for traversal (function expects one delimiter)
 Input_Traverse <- MetaboliteID_Translated %>%
@@ -394,7 +404,7 @@ Results_Traverse <- MetaProViz::traverse_ids(
 
 ```
 \
-First we need to take some decisions regarding detected incompatible seed IDs in 74 rows. Not all seed IDs in these rows are mutually reachable through IDEdges, suggesting they may map to different molecules. This can overexpand the ID space during traversal. Please manually remove or correct incompatible seed IDs and rerun traverse_ids() freshly on a clean input table.
+First we need to take some decisions regarding detected incompatible seed IDs in 74 rows. Not all seed IDs in these rows are mutually reachable through IDEdges, suggesting they may map to different molecules. This can overexpanded the ID space during traversal. Please manually remove or correct incompatible seed IDs and rerun traverse_ids() freshly on a clean input table.
 ```{r}
 #How can I see what are compatible once for a feature? If e.g. 2 of 3 are, How can I ignore the one an exclude the new IDs coming from this?
 
@@ -444,6 +454,7 @@ We will start to compile a summary table that will include the number of IDs  (1
 
 
 ## Eqivalent ID
+@Jannik --> Do we already have them from tarverse?
 
 ```{r}
 
