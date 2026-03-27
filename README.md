@@ -1,4 +1,4 @@
-# MetaProViz <img src="vignettes/Hexagon_MetaProViz.png" align="right" width="200" />
+# MetaProViz <img src="man/figures/Hexagon_MetaProViz.png" align="right" width="200" />
 
 <!-- badges: start -->
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
@@ -11,7 +11,7 @@
 
 <center>
 
-![**Fig. 1:** Overview of MetaProViz functions.](vignettes/Fig.1.png)
+![**Fig. 1:** Overview of MetaProViz functions.](man/figures/Fig.1.png)
 
 </center>
 
@@ -38,7 +38,7 @@ Here you will find a brief overview and information about the installation of th
 
 clear cell Renal Cell Carcinoma (ccRCC) patients data from Hakimi et. al including 138 matched tumour and normal tissue pairs (Hakimi et al. 2016). Cell-lines data from intra- and extracellular metabolomics data from cell culture media from [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418).
 
-<img src="vignettes/readme-example-data.png" width="100%" style="display: block; margin: auto auto auto 0;" />
+<img src="man/figures/readme-example-data.png" width="100%" style="display: block; margin: auto auto auto 0;" />
 
 Additionally we also added transcriptomics and proteomics data of ccRCC patients processed with SiRCle (Mora et al. 2024), originally from [PDC000127](https://proteomic.datacommons.cancer.gov/pdc/study/PDC000127) (Clark et al. 2019).
 
