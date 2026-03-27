@@ -79,6 +79,10 @@ if (!dir.exists("MetaProViz_Results/PK/PK_HMDB/Original")) {
   dir.create("MetaProViz_Results/PK/PK_HMDB/Original", recursive = TRUE)
 }
 
+if (!dir.exists("MetaProViz_Results/PK/PK_HMDB/Translated")) {
+  dir.create("MetaProViz_Results/PK/PK_HMDB/Translated", recursive = TRUE)
+}
+
 ## KEGG
 if (!dir.exists("MetaProViz_Results/PK/PK_KEGG")) {
   dir.create("MetaProViz_Results/PK/PK_KEGG", recursive = TRUE)
@@ -86,6 +90,10 @@ if (!dir.exists("MetaProViz_Results/PK/PK_KEGG")) {
 
 if (!dir.exists("MetaProViz_Results/PK/PK_KEGG/Original")) {
   dir.create("MetaProViz_Results/PK/PK_KEGG/Original", recursive = TRUE)
+}
+
+if (!dir.exists("MetaProViz_Results/PK/PK_KEGG/Translated")) {
+  dir.create("MetaProViz_Results/PK/PK_KEGG/Translated", recursive = TRUE)
 }
 
 ## PUBCHEM
@@ -96,6 +104,34 @@ if (!dir.exists("MetaProViz_Results/PK/PK_PUBCHEM")) {
 if (!dir.exists("MetaProViz_Results/PK/PK_PUBCHEM/Original")) {
   dir.create("MetaProViz_Results/PK/PK_PUBCHEM/Original", recursive = TRUE)
 }
+
+if (!dir.exists("MetaProViz_Results/PK/PK_PUBCHEM/Translated")) {
+  dir.create("MetaProViz_Results/PK/PK_PUBCHEM/Translated", recursive = TRUE)
+}
+
+if (!dir.exists("MetaProViz_Results/PK/Translated")) {
+  dir.create("MetaProViz_Results/PK/Translated", recursive = TRUE)
+}
+
+if (!dir.exists("MetaProViz_Results/PK/Results_Traverse")) {
+  dir.create("MetaProViz_Results/PK/Results_Traverse", recursive = TRUE)
+}
+
+if (!dir.exists("MetaProViz_Results/PK/PK_HMDB/Traverse")) {
+  dir.create("MetaProViz_Results/PK/PK_HMDB/Traverse", recursive = TRUE)
+}
+
+if (!dir.exists("MetaProViz_Results/PK/PK_KEGG/Traverse")) {
+  dir.create("MetaProViz_Results/PK/PK_KEGG/Traverse", recursive = TRUE)
+}
+
+if (!dir.exists("MetaProViz_Results/PK/PK_PUBCHEM/Traverse")) {
+  dir.create("MetaProViz_Results/PK/PK_PUBCHEM/Traverse", recursive = TRUE)
+}
+
+if (!dir.exists("MetaProViz_Results/PK/Traverse")) {
+  dir.create("MetaProViz_Results/PK/Traverse", recursive = TRUE)
+}
 ```
 
 # 1. Loading the Feature metadata
@@ -104,14 +140,33 @@ We have updated the PubChem IDs as there were PubChem entries in the excel file 
 
 Load the feature metadata:
 ```{r}
-load("C:/Users/chris/OneDrive/docs/Desktop/tissue_meta.rda")
-#data(tissue_meta)
+data(tissue_meta)
+
+# Global separator convention for all metabolite ID columns
+id_separator <- ", "
+
+# Normalize mixed separators (",", ";") to one global format
+normalize_id_cell <- function(x, out_sep = id_separator) {
+  ifelse(
+    is.na(x),
+    NA_character_,
+    purrr::map_chr(stringr::str_split(x, "[;,]"), ~ {
+      vals <- stringr::str_trim(.x)
+      vals <- vals[vals != ""]
+      if (length(vals) == 0) NA_character_ else paste(vals, collapse = out_sep)
+    })
+  )
+}
 
 MetaboliteIDs <- tissue_meta %>%
   dplyr::filter(!stringr::str_detect(Metabolite, "^X\\s*-\\s*\\d+$"))%>%# only keep entries with trivial names
    dplyr::mutate(
     SUPER_PATHWAY = dplyr::coalesce(SUPER_PATHWAY, "None"),
-    SUB_PATHWAY   = dplyr::coalesce(SUB_PATHWAY, "None")
+    SUB_PATHWAY   = dplyr::coalesce(SUB_PATHWAY, "None"),
+    CAS = normalize_id_cell(CAS),
+    HMDB = normalize_id_cell(HMDB),
+    KEGG = normalize_id_cell(KEGG),
+    PUBCHEM = normalize_id_cell(PUBCHEM)
   )
 ```
 
@@ -129,20 +184,22 @@ ccRCC_CompareIDs <- MetaProViz::compare_pk(data = list(Biocft = MetaboliteIDs |>
 Here we notice that 76 features have no metabolite ID assigned, yet have a trivial name and a metabolite class assigned. For 135 metabolites we only have a pubchem ID, yet no HMDB or KEGG ID. 
 
 2. Metabolite IDs per feature:
+2.0. Harmonize ID separators:
+We use one separator convention (`; `) across all ID columns (CAS, HMDB, KEGG, PUBCHEM) from this point onward.
+
 2.1. HMDB:
 ```{r}
 Plot1_HMDB <- MetaProViz::count_id(MetaboliteIDs, 
-                                   delimiter =",",
+                                   delimiter = id_separator,
                                    "HMDB",
                                    fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
-                                   binwidth = 1,
                                    path = "MetaProViz_Results/PK/PK_HMDB/Original")
 ```
 
 2.2. KEGG:
 ```{r}
 Plot1_KEGG <- MetaProViz::count_id(MetaboliteIDs, 
-                                   delimiter =",",
+                                   delimiter = id_separator,
                                    fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
                                    "KEGG",
                                    path= "MetaProViz_Results/PK/PK_KEGG/Original")
@@ -151,7 +208,7 @@ Plot1_KEGG <- MetaProViz::count_id(MetaboliteIDs,
 2.3.: PubChem:
 ```{r}
 Plot1_PubChem <- MetaProViz::count_id(MetaboliteIDs,
-                                   delimiter ="; ",
+                                   delimiter = id_separator,
                                    fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
                                    "PUBCHEM",
                                    path= "MetaProViz_Results/PK/PK_PUBCHEM/Original")
@@ -179,40 +236,207 @@ print(paste0("We have ", nrow(features_no_ids_with_cas), " features with CAS num
 ## Translate Cas to metabolite ID
 There are some cases in which we have a CAS number, yet no HMDB, PubChem or KEGG ID. We can use the CAS number to check if we can find a metabolite ID for these features.\
 ```{r}
-MetaProViz::translate_id(data = features_no_ids_with_cas, 
-                         metadata_info = list(InputID = "CAS", grouping_variable = "SUPER_PATHWAY"), 
-                         from = "cas", 
-                         to = c("hmdb", "kegg", "pubchem"), 
-                         path="MetaProViz_Results/PK/PlusTranslatedIDs_FromCAS")
+features_ids_from_cas <- MetaProViz::translate_id(data = features_no_ids_with_cas, 
+                                                  metadata_info = list(InputID = "CAS", grouping_variable = "SUPER_PATHWAY"), 
+                                                  from = "cas", 
+                                                  to = c("hmdb", "kegg", "pubchem"), 
+                                                  path="MetaProViz_Results/PK/PlusTranslatedIDs_FromCAS")
 
+# Keep only rows where at least one new ID was actually found
+cas_ids_found <- features_ids_from_cas[["TranslatedDF"]] %>%
+  dplyr::filter(
+    !(is.na(hmdb)    | hmdb    == "") |
+    !(is.na(kegg)    | kegg    == "") |
+    !(is.na(pubchem) | pubchem == "")
+  ) %>%
+  # Replace the (empty) original ID columns with the translated ones
+  dplyr::mutate(
+    HMDB = normalize_id_cell(hmdb),
+    KEGG = normalize_id_cell(kegg),
+    PUBCHEM = normalize_id_cell(pubchem)
+  ) %>%
+  dplyr::select(-hmdb, -kegg, -pubchem)
+
+# Merge back: update matching rows in MetaboliteIDs by COMP_ID
+MetaboliteID_Translated <- MetaboliteIDs %>%
+  dplyr::rows_update(cas_ids_found, by = "COMP_ID")
 ```
 \
 We will repeat the `count_id` and `compare_pk` plot after every change to the number of metabolite IDs:
 ```{r}
+ccRCC_CompareIDs_Translated <- MetaProViz::compare_pk(data = list(Biocft = MetaboliteID_Translated |> dplyr::rename("Class"="SUPER_PATHWAY")),
+                                           name_col = "Metabolite",
+                                           metadata_info = list(Biocft = c("KEGG", "HMDB", "PUBCHEM")),
+                                           plot_name = "Overlap of ID types in ccRCC data",
+                                           path= "MetaProViz_Results/PK/Translated")
 
+Plot2_HMDB <- MetaProViz::count_id(MetaboliteID_Translated,
+                                   delimiter = id_separator,
+                                   "HMDB",
+                                   fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
+                                   binwidth = 1,
+                                   path = "MetaProViz_Results/PK/PK_HMDB/Translated")
 
+Plot2_KEGG <- MetaProViz::count_id(MetaboliteID_Translated,
+                                   delimiter = id_separator,
+                                   fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
+                                   "KEGG",
+                                   path= "MetaProViz_Results/PK/PK_KEGG/Translated")
+
+Plot2_PubChem <- MetaProViz::count_id(MetaboliteID_Translated,
+                                   delimiter = id_separator,
+                                   fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
+                                   "PUBCHEM",
+                                   path= "MetaProViz_Results/PK/PK_PUBCHEM/Translated")
 ```
 \
 We will start to compile a summary table that will include the number of IDs  (1,2,n) after each step taken to increase the feature space. So now we will add the The CAS IDs
 ```{r}
+# Helper: count features with at least one ID in one DB from count_id output
+count_present <- function(count_id_obj) {
+  tbl <- count_id_obj[["Table"]]
+  sum(tbl$id_label %in% c("Single ID", "Multiple IDs"), na.rm = TRUE)
+}
 
+# Helper: count features with no HMDB, KEGG and PUBCHEM ID at all
+count_none_all <- function(df) {
+  sum(
+    (is.na(df$HMDB)    | trimws(df$HMDB) %in% c("", "NA")) &
+    (is.na(df$KEGG)    | trimws(df$KEGG) %in% c("", "NA")) &
+    (is.na(df$PUBCHEM) | trimws(df$PUBCHEM) %in% c("", "NA")),
+    na.rm = TRUE
+  )
+}
+
+CAS_ID_Summary <- tibble::tibble(
+  HMDB_Original = count_present(Plot1_HMDB),
+  HMDB_Translated = count_present(Plot2_HMDB),
+  HMDB_deltaOT = HMDB_Translated - HMDB_Original,
+  KEGG_Original = count_present(Plot1_KEGG),
+  KEGG_Translated = count_present(Plot2_KEGG),
+  KEGG_deltaOT = KEGG_Translated - KEGG_Original,
+  PUBCHEM_Original = count_present(Plot1_PubChem),
+  PUBCHEM_Translated = count_present(Plot2_PubChem),
+  PUBCHEM_deltaOT = PUBCHEM_Translated - PUBCHEM_Original,
+  None_Original = count_none_all(MetaboliteIDs),
+  None_Translated = count_none_all(MetaboliteID_Translated),
+  None_deltaOT = None_Translated - None_Original
+)
+
+CAS_ID_Summary
+
+# Optional detailed distribution (No ID / Single ID / Multiple IDs) by DB
+CAS_ID_Label_Summary <- dplyr::bind_rows(
+  Plot1_HMDB[["Table"]] %>% dplyr::count(id_label, name = "HMDB_Original"),
+  Plot2_HMDB[["Table"]] %>% dplyr::count(id_label, name = "HMDB_Translated")
+) %>%
+  dplyr::group_by(id_label) %>%
+  dplyr::summarise(
+    HMDB_Original = sum(dplyr::coalesce(HMDB_Original, 0L)),
+    HMDB_Translated = sum(dplyr::coalesce(HMDB_Translated, 0L)),
+    .groups = "drop"
+  ) %>%
+  dplyr::left_join(
+    dplyr::bind_rows(
+      Plot1_KEGG[["Table"]] %>% dplyr::count(id_label, name = "KEGG_Original"),
+      Plot2_KEGG[["Table"]] %>% dplyr::count(id_label, name = "KEGG_Translated")
+    ) %>%
+      dplyr::group_by(id_label) %>%
+      dplyr::summarise(
+        KEGG_Original = sum(dplyr::coalesce(KEGG_Original, 0L)),
+        KEGG_Translated = sum(dplyr::coalesce(KEGG_Translated, 0L)),
+        .groups = "drop"
+      ),
+    by = "id_label"
+  ) %>%
+  dplyr::left_join(
+    dplyr::bind_rows(
+      Plot1_PubChem[["Table"]] %>% dplyr::count(id_label, name = "PUBCHEM_Original"),
+      Plot2_PubChem[["Table"]] %>% dplyr::count(id_label, name = "PUBCHEM_Translated")
+    ) %>%
+      dplyr::group_by(id_label) %>%
+      dplyr::summarise(
+        PUBCHEM_Original = sum(dplyr::coalesce(PUBCHEM_Original, 0L)),
+        PUBCHEM_Translated = sum(dplyr::coalesce(PUBCHEM_Translated, 0L)),
+        .groups = "drop"
+      ),
+    by = "id_label"
+  ) %>%
+  dplyr::mutate(
+    HMDB_deltaOT = HMDB_Translated - HMDB_Original,
+    KEGG_deltaOT = KEGG_Translated - KEGG_Original,
+    PUBCHEM_deltaOT = PUBCHEM_Translated - PUBCHEM_Original
+  ) %>%
+  dplyr::arrange(factor(id_label, levels = c("No ID", "Single ID", "Multiple IDs")))
+
+CAS_ID_Label_Summary
 
 ```
 
 ## Traverse ID
+Next, we fill the gaps by expanding the metabolite identifiers across HMDB, KEGG and PubChem by building and traversing a metabolite ID graph (see methods for details).  This fills the gaps by iteratively going through the cross-database mappings and collecting all connected IDs whilst additionally adding ChEBI IDs to the features.
 ```{r}
+# Harmonize ID separators for traversal (function expects one delimiter)
+Input_Traverse <- MetaboliteID_Translated %>%
+  dplyr::mutate(
+    HMDB = normalize_id_cell(HMDB),
+    KEGG = normalize_id_cell(KEGG),
+    PUBCHEM = normalize_id_cell(PUBCHEM)
+  )
+
+Results_Traverse <- MetaProViz::traverse_ids(
+  data = Input_Traverse,
+  id_types = c("HMDB", "KEGG", "CHEBI", "PUBCHEM"),
+  delimiter = ";",
+  path = "MetaProViz_Results/PK/Results_Traverse"
+)
 
 
 ```
+\
+First we need to take some decisions regarding detected incompatible seed IDs in 74 rows. Not all seed IDs in these rows are mutually reachable through IDEdges, suggesting they may map to different molecules. This can overexpand the ID space during traversal. Please manually remove or correct incompatible seed IDs and rerun traverse_ids() freshly on a clean input table.
+```{r}
+#How can I see what are compatible once for a feature? If e.g. 2 of 3 are, How can I ignore the one an exclude the new IDs coming from this?
+
+
+
+#Final Output:
+MetaboliteID_Traverse <- Results_Traverse[["ExpandedDF"]]
+```
+
 
 \
 We will repeat the `count_id` and `compare_pk` plot after every change to the number of metabolite IDs:
 ```{r}
+ccRCC_CompareIDs_Traverse <- MetaProViz::compare_pk(data = list(Biocft = MetaboliteID_Traverse |> dplyr::rename("Class"="SUPER_PATHWAY")),
+                                           name_col = "Metabolite",
+                                           metadata_info = list(Biocft = c("KEGG", "HMDB", "PUBCHEM", "CHEBI")),
+                                           plot_name = "Overlap of ID types in ccRCC data",
+                                           path= "MetaProViz_Results/PK/Traverse")
+
+Plot3_HMDB <- MetaProViz::count_id(MetaboliteID_Traverse,
+                                   delimiter = id_separator,
+                                   "HMDB",
+                                   fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
+                                   binwidth = 1,
+                                   path = "MetaProViz_Results/PK/PK_HMDB/Traverse")
+
+Plot3_KEGG <- MetaProViz::count_id(MetaboliteID_Traverse,
+                                   delimiter = id_separator,
+                                   fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
+                                   "KEGG",
+                                   path= "MetaProViz_Results/PK/PK_KEGG/Traverse")
+
+Plot3_PubChem <- MetaProViz::count_id(MetaboliteID_Traverse,
+                                   delimiter = id_separator,
+                                   fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
+                                   "PUBCHEM",
+                                   path= "MetaProViz_Results/PK/PK_PUBCHEM/Traverse")
 
 
 ```
 \
-We will start to compile a summary table that will include the number of IDs  (1,2,n) after each step taken to increase the feature space. So now we will add the The CAS IDs
+We will start to compile a summary table that will include the number of IDs  (1,2,n) after each step taken to increase the feature space. So now we will add the new IDs from Traverse ID
 ```{r}
 
 
@@ -228,7 +452,7 @@ We will start to compile a summary table that will include the number of IDs  (1
 
 
 # Add equivalent IDs:
-tissue_meta_AddIDs_HMDB <- MetaProViz::equivalent_id(data= Input_HMDB,
+Res_Equivalent <- MetaProViz::equivalent_id(data= Input_HMDB,
                                                            metadata_info = c(InputID="HMDB"),# ID in the measured data, here we use the HMDB ID
                                                            from = "hmdb",
                                                      path= "MetaProViz_Results/PK/PK_HMDB/PlusEquivalentIDs")
@@ -248,6 +472,24 @@ We will start to compile a summary table that will include the number of IDs  (1
 
 
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 # 3. Integrate feature IDs with prior knowledge
