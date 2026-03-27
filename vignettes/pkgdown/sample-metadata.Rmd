@@ -16,6 +16,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 bibliography: bibliography.bib
+resource_files:
+  - ../Hexagon_MetaProViz.png
+  - sample-metadata.Rmd_compare-pk.svg
+  - sample-metadata.Rmd_compare-pk-2.svg
 editor_options:
   chunk_output_type: console
 ---
@@ -36,7 +40,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# <img src="https://raw.githubusercontent.com/saezlab/MetaProViz/main/vignettes/Hexagon_MetaProViz.png" align="right" width="200" />
+# <img src="../Hexagon_MetaProViz.png" align="right" width="200" />
 \
 Tissue metabolomics experiment is a standard metabolomics experiment using tissue samples (e.g. from animals or patients).\
 \
@@ -320,7 +324,7 @@ plot_name = "Overlap of ID types in ccRCC data")
 ```{r, echo=FALSE}
 cat(sprintf(
   '<img src="%s" width="100%%" style="display:block; margin:0 auto;"/>',
-  "https://raw.githubusercontent.com/saezlab/MetaProViz/main/vignettes/pkgdown/sample-metadata.Rmd_compare-pk.svg"
+  "sample-metadata.Rmd_compare-pk.svg"
 ))
 ```
 \
@@ -465,7 +469,7 @@ ccRCC_CompareIDs_Extended <- compare_pk(data = list(Biocft = Tissue_MetaData_Ext
 ```{r, echo=FALSE}
 cat(sprintf(
   '<img src="%s" width="100%%" style="display:block; margin:0 auto;"/>',
-  "https://raw.githubusercontent.com/saezlab/MetaProViz/main/vignettes/pkgdown/sample-metadata.Rmd_compare-pk-2.svg"
+  "sample-metadata.Rmd_compare-pk-2.svg"
 ))
 ```
 \
