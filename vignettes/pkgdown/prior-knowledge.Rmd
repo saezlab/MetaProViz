@@ -19,6 +19,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 bibliography: bibliography.bib
+resource_files:
+    - ../Hexagon_MetaProViz.png
+    - ../Fig.2.png
+    - ../Fig.3.png
+    - prior-knowledge.Rmd_compare-pk.svg
+    - prior-knowledge.Rmd_compare-pk-2.svg
+    - prior-knowledge.Rmd_compare-pk-3.svg
 editor_options:
   chunk_output_type: console
   markdown:
@@ -43,7 +50,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# <img src="https://raw.githubusercontent.com/saezlab/MetaProViz/main/vignettes/Hexagon_MetaProViz.png" align="right" width="200"/>
+# <img src="../Hexagon_MetaProViz.png" align="right" width="200"/>
 
 \
 [In this tutorial we showcase how to use **MetaProViz** prior knowledge]{style="text-decoration:underline"}:\
@@ -494,7 +501,7 @@ MetalinksDB = as.data.frame(MetaLinksDB))
 ```{r, echo=FALSE}
 cat(sprintf(
     '<img src="%s" width="100%%" style="display:block; margin:0 auto;"/>',
-    "https://raw.githubusercontent.com/saezlab/MetaProViz/main/vignettes/pkgdown/prior-knowledge.Rmd_compare-pk.svg"
+    "prior-knowledge.Rmd_compare-pk.svg"
 ))
 ```
 \
@@ -559,7 +566,7 @@ plot_name = "Overlap of BioCrates Columns")
 ```{r, echo=FALSE}
 cat(sprintf(
     '<img src="%s" width="100%%" style="display:block; margin:0 auto;"/>',
-    "https://raw.githubusercontent.com/saezlab/MetaProViz/main/vignettes/pkgdown/prior-knowledge.Rmd_compare-pk-2.svg"
+    "prior-knowledge.Rmd_compare-pk-2.svg"
 ))
 ```
 \
@@ -778,7 +785,7 @@ pk_comp_res_keggtrans <- compare_pk(data = list(kegg_translated = KEGG_Pathways_
 ```{r, echo=FALSE}
 cat(sprintf(
     '<img src="%s" width="100%%" style="display:block; margin:0 auto;"/>',
-    "https://raw.githubusercontent.com/saezlab/MetaProViz/main/vignettes/pkgdown/prior-knowledge.Rmd_compare-pk-3.svg"
+    "prior-knowledge.Rmd_compare-pk-3.svg"
 ))
 ```
 \
@@ -794,7 +801,7 @@ For enrichment analysis the translation from KEGG IDs to HMDB IDs increases the 
 
 <center>
 
-![Fig. 2: Mapping problems in prior knowledge metabolite-sets when translating metabolite IDs.](Fig.2.png){width="50%"}
+![Fig. 2: Mapping problems in prior knowledge metabolite-sets when translating metabolite IDs.](../Fig.2.png){width="50%"}
 
 </center>
 
@@ -920,7 +927,7 @@ This is something we are currently working on and hope to provide within the nex
 
 <center>
 
-![Fig. 3: Mapping problems in prior knowledge metabolite-sets when translating metabolite IDs and the connection to detected (measured input metabolites).](Fig.3.png){width="50%"}
+![Fig. 3: Mapping problems in prior knowledge metabolite-sets when translating metabolite IDs and the connection to detected (measured input metabolites).](../Fig.3.png){width="50%"}
 
 </center>
 

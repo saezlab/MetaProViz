@@ -19,6 +19,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 bibliography: bibliography.bib
+resource_files:
+  - ../Hexagon_MetaProViz.png
 editor_options:
   chunk_output_type: console
 ---
@@ -39,7 +41,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# <img src="https://raw.githubusercontent.com/saezlab/MetaProViz/main/vignettes/Hexagon_MetaProViz.png" align="right" width="200" />
+# <img src="../Hexagon_MetaProViz.png" align="right" width="200" />
 \
 A Consumption-Release (core) metabolomics experiment usually refers to a cell culture experiment where metabolomics is performed on the cell culture media.\
 \
