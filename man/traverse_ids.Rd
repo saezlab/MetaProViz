@@ -39,10 +39,10 @@ construction diagnostics to the console.}
 Named list with three data frames:
 \item{ExpandedDF}{Input data with appended expanded ID columns and QC
 summary columns, including \code{all_seed_ids_compatible} (logical flag indicating
-whether all seed IDs in each row are mutually reachable through \code{IDEdges}).}
-\item{ExpandedIDs_Long}{Long-format table with \code{row_id}, \code{type}, \code{id}, and
-\code{is_seed}.}
-\item{IDEdges}{Bidirectional ID edge table used for traversal.}
+whether all seed-ID pairs in each row are compatible).}
+\item{ID_pair_compatibility}{Long-format table with one unique unordered seed-ID pair per input row. The first column \code{original_row_id} stores the original input row name. The table also includes \code{pair_compatible}, \code{compatibility_path}, and \code{all_seed_ids_compatible}.}
+\item{ID_Edges_prior_knowledge}{Bidirectional ID edge table used for
+traversal and compatibility checks.}
 }
 \description{
 Traverses pairwise RaMP mappings from \code{\link[OmnipathR:ramp_id_mapping_table]{OmnipathR::ramp_id_mapping_table()}}
