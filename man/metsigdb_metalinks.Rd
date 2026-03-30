@@ -14,7 +14,8 @@ metsigdb_metalinks(
   hmdb_ids = NULL,
   uniprot_ids = NULL,
   save_table = "csv",
-  path = NULL
+  path = NULL,
+  exclude_metabolites = "all"
 )
 }
 \arguments{
@@ -63,6 +64,10 @@ Humour", "Ascites Fluid", "Lymph", "Tears", "Breath", "Bile", "Semen",
 
 \item{path}{\emph{Optional:} Path to the folder the results should be saved at.
 \strong{default: NULL}}
+
+\item{exclude_metabolites}{Optional metabolite classes to exclude:
+NULL (exclude nothing), "all" (default), or any combination of
+c("ions", "small_molecules", "xenobiotics", "atoms").}
 }
 \value{
 A data frame of metabolite-protein interactions from MetalinksDB.

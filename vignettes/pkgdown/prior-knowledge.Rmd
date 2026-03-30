@@ -19,6 +19,13 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 bibliography: bibliography.bib
+resource_files:
+    - ../Hexagon_MetaProViz.png
+    - ../Fig.2.png
+    - ../Fig.3.png
+    - prior-knowledge.Rmd_compare-pk.svg
+    - prior-knowledge.Rmd_compare-pk-2.svg
+    - prior-knowledge.Rmd_compare-pk-3.svg
 editor_options:
   chunk_output_type: console
   markdown:
@@ -43,7 +50,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# <img src="Hexagon_MetaProViz.png" align="right" width="200"/>
+# <img src="../Hexagon_MetaProViz.png" align="right" width="200"/>
 
 \
 [In this tutorial we showcase how to use **MetaProViz** prior knowledge]{style="text-decoration:underline"}:\
@@ -66,9 +73,12 @@ knitr::opts_chunk$set(
 First if you have not done yet, install the required dependencies and load the libraries:
 
 ```{r load-packages, message=FALSE, warning=FALSE}
-# 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
+# 1. Install MetaProViz from Bioconductor devel:
+# if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+# BiocManager::install(version = "devel")
+# BiocManager::install("MetaProViz")
 # 2. Install the latest development version from GitHub using devtools
-# devtools::install_github("https://github.com/saezlab/MetaProViz")
+# remotes::install_github("saezlab/MetaProViz") # Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
 
 library(MetaProViz)
 
@@ -489,7 +499,10 @@ MetalinksDB = as.data.frame(MetaLinksDB))
 )
 ```
 ```{r, echo=FALSE}
-knitr::include_graphics("prior-knowledge.Rmd_compare-pk.svg")
+cat(sprintf(
+    '<img src="%s" width="100%%" style="display:block; margin:0 auto;"/>',
+    "prior-knowledge.Rmd_compare-pk.svg"
+))
 ```
 \
 The table includes all features of the three PK resources we decided to compare. Additionally, it includes a column for each PK resource with value 1 if the feature is present in the PK resource and 0 if it is not. The column "Type" specifies with ID type the feature is corresponding to, here either metabolite (HMDB) or gene, which is used for visualisation purposes in the upset plot.\
@@ -551,7 +564,10 @@ plot_name = "Overlap of BioCrates Columns")
 
 ```
 ```{r, echo=FALSE}
-knitr::include_graphics("prior-knowledge.Rmd_compare-pk-2.svg")
+cat(sprintf(
+    '<img src="%s" width="100%%" style="display:block; margin:0 auto;"/>',
+    "prior-knowledge.Rmd_compare-pk-2.svg"
+))
 ```
 \
 
@@ -767,7 +783,10 @@ pk_comp_res_keggtrans <- compare_pk(data = list(kegg_translated = KEGG_Pathways_
                                                 plot_name = "IDs available after KEGG ID Translation")
 ```
 ```{r, echo=FALSE}
-knitr::include_graphics("prior-knowledge.Rmd_compare-pk-3.svg")
+cat(sprintf(
+    '<img src="%s" width="100%%" style="display:block; margin:0 auto;"/>',
+    "prior-knowledge.Rmd_compare-pk-3.svg"
+))
 ```
 \
 We can also note from the previous table that it becomes apparent that the translation of IDs is not a one-to-one mapping, but rather a one-to-many mapping.
@@ -782,7 +801,7 @@ For enrichment analysis the translation from KEGG IDs to HMDB IDs increases the 
 
 <center>
 
-![Fig. 2: Mapping problems in prior knowledge metabolite-sets when translating metabolite IDs.](Fig.2.png){width="50%"}
+![Fig. 2: Mapping problems in prior knowledge metabolite-sets when translating metabolite IDs.](../Fig.2.png){width="50%"}
 
 </center>
 
@@ -908,7 +927,7 @@ This is something we are currently working on and hope to provide within the nex
 
 <center>
 
-![Fig. 3: Mapping problems in prior knowledge metabolite-sets when translating metabolite IDs and the connection to detected (measured input metabolites).](Fig.3.png){width="50%"}
+![Fig. 3: Mapping problems in prior knowledge metabolite-sets when translating metabolite IDs and the connection to detected (measured input metabolites).](../Fig.3.png){width="50%"}
 
 </center>
 

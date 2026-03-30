@@ -13,7 +13,6 @@ viz_graph(
   min_degree = NULL,
   node_sizes = NULL,
   show_density = FALSE,
-  seed = NULL,
   save_plot = "svg",
   print_plot = TRUE,
   path = NULL,
@@ -45,9 +44,6 @@ with names matching term IDs. Values are scaled for plotting.}
 \item{show_density}{\emph{Optional: } If TRUE, add a hull background per
 cluster. Default = FALSE.}
 
-\item{seed}{\emph{Optional: } Random seed for graph layout reproducibility.
-Default = NULL.}
-
 \item{save_plot}{\emph{Optional: } Select the file type of output plots.
 Options are svg, pdf, png or NULL. \strong{Default = "svg"}}
 
@@ -56,6 +52,13 @@ plots. \strong{Default = TRUE}}
 
 \item{path}{{Optional:} String which is added to the resulting folder name.
 \strong{default: NULL}}
+
+\item{plot_width}{\emph{Optional: } Plot width passed to \code{save_res}. Default = 3000.}
+
+\item{plot_height}{\emph{Optional: } Plot height passed to \code{save_res}. Default = 2000.}
+
+\item{plot_unit}{\emph{Optional: } Unit for plot dimensions passed to \code{save_res}.
+Default = "px".}
 }
 \value{
 Graph plot as a ggplot object.
@@ -64,44 +67,27 @@ Graph plot as a ggplot object.
 Graph visualization for clustered terms
 }
 \examples{
-
-# Load example data
-d <- metsigdb_kegg()
-
-# Run clustering with graph plotting
-r <- cluster_pk(
-    d,
-    metadata_info = c(
-        metabolite_column = "MetaboliteID",
-        pathway_column = "term"
-    ),
-    input_format = "long",
-    similarity = "jaccard",
-    threshold = 0.2,
-    clust = "community",
-    min = 2,
-    plot_name = "GraphExample_long_format",
-    save_plot = "png",
-    min_degree = 1,
-    seed = 123,
-    show_density = FALSE,
-    max_nodes = 1000
-) 
-
-# run graph plotting separately from clustering output but without node_sizes
+# Create toy similarity matrix and clusters
+sim <- matrix(
+    c(1, 0.8, 0.3, 0.1,
+      0.8, 1, 0.2, 0.1,
+      0.3, 0.2, 1, 0.7,
+      0.1, 0.1, 0.7, 1),
+    nrow = 4,
+    dimnames = list(
+        c("Pathway_A", "Pathway_B", "Pathway_C", "Pathway_D"),
+        c("Pathway_A", "Pathway_B", "Pathway_C", "Pathway_D")
+    )
+)
+clusters <- c(
+    Pathway_A = "1", Pathway_B = "1",
+    Pathway_C = "2", Pathway_D = "2"
+)
 viz_graph(
-    r$similarity_matrix,
-    r$clusters,
-    plot_threshold = 0.5,
-    plot_name = "ClusterGraph",
-    max_nodes = NULL,
-    min_degree = NULL,
-    node_sizes = NULL,
-    show_density = TRUE,
-    seed = 123,
+    sim, clusters,
+    plot_threshold = 0.2,
     save_plot = NULL,
-    print_plot = FALSE,
-    path = NULL
+    print_plot = FALSE
 )
 
 }

@@ -35,56 +35,41 @@
 #'     with names matching term IDs. Values are scaled for plotting.
 #' @param show_density \emph{Optional: } If TRUE, add a hull background per
 #'     cluster. Default = FALSE.
-#' @param seed \emph{Optional: } Random seed for graph layout reproducibility.
-#'     Default = NULL.
 #' @param save_plot \emph{Optional: } Select the file type of output plots.
 #'     Options are svg, pdf, png or NULL. \strong{Default = "svg"}
 #' @param print_plot \emph{Optional: } If TRUE prints an overview of resulting
 #'     plots. \strong{Default = TRUE}
 #' @param path {Optional:} String which is added to the resulting folder name.
 #'     \strong{default: NULL}
+#' @param plot_width \emph{Optional: } Plot width passed to `save_res`. Default = 3000.
+#' @param plot_height \emph{Optional: } Plot height passed to `save_res`. Default = 2000.
+#' @param plot_unit \emph{Optional: } Unit for plot dimensions passed to `save_res`.
+#'     Default = "px".
 #'
 #' @return Graph plot as a ggplot object.
-#' 
+#'
 #' @examples
-#' 
-#' # Load example data
-#' d <- metsigdb_kegg()
-#' 
-#' # Run clustering with graph plotting
-#' r <- cluster_pk(
-#'     d,
-#'     metadata_info = c(
-#'         metabolite_column = "MetaboliteID",
-#'         pathway_column = "term"
-#'     ),
-#'     input_format = "long",
-#'     similarity = "jaccard",
-#'     threshold = 0.2,
-#'     clust = "community",
-#'     min = 2,
-#'     plot_name = "GraphExample_long_format",
-#'     save_plot = "png",
-#'     min_degree = 1,
-#'     seed = 123,
-#'     show_density = FALSE,
-#'     max_nodes = 1000
-#' ) 
-#' 
-#' # run graph plotting separately from clustering output but without node_sizes
+#' # Create toy similarity matrix and clusters
+#' sim <- matrix(
+#'     c(1, 0.8, 0.3, 0.1,
+#'       0.8, 1, 0.2, 0.1,
+#'       0.3, 0.2, 1, 0.7,
+#'       0.1, 0.1, 0.7, 1),
+#'     nrow = 4,
+#'     dimnames = list(
+#'         c("Pathway_A", "Pathway_B", "Pathway_C", "Pathway_D"),
+#'         c("Pathway_A", "Pathway_B", "Pathway_C", "Pathway_D")
+#'     )
+#' )
+#' clusters <- c(
+#'     Pathway_A = "1", Pathway_B = "1",
+#'     Pathway_C = "2", Pathway_D = "2"
+#' )
 #' viz_graph(
-#'     r$similarity_matrix,
-#'     r$clusters,
-#'     plot_threshold = 0.5,
-#'     plot_name = "ClusterGraph",
-#'     max_nodes = NULL,
-#'     min_degree = NULL,
-#'     node_sizes = NULL,
-#'     show_density = TRUE,
-#'     seed = 123,
+#'     sim, clusters,
+#'     plot_threshold = 0.2,
 #'     save_plot = NULL,
-#'     print_plot = FALSE,
-#'     path = NULL
+#'     print_plot = FALSE
 #' )
 #'
 #' @importFrom igraph graph_from_adjacency_matrix components degree induced_subgraph
@@ -104,7 +89,6 @@ viz_graph <- function(
     min_degree = NULL,
     node_sizes = NULL,
     show_density = FALSE,
-    seed = NULL,
     save_plot = "svg",
     print_plot = TRUE,
     path = NULL,
@@ -129,8 +113,7 @@ viz_graph <- function(
         node_sizes = node_sizes,
         show_density = show_density,
         print_plot = print_plot,
-        save_plot = save_plot,
-        seed = seed
+        save_plot = save_plot
     )
 
     # ---- Create adjacency ------------------------------------------------
@@ -164,9 +147,6 @@ viz_graph <- function(
     # Attach cluster labels to nodes for stable color mapping
     igraph::V(g)$cluster <- clusters[igraph::V(g)$name]
 
-    if (!is.null(seed)) {
-        set.seed(seed)
-    }
     layout <- ggraph::create_layout(g, layout = "fr")
 
     node_size_vec <- NULL
@@ -275,7 +255,7 @@ viz_graph <- function(
     )
 
     if (print_plot) {
-        print(graph_plot)
+        plot(graph_plot)
     }
 
     return(graph_plot)

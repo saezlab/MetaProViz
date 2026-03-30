@@ -20,8 +20,6 @@
 ^metaproviz-log.*$
 ^_pkgdown.yml$
 ^pkgdown$
-^vignettes/.*\.png$
-^inst/doc/.*\.png$
 ^MetaProViz.BiocCheck$
 ^inst/scripts$
 ^README\.Rmd\.bak$

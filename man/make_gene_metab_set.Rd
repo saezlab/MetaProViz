@@ -9,7 +9,8 @@ make_gene_metab_set(
   metadata_info = c(Target = "gene"),
   pk_name = NULL,
   save_table = "csv",
-  path = NULL
+  path = NULL,
+  exclude_metabolites = "all"
 )
 }
 \arguments{
@@ -27,6 +28,10 @@ NULL}}
 
 \item{path}{{Optional:} String which is added to the resulting folder name
 \strong{default: NULL}}
+
+\item{exclude_metabolites}{Optional metabolite classes to exclude:
+NULL (exclude nothing), "all" (default), or any combination of
+c("ions", "small_molecules", "xenobiotics", "atoms").}
 }
 \value{
 List of two data frames: "GeneMetabSet" and "MetabSet".

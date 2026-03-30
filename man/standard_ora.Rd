@@ -35,8 +35,8 @@ input_pathway, PathwayFeature= ColumnName input_pathway)
 numeric value. \strong{default: 0.05}}
 
 \item{cutoff_percentage}{\emph{Optional: } percentage cutoff of metabolites that should be
-considered for ORA. Selects top/Bottom \% of selected percentage Column,
-usually t.val or Log2FC \strong{default: 10}}
+considered for ORA. Selects top and bottom percentage of selected
+numeric variable, usually t.val or Log2FC \strong{default: 10}}
 
 \item{input_pathway}{DF that must include column "term" with the pathway name, column
 "Metabolite" with the Metabolite name or ID and column "Description"

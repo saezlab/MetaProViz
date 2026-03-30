@@ -48,7 +48,7 @@ jobs:
         run: |
           Rscript -e 'install.packages("remotes")'
           Rscript -e 'install.packages("pkgdown")'
-          Rscript -e "remotes::install_github('saezlab/OmnipathR@devel')"
+          Rscript -e "remotes::install_github('saezlab/OmnipathR@devel', force=TRUE)"
 
       - name: Install EnhancedVolcano (not yet in Bioc 3.22)
         run: |

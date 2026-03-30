@@ -19,6 +19,8 @@ vignette: >
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
 bibliography: bibliography.bib
+resource_files:
+  - ../Hexagon_MetaProViz.png
 editor_options:
   chunk_output_type: console
 ---
@@ -39,7 +41,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# <img src="Hexagon_MetaProViz.png" align="right" width="200" />
+# <img src="../Hexagon_MetaProViz.png" align="right" width="200" />
 \
 A standard metabolomics experiment refers to intracellular extracts (e.g. cell or bacteria culture), to tissue samples (e.g. from animals or patients), to plasma samples (e.g. blood) and many other types of experimental setups.\
 \
@@ -52,9 +54,12 @@ A standard metabolomics experiment refers to intracellular extracts (e.g. cell o
 \
 First if you have not done yet, install the required dependencies and load the libraries:
 ```{r load-packages, message=FALSE, warning=FALSE}
-# 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
+# 1. Install MetaProViz from Bioconductor devel:
+# if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+# BiocManager::install(version = "devel")
+# BiocManager::install("MetaProViz")
 # 2. Install the latest development version from GitHub using devtools
-# devtools::install_github("https://github.com/saezlab/MetaProViz")
+# remotes::install_github("saezlab/MetaProViz") # Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
 
 library(MetaProViz)
 

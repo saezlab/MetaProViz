@@ -8,7 +8,7 @@ translate_id(
   data,
   metadata_info = c(InputID = "MetaboliteID", grouping_variable = "term"),
   from = "kegg",
-  to = c("pubchem", "chebi", "hmdb"),
+  to = c("pubchem", "chebi", "hmdb", "cas"),
   summary = FALSE,
   save_table = "csv",
   path = NULL
@@ -23,11 +23,11 @@ meaning one ID per row.}
 list(InputID="MetaboliteID" , grouping_variable="term")}}
 
 \item{from}{ID type that is present in your data. Choose between "kegg", "pubchem",
-"chebi", "hmdb". \strong{Default = "kegg"}}
+"chebi", "hmdb", "cas". \strong{Default = "kegg"}}
 
 \item{to}{One or multiple ID types to which you want to translate your data.
-Choose between "kegg", "pubchem", "chebi", "hmdb". \strong{Default =
-c("pubchem","chebi","hmdb")}}
+Choose between "kegg", "pubchem", "chebi", "hmdb", "cas". \strong{Default =
+c("pubchem","chebi","hmdb","cas")}}
 
 \item{summary}{\emph{Optional: } If TRUE a long summary tables are created.
 \strong{Default = FALSE}}

@@ -96,38 +96,18 @@ normalization, missing value imputation, and outlier detection using
 Hotelling's T2 test.
 }
 \examples{
-data(intracell_raw_se)
-ResI <- processing(
-    data = intracell_raw_se,
-    metadata_info = c(
-        Conditions = "Conditions",
-        Biological_Replicates = "Biological_Replicates"
-    )
-)
-
 data(intracell_raw)
 Intra <- intracell_raw \%>\% tibble::column_to_rownames("Code")
 ResI <- processing(
-    data = Intra[-c(49:58), -c(1:3)],
-    metadata_sample = Intra[-c(49:58), c(1:3)],
+    data = Intra[1:30, -c(1:3)],
+    metadata_sample = Intra[1:30, c(1:3)],
     metadata_info = c(
         Conditions = "Conditions",
         Biological_Replicates = "Biological_Replicates"
-    )
-)
-
-data(medium_raw)
-Media <- medium_raw \%>\% tibble::column_to_rownames("Code")
-ResM <- processing(
-    data = Media[-c(40:45), -c(1:3)],
-    metadata_sample = Media[-c(40:45), c(1:3)],
-    metadata_info = c(
-        Conditions = "Conditions",
-        Biological_Replicates = "Biological_Replicates",
-        core_norm_factor = "GrowthFactor",
-        core_media = "blank"
     ),
-    core = TRUE
+    save_plot = NULL,
+    save_table = NULL,
+    print_plot = FALSE
 )
 
 }

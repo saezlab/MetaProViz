@@ -103,7 +103,7 @@ jobs:
         run: |
           Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")'
           Rscript -e 'BiocManager::install()'
-          Rscript -e 'remotes::install_github("saezlab/OmnipathR@devel")'
+          Rscript -e 'remotes::install_github("saezlab/OmnipathR@devel", force=TRUE)'
 
       - name: Install EnhancedVolcano (not yet in Bioc 3.22)
         run: |
@@ -120,6 +120,12 @@ jobs:
 
       - name: Install ComplexUpset from source
         run: Rscript -e 'install.packages("ComplexUpset", type="source")'
+
+      # Re-install OmnipathR devel last to guarantee this is the version used for build/check
+      - name: Reinstall OmnipathR from devel (final)
+        run: |
+          Rscript -e 'remotes::install_github("saezlab/OmnipathR@devel", force=TRUE, upgrade="never", dependencies=FALSE)'
+          Rscript -e 'cat("OmnipathR version used: ", as.character(packageVersion("OmnipathR")), "\n", sep = "")'
 
       # Install  MetaProViz
       - name: Install MetaProViz from git by remotes

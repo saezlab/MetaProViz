@@ -1,4 +1,4 @@
-# MetaProViz <img src="vignettes/Hexagon_MetaProViz.png" align="right" width="200" />
+# MetaProViz <img src="man/figures/Hexagon_MetaProViz.png" align="right" width="200" />
 
 <!-- badges: start -->
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-maturing-blue.svg)](https://www.tidyverse.org/lifecycle/#maturing)
@@ -11,7 +11,7 @@
 
 <center>
 
-![**Fig. 1:** Overview of MetaProViz functions.](https://github.com/saezlab/MetaProViz/blob/development/vignettes/Fig.1.png?raw=true)
+![**Fig. 1:** Overview of MetaProViz functions.](man/figures/Fig.1.png)
 
 </center>
 
@@ -38,16 +38,23 @@ Here you will find a brief overview and information about the installation of th
 
 clear cell Renal Cell Carcinoma (ccRCC) patients data from Hakimi et. al including 138 matched tumour and normal tissue pairs (Hakimi et al. 2016). Cell-lines data from intra- and extracellular metabolomics data from cell culture media from [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418).
 
-<img src="vignettes/readme-example-data.png" width="100%" style="display: block; margin: auto auto auto 0;" />
+<img src="man/figures/readme-example-data.png" width="100%" style="display: block; margin: auto auto auto 0;" />
 
 Additionally we also added transcriptomics and proteomics data of ccRCC patients processed with SiRCle (Mora et al. 2024), originally from [PDC000127](https://proteomic.datacommons.cancer.gov/pdc/study/PDC000127) (Clark et al. 2019).
 
 ## Installation
 
-**MetaProViz** is an R package and to install the package, start R and enter:
+**MetaProViz** is an Bioconductor R package. To install the package, start R and enter:
 
 ```r
-devtools::install_github("https://github.com/saezlab/MetaProViz")
+# 1. Install MetaProViz from Bioconductor devel:
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+BiocManager::install(version = "devel")
+BiocManager::install("MetaProViz")
+
+# 2. Install the latest development version from GitHub using devtools
+# Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
+# remotes::install_github("saezlab/MetaProViz")
 ```
 
 Now **MetaProViz** can be imported as:

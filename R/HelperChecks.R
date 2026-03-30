@@ -870,7 +870,7 @@ check_param_dma <- function(
                     " Those metabolite(s) might return p.val = NA, p.adj.= NA, t.val = NA. The Log2FC = Inf, if all replicates are 0/NA."
                 )
             log_info(message)
-            message(message)  # 
+            message(message)  #
         }
     } else if (ncol(Num_Miss) > 0 & ncol(Denom_Miss) > 0) {
     Metabolites_Miss <- c(colnames(Num_Miss), colnames(Denom_Miss))
@@ -955,7 +955,7 @@ check_param_dma <- function(
 #' @param cutoff_stat \emph{Optional: } p-adjusted value cutoff from ORA results. Must be a
 #'     numeric value. \strong{default: 0.05}
 #' @param cutoff_percentage \emph{Optional: } percentage cutoff of metabolites that should be
-#'     considered for ORA. Selects top/Bottom % of selected percentageColumn,
+#'     considered for ORA. Selects top_bottom % of selected percentageColumn,
 #'     usually t.val or Log2FC \strong{default: 10}
 #' @param input_pathway DF that must include column "term" with the pathway name, column
 #'     "Metabolite" with the Metabolite name or ID and column "Description"
@@ -1628,7 +1628,6 @@ if (!(metadata_info_intra[["ValueCol"]] %in% colnames(data_intra))) {
 #' @param min_degree Minimum degree filter for graph plotting.
 #' @param node_size_column Optional numeric column name for node sizing.
 #' @param show_density Logical flag to draw hull background.
-#' @param seed Optional seed for reproducibility.
 #' @param save_plot File extension or NULL.
 #' @param print_plot Logical flag for printing.
 #'
@@ -1651,7 +1650,6 @@ check_param_cluster_pk <- function(
     min_degree,
     node_size_column,
     show_density,
-    seed,
     save_plot,
     print_plot
 ) {
@@ -1736,10 +1734,6 @@ check_param_cluster_pk <- function(
         stop("`show_density` must be TRUE or FALSE.")
     }
 
-    if (!is.null(seed) && (!is.numeric(seed) || length(seed) != 1L || is.na(seed))) {
-        stop("`seed` must be a single numeric value or NULL.")
-    }
-
     save_plot_options <- c("svg", "pdf", "png")
     if (!is.null(save_plot) && !(save_plot %in% save_plot_options)) {
         stop(
@@ -1767,7 +1761,6 @@ check_param_cluster_pk <- function(
 #' @param show_density Logical flag to draw hull background.
 #' @param print_plot Logical flag for printing.
 #' @param save_plot File extension or NULL.
-#' @param seed Optional seed for reproducibility.
 #'
 #' @return Invisible TRUE if checks pass.
 #'
@@ -1781,8 +1774,7 @@ check_param_VizGraph <- function(
     node_sizes,
     show_density,
     print_plot,
-    save_plot,
-    seed
+    save_plot
 ) {
     if (!is.matrix(similarity_matrix)) {
         stop("similarity_matrix must be a numeric matrix.")
@@ -1827,9 +1819,6 @@ check_param_VizGraph <- function(
     }
     if (!is.logical(show_density) || length(show_density) != 1L) {
         stop("show_density must be TRUE or FALSE.")
-    }
-    if (!is.null(seed) && (!is.numeric(seed) || length(seed) != 1L || is.na(seed))) {
-        stop("seed must be a single numeric value or NULL.")
     }
 
     save_plot_options <- c("svg", "pdf", "png")
