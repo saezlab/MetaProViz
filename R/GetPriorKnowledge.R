@@ -801,7 +801,7 @@ metsigdb_metalinks <- function(
 ) {
 
     # NSE vs. R CMD check workaround
-    protein_type <- type <- NULL
+    combined_score <- experiment_score <- mor <- protein_type <- source <- transport_direction <- type <- NULL
     ## ------------ Create log file ----------- ##
     metaproviz_init()
 
@@ -1027,6 +1027,68 @@ metsigdb_metalinks <- function(
         # this keeps the original value if it doesn't match any condition
         TRUE ~ as.character(mor)
     )
+    ) %>%
+    mutate(
+        protein_type_clean = str_replace_all(protein_type, '"', ''),
+        receptor_class = case_when(
+            protein_type_clean == "gpcr" ~ "GPCR",
+            protein_type_clean == "lgic" ~ "Ligand-gated ion channel",
+            protein_type_clean == "vgic" ~ "Voltage-gated ion channel",
+            protein_type_clean == "catalytic_receptor" ~ "Catalytic receptor",
+            protein_type_clean == "nhr" ~ "Nuclear hormone receptor",
+            TRUE ~ NA_character_
+        ),
+        interaction_family = case_when(
+            protein_type_clean == "transporter" | !is.na(transport_direction) ~ "Transporter-metabolite",
+            type == "Ligand-Receptor" | !is.na(receptor_class) ~ "Receptor-metabolite",
+            protein_type_clean == "enzyme" ~ "Enzyme-metabolite",
+            TRUE ~ "Other protein-metabolite"
+        ),
+        interaction_mechanism = case_when(
+            interaction_family == "Transporter-metabolite" ~ "Transport",
+            interaction_family == "Receptor-metabolite" ~ "Ligand-receptor signaling",
+            interaction_family == "Enzyme-metabolite" | type == "Production-Degradation" ~ "Metabolic conversion/turnover",
+            TRUE ~ "Other/unspecified"
+        ),
+        regulation_polarity = case_when(
+            mor == 1 ~ "Positive (activating)",
+            mor == -1 ~ "Negative (inhibiting)",
+            mor == 0 ~ "Neutral (binding)",
+            TRUE ~ "Unknown"
+        ),
+        transport_direction_label = case_when(
+            transport_direction == "in" ~ "Import/Uptake",
+            transport_direction == "out" ~ "Export/Secretion",
+            is.na(transport_direction) ~ "Not specified",
+            TRUE ~ "Other"
+        ),
+        transport_mode = case_when(
+            interaction_family == "Transporter-metabolite" & transport_direction == "in" ~ "Uptake transporter",
+            interaction_family == "Transporter-metabolite" & transport_direction == "out" ~ "Efflux transporter",
+            interaction_family == "Transporter-metabolite" ~ "Transporter (direction unspecified)",
+            TRUE ~ NA_character_
+        ),
+        evidence_class = case_when(
+            source %in% c("rhea", "hmr", "recon") ~ "Metabolic knowledgebase",
+            source %in% c("CellPhoneDB", "scConnect", "Cellinker", "NeuronChat") ~ "Cell-cell communication resource",
+            source == "Stitch" ~ "Chemical-protein interaction resource",
+            is.na(source) ~ "Unknown",
+            TRUE ~ "Other"
+        ),
+        experiment_evidence_present = ifelse(!is.na(experiment_score) & experiment_score > 0, "Yes", "No/Unknown"),
+        combined_confidence_tier = case_when(
+            is.na(combined_score) ~ "Unknown",
+            combined_score >= 900 ~ "Very high",
+            combined_score >= 700 ~ "High",
+            combined_score >= 400 ~ "Medium",
+            TRUE ~ "Low"
+        ),
+        interaction_detail = case_when(
+            interaction_family == "Transporter-metabolite" ~ paste0(transport_mode, "; ", regulation_polarity),
+            interaction_family == "Receptor-metabolite" ~ paste0(ifelse(is.na(receptor_class), "Receptor", receptor_class), "; ", regulation_polarity),
+            interaction_family == "Enzyme-metabolite" ~ paste0("Enzymatic link; ", regulation_polarity),
+            TRUE ~ paste0("Other link; ", regulation_polarity)
+        )
     )
     # --------------------------------------------------------
     # Remove metabolites that are not detectable by mass spectrometry
