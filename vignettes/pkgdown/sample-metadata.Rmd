@@ -313,7 +313,6 @@ Before we perform enrichment analysis,it is important to check the availability 
 #Load the feature metadata:
 MetaboliteIDs <- Tissue_MetaData %>%
 rownames_to_column("Metabolite")%>%
-dplyr::rename("HMDB"= "Group_HMDB")%>%
 slice(1:577)# only keep entrys with trivial names
 
 ccRCC_CompareIDs <- compare_pk(data = list(Biocft = MetaboliteIDs |> dplyr::rename("Class"="SUPER_PATHWAY")),
@@ -357,7 +356,7 @@ Additionally, for the metabolites without HMDB ID we can check if a HMDB ID is a
 ```{r data-prep-2, echo=FALSE}
 summary_table <-
 tissue_meta |>
-dplyr::filter(is.na(Group_HMDB) & (!is.na(PUBCHEM) | !is.na(KEGG))) |>
+dplyr::filter(is.na(HMDB) & (!is.na(PUBCHEM) | !is.na(KEGG))) |>
 dplyr::summarise(
     Total_Cases = dplyr::n(),
     Not_NA_PUBCHEM = sum(!is.na(PUBCHEM)),
