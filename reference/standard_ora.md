@@ -47,8 +47,8 @@ standard_ora(
 - cutoff_percentage:
 
   *Optional:* percentage cutoff of metabolites that should be considered
-  for ORA. Selects top/Bottom % of selected percentage Column, usually
-  t.val or Log2FC **default: 10**
+  for ORA. Selects top and bottom percentage of selected numeric
+  variable, usually t.val or Log2FC **default: 10**
 
 - input_pathway:
 

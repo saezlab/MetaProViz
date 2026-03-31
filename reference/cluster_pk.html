@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.99.32</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.99.51</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,7 +66,6 @@
 <span>  min_degree <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  node_size_column <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  show_density <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  save_plot <span class="op">=</span> <span class="st">"png"</span>,</span>
 <span>  print_plot <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  path <span class="op">=</span> <span class="cn">NULL</span></span>
@@ -91,8 +90,8 @@ Defaults to <code>c(metabolite_column = "MetaboliteID", pathway_column = "term")
 <dt id="arg-similarity">similarity<a class="anchor" aria-label="anchor" href="#arg-similarity"></a></dt>
 <dd><p>Similarity measure between term ID sets. Options:
 "jaccard" (default), "overlap_coefficient", or "correlation".
-Jaccard similarity is |A ∩ B| / |A ∪ B|. Overlap coefficient is
-|A ∩ B| / min(|A|, |B|). Jaccard is stricter for large sets, while
+Jaccard similarity is |A intersect B| / |A union B|. Overlap coefficient is
+|A intersect B| / min(|A|, |B|). Jaccard is stricter for large sets, while
 overlap_coefficient is more permissive for nested sets.</p></dd>
 
 
@@ -166,11 +165,6 @@ multiple rows map to the same term. Default = NULL.</p></dd>
 cluster to the graph. Default = FALSE.</p></dd>
 
 
-<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
-<dd><p><em>Optional: </em> Random seed for graph layout reproducibility.
-Default = NULL.</p></dd>
-
-
 <dt id="arg-save-plot">save_plot<a class="anchor" aria-label="anchor" href="#arg-save-plot"></a></dt>
 <dd><p><em>Optional: </em> Select the file type of output plots.
 Options are svg, pdf, png or NULL. <strong>Default = "svg"</strong></p></dd>
@@ -214,75 +208,25 @@ plots. <strong>Default = FALSE</strong></p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Load example data</span></span></span>
-<span class="r-in"><span><span class="va">kegg_pathways</span> <span class="op">&lt;-</span> <span class="fu"><a href="metsigdb_kegg.html">metsigdb_kegg</a></span><span class="op">(</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Create toy pathway data in long format</span></span></span>
+<span class="r-in"><span><span class="va">toy_pw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    MetaboliteID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"C1"</span>, <span class="st">"C2"</span>, <span class="st">"C3"</span>, <span class="st">"C1"</span>, <span class="st">"C2"</span>, <span class="st">"C4"</span>, <span class="st">"C3"</span>, <span class="st">"C4"</span>, <span class="st">"C5"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    term <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pA"</span>, <span class="st">"pA"</span>, <span class="st">"pA"</span>, <span class="st">"pB"</span>, <span class="st">"pB"</span>, <span class="st">"pB"</span>, <span class="st">"pC"</span>, <span class="st">"pC"</span>, <span class="st">"pC"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Run clustering with graph plotting</span></span></span>
 <span class="r-in"><span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu">cluster_pk</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="va">kegg_pathways</span>,</span></span>
+<span class="r-in"><span>    <span class="va">toy_pw</span>,</span></span>
 <span class="r-in"><span>    metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
 <span class="r-in"><span>        metabolite_column <span class="op">=</span> <span class="st">"MetaboliteID"</span>,</span></span>
 <span class="r-in"><span>        pathway_column <span class="op">=</span> <span class="st">"term"</span></span></span>
 <span class="r-in"><span>    <span class="op">)</span>,</span></span>
 <span class="r-in"><span>    input_format <span class="op">=</span> <span class="st">"long"</span>,</span></span>
 <span class="r-in"><span>    similarity <span class="op">=</span> <span class="st">"jaccard"</span>,</span></span>
-<span class="r-in"><span>    threshold <span class="op">=</span> <span class="fl">0.2</span>,</span></span>
+<span class="r-in"><span>    threshold <span class="op">=</span> <span class="fl">0.1</span>,</span></span>
 <span class="r-in"><span>    clust <span class="op">=</span> <span class="st">"community"</span>,</span></span>
-<span class="r-in"><span>    min <span class="op">=</span> <span class="fl">2</span>,</span></span>
-<span class="r-in"><span>    plot_name <span class="op">=</span> <span class="st">"GraphExample_long_format"</span>,</span></span>
+<span class="r-in"><span>    min <span class="op">=</span> <span class="fl">1</span>,</span></span>
 <span class="r-in"><span>    save_plot <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>    min_degree <span class="op">=</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span>    print_plot <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>    seed <span class="op">=</span> <span class="fl">123</span>,</span></span>
-<span class="r-in"><span>    show_density <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>    max_nodes <span class="op">=</span> <span class="fl">1000</span></span></span>
-<span class="r-in"><span><span class="op">)</span> </span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">r</span><span class="op">$</span><span class="va">cluster_summary</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 3</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   cluster    n_terms pct_terms</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> None           191    42.4  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> cluster10       26     5.76 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> cluster101       8     1.77 </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> cluster11        4     0.887</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> cluster112       4     0.887</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> cluster12        4     0.887</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co">## example for an enrichment format result</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">intracell_dma</span><span class="op">)</span> <span class="co"># loads the object into your environment</span></span></span>
-<span class="r-in"><span><span class="va">DMAres</span> <span class="op">&lt;-</span> <span class="va">intracell_dma</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">KEGGCompound</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>    <span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"KEGGCompound"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
-<span class="r-in"><span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="st">"Metabolite"</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">RES</span> <span class="op">&lt;-</span> <span class="fu"><a href="standard_ora.html">standard_ora</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    data <span class="op">=</span> <span class="va">DMAres</span>,</span></span>
-<span class="r-in"><span>    input_pathway <span class="op">=</span> <span class="va">kegg_pathways</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">enrichment_result_filtered</span> <span class="op">&lt;-</span> <span class="va">RES</span><span class="op">$</span><span class="va">ClusterGosummary</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">p.adjust</span> <span class="op">&lt;</span> <span class="fl">0.5</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu">cluster_pk</span><span class="op">(</span></span></span>
-<span class="r-in"><span>   <span class="va">enrichment_result_filtered</span>,</span></span>
-<span class="r-in"><span>   metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>       metabolite_column <span class="op">=</span> <span class="st">"Metabolites_in_pathway"</span>,</span></span>
-<span class="r-in"><span>       pathway_column <span class="op">=</span> <span class="st">"ID"</span></span></span>
-<span class="r-in"><span>   <span class="op">)</span>,</span></span>
-<span class="r-in"><span>   input_format <span class="op">=</span> <span class="st">"enrichment"</span>,</span></span>
-<span class="r-in"><span>   similarity <span class="op">=</span> <span class="st">"jaccard"</span>,</span></span>
-<span class="r-in"><span>   threshold <span class="op">=</span> <span class="fl">0.4</span>,</span></span>
-<span class="r-in"><span>   clust <span class="op">=</span> <span class="st">"community"</span>,</span></span>
-<span class="r-in"><span>   min <span class="op">=</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span>   node_size_column <span class="op">=</span> <span class="st">"percentage_of_Pathway_detected"</span>,</span></span>
-<span class="r-in"><span>   save_plot <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>   plot_name <span class="op">=</span> <span class="st">"GraphExample_enrichment_format"</span>,</span></span>
-<span class="r-in"><span>   print_plot <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>   min_degree <span class="op">=</span> <span class="fl">0</span>,</span></span>
-<span class="r-in"><span>   seed <span class="op">=</span> <span class="fl">42</span>,</span></span>
-<span class="r-in"><span>   show_density <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>   max_nodes <span class="op">=</span> <span class="fl">1000</span></span></span>
+<span class="r-in"><span>    print_plot <span class="op">=</span> <span class="cn">FALSE</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -292,7 +236,7 @@ plots. <strong>Default = FALSE</strong></p></dd>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Jannik Franken, Julio Saez-Rodriguez, Christian Frezza.</p>
+  <p>Developed by Christina Schmidt, Denes Turei, Jannik Franken, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez, Christian Frezza.</p>
 </div>
 
 <div class="pkgdown-footer-right">

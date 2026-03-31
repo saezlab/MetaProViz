@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.99.32</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.99.51</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,7 +84,7 @@ Schmidt</h4>
 </style>
 <div class="section level2">
 <h2 id="section">
-<img src="Hexagon_MetaProViz.png" align="right" width="200"><a class="anchor" aria-label="anchor" href="#section"></a>
+<img src="../Hexagon_MetaProViz.png" align="right" width="200"><a class="anchor" aria-label="anchor" href="#section"></a>
 </h2>
 <p><br>
 Tissue metabolomics experiment is a standard metabolomics experiment
@@ -105,9 +105,12 @@ First if you have not done yet, install the required dependencies and
 load the libraries:</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).</span></span>
+<code class="sourceCode R"><span><span class="co"># 1. Install MetaProViz from Bioconductor devel:</span></span>
+<span><span class="co"># if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")</span></span>
+<span><span class="co"># BiocManager::install(version = "devel")</span></span>
+<span><span class="co"># BiocManager::install("MetaProViz")</span></span>
 <span><span class="co"># 2. Install the latest development version from GitHub using devtools</span></span>
-<span><span class="co"># devtools::install_github("https://github.com/saezlab/MetaProViz")</span></span>
+<span><span class="co"># remotes::install_github("saezlab/MetaProViz") # Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).</span></span>
 <span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://saezlab.github.io/MetaProViz" class="external-link">MetaProViz</a></span><span class="op">)</span></span>
 <span></span>
@@ -352,7 +355,7 @@ names to KEGG IDs, HMDB IDs, etc. and selected pathways
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tissue_meta</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">Tissue_MetaData</span> <span class="op">&lt;-</span> <span class="va">tissue_meta</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span></span></code></pre></div>
+<span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">Metabolite</span>, <span class="st">"^X\\s*-\\s*\\d+$"</span><span class="op">)</span><span class="op">)</span><span class="co"># remove rows without identification    </span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
 Preview of the DF <code>Tissue_MetaData</code> including the trivial
@@ -361,24 +364,22 @@ information.
 </caption>
 <thead><tr>
 <th style="text-align:left;">
-</th>
-<th style="text-align:left;">
-SUPER_PATHWAY
-</th>
-<th style="text-align:left;">
-SUB_PATHWAY
+Metabolite
 </th>
 <th style="text-align:left;">
 CAS
 </th>
-<th style="text-align:right;">
+<th style="text-align:left;">
+RI
+</th>
+<th style="text-align:left;">
+MASS
+</th>
+<th style="text-align:left;">
 PUBCHEM
 </th>
 <th style="text-align:left;">
 KEGG
-</th>
-<th style="text-align:left;">
-Group_HMDB
 </th>
 </tr></thead>
 <tbody>
@@ -387,22 +388,19 @@ Group_HMDB
 1,2-propanediol
 </td>
 <td style="text-align:left;">
-Lipid
-</td>
-<td style="text-align:left;">
-Ketone bodies
-</td>
-<td style="text-align:left;">
 57-55-6;
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
+1041
+</td>
+<td style="text-align:left;">
+117
+</td>
+<td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
 C00583
-</td>
-<td style="text-align:left;">
-HMDB01881
 </td>
 </tr>
 <tr>
@@ -410,22 +408,19 @@ HMDB01881
 1,3-dihydroxyacetone
 </td>
 <td style="text-align:left;">
-Carbohydrate
-</td>
-<td style="text-align:left;">
-Glycolysis, gluconeogenesis, pyruvate metabolism
-</td>
-<td style="text-align:left;">
 62147-49-3;
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
+1263
+</td>
+<td style="text-align:left;">
+103
+</td>
+<td style="text-align:left;">
 670
 </td>
 <td style="text-align:left;">
 C00184
-</td>
-<td style="text-align:left;">
-HMDB01882
 </td>
 </tr>
 <tr>
@@ -433,62 +428,53 @@ HMDB01882
 1,5-anhydroglucitol (1,5-AG)
 </td>
 <td style="text-align:left;">
-Carbohydrate
-</td>
-<td style="text-align:left;">
-Glycolysis, gluconeogenesis, pyruvate metabolism
-</td>
-<td style="text-align:left;">
 154-58-5;
 </td>
-<td style="text-align:right;">
+<td style="text-align:left;">
+1788.7
+</td>
+<td style="text-align:left;">
+217
+</td>
+<td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
 C07326
 </td>
-<td style="text-align:left;">
-HMDB02712
-</td>
 </tr>
 <tr>
 <td style="text-align:left;">
-10-heptadecenoate (17:1n7)
-</td>
-<td style="text-align:left;">
-Lipid
-</td>
-<td style="text-align:left;">
-Long chain fatty acid
-</td>
-<td style="text-align:left;">
-29743-97-3;
-</td>
-<td style="text-align:right;">
-5312435
+1-arachidonoylglycerophosphocholine*
 </td>
 <td style="text-align:left;">
 NA
 </td>
 <td style="text-align:left;">
+5554
+</td>
+<td style="text-align:left;">
+544.29999999999995
+</td>
+<td style="text-align:left;">
 NA
+</td>
+<td style="text-align:left;">
+C05208
 </td>
 </tr>
 <tr>
 <td style="text-align:left;">
-10-nonadecenoate (19:1n9)
+1-arachidonoylglycerophosphoethanolamine*
 </td>
 <td style="text-align:left;">
-Lipid
+NA
 </td>
 <td style="text-align:left;">
-Long chain fatty acid
+5731
 </td>
 <td style="text-align:left;">
-73033-09-7;
-</td>
-<td style="text-align:right;">
-5312513
+500.3
 </td>
 <td style="text-align:left;">
 NA
@@ -1136,13 +1122,14 @@ an overview plot:</p>
 <span><span class="co">#&gt; Warning: themes$overall_sizes is not a valid theme.</span></span>
 <span><span class="co">#&gt; Please use `theme()` to construct themes.</span></span>
 <span><span class="co">#&gt; Note: Could not render upset plot to screen due to theme compatibility issues. Plot was saved to file successfully.</span></span></code></pre>
-<p><img src="sample-metadata.Rmd_compare-pk.svg"><!-- --><br>
+<pre><code><span><span class="co">#&gt; &lt;img src="sample-metadata.Rmd_compare-pk.svg" width="100%" style="display:block; margin:0 auto;"/&gt;</span></span></code></pre>
+<p><br>
 Here we notice that 76 features have no metabolite ID assigned, yet have
 a trivial name and a metabolite class assigned. For 135 metabolites we
 only have a pubchem ID, yet no HMDB or KEGG ID. Next, we will try to
 understand the missing IDs focusing on HMDb as an example:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">Plot1_HMDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">MetaboliteIDs</span>, <span class="st">"HMDB"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">Plot1_HMDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">MetaboliteIDs</span>, <span class="st">"HMDB"</span>,  delimiter <span class="op">=</span> <span class="st">","</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sample-metadata_files/figure-html/code-6-1.png" class="r-plt" alt="" width="700"><br>
 Over 200 metabolites have no HMDB ID and if there is a HMDB ID assigned,
 we only have one HMDB ID. Here we assume the experimental setup does not
@@ -1150,7 +1137,7 @@ account for stereoisomers and that other IDs are with different degrees
 of ambiguity are possible (e.g. L-Alanine HMDB ID is present and we will
 add D-Alanine HMDB ID, see PK vignette for more details). This enables
 us to assign additional potential HMDB IDs per feature.</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Input_HMDB</span> <span class="op">&lt;-</span> <span class="va">MetaboliteIDs</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">HMDB</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="co"># ID in the measured data we want to use, hence we remove NA's</span></span>
 <span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="st">"Metabolite"</span>, <span class="st">"HMDB"</span>, <span class="st">"SUPER_PATHWAY"</span><span class="op">)</span> <span class="co"># only keep relevant columns</span></span>
@@ -1169,7 +1156,7 @@ us to assign additional potential HMDB IDs per feature.</p>
 <span>all.x<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Plot 2 after equivalent IDs where added</span></span>
-<span><span class="va">Plot2_HMDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">tissue_meta_AddIDs_HMDB</span>, <span class="st">"AllIDs"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">Plot2_HMDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">tissue_meta_AddIDs_HMDB</span>, <span class="st">"AllIDs"</span>, delimiter <span class="op">=</span> <span class="st">", "</span><span class="op">)</span></span></code></pre></div>
 <img src="sample-metadata_files/figure-html/data-prep-1.png" class="r-plt" alt="" width="700"><br>
 Additionally, for the metabolites without HMDB ID we can check if a HMDB
 ID is available using the other ID types. First we check if we have
@@ -1207,7 +1194,7 @@ Both_Not_NA
 </td>
 </tr></tbody>
 </table>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">no_hmdb</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">MetaboliteIDs</span>, <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">HMDB</span><span class="op">)</span> <span class="op">&amp;</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">PUBCHEM</span><span class="op">)</span> <span class="op">|</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">KEGG</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">tissue_meta_translated_HMDB</span> <span class="op">&lt;-</span></span>
@@ -1217,8 +1204,6 @@ Both_Not_NA
 <span><span class="fu"><a href="../../reference/translate_id.html">translate_id</a></span><span class="op">(</span>metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>InputID <span class="op">=</span> <span class="st">"KEGG"</span>, grouping_variable <span class="op">=</span> <span class="st">"SUPER_PATHWAY"</span><span class="op">)</span>, from <span class="op">=</span> <span class="st">"kegg"</span>, to <span class="op">=</span> <span class="st">"hmdb"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span><span class="fu"><a href="https://magrittr.tidyverse.org/reference/aliases.html" class="external-link">extract2</a></span><span class="op">(</span><span class="st">"TranslatedDF"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>hmdb_from_kegg <span class="op">=</span> <span class="va">hmdb</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in translate_id(no_hmdb, metadata_info = list(InputID = "PUBCHEM", :</span></span>
-<span><span class="co">#&gt; The following IDs are duplicated within one group: 5.24601e+13, 6.99312e+13</span></span>
 <span></span>
 <span><span class="co"># Here we combine the tables above, created by equivalent_id and translate_id:</span></span>
 <span><span class="va">Tissue_MetaData_HMDB</span> <span class="op">&lt;-</span></span>
@@ -1235,7 +1220,7 @@ Both_Not_NA
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Plot 3:</span></span>
-<span><span class="va">Plot3_HMDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">Tissue_MetaData_HMDB</span>, <span class="st">"hmdb_combined"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">Plot3_HMDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">Tissue_MetaData_HMDB</span>, <span class="st">"hmdb_combined"</span>, delimiter <span class="op">=</span> <span class="st">", "</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sample-metadata_files/figure-html/data-prep-3-1.png" class="r-plt" alt="" width="700"><br>
 If we inspect the tables we can check that for example,
 16-hydroxypalmitate certainly has an HMDB ID, yet was missing from the
@@ -1245,10 +1230,10 @@ and <a href="https://www.genome.jp/entry/C18218" class="external-link">KEGG:C182
 indeed identical, and as we expect, the same structure is in HMDB too,
 under the ID <a href="https://hmdb.ca/metabolites/HMDB0006294" class="external-link">HMDB0006294</a>.<br><br>
 We can of course do the same for other IDs, such as the KEGG IDs:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">Plot1_KEGG</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">MetaboliteIDs</span>, <span class="st">"KEGG"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="sample-metadata_files/figure-html/data-prep-4-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">Plot1_KEGG</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">MetaboliteIDs</span>, <span class="st">"KEGG"</span>, delimiter <span class="op">=</span> <span class="st">","</span><span class="op">)</span></span></code></pre></div>
+<p><img src="sample-metadata_files/figure-html/data-prep-4-1.png" class="r-plt" alt="" width="700"></p>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">##################################################################################################################</span></span>
 <span><span class="va">Input_KEGG</span> <span class="op">&lt;-</span> <span class="va">Tissue_MetaData_HMDB</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -1270,9 +1255,9 @@ We can of course do the same for other IDs, such as the KEGG IDs:</p>
 <span>by<span class="op">=</span><span class="st">"KEGG"</span>,</span>
 <span>all.x<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">Plot2_KEGG</span> <span class="op">&lt;-</span>  <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">tissue_meta_AddIDs_KEGG</span>, <span class="st">"AllIDs"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">Plot2_KEGG</span> <span class="op">&lt;-</span>  <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">tissue_meta_AddIDs_KEGG</span>, <span class="st">"AllIDs"</span>, delimiter <span class="op">=</span> <span class="st">","</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sample-metadata_files/figure-html/data-prep-4-2.png" class="r-plt" alt="" width="700"></p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co">###################################################################################################################</span></span>
 <span><span class="va">no_KEGG</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">Tissue_MetaData_HMDB</span>, <span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">KEGG</span><span class="op">)</span> <span class="op">&amp;</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">PUBCHEM</span><span class="op">)</span> <span class="op">|</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">HMDB</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
@@ -1284,8 +1269,6 @@ We can of course do the same for other IDs, such as the KEGG IDs:</p>
 <span><span class="fu"><a href="../../reference/translate_id.html">translate_id</a></span><span class="op">(</span>metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>InputID <span class="op">=</span> <span class="st">"HMDB"</span>, grouping_variable <span class="op">=</span> <span class="st">"SUPER_PATHWAY"</span><span class="op">)</span>, from <span class="op">=</span> <span class="st">"hmdb"</span>, to <span class="op">=</span> <span class="st">"kegg"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span><span class="fu"><a href="https://magrittr.tidyverse.org/reference/aliases.html" class="external-link">extract2</a></span><span class="op">(</span><span class="st">"TranslatedDF"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html" class="external-link">rename</a></span><span class="op">(</span>kegg_from_hmdb <span class="op">=</span> <span class="va">kegg</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in translate_id(no_KEGG, metadata_info = list(InputID = "PUBCHEM", :</span></span>
-<span><span class="co">#&gt; The following IDs are duplicated within one group: 5.24601e+13, 6.99312e+13</span></span>
 <span></span>
 <span><span class="co"># here we combine the tables above, created by equivalent_id and translate_id:</span></span>
 <span><span class="va">Tissue_MetaData_KEGG</span> <span class="op">&lt;-</span></span>
@@ -1302,7 +1285,7 @@ We can of course do the same for other IDs, such as the KEGG IDs:</p>
 <span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Lets see the count now:</span></span>
-<span><span class="va">Plot3_KEGG</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">Tissue_MetaData_KEGG</span>, <span class="st">"KEGG"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">Plot3_KEGG</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/count_id.html">count_id</a></span><span class="op">(</span><span class="va">Tissue_MetaData_KEGG</span>, <span class="st">"KEGG"</span>,  delimiter <span class="op">=</span> <span class="st">","</span><span class="op">)</span></span></code></pre></div>
 <p><img src="sample-metadata_files/figure-html/data-prep-4-3.png" class="r-plt" alt="" width="700"><br>
 Lastly, we will have the new metadata table, which we can use for
 enrichment analysis:</p>
@@ -1325,7 +1308,8 @@ enrichment analysis:</p>
 <span><span class="co">#&gt; Warning: themes$overall_sizes is not a valid theme.</span></span>
 <span><span class="co">#&gt; Please use `theme()` to construct themes.</span></span>
 <span><span class="co">#&gt; Note: Could not render upset plot to screen due to theme compatibility issues. Plot was saved to file successfully.</span></span></code></pre>
-<p><img src="sample-metadata.Rmd_compare-pk-2.svg"><!-- --><br>
+<pre><code><span><span class="co">#&gt; &lt;img src="sample-metadata.Rmd_compare-pk-2.svg" width="100%" style="display:block; margin:0 auto;"/&gt;</span></span></code></pre>
+<p><br>
 If we compare the results to the upset plot from the original metadata
 we can see that initially 251 metabolites had a pubchem, HMDB and KEGG
 ID, whilst after adding the equivalent IDs and translating the IDs, we
@@ -1345,7 +1329,7 @@ information.<br></p>
 Given that in some cases we have multiple KEGG IDs for a measured
 feature, we will check if this causes mapping to multiple, different
 entries in the KEGG pathway-metabolite sets:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">#Load Kegg pathways:</span></span>
 <span><span class="va">KEGG_Pathways</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/metsigdb_kegg.html">metsigdb_kegg</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -1355,12 +1339,12 @@ entries in the KEGG pathway-metabolite sets:</p>
 <span>input_pk <span class="op">=</span> <span class="va">KEGG_Pathways</span>,</span>
 <span>metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>InputID <span class="op">=</span> <span class="st">"KEGG"</span>, PriorID <span class="op">=</span> <span class="st">"MetaboliteID"</span>, grouping_variable <span class="op">=</span> <span class="st">"term"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; Warning in checkmatch_pk_to_data(data = Tissue_MetaData_Extended, input_pk =</span></span>
-<span><span class="co">#&gt; KEGG_Pathways, : 251 NA values were removed from column KEGG</span></span>
+<span><span class="co">#&gt; KEGG_Pathways, : 250 NA values were removed from column KEGG</span></span>
 <span><span class="co">#&gt; Warning in checkmatch_pk_to_data(data = Tissue_MetaData_Extended, input_pk =</span></span>
 <span><span class="co">#&gt; KEGG_Pathways, : 8 duplicated IDs were removed from column KEGG</span></span>
 <span><span class="co">#&gt; data has multiple IDs per measurement = TRUE. input_pk has multiple IDs per entry = FALSE.</span></span>
-<span><span class="co">#&gt; data has 318 unique entries with 328 unique KEGG IDs. Of those IDs, 249 match, which is 75.9146341463415%.</span></span>
-<span><span class="co">#&gt; input_pk has 6583 unique entries with 6583 unique MetaboliteID IDs. Of those IDs, 249 are detected in the data, which is 3.78246999848094%.</span></span>
+<span><span class="co">#&gt; data has 319 unique entries with 329 unique KEGG IDs. Of those IDs, 250 match, which is 75.9878419452888%.</span></span>
+<span><span class="co">#&gt; input_pk has 6586 unique entries with 6586 unique MetaboliteID IDs. Of those IDs, 250 are detected in the data, which is 3.7959307622229%.</span></span>
 <span><span class="co">#&gt; Warning in checkmatch_pk_to_data(data = Tissue_MetaData_Extended, input_pk =</span></span>
 <span><span class="co">#&gt; KEGG_Pathways, : There are cases where multiple detected IDs match to multiple</span></span>
 <span><span class="co">#&gt; prior knowledge IDs of the same category</span></span>
@@ -1401,10 +1385,95 @@ C00221, C00031
 2
 </td>
 <td style="text-align:left;">
+C00221
+</td>
+<td style="text-align:left;">
+Biosynthesis of secondary metabolites
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C00221, C00031
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+C00221
+</td>
+<td style="text-align:left;">
+Metabolic pathways
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C00221, C00031
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+C00221
+</td>
+<td style="text-align:left;">
+Pentose phosphate pathway
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C00221, C00031
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
 C00031
 </td>
 <td style="text-align:left;">
 Metabolic pathways
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C00221, C00031
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+C00221
+</td>
+<td style="text-align:left;">
+Glycolysis / Gluconeogenesis
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+C00221, C00031
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+C00031
+</td>
+<td style="text-align:left;">
+Glycolysis / Gluconeogenesis
 </td>
 </tr>
 <tr>
@@ -1438,109 +1507,7 @@ C00221, C00031
 C00031
 </td>
 <td style="text-align:left;">
-Glycolysis / Gluconeogenesis
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-C00221, C00031
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-C00221
-</td>
-<td style="text-align:left;">
-Glycolysis / Gluconeogenesis
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-C00221, C00031
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-C00031
-</td>
-<td style="text-align:left;">
 Biosynthesis of secondary metabolites
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-C00221, C00031
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-C00221
-</td>
-<td style="text-align:left;">
-Pentose phosphate pathway
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-C00221, C00031
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-C00221
-</td>
-<td style="text-align:left;">
-Metabolic pathways
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-C00221, C00031
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-C00221
-</td>
-<td style="text-align:left;">
-Biosynthesis of secondary metabolites
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-C03460, C03722
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:right;">
-2
-</td>
-<td style="text-align:left;">
-C03722
-</td>
-<td style="text-align:left;">
-Metabolic pathways
 </td>
 </tr>
 <tr>
@@ -1562,7 +1529,7 @@ Metabolic pathways
 </tr>
 <tr>
 <td style="text-align:left;">
-C17737, C00695
+C03460, C03722
 </td>
 <td style="text-align:right;">
 2
@@ -1571,10 +1538,10 @@ C17737, C00695
 2
 </td>
 <td style="text-align:left;">
-C00695
+C03722
 </td>
 <td style="text-align:left;">
-Secondary bile acid biosynthesis
+Metabolic pathways
 </td>
 </tr>
 <tr>
@@ -1594,6 +1561,23 @@ C17737
 Secondary bile acid biosynthesis
 </td>
 </tr>
+<tr>
+<td style="text-align:left;">
+C17737, C00695
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:right;">
+2
+</td>
+<td style="text-align:left;">
+C00695
+</td>
+<td style="text-align:left;">
+Secondary bile acid biosynthesis
+</td>
+</tr>
 </tbody>
 </table>
 <p><br>
@@ -1605,7 +1589,7 @@ pathways (specificity). If we are looking into the cases where we do
 have multiple IDs, for cases with no match to the prior knowledge we can
 just maintain one ID, whilst for cases with exactly one match we should
 maintain the ID that is found in the prior knowledge.</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Select the cases where a feature has multiple IDs</span></span>
 <span><span class="va">multipleIDs</span> <span class="op">&lt;-</span> <span class="va">ccRCC_to_KEGGPathways</span><span class="op">[[</span><span class="st">"data_summary"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">original_count</span><span class="op">&gt;</span><span class="fl">1</span><span class="op">)</span></span></code></pre></div>
@@ -1710,8 +1694,8 @@ NA
 C00221, C00031
 </td>
 <td style="text-align:left;">
-Metabolic pathways || None || Pentose phosphate pathway || Glycolysis /
-Gluconeogenesis || Biosynthesis of secondary metabolites
+None || Biosynthesis of secondary metabolites || Metabolic pathways ||
+Pentose phosphate pathway || Glycolysis / Gluconeogenesis
 </td>
 <td style="text-align:left;">
 Check
@@ -1841,7 +1825,7 @@ NA
 C03460, C03722
 </td>
 <td style="text-align:left;">
-None || Metabolic pathways
+Metabolic pathways || None
 </td>
 <td style="text-align:left;">
 Check
@@ -1887,7 +1871,7 @@ different pathways (=GroupingVariable). Yet, in case of
 <code>KeepOneID</code>, the different IDs map to the same pathway in the
 prior knowledge for at least one case and therefore keeping both would
 inflate the enrichment analysis.<br></p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">SelectedIDs</span> <span class="op">&lt;-</span> <span class="va">ccRCC_to_KEGGPathways</span><span class="op">[[</span><span class="st">"data_summary"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span><span class="co">#Expand rows where Action == KeepEachID by splitting `matches`</span></span>
 <span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>matches_split <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">Action_Specific</span> <span class="op">==</span> <span class="st">"KeepEachID"</span>, <span class="va">matches</span>, <span class="cn">NA_character_</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -1895,7 +1879,7 @@ inflate the enrichment analysis.<br></p>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>InputID_select <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">Action_Specific</span>  <span class="op">==</span> <span class="st">"KeepEachID"</span>, <span class="va">matches_split</span>, <span class="va">InputID_select</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">matches_split</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span><span class="co">#Select one ID for AcionSpecific==KeepOneID</span></span>
-<span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>InputID_select <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
+<span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>InputID_select <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>    <span class="va">Action_Specific</span> <span class="op">==</span> <span class="st">"KeepOneID"</span> <span class="op">&amp;</span> <span class="va">matches</span> <span class="op">==</span> <span class="st">"C03460, C03722"</span> <span class="op">~</span> <span class="st">"C03722"</span>, <span class="co"># 2-Methylprop-2-enoyl-CoA versus Quinolinate. No evidence, hence we keep the one present in more pathways ( C03722=7 pathways, C03460=2 pathway)</span></span>
 <span>    <span class="va">Action_Specific</span> <span class="op">==</span> <span class="st">"KeepOneID"</span> <span class="op">&amp;</span> <span class="va">matches</span> <span class="op">==</span>  <span class="st">"C00221, C00031"</span> <span class="op">~</span> <span class="st">"C00031"</span>, <span class="co"># These are D- and L-Glucose. We have human samples, so in this conflict we will maintain L-Glucose</span></span>
 <span>    <span class="va">Action_Specific</span> <span class="op">==</span> <span class="st">"KeepOneID"</span> <span class="op">&amp;</span> <span class="va">matches</span> <span class="op">==</span>  <span class="st">"C17737, C00695"</span> <span class="op">~</span> <span class="st">"C00695"</span>, <span class="co"># Allocholic acid versus Cholic acid. No evidence, hence we keep the one present in more pathways (C00695 = 4 pathways, C17737 = 1 pathway)</span></span>
@@ -1905,7 +1889,7 @@ inflate the enrichment analysis.<br></p>
 <p><br>
 Lastly, we need to add the column including our selected IDs to the
 metadata table:</p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Tissue_MetaData_Extended</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span>x<span class="op">=</span> <span class="va">SelectedIDs</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>                                        <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">KEGG</span>, <span class="va">InputID_select</span><span class="op">)</span>,</span>
 <span>                                        y<span class="op">=</span> <span class="va">Tissue_MetaData_Extended</span>,</span>
@@ -1914,7 +1898,7 @@ metadata table:</p>
 <br>
 For results with p.adjusted value &lt; 0.1 and a minimum of 10% of the
 pathway detected will be visualized as Volcano plots:<br><div class="vscroll-plot">
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison</span></span>
 <span><span class="va">DM_ORA_res</span><span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -2004,7 +1988,7 @@ positive, yet does not meet the threshold set for “UP” (e.g. Log2FC
 the underlying comparison and the differential metabolite abundance is
 negative, yet does not meet the threshold set for “DOWN”.<br><br>
 For more information you can also check out the other vignettes.</p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">MCAres</span> <span class="op">&lt;-</span>  <span class="fu"><a href="../../reference/mca_2cond.html">mca_2cond</a></span><span class="op">(</span>data_c1<span class="op">=</span><span class="va">ResList</span><span class="op">[[</span><span class="st">"Young"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"dma"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"TUMOR_vs_NORMAL"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>data_c2<span class="op">=</span><span class="va">ResList</span><span class="op">[[</span><span class="st">"Old"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"dma"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"TUMOR_vs_NORMAL"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>metadata_info_c1<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ValueCol<span class="op">=</span><span class="st">"Log2FC"</span>,StatCol<span class="op">=</span><span class="st">"p.adj"</span>, cutoff_stat<span class="op">=</span> <span class="fl">0.05</span>, ValueCutoff<span class="op">=</span><span class="fl">1</span><span class="op">)</span>,</span>
@@ -2017,13 +2001,12 @@ For more information you can also check out the other vignettes.</p>
 Now we can use this information to colour code our volcano plot. We will
 plot individual vocano plots for each metabolite pathway as defined by
 the feature metadata provided as part of the data in <span class="citation">(Hakimi et al. 2016)</span>.</p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Add metabolite information such as KEGG ID or pathway to results</span></span>
 <span><span class="va">MetaData_Metab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span>x<span class="op">=</span><span class="va">Tissue_MetaData</span>,</span>
-<span>y<span class="op">=</span> <span class="va">MCAres</span><span class="op">[[</span><span class="st">"MCA_2Cond_Results"</span><span class="op">]</span><span class="op">]</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">14</span><span class="op">:</span><span class="fl">15</span><span class="op">)</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
-<span>by<span class="op">=</span><span class="fl">0</span>,</span>
+<span>y<span class="op">=</span> <span class="va">MCAres</span><span class="op">[[</span><span class="st">"MCA_2Cond_Results"</span><span class="op">]</span><span class="op">]</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">14</span><span class="op">:</span><span class="fl">15</span><span class="op">)</span><span class="op">]</span>,</span>
+<span>by<span class="op">=</span><span class="st">"Metabolite"</span>,</span>
 <span>all.y<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span><span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Row.names"</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">SUPER_PATHWAY</span><span class="op">)</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span><span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">SUB_PATHWAY</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
@@ -2031,7 +2014,7 @@ the feature metadata provided as part of the data in <span class="citation">(Hak
 <span>data<span class="op">=</span><span class="va">ResList</span><span class="op">[[</span><span class="st">"Young"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"dma"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"TUMOR_vs_NORMAL"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>data2<span class="op">=</span> <span class="va">ResList</span><span class="op">[[</span><span class="st">"Old"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"dma"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"TUMOR_vs_NORMAL"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>name_comparison<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>data<span class="op">=</span><span class="st">"Young"</span>, data2<span class="op">=</span> <span class="st">"Old"</span><span class="op">)</span>,</span>
-<span>metadata_feature <span class="op">=</span>  <span class="va">MetaData_Metab</span>,</span>
+<span>metadata_feature <span class="op">=</span>  <span class="va">MetaData_Metab</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>plot_name<span class="op">=</span> <span class="st">"Young-TUMOR_vs_NORMAL compared to Old-TUMOR_vs_NORMAL"</span>,</span>
 <span>subtitle<span class="op">=</span> <span class="st">"Results of dma"</span>,</span>
 <span>metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>individual <span class="op">=</span> <span class="st">"SUPER_PATHWAY"</span>,</span>
@@ -2041,7 +2024,7 @@ the feature metadata provided as part of the data in <span class="citation">(Hak
 <span>data<span class="op">=</span><span class="va">ResList</span><span class="op">[[</span><span class="st">"Young"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"dma"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"TUMOR_vs_NORMAL"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>data2<span class="op">=</span> <span class="va">ResList</span><span class="op">[[</span><span class="st">"Old"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"dma"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"TUMOR_vs_NORMAL"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>name_comparison<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>data<span class="op">=</span><span class="st">"Young"</span>, data2<span class="op">=</span> <span class="st">"Old"</span><span class="op">)</span>,</span>
-<span>metadata_feature <span class="op">=</span>  <span class="va">MetaData_Metab</span>,</span>
+<span>metadata_feature <span class="op">=</span>  <span class="va">MetaData_Metab</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu">tibble</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>plot_name<span class="op">=</span> <span class="st">"Young-TUMOR_vs_NORMAL compared to Old-TUMOR_vs_NORMAL_Sub"</span>,</span>
 <span>subtitle<span class="op">=</span> <span class="st">"Results of dma"</span>,</span>
 <span>metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>individual <span class="op">=</span> <span class="st">"SUB_PATHWAY"</span>,</span>
@@ -2060,7 +2043,7 @@ the feature metadata provided as part of the data in <span class="citation">(Hak
 </h3>
 <p>Next, we perform Over Representation Analysis (<code>ORA</code>)
 using KEGG pathways for each comparison.<br></p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison</span></span>
 <span><span class="va">DM_ORA_res</span><span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -2117,7 +2100,7 @@ using KEGG pathways for each comparison.<br></p>
 <span>        <span class="op">}</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 <br><div class="vscroll-plot">
-<p><img src="sample-metadata_files/figure-html/viz-volcano-7-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-2.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-3.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-4.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-5.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-6.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-7.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"></p>
+<p><img src="sample-metadata_files/figure-html/viz-volcano-7-1.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-2.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-3.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-4.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-5.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="sample-metadata_files/figure-html/viz-volcano-7-6.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"></p>
 </div>
 <p><br><br><br></p>
 <div class="progress progress-striped active">
@@ -2150,46 +2133,46 @@ using KEGG pathways for each comparison.<br></p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] stringr_1.6.0      tibble_3.3.1       tidyr_1.3.2        rlang_1.1.7        dplyr_1.1.4        magrittr_2.0.4    </span></span>
-<span><span class="co">#&gt; [7] MetaProViz_3.99.32 BiocStyle_2.38.0  </span></span>
+<span><span class="co">#&gt; [1] stringr_1.6.0      tibble_3.3.1       tidyr_1.3.2        rlang_1.1.7        dplyr_1.2.0        magrittr_2.0.4    </span></span>
+<span><span class="co">#&gt; [7] MetaProViz_3.99.51 BiocStyle_2.38.0  </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;   [1] RColorBrewer_1.1-3          rstudioapi_0.18.0           jsonlite_2.0.0              ggbeeswarm_0.7.3           </span></span>
-<span><span class="co">#&gt;   [5] farver_2.1.2                rmarkdown_2.30              fs_1.6.6                    ragg_1.5.0                 </span></span>
-<span><span class="co">#&gt;   [9] vctrs_0.7.1                 memoise_2.0.1               rstatix_0.7.3               htmltools_0.5.9            </span></span>
+<span><span class="co">#&gt;   [5] farver_2.1.2                rmarkdown_2.31              fs_2.0.1                    ragg_1.5.2                 </span></span>
+<span><span class="co">#&gt;   [9] vctrs_0.7.2                 memoise_2.0.1               rstatix_0.7.3               htmltools_0.5.9            </span></span>
 <span><span class="co">#&gt;  [13] S4Arrays_1.10.1             progress_1.2.3              curl_7.0.0                  ComplexUpset_1.3.3         </span></span>
-<span><span class="co">#&gt;  [17] decoupleR_2.16.0            broom_1.0.11                cellranger_1.1.0            SparseArray_1.10.8         </span></span>
+<span><span class="co">#&gt;  [17] decoupleR_2.16.0            broom_1.0.12                cellranger_1.1.0            SparseArray_1.10.9         </span></span>
 <span><span class="co">#&gt;  [21] Formula_1.2-5               sass_0.4.10                 parallelly_1.46.1           bslib_0.10.0               </span></span>
 <span><span class="co">#&gt;  [25] htmlwidgets_1.6.4           desc_1.4.3                  plyr_1.8.9                  httr2_1.2.2                </span></span>
-<span><span class="co">#&gt;  [29] lubridate_1.9.4             cachem_1.1.0                igraph_2.2.1                lifecycle_1.0.5            </span></span>
+<span><span class="co">#&gt;  [29] lubridate_1.9.5             cachem_1.1.0                igraph_2.2.2                lifecycle_1.0.5            </span></span>
 <span><span class="co">#&gt;  [33] pkgconfig_2.0.3             Matrix_1.7-4                R6_2.6.1                    fastmap_1.2.0              </span></span>
 <span><span class="co">#&gt;  [37] MatrixGenerics_1.22.0       digest_0.6.39               colorspace_2.1-2            patchwork_1.3.2            </span></span>
-<span><span class="co">#&gt;  [41] S4Vectors_0.48.0            textshaping_1.0.4           GenomicRanges_1.62.1        RSQLite_2.4.5              </span></span>
-<span><span class="co">#&gt;  [45] ggpubr_0.6.2                labeling_0.4.3              timechange_0.3.0            polyclip_1.10-7            </span></span>
-<span><span class="co">#&gt;  [49] httr_1.4.7                  abind_1.4-8                 compiler_4.5.2              bit64_4.6.0-1              </span></span>
+<span><span class="co">#&gt;  [41] S4Vectors_0.48.0            textshaping_1.0.5           GenomicRanges_1.62.1        RSQLite_2.4.6              </span></span>
+<span><span class="co">#&gt;  [45] ggpubr_0.6.3                labeling_0.4.3              timechange_0.4.0            polyclip_1.10-7            </span></span>
+<span><span class="co">#&gt;  [49] httr_1.4.8                  abind_1.4-8                 compiler_4.5.2              bit64_4.6.0-1              </span></span>
 <span><span class="co">#&gt;  [53] withr_3.0.2                 S7_0.2.1                    backports_1.5.0             BiocParallel_1.44.0        </span></span>
-<span><span class="co">#&gt;  [57] viridis_0.6.5               carData_3.0-5               DBI_1.2.3                   logger_0.4.1               </span></span>
-<span><span class="co">#&gt;  [61] OmnipathR_3.19.6            ggforce_0.5.0               R.utils_2.13.0              ggsignif_0.6.4             </span></span>
-<span><span class="co">#&gt;  [65] cosmosR_1.18.0              MASS_7.3-65                 rappdirs_0.3.4              DelayedArray_0.36.0        </span></span>
-<span><span class="co">#&gt;  [69] sessioninfo_1.2.3           scatterplot3d_0.3-44        gtools_3.9.5                tools_4.5.2                </span></span>
+<span><span class="co">#&gt;  [57] viridis_0.6.5               carData_3.0-6               DBI_1.3.0                   logger_0.4.1               </span></span>
+<span><span class="co">#&gt;  [61] OmnipathR_3.19.12           ggforce_0.5.0               R.utils_2.13.0              ggsignif_0.6.4             </span></span>
+<span><span class="co">#&gt;  [65] cosmosR_1.18.1              MASS_7.3-65                 rappdirs_0.3.4              DelayedArray_0.36.0        </span></span>
+<span><span class="co">#&gt;  [69] sessioninfo_1.2.3           scatterplot3d_0.3-45        gtools_3.9.5                tools_4.5.2                </span></span>
 <span><span class="co">#&gt;  [73] vipor_0.4.7                 otel_0.2.0                  qcc_2.7                     beeswarm_0.4.0             </span></span>
 <span><span class="co">#&gt;  [77] zip_2.3.3                   R.oo_1.27.1                 glue_1.8.0                  grid_4.5.2                 </span></span>
-<span><span class="co">#&gt;  [81] checkmate_2.3.3             reshape2_1.4.5              generics_0.1.4              gtable_0.3.6               </span></span>
+<span><span class="co">#&gt;  [81] checkmate_2.3.4             reshape2_1.4.5              generics_0.1.4              gtable_0.3.6               </span></span>
 <span><span class="co">#&gt;  [85] tzdb_0.5.0                  R.methodsS3_1.8.2           ggVennDiagram_1.5.7         hms_1.1.4                  </span></span>
-<span><span class="co">#&gt;  [89] tidygraph_1.3.1             xml2_1.5.2                  car_3.1-3                   XVector_0.50.0             </span></span>
-<span><span class="co">#&gt;  [93] BiocGenerics_0.56.0         ggrepel_0.9.6               pillar_1.11.1               vroom_1.6.7                </span></span>
-<span><span class="co">#&gt;  [97] limma_3.66.0                later_1.4.5                 splines_4.5.2               tweenr_2.0.3               </span></span>
+<span><span class="co">#&gt;  [89] tidygraph_1.3.1             xml2_1.5.2                  car_3.1-5                   XVector_0.50.0             </span></span>
+<span><span class="co">#&gt;  [93] BiocGenerics_0.56.0         ggrepel_0.9.8               pillar_1.11.1               vroom_1.7.0                </span></span>
+<span><span class="co">#&gt;  [97] limma_3.66.0                later_1.4.8                 splines_4.5.2               tweenr_2.0.3               </span></span>
 <span><span class="co">#&gt; [101] lattice_0.22-7              bit_4.6.0                   tidyselect_1.2.1            knitr_1.51                 </span></span>
 <span><span class="co">#&gt; [105] gridExtra_2.3               bookdown_0.46               IRanges_2.44.0              Seqinfo_1.0.0              </span></span>
-<span><span class="co">#&gt; [109] SummarizedExperiment_1.40.0 svglite_2.2.2               stats4_4.5.2                xfun_0.56                  </span></span>
-<span><span class="co">#&gt; [113] graphlayouts_1.2.2          Biobase_2.70.0              statmod_1.5.1               factoextra_1.0.7           </span></span>
+<span><span class="co">#&gt; [109] SummarizedExperiment_1.40.0 svglite_2.2.2               stats4_4.5.2                xfun_0.57                  </span></span>
+<span><span class="co">#&gt; [113] graphlayouts_1.2.3          Biobase_2.70.0              statmod_1.5.1               factoextra_2.0.0           </span></span>
 <span><span class="co">#&gt; [117] matrixStats_1.5.0           pheatmap_1.0.13             stringi_1.8.7               yaml_2.3.12                </span></span>
 <span><span class="co">#&gt; [121] kableExtra_1.4.0            evaluate_1.0.5              codetools_0.2-20            tcltk_4.5.2                </span></span>
 <span><span class="co">#&gt; [125] ggraph_2.2.2                qvalue_2.42.0               hash_2.2.6.4                BiocManager_1.30.27        </span></span>
-<span><span class="co">#&gt; [129] Polychrome_1.5.4            cli_3.6.5                   systemfonts_1.3.1           jquerylib_0.1.4            </span></span>
-<span><span class="co">#&gt; [133] EnhancedVolcano_1.29.1      Rcpp_1.1.1                  readxl_1.4.5                XML_3.99-0.20              </span></span>
-<span><span class="co">#&gt; [137] parallel_4.5.2              ggfortify_0.4.19            pkgdown_2.2.0               ggplot2_4.0.1              </span></span>
-<span><span class="co">#&gt; [141] readr_2.1.6                 blob_1.3.0                  prettyunits_1.2.0           viridisLite_0.4.2          </span></span>
+<span><span class="co">#&gt; [129] Polychrome_1.5.4            cli_3.6.5                   systemfonts_1.3.2           jquerylib_0.1.4            </span></span>
+<span><span class="co">#&gt; [133] EnhancedVolcano_1.29.1      Rcpp_1.1.1                  readxl_1.4.5                XML_3.99-0.23              </span></span>
+<span><span class="co">#&gt; [137] parallel_4.5.2              ggfortify_0.4.19            pkgdown_2.2.0               ggplot2_4.0.2              </span></span>
+<span><span class="co">#&gt; [141] readr_2.2.0                 blob_1.3.0                  prettyunits_1.2.0           viridisLite_0.4.3          </span></span>
 <span><span class="co">#&gt; [145] scales_1.4.0                writexl_1.5.4               inflection_1.3.7            purrr_1.2.1                </span></span>
 <span><span class="co">#&gt; [149] crayon_1.5.3                rvest_1.0.5</span></span></code></pre>
 </div>
@@ -2212,7 +2195,7 @@ Cell</em> 29 (1): 104–16. <a href="https://doi.org/10.1016/j.ccell.2015.12.004
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Jannik Franken, Julio Saez-Rodriguez, Christian Frezza.</p>
+  <p>Developed by Christina Schmidt, Denes Turei, Jannik Franken, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez, Christian Frezza.</p>
 </div>
 
 <div class="pkgdown-footer-right">

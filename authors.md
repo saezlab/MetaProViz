@@ -2,17 +2,17 @@
 
 ## Authors
 
-- **Christina Schmidt**. Author, maintainer, funder.
+- **Christina Schmidt**. Author, maintainer.
   [](https://orcid.org/0000-0002-3867-0881)
 
 - **Denes Turei**. Author. [](https://orcid.org/0000-0002-7249-9379)
+
+- **Jannik Franken**. Author.
 
 - **Dimitrios Prymidis**. Author.
   [](https://orcid.org/0009-0000-0168-3841)
 
 - **Macabe Daley**. Author. [](https://orcid.org/0000-0002-8026-7068)
-
-- **Jannik Franken**. Author.
 
 - **Julio Saez-Rodriguez**. Author.
   [](https://orcid.org/0000-0002-8552-8976)

@@ -21,7 +21,7 @@
 
     <a class="navbar-brand me-2" href="../../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.99.32</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.99.51</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -89,7 +89,7 @@ Prymidis</h4>
 </style>
 <div class="section level2">
 <h2 id="section">
-<img src="Hexagon_MetaProViz.png" align="right" width="200"><a class="anchor" aria-label="anchor" href="#section"></a>
+<img src="../Hexagon_MetaProViz.png" align="right" width="200"><a class="anchor" aria-label="anchor" href="#section"></a>
 </h2>
 <p><br>
 A Consumption-Release (core) metabolomics experiment usually refers to a
@@ -113,9 +113,12 @@ First if you have not done yet, install the required dependencies and
 load the libraries:</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).</span></span>
+<code class="sourceCode R"><span><span class="co"># 1. Install MetaProViz from Bioconductor devel:</span></span>
+<span><span class="co"># if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")</span></span>
+<span><span class="co"># BiocManager::install(version = "devel")</span></span>
+<span><span class="co"># BiocManager::install("MetaProViz")</span></span>
 <span><span class="co"># 2. Install the latest development version from GitHub using devtools</span></span>
-<span><span class="co"># devtools::install_github("https://github.com/saezlab/MetaProViz")</span></span>
+<span><span class="co"># remotes::install_github("saezlab/MetaProViz") # Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).</span></span>
 <span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://saezlab.github.io/MetaProViz" class="external-link">MetaProViz</a></span><span class="op">)</span></span>
 <span></span>
@@ -935,48 +938,9 @@ the condition name for the <code>core_media</code> in the
 <span><span class="co">#&gt; (`stat_boxplot()`).</span></span></code></pre>
 <p><img src="core-metabolomics_files/figure-html/code-5-2.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"></p>
 <pre><code><span><span class="co">#&gt; Warning: Removed 5 rows containing non-finite outside the scale range</span></span>
-<span><span class="co">#&gt; (`stat_boxplot()`).</span></span>
-<span><span class="co">#&gt; Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider</span></span>
-<span><span class="co">#&gt; increasing max.overlaps</span></span></code></pre>
-<p><img src="core-metabolomics_files/figure-html/code-5-3.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"></p>
-<pre><code><span><span class="co">#&gt; Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider</span></span>
-<span><span class="co">#&gt; increasing max.overlaps</span></span>
-<span><span class="co">#&gt; Warning in geom_bar(stat = "identity", fill = barfill, color = barcolor, :</span></span>
-<span><span class="co">#&gt; Ignoring empty aesthetic: `width`.</span></span></code></pre>
-<p><img src="core-metabolomics_files/figure-html/code-5-4.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"></p>
-<pre><code><span><span class="co">#&gt; Warning in geom_bar(stat = "identity", fill = barfill, color = barcolor, :</span></span>
-<span><span class="co">#&gt; Ignoring empty aesthetic: `width`.</span></span></code></pre>
-<p><img src="core-metabolomics_files/figure-html/code-5-5.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"></p>
-<pre><code><span><span class="co">#&gt; Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider</span></span>
-<span><span class="co">#&gt; increasing max.overlaps</span></span></code></pre>
-<p><img src="core-metabolomics_files/figure-html/code-5-6.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"></p>
-<pre><code><span><span class="co">#&gt; Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider increasing max.overlaps</span></span>
-<span><span class="co">#&gt; Ignoring empty aesthetic: `width`.</span></span></code></pre>
-<p><img src="core-metabolomics_files/figure-html/code-5-7.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"></p>
-<pre><code><span><span class="co">#&gt; Warning in geom_bar(stat = "identity", fill = barfill, color = barcolor, :</span></span>
-<span><span class="co">#&gt; Ignoring empty aesthetic: `width`.</span></span></code></pre>
-<p><img src="core-metabolomics_files/figure-html/code-5-8.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"></p>
-<pre><code><span><span class="co">#&gt; Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider</span></span>
-<span><span class="co">#&gt; increasing max.overlaps</span></span></code></pre>
-<p><img src="core-metabolomics_files/figure-html/code-5-9.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"></p>
-<pre><code><span><span class="co">#&gt; Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider increasing max.overlaps</span></span>
-<span><span class="co">#&gt; Ignoring empty aesthetic: `width`.</span></span></code></pre>
-<p><img src="core-metabolomics_files/figure-html/code-5-10.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"></p>
-<pre><code><span><span class="co">#&gt; Warning in geom_bar(stat = "identity", fill = barfill, color = barcolor, :</span></span>
-<span><span class="co">#&gt; Ignoring empty aesthetic: `width`.</span></span></code></pre>
-<p><img src="core-metabolomics_files/figure-html/code-5-11.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"></p>
-<pre><code><span><span class="co">#&gt; Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider</span></span>
-<span><span class="co">#&gt; increasing max.overlaps</span></span></code></pre>
-<p><img src="core-metabolomics_files/figure-html/code-5-12.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"></p>
-<pre><code><span><span class="co">#&gt; Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider</span></span>
-<span><span class="co">#&gt; increasing max.overlaps</span></span>
-<span><span class="co">#&gt; Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider</span></span>
-<span><span class="co">#&gt; increasing max.overlaps</span></span></code></pre>
-<p><img src="core-metabolomics_files/figure-html/code-5-13.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"></p>
-<pre><code><span><span class="co">#&gt; Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider</span></span>
-<span><span class="co">#&gt; increasing max.overlaps</span></span></code></pre>
-<p><img src="core-metabolomics_files/figure-html/code-5-14.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/code-5-15.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/code-5-16.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"></p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<span><span class="co">#&gt; (`stat_boxplot()`).</span></span></code></pre>
+<p><img src="core-metabolomics_files/figure-html/code-5-3.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/code-5-4.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/code-5-5.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/code-5-6.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/code-5-7.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/code-5-8.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/code-5-9.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/code-5-10.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/code-5-11.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/code-5-12.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/code-5-13.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/code-5-14.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/code-5-15.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/code-5-16.png" class="r-plt" alt="" width="576" style="display: block; margin: auto auto auto 0;"></p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Now we can have a look at the results table:</span></span>
 <span><span class="va">Media_Preprocessed</span> <span class="op">&lt;-</span>  <span class="va">PreProcessing_res</span><span class="op">[[</span><span class="st">"DF"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"Preprocessing_output"</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
@@ -1195,7 +1159,7 @@ easily further customize the PCA plot and adapt color and shape for the
 information of interest. You can see more below for the
 <code><a href="../../reference/viz_pca.html">viz_pca()</a></code> function.<br>
 Before we proceed, we will remove the outlier:<br></p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Media_Preprocessed</span> <span class="op">&lt;-</span><span class="va">Media_Preprocessed</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/subset.html" class="external-link">subset</a></span><span class="op">(</span><span class="op">!</span><span class="va">Outliers</span><span class="op">==</span><span class="st">"Outlier_filtering_round_1"</span><span class="op">)</span></span></code></pre></div>
 <p><br>
@@ -1257,7 +1221,7 @@ and hence we can perform multiple different comparisons. The results can
 be automatically saved and all the results are returned in a list with
 the different data frames. If parameter Plot=TRUE, an overview Volcano
 plot is generated and saved.<br><div class="vscroll-plot">
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Perform multiple comparison All_vs_One using annova:</span></span>
 <span><span class="va">DMA_Annova</span> <span class="op">&lt;-</span>  <span class="fu"><a href="../../reference/dma.html">dma</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">Media_Preprocessed</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span><span class="op">]</span>,</span>
 <span>metadata_sample<span class="op">=</span><span class="va">Media_Preprocessed</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">]</span>,</span>
@@ -1279,7 +1243,7 @@ plot is generated and saved.<br><div class="vscroll-plot">
 <p><img src="core-metabolomics_files/figure-html/dma-7.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"></p>
 <pre><code><span><span class="co">#&gt; `stat_bin()` using `bins = 30`. Pick better value `binwidth`.</span></span></code></pre>
 <p><img src="core-metabolomics_files/figure-html/dma-8.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/dma-9.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/dma-10.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/dma-11.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/dma-12.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/dma-13.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"><img src="core-metabolomics_files/figure-html/dma-14.png" class="r-plt" alt="" width="672" style="display: block; margin: auto auto auto 0;"></p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Inspect the dma results tables:</span></span>
 <span><span class="va">DMA_HK2_vs_786M1A</span> <span class="op">&lt;-</span> <span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"dma"</span><span class="op">]</span><span class="op">]</span><span class="op">[[</span><span class="st">"HK2_vs_786-M1A"</span><span class="op">]</span><span class="op">]</span></span>
@@ -1872,7 +1836,7 @@ visualization module and generate further customized Volcano plots
 Additionally to the individual comparison that there is also a summary
 table created including the individual information about metabolite
 consumption or release based on the mean measured value:<br></p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">core_MetaInfo</span> <span class="op">&lt;-</span> <span class="va">DMA_Annova</span><span class="op">[[</span><span class="st">"Feature_Metadata"</span><span class="op">]</span><span class="op">]</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -2088,7 +2052,7 @@ trivial names. In general, the <code>input_pathway</code> requirements
 are column “term”, “Metabolite” and “Description”, and the
 <code>Input_data</code> requirements are column “t.val” and column
 “Metabolite”.<br></p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison</span></span>
 <span><span class="va">DM_ORA_res</span><span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
@@ -2303,10 +2267,10 @@ L-Aspartate/Glycine/L-Histidine/Taurine
 4
 </td>
 <td style="text-align:right;">
-129
+130
 </td>
 <td style="text-align:right;">
-3.10
+3.08
 </td>
 </tr>
 <tr>
@@ -2434,7 +2398,7 @@ on the <code>Log2 Distance</code> and the <code>significance</code>
 1, whilst for the <code>Log2 Distance</code> one should check the
 distance ranges and base the threshold on this.<br><br>
 Regulatory rules:<br><br></p>
-<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Example of all possible flows:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">mca_core_rules</span><span class="op">)</span></span>
 <span></span>
@@ -4630,7 +4594,7 @@ CoRe_UP (Released/Consumed)
 Now we can load the corresponding pre-processed intracellular example
 data for the comparison of 786M-1A versus HK2 (For the detailed
 pre-processing please see the vignette “Standard Metabolomics”).</p>
-<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load the Pre-processed intracellular data:</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">intracell_dma</span><span class="op">)</span></span>
 <span></span>
@@ -4892,7 +4856,7 @@ to remove potential false positives and decrease the number of putative
 metabolite-receptor interactions, we filter the MetalinksDB resource to
 metabolites that are annotated as present in the kidney, blood, or urine
 in HMDB and known to be extracellular.<br></p>
-<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Selection as described in ST2 of Farr_Dimitrov2024:</span></span>
 <span><span class="va">MetaLinksDB</span> <span class="op">&lt;-</span> <span class="fu"><a href="../../reference/metsigdb_metalinks.html">metsigdb_metalinks</a></span><span class="op">(</span>cell_location <span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Extracellular"</span><span class="op">)</span>,</span>
 <span>tissue_location <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Kidney"</span>, <span class="st">"All Tissues"</span><span class="op">)</span>,</span>
@@ -5045,7 +5009,7 @@ Amino acid metabolism
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">MC_ORA_result</span><span class="op">&lt;-</span> <span class="fu"><a href="../../reference/cluster_ora.html">cluster_ora</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">MCA_core_res</span><span class="op">[[</span><span class="st">"MCA_core_Results"</span><span class="op">]</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>metadata_info<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>ClusterColumn<span class="op">=</span><span class="st">"RG2_Significant"</span>,</span>
 <span>                                                        BackgroundColumn<span class="op">=</span><span class="st">"BG_method"</span>,</span>
@@ -5105,9 +5069,9 @@ enable to plot individual plots where applicable based on those MetaData
 (e.g. one plot for each metabolic pathway).<br>
 For this we need a metadata table including information about our
 samples that could be relevant to e.g. color code:<br></p>
-<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">MetaData_Sample</span> <span class="op">&lt;-</span> <span class="va">Media_Preprocessed</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">2</span><span class="op">)</span><span class="op">]</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Status <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">Conditions</span><span class="op">==</span><span class="st">"HK2"</span> <span class="op">~</span> <span class="st">'Healthy'</span>,</span>
+<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>Status <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case-and-replace-when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">Conditions</span><span class="op">==</span><span class="st">"HK2"</span> <span class="op">~</span> <span class="st">'Healthy'</span>,</span>
 <span><span class="cn">TRUE</span> <span class="op">~</span> <span class="st">'Cancer'</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -5596,7 +5560,7 @@ Moreover, we can use MetaData for our features (=Metabolites), which we
 loaded with the <code>MappingInfo</code> and we can also add the
 information on which cluster a metabolite was assigned to in the
 <code>MCA()</code> analysis above:<br></p>
-<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">MetaData_Metab</span> <span class="op">&lt;-</span><span class="va">MappingInfo</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -5721,7 +5685,7 @@ but of course it offers us many more opportunities, which will be
 showcased here.<br><br>
 As input, we need a DF that contains the samples as rownames and the
 features (=metabolites) as column names:<br></p>
-<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Input_PCA</span> <span class="op">&lt;-</span> <span class="va">Media_Preprocessed</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">]</span> <span class="co">#remove columns that include Metadata such as cell type,...</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -5914,7 +5878,7 @@ MS51-12
 </table>
 <p><br>
 Now lets check out the standard plot:</p>
-<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/viz_pca.html">viz_pca</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">Input_PCA</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
 <img src="core-metabolomics_files/figure-html/viz-pca-2-1.png" class="r-plt" alt="Figure: Standard Settings." width="576"><p class="caption">
@@ -5928,13 +5892,11 @@ demographics (e.g. age, gender, medication,…) for this. First lets check
 if we have any batch effect by colour coding for the biological
 replicates, which would be the case if the replicates cluster
 together.<br></p>
-<div class="sourceCode" id="cb39"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/viz_pca.html">viz_pca</a></span><span class="op">(</span>metadata_info<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"Biological_Replicates"</span><span class="op">)</span>,</span>
 <span>metadata_sample <span class="op">=</span> <span class="va">MetaData_Sample</span> ,</span>
 <span>data<span class="op">=</span><span class="va">Input_PCA</span>,</span>
-<span>plot_name <span class="op">=</span> <span class="st">"Batch Effect"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider increasing max.overlaps</span></span>
-<span><span class="co">#&gt; ggrepel: 3 unlabeled data points (too many overlaps). Consider increasing max.overlaps</span></span></code></pre></div>
+<span>plot_name <span class="op">=</span> <span class="st">"Batch Effect"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
 <img src="core-metabolomics_files/figure-html/viz-pca-3-1.png" class="r-plt" alt="Figure: Do we have a batch effect?" width="576"><p class="caption">
 Figure: Do we have a batch effect?
@@ -5942,14 +5904,12 @@ Figure: Do we have a batch effect?
 </div>
 <p>Given the biological replicates are numeric, we can also set
 <code>color_scale</code> to continuous:</p>
-<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/viz_pca.html">viz_pca</a></span><span class="op">(</span>metadata_info<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"Biological_Replicates"</span><span class="op">)</span>,</span>
 <span>metadata_sample <span class="op">=</span> <span class="va">MetaData_Sample</span> ,</span>
 <span>data<span class="op">=</span><span class="va">Input_PCA</span>,</span>
 <span>scale_color <span class="op">=</span> <span class="st">"continuous"</span>,</span>
-<span>plot_name <span class="op">=</span> <span class="st">"Batch Effect (continuous color scale)"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider increasing max.overlaps</span></span>
-<span><span class="co">#&gt; ggrepel: 3 unlabeled data points (too many overlaps). Consider increasing max.overlaps</span></span></code></pre></div>
+<span>plot_name <span class="op">=</span> <span class="st">"Batch Effect (continuous color scale)"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
 <img src="core-metabolomics_files/figure-html/viz-pca-4-1.png" class="r-plt" alt="Figure: Do we have a batch effect?" width="576"><p class="caption">
 Figure: Do we have a batch effect?
@@ -5957,13 +5917,11 @@ Figure: Do we have a batch effect?
 </div>
 <p>Next, we can colour code for condition and use the biological
 replicates in the shape parameter:<br></p>
-<div class="sourceCode" id="cb41"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/viz_pca.html">viz_pca</a></span><span class="op">(</span>metadata_info<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"Conditions"</span>, shape<span class="op">=</span><span class="st">"Biological_Replicates"</span><span class="op">)</span>,</span>
 <span>metadata_sample <span class="op">=</span> <span class="va">MetaData_Sample</span> ,</span>
 <span>data<span class="op">=</span><span class="va">Input_PCA</span>,</span>
-<span>plot_name <span class="op">=</span> <span class="st">"Sample Conditions"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider increasing max.overlaps</span></span>
-<span><span class="co">#&gt; ggrepel: 3 unlabeled data points (too many overlaps). Consider increasing max.overlaps</span></span></code></pre></div>
+<span>plot_name <span class="op">=</span> <span class="st">"Sample Conditions"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
 <img src="core-metabolomics_files/figure-html/viz-pca-5-1.png" class="r-plt" alt="Figure: Do the samples cluster for the conditions?" width="576"><p class="caption">
 Figure: Do the samples cluster for the conditions?
@@ -5971,13 +5929,11 @@ Figure: Do the samples cluster for the conditions?
 </div>
 <p>The different cell lines we have are either control or cancerous, so
 we can display this too.<br></p>
-<div class="sourceCode" id="cb42"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/viz_pca.html">viz_pca</a></span><span class="op">(</span>metadata_info<span class="op">=</span>  <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"Status"</span><span class="op">)</span>,</span>
 <span>metadata_sample <span class="op">=</span> <span class="va">MetaData_Sample</span> ,</span>
 <span>data<span class="op">=</span><span class="va">Input_PCA</span>,</span>
-<span>plot_name <span class="op">=</span> <span class="st">"Sample Status"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider increasing max.overlaps</span></span>
-<span><span class="co">#&gt; ggrepel: 3 unlabeled data points (too many overlaps). Consider increasing max.overlaps</span></span></code></pre></div>
+<span>plot_name <span class="op">=</span> <span class="st">"Sample Status"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
 <img src="core-metabolomics_files/figure-html/viz-pca-6-1.png" class="r-plt" alt="Figure: Do the samples cluster for the Cell status?" width="576"><p class="caption">
 Figure: Do the samples cluster for the Cell status?
@@ -5991,7 +5947,7 @@ Figure: Do the samples cluster for the Cell status?
 data, which will be showcased on different examples.<br>
 As input, we need a DF that contains the samples as rownames and the
 features (=metabolites) as column names:<br></p>
-<div class="sourceCode" id="cb43"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Input_Heatmap</span> <span class="op">&lt;-</span>   <span class="va">Media_Preprocessed</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span><span class="op">]</span> <span class="co">#remove columns that include Metadata such as cell type,...</span></span>
 <span></span>
 <span><span class="co"># Add consumption-release information of each cell type:</span></span>
@@ -6149,7 +6105,7 @@ Now we can generate an overview heatmap. Since we plot all metabolites
 the metabolite names are not plotted since this would get too crowded
 (You can enforce this by changing the parameter
 <code>enforce_featurenames = TRUE</code>).</p>
-<div class="sourceCode" id="cb44"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/viz_heatmap.html">viz_heatmap</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">Input_Heatmap</span>,</span>
 <span>plot_name <span class="op">=</span> <span class="st">"Overview"</span><span class="op">)</span></span></code></pre></div>
 <div class="figure" style="text-align: left">
@@ -6160,7 +6116,7 @@ Overview heatmap.
 <p><br>
 Here we can add as many sample metadata information as needed at the
 same time:<br></p>
-<div class="sourceCode" id="cb45"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/viz_heatmap.html">viz_heatmap</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">Input_Heatmap</span>,</span>
 <span>metadata_sample <span class="op">=</span> <span class="va">MetaData_Sample</span>,</span>
 <span>metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color_Sample <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Conditions"</span>,<span class="st">"Biological_Replicates"</span>, <span class="st">"Status"</span><span class="op">)</span><span class="op">)</span>,</span>
@@ -6172,7 +6128,7 @@ Colour for sample metadata.
 </div>
 <p><br>
 Moreover, we can also add metabolite metadata information:<br></p>
-<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/viz_heatmap.html">viz_heatmap</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">Input_Heatmap</span>,</span>
 <span>metadata_sample <span class="op">=</span> <span class="va">MetaData_Sample</span>,</span>
 <span>metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color_Metab <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="st">"Pathway"</span>,  <span class="st">"core_786-M1A"</span>, <span class="st">"core_HK2"</span>, <span class="st">"core_786-M2A"</span>, <span class="st">"core_786-O"</span>, <span class="st">"core_OSLM1B"</span>, <span class="st">"core_OSRC2"</span>, <span class="st">"core_RFX631"</span><span class="op">)</span>,</span>
@@ -6195,7 +6151,7 @@ observe for the <code>D-Amino acid metabolism</code> many metabolites
 fall into the MCA-Cluster <code>core_DOWN</code>, meaning in comparison
 to HK2 cells we have a negative Log2FC for 786-O and 786-M1A.
 <div class="vscroll-plot">
-<div class="sourceCode" id="cb47"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/viz_heatmap.html">viz_heatmap</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">Input_Heatmap</span>,</span>
 <span>metadata_sample <span class="op">=</span> <span class="va">MetaData_Sample</span>,</span>
 <span>metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>individual_Metab <span class="op">=</span> <span class="st">"Pathway"</span>,</span>
@@ -6218,7 +6174,7 @@ metabolite to understand the differences between specific conditions.
 For this common plot types are bargraphs, boxplots or violin plots. As
 input, we need a DF that contains the samples as rownames and the
 features (=metabolites) as column names:<br></p>
-<div class="sourceCode" id="cb48"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">Input_Superplot</span> <span class="op">&lt;-</span>  <span class="va">Media_Preprocessed</span><span class="op">[</span>,<span class="op">-</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">4</span><span class="op">)</span><span class="op">]</span><span class="co">#remove columns that include Metadata such as cell type,...</span></span></code></pre></div>
 <table class="table  lightable-classic" style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;">
 <caption style="font-size: initial !important;">
@@ -7115,7 +7071,7 @@ We also need the Metadata as we will need to know which conditions to
 plot for together. If you have further information such as replicates or
 patient ID, we can use this for the colour of the plotted samples per
 condition as in the superplots style as described in by Lord et al <span class="citation">(Lord et al. 2020)</span>.<br><br><div class="vscroll-plot">
-<div class="sourceCode" id="cb49"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb38"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">metabolite_list</span> <span class="op">&lt;-</span> <span class="va">MCA_res</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu">stringr</span><span class="fu">::</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_detect.html" class="external-link">str_detect</a></span><span class="op">(</span><span class="va">RG2_Significant</span>, <span class="st">"Opposite"</span><span class="op">)</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">Metabolite</span><span class="op">)</span></span>
@@ -7142,7 +7098,7 @@ condition as in the superplots style as described in by Lord et al <span class="
 Now, if we for instance prefer boxplots over bargraphs we can simply
 change the parameter <code>plot_type</code>:
 <div class="vscroll-plot">
-<div class="sourceCode" id="cb51"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb40"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/viz_superplot.html">viz_superplot</a></span><span class="op">(</span>data <span class="op">=</span><span class="va">Input_Superplot</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span><span class="op">]</span>,<span class="co">#We just plot six metabolites</span></span>
 <span>metadata_sample <span class="op">=</span><span class="va">MetaData_Sample</span>,</span>
 <span>metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Conditions<span class="op">=</span><span class="st">"Conditions"</span>, Superplot <span class="op">=</span> <span class="st">"Biological_Replicates"</span><span class="op">)</span>,</span>
@@ -7183,7 +7139,7 @@ change the parameter <code>plot_type</code>:
 <br><br><br>
 We can also change it to violin plots:
 <div class="vscroll-plot">
-<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb46"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/viz_superplot.html">viz_superplot</a></span><span class="op">(</span>data <span class="op">=</span><span class="va">Input_Superplot</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">6</span><span class="op">)</span><span class="op">]</span>,<span class="co">#We just plot six metabolites</span></span>
 <span>metadata_sample <span class="op">=</span><span class="va">MetaData_Sample</span>,</span>
 <span>metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>Conditions<span class="op">=</span><span class="st">"Conditions"</span>, Superplot <span class="op">=</span> <span class="st">"Biological_Replicates"</span><span class="op">)</span>,</span>
@@ -7416,7 +7372,7 @@ Consumed
 <p>Here we will first look into the results from the differential
 analysis (see section <code>dma</code> above) for the comparison of
 <code>HK2_vs_786M1A</code>:</p>
-<div class="sourceCode" id="cb63"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb52"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run with default parameter --&gt; only need to provide Input_data and the title we like</span></span>
 <span><span class="fu"><a href="../../reference/viz_volcano.html">viz_volcano</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">DMA_HK2_vs_786M1A</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>x<span class="op">=</span> <span class="st">"Log2(Distance)"</span><span class="op">)</span></span></code></pre></div>
@@ -7430,7 +7386,7 @@ If you seek to plot the metabolite names you can change the paramter
 <code>select_label</code> from its default
 (<code>select_label=""</code>) to NULL and the metabolite names will be
 plotted randomly.</p>
-<div class="sourceCode" id="cb64"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb53"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run with default parameter --&gt; only need to provide Input_data and the title we like</span></span>
 <span><span class="fu"><a href="../../reference/viz_volcano.html">viz_volcano</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">DMA_HK2_vs_786M1A</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>x<span class="op">=</span> <span class="st">"Log2(Distance)"</span>,</span>
@@ -7443,7 +7399,7 @@ Figure: Standard figure displaying dma results.
 <p><br>
 With the parameter <code>select_label</code> you can also pass a vector
 with Metabolite names that should be labeled:</p>
-<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb54"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Run with default parameter --&gt; only need to provide Input_data and the title we like</span></span>
 <span><span class="fu"><a href="../../reference/viz_volcano.html">viz_volcano</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">DMA_HK2_vs_786M1A</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
 <span>x<span class="op">=</span> <span class="st">"Log2(Distance)"</span>,</span>
@@ -7460,7 +7416,7 @@ information to colour code and or shape the metabolites on the
 plot.<br>
 For this we need to add this information into the Metadata_Metabolite
 file:</p>
-<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb55"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># colour for consumption and release: For this we need to add this information into the Metadata_Metabolite file</span></span>
 <span><span class="va">MetaData_Metab</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/merge.html" class="external-link">merge</a></span><span class="op">(</span><span class="va">MappingInfo</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">rownames_to_column</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>, <span class="va">DMA_HK2_vs_786M1A</span><span class="op">[</span>,<span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>,<span class="fl">6</span>,<span class="fl">8</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">]</span>, by<span class="op">=</span><span class="st">"Metabolite"</span>, all.y<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span></span></code></pre></div>
@@ -7675,7 +7631,7 @@ Consumed
 </table>
 <p><br>
 Now we can make the different plots:</p>
-<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb56"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Now we need to add our Plot_SettingsFile and the Plot_metadata_info:</span></span>
 <span><span class="fu"><a href="../../reference/viz_volcano.html">viz_volcano</a></span><span class="op">(</span>plot_types<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>metadata_info<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"core_specific"</span><span class="op">)</span>,</span>
@@ -7689,7 +7645,7 @@ Now we can make the different plots:</p>
 Figure: Standard figure displaying dma results.
 </p>
 </div>
-<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb57"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># If we want to use the shape instead of the colour for the cluster info, we can just change our Plot_metadata_info</span></span>
 <span><span class="fu"><a href="../../reference/viz_volcano.html">viz_volcano</a></span><span class="op">(</span>plot_types<span class="op">=</span><span class="st">"Standard"</span>,</span>
@@ -7704,7 +7660,7 @@ Figure: Standard figure displaying dma results.
 Figure: Standard figure displaying dma results.
 </p>
 </div>
-<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb58"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span></span>
 <span><span class="co"># Of course, we can also adapt both, color and shape for the same parameter:</span></span>
 <span><span class="fu"><a href="../../reference/viz_volcano.html">viz_volcano</a></span><span class="op">(</span>plot_types<span class="op">=</span><span class="st">"Standard"</span>,</span>
@@ -7722,7 +7678,7 @@ Figure: Standard figure displaying dma results.
 <p><br>
 Of course, here we may also want an individual plot for each of the
 consumption/release metabolites.</p>
-<div class="sourceCode" id="cb70"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb59"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># individual plot for each metabolite behaviour:</span></span>
 <span><span class="fu"><a href="../../reference/viz_volcano.html">viz_volcano</a></span><span class="op">(</span>plot_types<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>metadata_info<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>individual<span class="op">=</span><span class="st">"core"</span>, shape<span class="op">=</span><span class="st">"core_specific"</span><span class="op">)</span>,</span>
@@ -7765,7 +7721,7 @@ the column “Pathway” also in our Input_data you can also pass
 default <code>Plot_SettingsFile=NULL</code>, in which case the
 <code>Plot_metadata_info</code> information (here <code>color</code>)
 will be used from Input_data.<br></p>
-<div class="sourceCode" id="cb73"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb62"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Now we can use color for the pathways and shape for the metabolite clusters:</span></span>
 <span><span class="fu"><a href="../../reference/viz_volcano.html">viz_volcano</a></span><span class="op">(</span>plot_types<span class="op">=</span><span class="st">"Standard"</span>,</span>
 <span>metadata_info<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>individual<span class="op">=</span><span class="st">"core"</span>, shape<span class="op">=</span><span class="st">"core_specific"</span>, color<span class="op">=</span><span class="st">"Pathway"</span><span class="op">)</span>,</span>
@@ -7808,7 +7764,7 @@ metabolic pathways and shaped for metabolic clusters.
 <p>The parameter <code>Plot_Settings="Compare"</code> is helpful if you
 have performed multiple comparisons and seek to compare two of them in
 one plot:<br></p>
-<div class="sourceCode" id="cb76"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb65"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Make the plot</span></span>
 <span><span class="fu"><a href="../../reference/viz_volcano.html">viz_volcano</a></span><span class="op">(</span>plot_types<span class="op">=</span><span class="st">"Compare"</span>,</span>
 <span>data<span class="op">=</span><span class="va">DMA_HK2_vs_786M1A</span><span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span><span class="fu"><a href="https://tibble.tidyverse.org/reference/rownames.html" class="external-link">column_to_rownames</a></span><span class="op">(</span><span class="st">"Metabolite"</span><span class="op">)</span>,</span>
@@ -7825,7 +7781,7 @@ Figure: Comparison.
 <p><br>
 Of course you have option to use shape or color to further customize
 your graph as well as make individual plots:<br></p>
-<div class="sourceCode" id="cb77"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb66"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Make the plot</span></span>
 <span><span class="fu"><a href="../../reference/viz_volcano.html">viz_volcano</a></span><span class="op">(</span>plot_types<span class="op">=</span><span class="st">"Compare"</span>,</span>
 <span>metadata_info<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>color<span class="op">=</span><span class="st">"Pathway"</span><span class="op">)</span>,</span>
@@ -7843,7 +7799,7 @@ Figure: Comparison.
 </div>
 Now we do individual plots again:
 <div class="vscroll-plot">
-<div class="sourceCode" id="cb78"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb67"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/viz_volcano.html">viz_volcano</a></span><span class="op">(</span>plot_types<span class="op">=</span><span class="st">"Compare"</span>,</span>
 <span>metadata_info<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>individual<span class="op">=</span><span class="st">"Pathway"</span><span class="op">)</span>,</span>
 <span>metadata_feature<span class="op">=</span> <span class="va">MetaData_Metab</span>,</span>
@@ -7869,7 +7825,7 @@ the differential expression results. Indeed for DMA_HK2_vs_786M1A we
 have performed ORA on each cluster (consumed, released,
 consumed/released). Here, I will plot the ORA results of the metabolites
 that are released in both conditions, HK2 and 786-M1A.</p>
-<div class="sourceCode" id="cb79"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb68"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Prepare the Input:</span></span>
 <span><span class="co"># 1. data=Pathway analysis input: Must have features as column names. Those feature names need to match features in the pathway analysis file metadata_feature.</span></span>
 <span><span class="va">InputPEA</span> <span class="op">&lt;-</span> <span class="va">DMA_HK2_vs_786M1A</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -7882,7 +7838,7 @@ that are released in both conditions, HK2 and 786-M1A.</p>
 <span></span>
 <span><span class="co"># 3. metadata_feature= Pathways used for pathway analysis: Must have same column names as metadata_feature for Pathway name and feature names need to match features in the data. PEA_Feature passes this column name!</span></span></code></pre></div>
 <br><div class="vscroll-plot">
-<div class="sourceCode" id="cb80"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb69"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../../reference/viz_volcano.html">viz_volcano</a></span><span class="op">(</span>plot_types<span class="op">=</span><span class="st">"PEA"</span>,</span>
 <span>metadata_info<span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>PEA_Pathway<span class="op">=</span><span class="st">"term"</span>,<span class="co"># Needs to be the same in both, metadata_feature and data2.</span></span>
 <span>PEA_stat<span class="op">=</span><span class="st">"p.adjust"</span>,<span class="co">#Column data2</span></span>
@@ -7928,46 +7884,46 @@ that are released in both conditions, HK2 and 786-M1A.</p>
 <span><span class="co">#&gt; [1] stats     graphics  grDevices utils     datasets  methods   base     </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; other attached packages:</span></span>
-<span><span class="co">#&gt; [1] stringr_1.6.0      ggfortify_0.4.19   ggplot2_4.0.1      rlang_1.1.7        tibble_3.3.1       dplyr_1.1.4       </span></span>
-<span><span class="co">#&gt; [7] magrittr_2.0.4     MetaProViz_3.99.32 BiocStyle_2.38.0  </span></span>
+<span><span class="co">#&gt; [1] stringr_1.6.0      ggfortify_0.4.19   ggplot2_4.0.2      rlang_1.1.7        tibble_3.3.1       dplyr_1.2.0       </span></span>
+<span><span class="co">#&gt; [7] magrittr_2.0.4     MetaProViz_3.99.51 BiocStyle_2.38.0  </span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; loaded via a namespace (and not attached):</span></span>
 <span><span class="co">#&gt;   [1] RColorBrewer_1.1-3          rstudioapi_0.18.0           jsonlite_2.0.0              ggbeeswarm_0.7.3           </span></span>
-<span><span class="co">#&gt;   [5] farver_2.1.2                rmarkdown_2.30              fs_1.6.6                    ragg_1.5.0                 </span></span>
-<span><span class="co">#&gt;   [9] vctrs_0.7.1                 memoise_2.0.1               rstatix_0.7.3               htmltools_0.5.9            </span></span>
+<span><span class="co">#&gt;   [5] farver_2.1.2                rmarkdown_2.31              fs_2.0.1                    ragg_1.5.2                 </span></span>
+<span><span class="co">#&gt;   [9] vctrs_0.7.2                 memoise_2.0.1               rstatix_0.7.3               htmltools_0.5.9            </span></span>
 <span><span class="co">#&gt;  [13] S4Arrays_1.10.1             progress_1.2.3              curl_7.0.0                  ComplexUpset_1.3.3         </span></span>
-<span><span class="co">#&gt;  [17] decoupleR_2.16.0            broom_1.0.11                cellranger_1.1.0            SparseArray_1.10.8         </span></span>
+<span><span class="co">#&gt;  [17] decoupleR_2.16.0            broom_1.0.12                cellranger_1.1.0            SparseArray_1.10.9         </span></span>
 <span><span class="co">#&gt;  [21] Formula_1.2-5               sass_0.4.10                 parallelly_1.46.1           bslib_0.10.0               </span></span>
 <span><span class="co">#&gt;  [25] htmlwidgets_1.6.4           desc_1.4.3                  plyr_1.8.9                  httr2_1.2.2                </span></span>
-<span><span class="co">#&gt;  [29] lubridate_1.9.4             cachem_1.1.0                igraph_2.2.1                lifecycle_1.0.5            </span></span>
+<span><span class="co">#&gt;  [29] lubridate_1.9.5             cachem_1.1.0                igraph_2.2.2                lifecycle_1.0.5            </span></span>
 <span><span class="co">#&gt;  [33] pkgconfig_2.0.3             Matrix_1.7-4                R6_2.6.1                    fastmap_1.2.0              </span></span>
 <span><span class="co">#&gt;  [37] MatrixGenerics_1.22.0       digest_0.6.39               colorspace_2.1-2            patchwork_1.3.2            </span></span>
-<span><span class="co">#&gt;  [41] S4Vectors_0.48.0            textshaping_1.0.4           GenomicRanges_1.62.1        RSQLite_2.4.5              </span></span>
-<span><span class="co">#&gt;  [45] ggpubr_0.6.2                labeling_0.4.3              timechange_0.3.0            polyclip_1.10-7            </span></span>
-<span><span class="co">#&gt;  [49] httr_1.4.7                  abind_1.4-8                 compiler_4.5.2              bit64_4.6.0-1              </span></span>
+<span><span class="co">#&gt;  [41] S4Vectors_0.48.0            textshaping_1.0.5           GenomicRanges_1.62.1        RSQLite_2.4.6              </span></span>
+<span><span class="co">#&gt;  [45] ggpubr_0.6.3                labeling_0.4.3              timechange_0.4.0            polyclip_1.10-7            </span></span>
+<span><span class="co">#&gt;  [49] httr_1.4.8                  abind_1.4-8                 compiler_4.5.2              bit64_4.6.0-1              </span></span>
 <span><span class="co">#&gt;  [53] withr_3.0.2                 S7_0.2.1                    backports_1.5.0             BiocParallel_1.44.0        </span></span>
-<span><span class="co">#&gt;  [57] viridis_0.6.5               carData_3.0-5               DBI_1.2.3                   logger_0.4.1               </span></span>
-<span><span class="co">#&gt;  [61] OmnipathR_3.19.6            ggforce_0.5.0               R.utils_2.13.0              ggsignif_0.6.4             </span></span>
-<span><span class="co">#&gt;  [65] cosmosR_1.18.0              MASS_7.3-65                 rappdirs_0.3.4              DelayedArray_0.36.0        </span></span>
-<span><span class="co">#&gt;  [69] sessioninfo_1.2.3           scatterplot3d_0.3-44        gtools_3.9.5                tools_4.5.2                </span></span>
+<span><span class="co">#&gt;  [57] viridis_0.6.5               carData_3.0-6               DBI_1.3.0                   logger_0.4.1               </span></span>
+<span><span class="co">#&gt;  [61] OmnipathR_3.19.12           ggforce_0.5.0               R.utils_2.13.0              ggsignif_0.6.4             </span></span>
+<span><span class="co">#&gt;  [65] cosmosR_1.18.1              MASS_7.3-65                 rappdirs_0.3.4              DelayedArray_0.36.0        </span></span>
+<span><span class="co">#&gt;  [69] sessioninfo_1.2.3           scatterplot3d_0.3-45        gtools_3.9.5                tools_4.5.2                </span></span>
 <span><span class="co">#&gt;  [73] vipor_0.4.7                 otel_0.2.0                  qcc_2.7                     beeswarm_0.4.0             </span></span>
 <span><span class="co">#&gt;  [77] zip_2.3.3                   R.oo_1.27.1                 glue_1.8.0                  grid_4.5.2                 </span></span>
-<span><span class="co">#&gt;  [81] checkmate_2.3.3             reshape2_1.4.5              generics_0.1.4              gtable_0.3.6               </span></span>
+<span><span class="co">#&gt;  [81] checkmate_2.3.4             reshape2_1.4.5              generics_0.1.4              gtable_0.3.6               </span></span>
 <span><span class="co">#&gt;  [85] tzdb_0.5.0                  R.methodsS3_1.8.2           tidyr_1.3.2                 hms_1.1.4                  </span></span>
-<span><span class="co">#&gt;  [89] tidygraph_1.3.1             xml2_1.5.2                  car_3.1-3                   XVector_0.50.0             </span></span>
-<span><span class="co">#&gt;  [93] BiocGenerics_0.56.0         ggrepel_0.9.6               pillar_1.11.1               vroom_1.6.7                </span></span>
-<span><span class="co">#&gt;  [97] limma_3.66.0                later_1.4.5                 splines_4.5.2               tweenr_2.0.3               </span></span>
+<span><span class="co">#&gt;  [89] tidygraph_1.3.1             xml2_1.5.2                  car_3.1-5                   XVector_0.50.0             </span></span>
+<span><span class="co">#&gt;  [93] BiocGenerics_0.56.0         ggrepel_0.9.8               pillar_1.11.1               vroom_1.7.0                </span></span>
+<span><span class="co">#&gt;  [97] limma_3.66.0                later_1.4.8                 splines_4.5.2               tweenr_2.0.3               </span></span>
 <span><span class="co">#&gt; [101] lattice_0.22-7              bit_4.6.0                   tidyselect_1.2.1            knitr_1.51                 </span></span>
 <span><span class="co">#&gt; [105] gridExtra_2.3               bookdown_0.46               IRanges_2.44.0              Seqinfo_1.0.0              </span></span>
-<span><span class="co">#&gt; [109] SummarizedExperiment_1.40.0 svglite_2.2.2               stats4_4.5.2                xfun_0.56                  </span></span>
-<span><span class="co">#&gt; [113] graphlayouts_1.2.2          Biobase_2.70.0              statmod_1.5.1               factoextra_1.0.7           </span></span>
+<span><span class="co">#&gt; [109] SummarizedExperiment_1.40.0 svglite_2.2.2               stats4_4.5.2                xfun_0.57                  </span></span>
+<span><span class="co">#&gt; [113] graphlayouts_1.2.3          Biobase_2.70.0              statmod_1.5.1               factoextra_2.0.0           </span></span>
 <span><span class="co">#&gt; [117] matrixStats_1.5.0           pheatmap_1.0.13             stringi_1.8.7               yaml_2.3.12                </span></span>
 <span><span class="co">#&gt; [121] kableExtra_1.4.0            evaluate_1.0.5              codetools_0.2-20            tcltk_4.5.2                </span></span>
 <span><span class="co">#&gt; [125] ggraph_2.2.2                qvalue_2.42.0               hash_2.2.6.4                BiocManager_1.30.27        </span></span>
-<span><span class="co">#&gt; [129] Polychrome_1.5.4            cli_3.6.5                   systemfonts_1.3.1           jquerylib_0.1.4            </span></span>
-<span><span class="co">#&gt; [133] EnhancedVolcano_1.29.1      Rcpp_1.1.1                  readxl_1.4.5                XML_3.99-0.20              </span></span>
-<span><span class="co">#&gt; [137] parallel_4.5.2              pkgdown_2.2.0               readr_2.1.6                 blob_1.3.0                 </span></span>
-<span><span class="co">#&gt; [141] prettyunits_1.2.0           viridisLite_0.4.2           scales_1.4.0                writexl_1.5.4              </span></span>
+<span><span class="co">#&gt; [129] Polychrome_1.5.4            cli_3.6.5                   systemfonts_1.3.2           jquerylib_0.1.4            </span></span>
+<span><span class="co">#&gt; [133] EnhancedVolcano_1.29.1      Rcpp_1.1.1                  readxl_1.4.5                XML_3.99-0.23              </span></span>
+<span><span class="co">#&gt; [137] parallel_4.5.2              pkgdown_2.2.0               readr_2.2.0                 blob_1.3.0                 </span></span>
+<span><span class="co">#&gt; [141] prettyunits_1.2.0           viridisLite_0.4.3           scales_1.4.0                writexl_1.5.4              </span></span>
 <span><span class="co">#&gt; [145] inflection_1.3.7            purrr_1.2.1                 crayon_1.5.3                rvest_1.0.5</span></span></code></pre>
 <div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
 <div id="ref-Badia-I-Mompel2022" class="csl-entry">
@@ -8026,7 +7982,7 @@ Various Normalization Methods for LC/MS Metabolomics Data.”</span>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Jannik Franken, Julio Saez-Rodriguez, Christian Frezza.</p>
+  <p>Developed by Christina Schmidt, Denes Turei, Jannik Franken, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez, Christian Frezza.</p>
 </div>
 
 <div class="pkgdown-footer-right">

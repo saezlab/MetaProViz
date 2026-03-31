@@ -1,23 +1,20 @@
 # Changelog
 
+## MetaProViz 3.99.40 (2026-02-18)
+
+- New cluster_pk() function for clustering prior knowledge terms
+- New viz_graph() function for network graph visualization
+- SummarizedExperiment support extended to viz_superplot()
+- Bug fixes in processing(), viz_volcano(), dma(), and ORA functions
+- NA handling improvements for correlation analysis
+- License changed from GPLv3 to BSD 3-clause
+- Code quality improvements for Bioconductor compliance
+- Added ggraph dependency
+- Updated documentation and argument descriptions
+
 ## MetaProViz 3.99.10 (2025-10-28)
 
-- SummarizedExperiment support:
-  - Implemention of se objects support as default input for
-    [`processing()`](../reference/processing.md),
-    [`replicate_sum()`](../reference/replicate_sum.md),
-    [`pool_estimation()`](../reference/pool_estimation.md),
-    [`dma()`](../reference/dma.md),
-    [`metadata_analysis()`](../reference/metadata_analysis.md),
-    [`meta_pk()`](../reference/meta_pk.md),
-    [`viz_heatmap()`](../reference/viz_heatmap.md) and
-    [`viz_pca()`](../reference/viz_pca.md)\#
-  - Implemention of se object output for
-    [`processing()`](../reference/processing.md),
-    [`replicate_sum()`](../reference/replicate_sum.md) and
-    [`pool_estimation()`](../reference/pool_estimation.md)
-  - Generation of example data se objects `intracell_raw_se.rda` and
-    `tissue_norm_se.rda` in /data folder
+- SummarizedExperiment support as default input and output
 - First candidate for Bioconductor submission
 
 ## MetaProViz 3.99.1 (2025-10-08)

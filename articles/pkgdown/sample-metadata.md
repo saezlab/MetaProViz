@@ -1,6 +1,6 @@
 # Sample Metadata Analysis
 
-## ![](Hexagon_MetaProViz.png)
+## ![](../Hexagon_MetaProViz.png)
 
   
 Tissue metabolomics experiment is a standard metabolomics experiment
@@ -21,9 +21,12 @@ In this tutorial we showcase how to use **MetaProViz**:
   load the libraries:
 
 ``` r
-# 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
+# 1. Install MetaProViz from Bioconductor devel:
+# if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+# BiocManager::install(version = "devel")
+# BiocManager::install("MetaProViz")
 # 2. Install the latest development version from GitHub using devtools
-# devtools::install_github("https://github.com/saezlab/MetaProViz")
+# remotes::install_github("saezlab/MetaProViz") # Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
 
 library(MetaProViz)
 
@@ -94,16 +97,16 @@ IDs, HMDB IDs, etc. and selected pathways **(MappingInfo)**
 data(tissue_meta)
 
 Tissue_MetaData <- tissue_meta%>%
-column_to_rownames("Metabolite")
+    dplyr::filter(!stringr::str_detect(Metabolite, "^X\\s*-\\s*\\d+$"))# remove rows without identification    
 ```
 
-|                              | SUPER_PATHWAY | SUB_PATHWAY                                      | CAS         | PUBCHEM | KEGG   | Group_HMDB |
-|:-----------------------------|:--------------|:-------------------------------------------------|:------------|--------:|:-------|:-----------|
-| 1,2-propanediol              | Lipid         | Ketone bodies                                    | 57-55-6;    |      NA | C00583 | HMDB01881  |
-| 1,3-dihydroxyacetone         | Carbohydrate  | Glycolysis, gluconeogenesis, pyruvate metabolism | 62147-49-3; |     670 | C00184 | HMDB01882  |
-| 1,5-anhydroglucitol (1,5-AG) | Carbohydrate  | Glycolysis, gluconeogenesis, pyruvate metabolism | 154-58-5;   |      NA | C07326 | HMDB02712  |
-| 10-heptadecenoate (17:1n7)   | Lipid         | Long chain fatty acid                            | 29743-97-3; | 5312435 | NA     | NA         |
-| 10-nonadecenoate (19:1n9)    | Lipid         | Long chain fatty acid                            | 73033-09-7; | 5312513 | NA     | NA         |
+| Metabolite                                 | CAS         | RI     | MASS               | PUBCHEM | KEGG   |
+|:-------------------------------------------|:------------|:-------|:-------------------|:--------|:-------|
+| 1,2-propanediol                            | 57-55-6;    | 1041   | 117                | NA      | C00583 |
+| 1,3-dihydroxyacetone                       | 62147-49-3; | 1263   | 103                | 670     | C00184 |
+| 1,5-anhydroglucitol (1,5-AG)               | 154-58-5;   | 1788.7 | 217                | NA      | C07326 |
+| 1-arachidonoylglycerophosphocholine\*      | NA          | 5554   | 544.29999999999995 | NA      | C05208 |
+| 1-arachidonoylglycerophosphoethanolamine\* | NA          | 5731   | 500.3              | NA      | NA     |
 
 Preview of the DF `Tissue_MetaData` including the trivial metabolite
 identifiers used in the experiment as well as IDs and pathway
@@ -411,14 +414,16 @@ an overview plot:
     #> Please use `theme()` to construct themes.
     #> Note: Could not render upset plot to screen due to theme compatibility issues. Plot was saved to file successfully.
 
-![](sample-metadata.Rmd_compare-pk.svg)  
+    #> <img src="sample-metadata.Rmd_compare-pk.svg" width="100%" style="display:block; margin:0 auto;"/>
+
+  
 Here we notice that 76 features have no metabolite ID assigned, yet have
 a trivial name and a metabolite class assigned. For 135 metabolites we
 only have a pubchem ID, yet no HMDB or KEGG ID. Next, we will try to
 understand the missing IDs focusing on HMDb as an example:
 
 ``` r
-Plot1_HMDB <- count_id(MetaboliteIDs, "HMDB")
+Plot1_HMDB <- count_id(MetaboliteIDs, "HMDB",  delimiter = ",")
 ```
 
 ![](sample-metadata_files/figure-html/code-6-1.png)  
@@ -448,7 +453,7 @@ by="HMDB",
 all.x=TRUE)
 
 # Plot 2 after equivalent IDs where added
-Plot2_HMDB <- count_id(tissue_meta_AddIDs_HMDB, "AllIDs")
+Plot2_HMDB <- count_id(tissue_meta_AddIDs_HMDB, "AllIDs", delimiter = ", ")
 ```
 
 ![](sample-metadata_files/figure-html/data-prep-1.png)  
@@ -472,8 +477,6 @@ rename(hmdb_from_pubchem = hmdb) |>
 translate_id(metadata_info = list(InputID = "KEGG", grouping_variable = "SUPER_PATHWAY"), from = "kegg", to = "hmdb") |>
 extract2("TranslatedDF") |>
 rename(hmdb_from_kegg = hmdb)
-#> Warning in translate_id(no_hmdb, metadata_info = list(InputID = "PUBCHEM", :
-#> The following IDs are duplicated within one group: 5.24601e+13, 6.99312e+13
 
 # Here we combine the tables above, created by equivalent_id and translate_id:
 Tissue_MetaData_HMDB <-
@@ -490,7 +493,7 @@ left_join(
     ungroup()
 
 # Plot 3:
-Plot3_HMDB <- count_id(Tissue_MetaData_HMDB, "hmdb_combined")
+Plot3_HMDB <- count_id(Tissue_MetaData_HMDB, "hmdb_combined", delimiter = ", ")
 ```
 
 ![](sample-metadata_files/figure-html/data-prep-3-1.png)  
@@ -505,7 +508,7 @@ and as we expect, the same structure is in HMDB too, under the ID
 We can of course do the same for other IDs, such as the KEGG IDs:
 
 ``` r
-Plot1_KEGG <- count_id(MetaboliteIDs, "KEGG")
+Plot1_KEGG <- count_id(MetaboliteIDs, "KEGG", delimiter = ",")
 ```
 
 ![](sample-metadata_files/figure-html/data-prep-4-1.png)
@@ -532,7 +535,7 @@ y=tissue_meta_AddIDs_KEGG,
 by="KEGG",
 all.x=TRUE)
 
-Plot2_KEGG <-  count_id(tissue_meta_AddIDs_KEGG, "AllIDs")
+Plot2_KEGG <-  count_id(tissue_meta_AddIDs_KEGG, "AllIDs", delimiter = ",")
 ```
 
 ![](sample-metadata_files/figure-html/data-prep-4-2.png)
@@ -549,8 +552,6 @@ rename(kegg_from_pubchem = kegg) |>
 translate_id(metadata_info = list(InputID = "HMDB", grouping_variable = "SUPER_PATHWAY"), from = "hmdb", to = "kegg") |>
 extract2("TranslatedDF") |>
 rename(kegg_from_hmdb = kegg)
-#> Warning in translate_id(no_KEGG, metadata_info = list(InputID = "PUBCHEM", :
-#> The following IDs are duplicated within one group: 5.24601e+13, 6.99312e+13
 
 # here we combine the tables above, created by equivalent_id and translate_id:
 Tissue_MetaData_KEGG <-
@@ -567,7 +568,7 @@ left_join(
     ungroup()
 
 # Lets see the count now:
-Plot3_KEGG <- count_id(Tissue_MetaData_KEGG, "KEGG")
+Plot3_KEGG <- count_id(Tissue_MetaData_KEGG, "KEGG",  delimiter = ",")
 ```
 
 ![](sample-metadata_files/figure-html/data-prep-4-3.png)  
@@ -594,7 +595,9 @@ enrichment analysis:
     #> Please use `theme()` to construct themes.
     #> Note: Could not render upset plot to screen due to theme compatibility issues. Plot was saved to file successfully.
 
-![](sample-metadata.Rmd_compare-pk-2.svg)  
+    #> <img src="sample-metadata.Rmd_compare-pk-2.svg" width="100%" style="display:block; margin:0 auto;"/>
+
+  
 If we compare the results to the upset plot from the original metadata
 we can see that initially 251 metabolites had a pubchem, HMDB and KEGG
 ID, whilst after adding the equivalent IDs and translating the IDs, we
@@ -624,12 +627,12 @@ ccRCC_to_KEGGPathways <- checkmatch_pk_to_data(data = Tissue_MetaData_Extended,
 input_pk = KEGG_Pathways,
 metadata_info = c(InputID = "KEGG", PriorID = "MetaboliteID", grouping_variable = "term"))
 #> Warning in checkmatch_pk_to_data(data = Tissue_MetaData_Extended, input_pk =
-#> KEGG_Pathways, : 251 NA values were removed from column KEGG
+#> KEGG_Pathways, : 250 NA values were removed from column KEGG
 #> Warning in checkmatch_pk_to_data(data = Tissue_MetaData_Extended, input_pk =
 #> KEGG_Pathways, : 8 duplicated IDs were removed from column KEGG
 #> data has multiple IDs per measurement = TRUE. input_pk has multiple IDs per entry = FALSE.
-#> data has 318 unique entries with 328 unique KEGG IDs. Of those IDs, 249 match, which is 75.9146341463415%.
-#> input_pk has 6583 unique entries with 6583 unique MetaboliteID IDs. Of those IDs, 249 are detected in the data, which is 3.78246999848094%.
+#> data has 319 unique entries with 329 unique KEGG IDs. Of those IDs, 250 match, which is 75.9878419452888%.
+#> input_pk has 6586 unique entries with 6586 unique MetaboliteID IDs. Of those IDs, 250 are detected in the data, which is 3.7959307622229%.
 #> Warning in checkmatch_pk_to_data(data = Tissue_MetaData_Extended, input_pk =
 #> KEGG_Pathways, : There are cases where multiple detected IDs match to multiple
 #> prior knowledge IDs of the same category
@@ -640,18 +643,18 @@ filter(!Group_Conflict_Notes== "None")
 
 | KEGG           | original_count | matches_count | MetaboliteID | term                                  |
 |:---------------|---------------:|--------------:|:-------------|:--------------------------------------|
-| C00221, C00031 |              2 |             2 | C00031       | Metabolic pathways                    |
-| C00221, C00031 |              2 |             2 | C00031       | Pentose phosphate pathway             |
-| C00221, C00031 |              2 |             2 | C00031       | Glycolysis / Gluconeogenesis          |
-| C00221, C00031 |              2 |             2 | C00221       | Glycolysis / Gluconeogenesis          |
-| C00221, C00031 |              2 |             2 | C00031       | Biosynthesis of secondary metabolites |
-| C00221, C00031 |              2 |             2 | C00221       | Pentose phosphate pathway             |
-| C00221, C00031 |              2 |             2 | C00221       | Metabolic pathways                    |
 | C00221, C00031 |              2 |             2 | C00221       | Biosynthesis of secondary metabolites |
-| C03460, C03722 |              2 |             2 | C03722       | Metabolic pathways                    |
+| C00221, C00031 |              2 |             2 | C00221       | Metabolic pathways                    |
+| C00221, C00031 |              2 |             2 | C00221       | Pentose phosphate pathway             |
+| C00221, C00031 |              2 |             2 | C00031       | Metabolic pathways                    |
+| C00221, C00031 |              2 |             2 | C00221       | Glycolysis / Gluconeogenesis          |
+| C00221, C00031 |              2 |             2 | C00031       | Glycolysis / Gluconeogenesis          |
+| C00221, C00031 |              2 |             2 | C00031       | Pentose phosphate pathway             |
+| C00221, C00031 |              2 |             2 | C00031       | Biosynthesis of secondary metabolites |
 | C03460, C03722 |              2 |             2 | C03460       | Metabolic pathways                    |
-| C17737, C00695 |              2 |             2 | C00695       | Secondary bile acid biosynthesis      |
+| C03460, C03722 |              2 |             2 | C03722       | Metabolic pathways                    |
 | C17737, C00695 |              2 |             2 | C17737       | Secondary bile acid biosynthesis      |
+| C17737, C00695 |              2 |             2 | C00695       | Secondary bile acid biosynthesis      |
 
 Terms in KEGG pathways where the same measured feature mapps with more
 than one ID, which will inflate the enrichment analysis.
@@ -676,12 +679,12 @@ filter(original_count>1)
 |:-----------------------|:---------------|---------------:|--------------:|:---------------|:-----------------------------------------------------------------------------------------------------------------------------------------|:---------------|:----------------|
 | C00065, C00716         | NA             |              2 |             2 | C00065, C00716 | None                                                                                                                                     | Check          | KeepEachID      |
 | C00155, C05330         | C00155         |              2 |             1 | C00155         | None                                                                                                                                     | None           | None            |
-| C00221, C00031         | NA             |              2 |             2 | C00221, C00031 | Metabolic pathways \|\| None \|\| Pentose phosphate pathway \|\| Glycolysis / Gluconeogenesis \|\| Biosynthesis of secondary metabolites | Check          | KeepOneID       |
+| C00221, C00031         | NA             |              2 |             2 | C00221, C00031 | None \|\| Biosynthesis of secondary metabolites \|\| Metabolic pathways \|\| Pentose phosphate pathway \|\| Glycolysis / Gluconeogenesis | Check          | KeepOneID       |
 | C00671, C06008         | C00671         |              2 |             1 | C00671         | None                                                                                                                                     | None           | None            |
 | C01835, C00721, C00420 | NA             |              3 |             2 | C01835, C00721 | None                                                                                                                                     | Check          | KeepEachID      |
 | C01991, C00989         | C00989         |              2 |             1 | C00989         | None                                                                                                                                     | None           | None            |
 | C02052, C00464         | C00464         |              2 |             1 | C00464         | None                                                                                                                                     | None           | None            |
-| C03460, C03722         | NA             |              2 |             2 | C03460, C03722 | None \|\| Metabolic pathways                                                                                                             | Check          | KeepOneID       |
+| C03460, C03722         | NA             |              2 |             2 | C03460, C03722 | Metabolic pathways \|\| None                                                                                                             | Check          | KeepOneID       |
 | C17737, C00695         | NA             |              2 |             2 | C17737, C00695 | None \|\| Secondary bile acid biosynthesis                                                                                               | Check          | KeepOneID       |
 
 Terms in KEGG pathways where the same measured feature mapps with more
@@ -845,10 +848,9 @@ the feature metadata provided as part of the data in (Hakimi et al.
 ``` r
 # Add metabolite information such as KEGG ID or pathway to results
 MetaData_Metab <- merge(x=Tissue_MetaData,
-y= MCAres[["MCA_2Cond_Results"]][, c(1, 14:15)]%>%tibble::column_to_rownames("Metabolite"),
-by=0,
+y= MCAres[["MCA_2Cond_Results"]][, c(1, 14:15)],
+by="Metabolite",
 all.y=TRUE)%>%
-tibble::column_to_rownames("Row.names")%>%
 dplyr::filter(!is.na(SUPER_PATHWAY))%>%
 dplyr::filter(!is.na(SUB_PATHWAY))
 
@@ -856,7 +858,7 @@ viz_volcano(plot_types="Compare",
 data=ResList[["Young"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
 data2= ResList[["Old"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
 name_comparison= c(data="Young", data2= "Old"),
-metadata_feature =  MetaData_Metab,
+metadata_feature =  MetaData_Metab%>%tibble::column_to_rownames("Metabolite"),
 plot_name= "Young-TUMOR_vs_NORMAL compared to Old-TUMOR_vs_NORMAL",
 subtitle= "Results of dma",
 metadata_info = c(individual = "SUPER_PATHWAY",
@@ -866,7 +868,7 @@ viz_volcano(plot_types="Compare",
 data=ResList[["Young"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
 data2= ResList[["Old"]][["dma"]][["TUMOR_vs_NORMAL"]]%>%tibble::column_to_rownames("Metabolite"),
 name_comparison= c(data="Young", data2= "Old"),
-metadata_feature =  MetaData_Metab,
+metadata_feature =  MetaData_Metab%>%tibble::column_to_rownames("Metabolite"),
 plot_name= "Young-TUMOR_vs_NORMAL compared to Old-TUMOR_vs_NORMAL_Sub",
 subtitle= "Results of dma",
 metadata_info = c(individual = "SUB_PATHWAY",
@@ -954,7 +956,7 @@ for(comparison in names(ResList)){
 
   
 
-![](sample-metadata_files/figure-html/viz-volcano-7-1.png)![](sample-metadata_files/figure-html/viz-volcano-7-2.png)![](sample-metadata_files/figure-html/viz-volcano-7-3.png)![](sample-metadata_files/figure-html/viz-volcano-7-4.png)![](sample-metadata_files/figure-html/viz-volcano-7-5.png)![](sample-metadata_files/figure-html/viz-volcano-7-6.png)![](sample-metadata_files/figure-html/viz-volcano-7-7.png)
+![](sample-metadata_files/figure-html/viz-volcano-7-1.png)![](sample-metadata_files/figure-html/viz-volcano-7-2.png)![](sample-metadata_files/figure-html/viz-volcano-7-3.png)![](sample-metadata_files/figure-html/viz-volcano-7-4.png)![](sample-metadata_files/figure-html/viz-volcano-7-5.png)![](sample-metadata_files/figure-html/viz-volcano-7-6.png)
 
   
   
@@ -982,46 +984,46 @@ for(comparison in names(ResList)){
     #> [1] stats     graphics  grDevices utils     datasets  methods   base     
     #> 
     #> other attached packages:
-    #> [1] stringr_1.6.0      tibble_3.3.1       tidyr_1.3.2        rlang_1.1.7        dplyr_1.1.4        magrittr_2.0.4    
-    #> [7] MetaProViz_3.99.32 BiocStyle_2.38.0  
+    #> [1] stringr_1.6.0      tibble_3.3.1       tidyr_1.3.2        rlang_1.1.7        dplyr_1.2.0        magrittr_2.0.4    
+    #> [7] MetaProViz_3.99.51 BiocStyle_2.38.0  
     #> 
     #> loaded via a namespace (and not attached):
     #>   [1] RColorBrewer_1.1-3          rstudioapi_0.18.0           jsonlite_2.0.0              ggbeeswarm_0.7.3           
-    #>   [5] farver_2.1.2                rmarkdown_2.30              fs_1.6.6                    ragg_1.5.0                 
-    #>   [9] vctrs_0.7.1                 memoise_2.0.1               rstatix_0.7.3               htmltools_0.5.9            
+    #>   [5] farver_2.1.2                rmarkdown_2.31              fs_2.0.1                    ragg_1.5.2                 
+    #>   [9] vctrs_0.7.2                 memoise_2.0.1               rstatix_0.7.3               htmltools_0.5.9            
     #>  [13] S4Arrays_1.10.1             progress_1.2.3              curl_7.0.0                  ComplexUpset_1.3.3         
-    #>  [17] decoupleR_2.16.0            broom_1.0.11                cellranger_1.1.0            SparseArray_1.10.8         
+    #>  [17] decoupleR_2.16.0            broom_1.0.12                cellranger_1.1.0            SparseArray_1.10.9         
     #>  [21] Formula_1.2-5               sass_0.4.10                 parallelly_1.46.1           bslib_0.10.0               
     #>  [25] htmlwidgets_1.6.4           desc_1.4.3                  plyr_1.8.9                  httr2_1.2.2                
-    #>  [29] lubridate_1.9.4             cachem_1.1.0                igraph_2.2.1                lifecycle_1.0.5            
+    #>  [29] lubridate_1.9.5             cachem_1.1.0                igraph_2.2.2                lifecycle_1.0.5            
     #>  [33] pkgconfig_2.0.3             Matrix_1.7-4                R6_2.6.1                    fastmap_1.2.0              
     #>  [37] MatrixGenerics_1.22.0       digest_0.6.39               colorspace_2.1-2            patchwork_1.3.2            
-    #>  [41] S4Vectors_0.48.0            textshaping_1.0.4           GenomicRanges_1.62.1        RSQLite_2.4.5              
-    #>  [45] ggpubr_0.6.2                labeling_0.4.3              timechange_0.3.0            polyclip_1.10-7            
-    #>  [49] httr_1.4.7                  abind_1.4-8                 compiler_4.5.2              bit64_4.6.0-1              
+    #>  [41] S4Vectors_0.48.0            textshaping_1.0.5           GenomicRanges_1.62.1        RSQLite_2.4.6              
+    #>  [45] ggpubr_0.6.3                labeling_0.4.3              timechange_0.4.0            polyclip_1.10-7            
+    #>  [49] httr_1.4.8                  abind_1.4-8                 compiler_4.5.2              bit64_4.6.0-1              
     #>  [53] withr_3.0.2                 S7_0.2.1                    backports_1.5.0             BiocParallel_1.44.0        
-    #>  [57] viridis_0.6.5               carData_3.0-5               DBI_1.2.3                   logger_0.4.1               
-    #>  [61] OmnipathR_3.19.6            ggforce_0.5.0               R.utils_2.13.0              ggsignif_0.6.4             
-    #>  [65] cosmosR_1.18.0              MASS_7.3-65                 rappdirs_0.3.4              DelayedArray_0.36.0        
-    #>  [69] sessioninfo_1.2.3           scatterplot3d_0.3-44        gtools_3.9.5                tools_4.5.2                
+    #>  [57] viridis_0.6.5               carData_3.0-6               DBI_1.3.0                   logger_0.4.1               
+    #>  [61] OmnipathR_3.19.12           ggforce_0.5.0               R.utils_2.13.0              ggsignif_0.6.4             
+    #>  [65] cosmosR_1.18.1              MASS_7.3-65                 rappdirs_0.3.4              DelayedArray_0.36.0        
+    #>  [69] sessioninfo_1.2.3           scatterplot3d_0.3-45        gtools_3.9.5                tools_4.5.2                
     #>  [73] vipor_0.4.7                 otel_0.2.0                  qcc_2.7                     beeswarm_0.4.0             
     #>  [77] zip_2.3.3                   R.oo_1.27.1                 glue_1.8.0                  grid_4.5.2                 
-    #>  [81] checkmate_2.3.3             reshape2_1.4.5              generics_0.1.4              gtable_0.3.6               
+    #>  [81] checkmate_2.3.4             reshape2_1.4.5              generics_0.1.4              gtable_0.3.6               
     #>  [85] tzdb_0.5.0                  R.methodsS3_1.8.2           ggVennDiagram_1.5.7         hms_1.1.4                  
-    #>  [89] tidygraph_1.3.1             xml2_1.5.2                  car_3.1-3                   XVector_0.50.0             
-    #>  [93] BiocGenerics_0.56.0         ggrepel_0.9.6               pillar_1.11.1               vroom_1.6.7                
-    #>  [97] limma_3.66.0                later_1.4.5                 splines_4.5.2               tweenr_2.0.3               
+    #>  [89] tidygraph_1.3.1             xml2_1.5.2                  car_3.1-5                   XVector_0.50.0             
+    #>  [93] BiocGenerics_0.56.0         ggrepel_0.9.8               pillar_1.11.1               vroom_1.7.0                
+    #>  [97] limma_3.66.0                later_1.4.8                 splines_4.5.2               tweenr_2.0.3               
     #> [101] lattice_0.22-7              bit_4.6.0                   tidyselect_1.2.1            knitr_1.51                 
     #> [105] gridExtra_2.3               bookdown_0.46               IRanges_2.44.0              Seqinfo_1.0.0              
-    #> [109] SummarizedExperiment_1.40.0 svglite_2.2.2               stats4_4.5.2                xfun_0.56                  
-    #> [113] graphlayouts_1.2.2          Biobase_2.70.0              statmod_1.5.1               factoextra_1.0.7           
+    #> [109] SummarizedExperiment_1.40.0 svglite_2.2.2               stats4_4.5.2                xfun_0.57                  
+    #> [113] graphlayouts_1.2.3          Biobase_2.70.0              statmod_1.5.1               factoextra_2.0.0           
     #> [117] matrixStats_1.5.0           pheatmap_1.0.13             stringi_1.8.7               yaml_2.3.12                
     #> [121] kableExtra_1.4.0            evaluate_1.0.5              codetools_0.2-20            tcltk_4.5.2                
     #> [125] ggraph_2.2.2                qvalue_2.42.0               hash_2.2.6.4                BiocManager_1.30.27        
-    #> [129] Polychrome_1.5.4            cli_3.6.5                   systemfonts_1.3.1           jquerylib_0.1.4            
-    #> [133] EnhancedVolcano_1.29.1      Rcpp_1.1.1                  readxl_1.4.5                XML_3.99-0.20              
-    #> [137] parallel_4.5.2              ggfortify_0.4.19            pkgdown_2.2.0               ggplot2_4.0.1              
-    #> [141] readr_2.1.6                 blob_1.3.0                  prettyunits_1.2.0           viridisLite_0.4.2          
+    #> [129] Polychrome_1.5.4            cli_3.6.5                   systemfonts_1.3.2           jquerylib_0.1.4            
+    #> [133] EnhancedVolcano_1.29.1      Rcpp_1.1.1                  readxl_1.4.5                XML_3.99-0.23              
+    #> [137] parallel_4.5.2              ggfortify_0.4.19            pkgdown_2.2.0               ggplot2_4.0.2              
+    #> [141] readr_2.2.0                 blob_1.3.0                  prettyunits_1.2.0           viridisLite_0.4.3          
     #> [145] scales_1.4.0                writexl_1.5.4               inflection_1.3.7            purrr_1.2.1                
     #> [149] crayon_1.5.3                rvest_1.0.5
 

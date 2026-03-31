@@ -1,4 +1,4 @@
-# MetaProViz ![](articles/Hexagon_MetaProViz.png)
+# MetaProViz ![](reference/figures/Hexagon_MetaProViz.png)
 
 ## **Short Introduction**
 
@@ -14,7 +14,7 @@ their functions can be used independently from each other or in
 combination (**Fig.1**).
 
 ![Fig. 1: Overview of MetaProViz
-functions.](https://github.com/saezlab/MetaProViz/blob/development/vignettes/Fig.1.png?raw=true)
+functions.](reference/figures/Fig.1.png)
 
 **Fig. 1:** Overview of MetaProViz functions.
 
@@ -84,7 +84,7 @@ al. 2016). Cell-lines data from intra- and extracellular metabolomics
 data from cell culture media from [metabolomics workbench project
 PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418).
 
-![](articles/readme-example-data.png)
+![](reference/figures/readme-example-data.png)
 
 Additionally we also added transcriptomics and proteomics data of ccRCC
 patients processed with SiRCle (Mora et al. 2024), originally from
@@ -93,11 +93,18 @@ patients processed with SiRCle (Mora et al. 2024), originally from
 
 ## Installation
 
-**MetaProViz** is an R package and to install the package, start R and
-enter:
+**MetaProViz** is an Bioconductor R package. To install the package,
+start R and enter:
 
 ``` r
-devtools::install_github("https://github.com/saezlab/MetaProViz")
+# 1. Install MetaProViz from Bioconductor devel:
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+BiocManager::install(version = "devel")
+BiocManager::install("MetaProViz")
+
+# 2. Install the latest development version from GitHub using devtools
+# Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
+# remotes::install_github("saezlab/MetaProViz")
 ```
 
 Now **MetaProViz** can be imported as:

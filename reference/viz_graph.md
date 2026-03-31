@@ -14,7 +14,6 @@ viz_graph(
   min_degree = NULL,
   node_sizes = NULL,
   show_density = FALSE,
-  seed = NULL,
   save_plot = "svg",
   print_plot = TRUE,
   path = NULL,
@@ -64,11 +63,6 @@ viz_graph(
   *Optional:* If TRUE, add a hull background per cluster. Default =
   FALSE.
 
-- seed:
-
-  *Optional:* Random seed for graph layout reproducibility. Default =
-  NULL.
-
 - save_plot:
 
   *Optional:* Select the file type of output plots. Options are svg,
@@ -84,6 +78,19 @@ viz_graph(
   Optional: String which is added to the resulting folder name.
   **default: NULL**
 
+- plot_width:
+
+  *Optional:* Plot width passed to `save_res`. Default = 3000.
+
+- plot_height:
+
+  *Optional:* Plot height passed to `save_res`. Default = 2000.
+
+- plot_unit:
+
+  *Optional:* Unit for plot dimensions passed to `save_res`. Default =
+  "px".
+
 ## Value
 
 Graph plot as a ggplot object.
@@ -91,47 +98,29 @@ Graph plot as a ggplot object.
 ## Examples
 
 ``` r
-# Load example data
-d <- metsigdb_kegg()
-
-# Run clustering with graph plotting
-r <- cluster_pk(
-    d,
-    metadata_info = c(
-        metabolite_column = "MetaboliteID",
-        pathway_column = "term"
-    ),
-    input_format = "long",
-    similarity = "jaccard",
-    threshold = 0.2,
-    clust = "community",
-    min = 2,
-    plot_name = "GraphExample_long_format",
-    save_plot = "png",
-    min_degree = 1,
-    seed = 123,
-    show_density = FALSE,
-    max_nodes = 1000
-) 
+# Create toy similarity matrix and clusters
+sim <- matrix(
+    c(1, 0.8, 0.3, 0.1,
+      0.8, 1, 0.2, 0.1,
+      0.3, 0.2, 1, 0.7,
+      0.1, 0.1, 0.7, 1),
+    nrow = 4,
+    dimnames = list(
+        c("Pathway_A", "Pathway_B", "Pathway_C", "Pathway_D"),
+        c("Pathway_A", "Pathway_B", "Pathway_C", "Pathway_D")
+    )
+)
+clusters <- c(
+    Pathway_A = "1", Pathway_B = "1",
+    Pathway_C = "2", Pathway_D = "2"
+)
+viz_graph(
+    sim, clusters,
+    plot_threshold = 0.2,
+    save_plot = NULL,
+    print_plot = FALSE
+)
 #> Warning: No shared levels found between `names(values)` of the manual scale and the
 #> data's fill values.
-#> Warning: ggrepel: 388 unlabeled data points (too many overlaps). Consider increasing max.overlaps
-
-# run graph plotting separately from clustering output but without node_sizes
-viz_graph(
-    r$similarity_matrix,
-    r$clusters,
-    plot_threshold = 0.5,
-    plot_name = "ClusterGraph",
-    max_nodes = NULL,
-    min_degree = NULL,
-    node_sizes = NULL,
-    show_density = TRUE,
-    seed = 123,
-    save_plot = NULL,
-    print_plot = FALSE,
-    path = NULL
-)
-#> Warning: ggrepel: 451 unlabeled data points (too many overlaps). Consider increasing max.overlaps
 
 ```

@@ -11,7 +11,8 @@ make_gene_metab_set(
   metadata_info = c(Target = "gene"),
   pk_name = NULL,
   save_table = "csv",
-  path = NULL
+  path = NULL,
+  exclude_metabolites = "all"
 )
 ```
 
@@ -40,6 +41,12 @@ make_gene_metab_set(
 
   Optional: String which is added to the resulting folder name
   **default: NULL**
+
+- exclude_metabolites:
+
+  Optional metabolite classes to exclude: NULL (exclude nothing), "all"
+  (default), or any combination of c("ions", "small_molecules",
+  "xenobiotics", "atoms").
 
 ## Value
 

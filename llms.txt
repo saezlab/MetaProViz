@@ -1,4 +1,4 @@
-# MetaProViz ![](articles/Hexagon_MetaProViz.png)
+# MetaProViz ![](reference/figures/Hexagon_MetaProViz.png)
 
 ## **Short Introduction**
 
@@ -14,7 +14,7 @@ their functions can be used independently from each other or in
 combination (**Fig.1**).
 
 ![Fig. 1: Overview of MetaProViz
-functions.](https://github.com/saezlab/MetaProViz/blob/development/vignettes/Fig.1.png?raw=true)
+functions.](reference/figures/Fig.1.png)
 
 **Fig. 1:** Overview of MetaProViz functions.
 
@@ -84,7 +84,7 @@ al. 2016). Cell-lines data from intra- and extracellular metabolomics
 data from cell culture media from [metabolomics workbench project
 PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418).
 
-![](articles/readme-example-data.png)
+![](reference/figures/readme-example-data.png)
 
 Additionally we also added transcriptomics and proteomics data of ccRCC
 patients processed with SiRCle (Mora et al. 2024), originally from
@@ -93,11 +93,18 @@ patients processed with SiRCle (Mora et al. 2024), originally from
 
 ## Installation
 
-**MetaProViz** is an R package and to install the package, start R and
-enter:
+**MetaProViz** is an Bioconductor R package. To install the package,
+start R and enter:
 
 ``` r
-devtools::install_github("https://github.com/saezlab/MetaProViz")
+# 1. Install MetaProViz from Bioconductor devel:
+if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+BiocManager::install(version = "devel")
+BiocManager::install("MetaProViz")
+
+# 2. Install the latest development version from GitHub using devtools
+# Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
+# remotes::install_github("saezlab/MetaProViz")
 ```
 
 Now **MetaProViz** can be imported as:
@@ -191,6 +198,8 @@ Integration Reveals Mechanisms of Phenotype Regulation in Renal Cancer.”
 - [`equivalent_id()`](equivalent_id.md) : Find additional potential IDs
   for "kegg", "pubchem", "chebi", "hmdb"
 - [`gaude_pathways`](gaude_pathways.md) : gaude_pathways
+- [`get_exclusion_metabolites()`](get_exclusion_metabolites.md) :
+  Metabolites excluded from prior knowledge resources
 - [`hallmarks`](hallmarks.md) : hallmarks
 - [`intracell_dma`](intracell_dma.md) : intracell_dma
 - [`intracell_raw`](intracell_raw.md) : intracell_raw
@@ -226,13 +235,21 @@ Integration Reveals Mechanisms of Phenotype Regulation in Renal Cancer.”
 - [`metsigdb_chemicalclass()`](metsigdb_chemicalclass.md) : Metabolite
   chemical classes from RaMP DB
 - [`metsigdb_kegg()`](metsigdb_kegg.md) : KEGG pathways
+- [`metsigdb_macdb()`](metsigdb_macdb.md) : Retrieve MACDB
+  metabolite-cancer associations.
 - [`metsigdb_metalinks()`](metsigdb_metalinks.md) : Annotated
   metabolite-protein interactions from MetalinksDB
+- [`metsigdb_reactome()`](metsigdb_reactome.md) : Retrieve Reactome
+  metabolite sets suitable for ORA.
+- [`metsigdb_wikipathways()`](metsigdb_wikipathways.md) : Retrieve
+  WikiPathways metabolite mapping suitable for ORA.
 - [`pool_estimation()`](pool_estimation.md) : Find metabolites with high
   variability across total pool samples
 - [`processing()`](processing.md) : Data preprocessing and normalization
 - [`replicate_sum()`](replicate_sum.md) : Merges the analytical
   replicates of an experiment
+- [`seed_id_compatibility_check()`](seed_id_compatibility_check.md) :
+  Check compatibility of seed ID pairs in input rows
 - [`standard_ora()`](standard_ora.md) : Overrepresentation analysis of
   metabolite sets in pathways
 - [`tissue_dma`](tissue_dma.md) : tissue_dma
@@ -246,6 +263,8 @@ Integration Reveals Mechanisms of Phenotype Regulation in Renal Cancer.”
 - [`tissue_tvn_rnaseq`](tissue_tvn_rnaseq.md) : tissue_tvn_rnaseq
 - [`translate_id()`](translate_id.md) : Translate IDs to/from KEGG,
   PubChem, Chebi, HMDB
+- [`traverse_ids()`](traverse_ids.md) : Expand metabolite IDs by
+  traversing RaMP ID mappings
 - [`viz_graph()`](viz_graph.md) : Graph visualization for clustered
   terms
 - [`viz_heatmap()`](viz_heatmap.md) : Heatmap visualization

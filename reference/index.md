@@ -22,6 +22,8 @@
 - [`equivalent_id()`](equivalent_id.md) : Find additional potential IDs
   for "kegg", "pubchem", "chebi", "hmdb"
 - [`gaude_pathways`](gaude_pathways.md) : gaude_pathways
+- [`get_exclusion_metabolites()`](get_exclusion_metabolites.md) :
+  Metabolites excluded from prior knowledge resources
 - [`hallmarks`](hallmarks.md) : hallmarks
 - [`intracell_dma`](intracell_dma.md) : intracell_dma
 - [`intracell_raw`](intracell_raw.md) : intracell_raw
@@ -57,13 +59,21 @@
 - [`metsigdb_chemicalclass()`](metsigdb_chemicalclass.md) : Metabolite
   chemical classes from RaMP DB
 - [`metsigdb_kegg()`](metsigdb_kegg.md) : KEGG pathways
+- [`metsigdb_macdb()`](metsigdb_macdb.md) : Retrieve MACDB
+  metabolite-cancer associations.
 - [`metsigdb_metalinks()`](metsigdb_metalinks.md) : Annotated
   metabolite-protein interactions from MetalinksDB
+- [`metsigdb_reactome()`](metsigdb_reactome.md) : Retrieve Reactome
+  metabolite sets suitable for ORA.
+- [`metsigdb_wikipathways()`](metsigdb_wikipathways.md) : Retrieve
+  WikiPathways metabolite mapping suitable for ORA.
 - [`pool_estimation()`](pool_estimation.md) : Find metabolites with high
   variability across total pool samples
 - [`processing()`](processing.md) : Data preprocessing and normalization
 - [`replicate_sum()`](replicate_sum.md) : Merges the analytical
   replicates of an experiment
+- [`seed_id_compatibility_check()`](seed_id_compatibility_check.md) :
+  Check compatibility of seed ID pairs in input rows
 - [`standard_ora()`](standard_ora.md) : Overrepresentation analysis of
   metabolite sets in pathways
 - [`tissue_dma`](tissue_dma.md) : tissue_dma
@@ -77,6 +87,8 @@
 - [`tissue_tvn_rnaseq`](tissue_tvn_rnaseq.md) : tissue_tvn_rnaseq
 - [`translate_id()`](translate_id.md) : Translate IDs to/from KEGG,
   PubChem, Chebi, HMDB
+- [`traverse_ids()`](traverse_ids.md) : Expand metabolite IDs by
+  traversing RaMP ID mappings
 - [`viz_graph()`](viz_graph.md) : Graph visualization for clustered
   terms
 - [`viz_heatmap()`](viz_heatmap.md) : Heatmap visualization

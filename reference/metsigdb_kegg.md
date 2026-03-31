@@ -5,8 +5,16 @@ KEGG pathways
 ## Usage
 
 ``` r
-metsigdb_kegg()
+metsigdb_kegg(exclude_metabolites = "all")
 ```
+
+## Arguments
+
+- exclude_metabolites:
+
+  Optional metabolite classes to exclude: NULL (exclude nothing), "all"
+  (default), or any combination of c("ions", "small_molecules",
+  "xenobiotics", "atoms").
 
 ## Value
 
@@ -16,7 +24,7 @@ A data frame containing the KEGG pathways suitable for ORA.
 
 ``` r
 metsigdb_kegg()
-#> # A tibble: 18,924 × 6
+#> # A tibble: 18,935 × 6
 #>    Description MetaboliteID term               Metabolite pubchem compound_names
 #>    <chr>       <chr>        <chr>              <chr>      <chr>   <list>        
 #>  1 map00010    C00022       Glycolysis / Gluc… Pyruvate   3324    <chr [5]>     
@@ -29,5 +37,5 @@ metsigdb_kegg()
 #>  8 map00010    C00084       Glycolysis / Gluc… Acetaldeh… 3384    <chr [2]>     
 #>  9 map00010    C00085       Glycolysis / Gluc… D-Fructos… 3385    <chr [3]>     
 #> 10 map00010    C00103       Glycolysis / Gluc… D-Glucose… 3403    <chr [4]>     
-#> # ℹ 18,914 more rows
+#> # ℹ 18,925 more rows
 ```

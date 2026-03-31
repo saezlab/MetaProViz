@@ -11,7 +11,7 @@ trivial names. doi:10.1016/j.ccell.2015.12.004"></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.99.32</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.99.51</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -60,7 +60,7 @@ trivial names. <a href="https://doi.org/10.1016/j.ccell.2015.12.004" class="exte
 
     <div class="section level2">
     <h2 id="format">Format<a class="anchor" aria-label="anchor" href="#format"></a></h2>
-    <p>An object of class <code>spec_tbl_df</code> (inherits from <code>tbl_df</code>, <code>tbl</code>, <code>data.frame</code>) with 877 rows and 11 columns.</p>
+    <p>An object of class <code>tbl_df</code> (inherits from <code>tbl</code>, <code>data.frame</code>) with 877 rows and 11 columns.</p>
     </div>
 
     <div class="section level2">
@@ -68,15 +68,15 @@ trivial names. <a href="https://doi.org/10.1016/j.ccell.2015.12.004" class="exte
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/data.html" class="external-link">data</a></span><span class="op">(</span><span class="va">tissue_meta</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">tissue_meta</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 6 × 11</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   Metabolite        SUPER_PATHWAY SUB_PATHWAY COMP_ID PLATFORM    RI  MASS CAS  </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 1,2-propanediol   Lipid         Ketone bod…   <span style="text-decoration: underline;">38</span>002 GC/MS    <span style="text-decoration: underline;">1</span>041   117  57-5…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 1,3-dihydroxyace… Carbohydrate  Glycolysis…   <span style="text-decoration: underline;">35</span>963 GC/MS    <span style="text-decoration: underline;">1</span>263   103  6214…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 1,5-anhydrogluci… Carbohydrate  Glycolysis…   <span style="text-decoration: underline;">20</span>675 GC/MS    <span style="text-decoration: underline;">1</span>789.  217  154-…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> 10-heptadecenoat… Lipid         Long chain…   <span style="text-decoration: underline;">33</span>971 LC/MS N… <span style="text-decoration: underline;">5</span>558   267. 2974…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> 10-nonadecenoate… Lipid         Long chain…   <span style="text-decoration: underline;">33</span>972 LC/MS N… <span style="text-decoration: underline;">5</span>775   295. 7303…</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> 13-HODE + 9-HODE  Lipid         Fatty acid…   <span style="text-decoration: underline;">37</span>752 LC/MS N… <span style="text-decoration: underline;">5</span>247   295. <span style="color: #BB0000;">NA</span>   </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 3 more variables: PUBCHEM &lt;dbl&gt;, KEGG &lt;chr&gt;, Group_HMDB &lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   Metabolite        CAS   SUPER_PATHWAY SUB_PATHWAY COMP_ID PLATFORM RI    MASS </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>       <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">1</span> 1,2-propanediol   57-5… Lipid         Ketone bod… 38002   GC/MS    1041  117  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">2</span> 1,3-dihydroxyace… 6214… Carbohydrate  Glycolysis… 35963   GC/MS    1263  103  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">3</span> 1,5-anhydrogluci… 154-… Carbohydrate  Glycolysis… 20675   GC/MS    1788… 217  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">4</span> 1-arachidonoylgl… <span style="color: #BB0000;">NA</span>    Lipid         Lysolipid   33228   LC/MS P… 5554  544.…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">5</span> 1-arachidonoylgl… <span style="color: #BB0000;">NA</span>    Lipid         Lysolipid   35186   LC/MS N… 5731  500.3</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">6</span> 1-arachidonoylgl… <span style="color: #BB0000;">NA</span>    Lipid         Lysolipid   34214   LC/MS N… 5479  619.4</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 3 more variables: PUBCHEM &lt;chr&gt;, KEGG &lt;chr&gt;, HMDB &lt;chr&gt;</span></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
@@ -85,7 +85,7 @@ trivial names. <a href="https://doi.org/10.1016/j.ccell.2015.12.004" class="exte
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Jannik Franken, Julio Saez-Rodriguez, Christian Frezza.</p>
+  <p>Developed by Christina Schmidt, Denes Turei, Jannik Franken, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez, Christian Frezza.</p>
 </div>
 
 <div class="pkgdown-footer-right">

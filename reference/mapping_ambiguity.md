@@ -20,13 +20,11 @@ mapping_ambiguity(
 
 - data:
 
-  Translated DF from translate_id reults or dataframe with at least one
+  Translated DF from translate_id results or dataframe with at least one
   column with the target metabolite ID and another MetaboliteID type.
   One of the IDs can only have one ID per row, the other ID can be
-  either
-
-  by comma or a list. Optional: add other columns such as source (e.g.
-  term).
+  either separated by comma or a list. Optional: add other columns such
+  as source (e.g. term).
 
 - from:
 

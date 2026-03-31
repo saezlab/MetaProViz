@@ -5,7 +5,12 @@ Metabolite chemical classes from RaMP DB
 ## Usage
 
 ``` r
-metsigdb_chemicalclass(version = "2.5.4", save_table = "csv", path = NULL)
+metsigdb_chemicalclass(
+  version = "2.5.4",
+  save_table = "csv",
+  path = NULL,
+  exclude_metabolites = "all"
+)
 ```
 
 ## Arguments
@@ -24,6 +29,12 @@ metsigdb_chemicalclass(version = "2.5.4", save_table = "csv", path = NULL)
 
   Optional: String which is added to the resulting folder name
   **default: NULL**
+
+- exclude_metabolites:
+
+  Optional metabolite classes to exclude: NULL (exclude nothing), "all"
+  (default), or any combination of c("ions", "small_molecules",
+  "xenobiotics", "atoms").
 
 ## Value
 

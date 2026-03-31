@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">MetaProViz</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.99.32</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">3.99.51</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -58,7 +58,6 @@
 <span>  min_degree <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  node_sizes <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  show_density <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  save_plot <span class="op">=</span> <span class="st">"svg"</span>,</span>
 <span>  print_plot <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  path <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -110,11 +109,6 @@ with names matching term IDs. Values are scaled for plotting.</p></dd>
 cluster. Default = FALSE.</p></dd>
 
 
-<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
-<dd><p><em>Optional: </em> Random seed for graph layout reproducibility.
-Default = NULL.</p></dd>
-
-
 <dt id="arg-save-plot">save_plot<a class="anchor" aria-label="anchor" href="#arg-save-plot"></a></dt>
 <dd><p><em>Optional: </em> Select the file type of output plots.
 Options are svg, pdf, png or NULL. <strong>Default = "svg"</strong></p></dd>
@@ -129,6 +123,19 @@ plots. <strong>Default = TRUE</strong></p></dd>
 <dd><p>Optional: String which is added to the resulting folder name.
 <strong>default: NULL</strong></p></dd>
 
+
+<dt id="arg-plot-width">plot_width<a class="anchor" aria-label="anchor" href="#arg-plot-width"></a></dt>
+<dd><p><em>Optional: </em> Plot width passed to <code>save_res</code>. Default = 3000.</p></dd>
+
+
+<dt id="arg-plot-height">plot_height<a class="anchor" aria-label="anchor" href="#arg-plot-height"></a></dt>
+<dd><p><em>Optional: </em> Plot height passed to <code>save_res</code>. Default = 2000.</p></dd>
+
+
+<dt id="arg-plot-unit">plot_unit<a class="anchor" aria-label="anchor" href="#arg-plot-unit"></a></dt>
+<dd><p><em>Optional: </em> Unit for plot dimensions passed to <code>save_res</code>.
+Default = "px".</p></dd>
+
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
@@ -137,49 +144,30 @@ plots. <strong>Default = TRUE</strong></p></dd>
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Load example data</span></span></span>
-<span class="r-in"><span><span class="va">d</span> <span class="op">&lt;-</span> <span class="fu"><a href="metsigdb_kegg.html">metsigdb_kegg</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Run clustering with graph plotting</span></span></span>
-<span class="r-in"><span><span class="va">r</span> <span class="op">&lt;-</span> <span class="fu"><a href="cluster_pk.html">cluster_pk</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="va">d</span>,</span></span>
-<span class="r-in"><span>    metadata_info <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>        metabolite_column <span class="op">=</span> <span class="st">"MetaboliteID"</span>,</span></span>
-<span class="r-in"><span>        pathway_column <span class="op">=</span> <span class="st">"term"</span></span></span>
-<span class="r-in"><span>    <span class="op">)</span>,</span></span>
-<span class="r-in"><span>    input_format <span class="op">=</span> <span class="st">"long"</span>,</span></span>
-<span class="r-in"><span>    similarity <span class="op">=</span> <span class="st">"jaccard"</span>,</span></span>
-<span class="r-in"><span>    threshold <span class="op">=</span> <span class="fl">0.2</span>,</span></span>
-<span class="r-in"><span>    clust <span class="op">=</span> <span class="st">"community"</span>,</span></span>
-<span class="r-in"><span>    min <span class="op">=</span> <span class="fl">2</span>,</span></span>
-<span class="r-in"><span>    plot_name <span class="op">=</span> <span class="st">"GraphExample_long_format"</span>,</span></span>
-<span class="r-in"><span>    save_plot <span class="op">=</span> <span class="st">"png"</span>,</span></span>
-<span class="r-in"><span>    min_degree <span class="op">=</span> <span class="fl">1</span>,</span></span>
-<span class="r-in"><span>    seed <span class="op">=</span> <span class="fl">123</span>,</span></span>
-<span class="r-in"><span>    show_density <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>    max_nodes <span class="op">=</span> <span class="fl">1000</span></span></span>
-<span class="r-in"><span><span class="op">)</span> </span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Create toy similarity matrix and clusters</span></span></span>
+<span class="r-in"><span><span class="va">sim</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">0.8</span>, <span class="fl">0.3</span>, <span class="fl">0.1</span>,</span></span>
+<span class="r-in"><span>      <span class="fl">0.8</span>, <span class="fl">1</span>, <span class="fl">0.2</span>, <span class="fl">0.1</span>,</span></span>
+<span class="r-in"><span>      <span class="fl">0.3</span>, <span class="fl">0.2</span>, <span class="fl">1</span>, <span class="fl">0.7</span>,</span></span>
+<span class="r-in"><span>      <span class="fl">0.1</span>, <span class="fl">0.1</span>, <span class="fl">0.7</span>, <span class="fl">1</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>    nrow <span class="op">=</span> <span class="fl">4</span>,</span></span>
+<span class="r-in"><span>    dimnames <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Pathway_A"</span>, <span class="st">"Pathway_B"</span>, <span class="st">"Pathway_C"</span>, <span class="st">"Pathway_D"</span><span class="op">)</span>,</span></span>
+<span class="r-in"><span>        <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Pathway_A"</span>, <span class="st">"Pathway_B"</span>, <span class="st">"Pathway_C"</span>, <span class="st">"Pathway_D"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>    <span class="op">)</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">clusters</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    Pathway_A <span class="op">=</span> <span class="st">"1"</span>, Pathway_B <span class="op">=</span> <span class="st">"1"</span>,</span></span>
+<span class="r-in"><span>    Pathway_C <span class="op">=</span> <span class="st">"2"</span>, Pathway_D <span class="op">=</span> <span class="st">"2"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">viz_graph</span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="va">sim</span>, <span class="va">clusters</span>,</span></span>
+<span class="r-in"><span>    plot_threshold <span class="op">=</span> <span class="fl">0.2</span>,</span></span>
+<span class="r-in"><span>    save_plot <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
+<span class="r-in"><span>    print_plot <span class="op">=</span> <span class="cn">FALSE</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>No shared levels found between `names(values)` of the manual scale and the</span>
 <span class="r-wrn co"><span class="r-pr">#&gt;</span> data's <span style="color: #00BB00;">fill</span> values.</span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>ggrepel: 388 unlabeled data points (too many overlaps). Consider increasing max.overlaps</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># run graph plotting separately from clustering output but without node_sizes</span></span></span>
-<span class="r-in"><span><span class="fu">viz_graph</span><span class="op">(</span></span></span>
-<span class="r-in"><span>    <span class="va">r</span><span class="op">$</span><span class="va">similarity_matrix</span>,</span></span>
-<span class="r-in"><span>    <span class="va">r</span><span class="op">$</span><span class="va">clusters</span>,</span></span>
-<span class="r-in"><span>    plot_threshold <span class="op">=</span> <span class="fl">0.5</span>,</span></span>
-<span class="r-in"><span>    plot_name <span class="op">=</span> <span class="st">"ClusterGraph"</span>,</span></span>
-<span class="r-in"><span>    max_nodes <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>    min_degree <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>    node_sizes <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>    show_density <span class="op">=</span> <span class="cn">TRUE</span>,</span></span>
-<span class="r-in"><span>    seed <span class="op">=</span> <span class="fl">123</span>,</span></span>
-<span class="r-in"><span>    save_plot <span class="op">=</span> <span class="cn">NULL</span>,</span></span>
-<span class="r-in"><span>    print_plot <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
-<span class="r-in"><span>    path <span class="op">=</span> <span class="cn">NULL</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>ggrepel: 451 unlabeled data points (too many overlaps). Consider increasing max.overlaps</span>
 <span class="r-plt img"><img src="viz_graph-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
@@ -189,7 +177,7 @@ plots. <strong>Default = TRUE</strong></p></dd>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Jannik Franken, Julio Saez-Rodriguez, Christian Frezza.</p>
+  <p>Developed by Christina Schmidt, Denes Turei, Jannik Franken, Dimitrios Prymidis, Macabe Daley, Julio Saez-Rodriguez, Christian Frezza.</p>
 </div>
 
 <div class="pkgdown-footer-right">

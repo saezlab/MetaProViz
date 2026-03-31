@@ -1,6 +1,6 @@
 # Prior Knowledge - Access & Integration
 
-## ![](Hexagon_MetaProViz.png)
+## ![](../Hexagon_MetaProViz.png)
 
   
 In this tutorial we showcase how to use **MetaProViz** prior
@@ -23,9 +23,12 @@ First if you have not done yet, install the required dependencies and
 load the libraries:
 
 ``` r
-# 1. Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
+# 1. Install MetaProViz from Bioconductor devel:
+# if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
+# BiocManager::install(version = "devel")
+# BiocManager::install("MetaProViz")
 # 2. Install the latest development version from GitHub using devtools
-# devtools::install_github("https://github.com/saezlab/MetaProViz")
+# remotes::install_github("saezlab/MetaProViz") # Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
 
 library(MetaProViz)
 
@@ -276,21 +279,21 @@ ChemicalClass_MetabSet <- metsigdb_chemicalclass()
 
   
 
-| class_source_id | common_name                                                                          | ClassyFire_class                 | ClassyFire_super_class          | ClassyFire_sub_class                      |
-|:----------------|:-------------------------------------------------------------------------------------|:---------------------------------|:--------------------------------|:------------------------------------------|
-| HMDB0000001     | 3-Methylhistidine; 1-Methylhistidine                                                 | Carboxylic acids and derivatives | Organic acids and derivatives   | Amino acids, peptides, and analogues      |
-| HMDB0000479     | 3-Methylhistidine; 1-Methylhistidine                                                 | Carboxylic acids and derivatives | Organic acids and derivatives   | Amino acids, peptides, and analogues      |
-| HMDB0000005     | 2-Ketobutyric acid                                                                   | Keto acids and derivatives       | Organic acids and derivatives   | Short-chain keto acids and derivatives    |
-| HMDB0000008     | 2-Hydroxybutyric acid                                                                | Hydroxy acids and derivatives    | Organic acids and derivatives   | Alpha hydroxy acids and derivatives       |
-| HMDB0000010     | 2-Methoxyestrone                                                                     | Steroids and steroid derivatives | Lipids and lipid-like molecules | Estrane steroids                          |
-| HMDB0000163     | D-Maltose                                                                            | Organooxygen compounds           | Organic oxygen compounds        | Carbohydrates and carbohydrate conjugates |
-| HMDB0000169     | D-Mannose                                                                            | Organooxygen compounds           | Organic oxygen compounds        | Carbohydrates and carbohydrate conjugates |
-| HMDB0000172     | L-Isoleucine                                                                         | Carboxylic acids and derivatives | Organic acids and derivatives   | Amino acids, peptides, and analogues      |
-| HMDB0000174     | L-Fucose                                                                             | Organooxygen compounds           | Organic oxygen compounds        | Carbohydrates and carbohydrate conjugates |
-| HMDB0004940     | N-Glycoloylganglioside GM1; Ganglioside GM2 (d18:1/20:0); N-Glycoloylganglioside GM2 | Sphingolipids                    | Lipids and lipid-like molecules | Glycosphingolipids                        |
-| HMDB0000772     | Nonadecanoic acid                                                                    | Fatty Acyls                      | Lipids and lipid-like molecules | Fatty acids and conjugates                |
-| HMDB0000780     | Porphinehexacarboxylic acid                                                          | Tetrapyrroles and derivatives    | Organoheterocyclic compounds    | Porphyrins                                |
-| HMDB0000781     | N-Acetylgalactosamine 4-sulphate                                                     | Organooxygen compounds           | Organic oxygen compounds        | Carbohydrates and carbohydrate conjugates |
+| class_source_id | common_name                          | ClassyFire_class                 | ClassyFire_super_class                  | ClassyFire_sub_class                      |
+|:----------------|:-------------------------------------|:---------------------------------|:----------------------------------------|:------------------------------------------|
+| HMDB0000001     | 3-Methylhistidine; 1-Methylhistidine | Carboxylic acids and derivatives | Organic acids and derivatives           | Amino acids, peptides, and analogues      |
+| HMDB0000479     | 3-Methylhistidine; 1-Methylhistidine | Carboxylic acids and derivatives | Organic acids and derivatives           | Amino acids, peptides, and analogues      |
+| HMDB0000005     | 2-Ketobutyric acid                   | Keto acids and derivatives       | Organic acids and derivatives           | Short-chain keto acids and derivatives    |
+| HMDB0000008     | 2-Hydroxybutyric acid                | Hydroxy acids and derivatives    | Organic acids and derivatives           | Alpha hydroxy acids and derivatives       |
+| HMDB0000010     | 2-Methoxyestrone                     | Steroids and steroid derivatives | Lipids and lipid-like molecules         | Estrane steroids                          |
+| HMDB0000172     | L-Isoleucine                         | Carboxylic acids and derivatives | Organic acids and derivatives           | Amino acids, peptides, and analogues      |
+| HMDB0000174     | L-Fucose                             | Organooxygen compounds           | Organic oxygen compounds                | Carbohydrates and carbohydrate conjugates |
+| HMDB0000175     | Inosinic acid                        | Purine nucleotides               | Nucleosides, nucleotides, and analogues | Purine ribonucleotides                    |
+| HMDB0000176     | Maleic acid                          | Carboxylic acids and derivatives | Organic acids and derivatives           | Dicarboxylic acids and derivatives        |
+| HMDB0000783     | Propionylglycine                     | Carboxylic acids and derivatives | Organic acids and derivatives           | Amino acids, peptides, and analogues      |
+| HMDB0000784     | Azelaic acid                         | Fatty Acyls                      | Lipids and lipid-like molecules         | Fatty acids and conjugates                |
+| HMDB0000785     | N-Acetyl-7-O-acetylneuraminic acid   | Organooxygen compounds           | Organic oxygen compounds                | Carbohydrates and carbohydrate conjugates |
+| HMDB0000786     | Alloxan; Oxypurinol                  | Imidazopyrimidines               | Organoheterocyclic compounds            | Purines and purine derivatives            |
 
 Preview of the DF `ChemicalClass_MetabSet`.
 
@@ -404,23 +407,23 @@ MetaLinksDB <- metsigdb_metalinks()
 
   
 
-| hmdb        | metabolite             | gene_symbol | protein_type         | source | mor | type                   | transport_direction | mode_of_regulation |
-|:------------|:-----------------------|:------------|:---------------------|:-------|----:|:-----------------------|:--------------------|:-------------------|
-| HMDB0000538 | Adenosine triphosphate | UBA6        | NA                   | hmr    |  -1 | Production-Degradation | NA                  | Inhibiting         |
-| HMDB0000538 | Adenosine triphosphate | UBA6        | NA                   | recon  |  -1 | Production-Degradation | NA                  | Inhibiting         |
-| HMDB0000122 | D-Glucose              | SLC5A10     | “transporter”        | recon  |   1 | Production-Degradation | out                 | Activating         |
-| HMDB0000143 | D-Galactose            | SLC5A10     | “transporter”        | recon  |   1 | Production-Degradation | out                 | Activating         |
-| HMDB0001341 | ADP                    | TLR4        | “catalytic_receptor” | Stitch |   0 | Ligand-Receptor        | NA                  | Binding            |
-| HMDB0000151 | Estradiol              | TNFRSF11B   | “catalytic_receptor” | Stitch |  -1 | Ligand-Receptor        | NA                  | Inhibiting         |
+| hmdb        | metabolite               | gene_symbol | protein_type | source | mor | type                   | transport_direction | mode_of_regulation |
+|:------------|:-------------------------|:------------|:-------------|:-------|----:|:-----------------------|:--------------------|:-------------------|
+| HMDB0031078 | Pentadecanal             | ILVBL       | NA           | rhea   |   1 | Production-Degradation | NA                  | Activating         |
+| HMDB0000538 | Adenosine triphosphate   | UBE2QL1     | NA           | recon  |  -1 | Production-Degradation | NA                  | Inhibiting         |
+| HMDB0006498 | 3-Oxooctadecanoyl-CoA    | ELOVL7      | NA           | recon  |   1 | Production-Degradation | NA                  | Activating         |
+| HMDB0001175 | Malonyl-CoA              | ELOVL7      | NA           | hmr    |  -1 | Production-Degradation | NA                  | Inhibiting         |
+| HMDB0003036 | Triiodothyronine sulfate | SULT1C2     | NA           | recon  |   1 | Production-Degradation | NA                  | Activating         |
+| HMDB0000045 | Adenosine monophosphate  | RTCA        | NA           | hmr    |  -1 | Production-Degradation | NA                  | Inhibiting         |
 
 Preview of the DF `MetaLinksDB` including metabolite-receptor sets.
 
-| hmdb        | metabolite                                           | pubchem | metabolite_subclass                       | uniprot | gene_symbol | protein_type         | source | db_score | experiment_score | combined_score | mor | type                   | transport_direction | mode_of_regulation | term_specific                        |
-|:------------|:-----------------------------------------------------|:--------|:------------------------------------------|:--------|:------------|:---------------------|:-------|---------:|-----------------:|---------------:|----:|:-----------------------|:--------------------|:-------------------|:-------------------------------------|
-| HMDB0000660 | D-Fructose                                           | 439709  | Carbohydrates and carbohydrate conjugates | A0PJK1  | SLC5A10     | “transporter”        | recon  |       NA |               NA |             NA |   1 | Production-Degradation | out                 | Activating         | transporter_Production-Degradation   |
-| HMDB0002212 | Arachidic acid                                       | 10467   | Fatty acids and conjugates                | A6NFH5  | FABP12      | “other_protein”      | hmr    |       NA |               NA |             NA |   1 | Production-Degradation | out                 | Activating         | other_protein_Production-Degradation |
-| HMDB0037790 | Polyethylene glycol                                  | 174     | Alcohols and polyols                      | O00206  | TLR4        | “catalytic_receptor” | Stitch |      413 |                0 |            483 |   0 | Ligand-Receptor        | NA                  | Binding            | catalytic_receptor_Ligand-Receptor   |
-| HMDB0034442 | L-trans-alpha-Amino-2-carboxycyclopropaneacetic acid | 1271    | Amino acids, peptides, and analogues      | O00222  | GRM8        | “gpcr”               | Stitch |      367 |                0 |            888 |   0 | Ligand-Receptor        | NA                  | Binding            | gpcr_Ligand-Receptor                 |
+| hmdb        | metabolite         | pubchem | metabolite_subclass                       | uniprot | gene_symbol | protein_type    | source      | db_score | experiment_score | combined_score | mor | type                   | transport_direction | mode_of_regulation | protein_type_clean | receptor_class | interaction_family     | interaction_mechanism     | regulation_polarity   | transport_direction_label | transport_mode     | evidence_class                        | experiment_evidence_present | combined_confidence_tier | interaction_detail                        | term_specific                        |
+|:------------|:-------------------|:--------|:------------------------------------------|:--------|:------------|:----------------|:------------|---------:|-----------------:|---------------:|----:|:-----------------------|:--------------------|:-------------------|:-------------------|:---------------|:-----------------------|:--------------------------|:----------------------|:--------------------------|:-------------------|:--------------------------------------|:----------------------------|:-------------------------|:------------------------------------------|:-------------------------------------|
+| HMDB0000660 | D-Fructose         | 439709  | Carbohydrates and carbohydrate conjugates | A0PJK1  | SLC5A10     | “transporter”   | recon       |       NA |               NA |             NA |   1 | Production-Degradation | out                 | Activating         | transporter        | NA             | Transporter-metabolite | Transport                 | Positive (activating) | Export/Secretion          | Efflux transporter | Metabolic knowledgebase               | No/Unknown                  | Unknown                  | Efflux transporter; Positive (activating) | transporter_Production-Degradation   |
+| HMDB0002345 | Heneicosanoic acid | 16898   | Fatty acids and conjugates                | A6NFH5  | FABP12      | “other_protein” | recon       |       NA |               NA |             NA |   1 | Production-Degradation | out                 | Activating         | other_protein      | NA             | Transporter-metabolite | Transport                 | Positive (activating) | Export/Secretion          | Efflux transporter | Metabolic knowledgebase               | No/Unknown                  | Unknown                  | Efflux transporter; Positive (activating) | other_protein_Production-Degradation |
+| HMDB0000148 | L-Glutamic acid    | 33032   | Amino acids, peptides, and analogues      | O00222  | GRM8        | “gpcr”          | CellPhoneDB |      845 |                0 |            986 |   1 | Ligand-Receptor        | NA                  | Activating         | gpcr               | GPCR           | Receptor-metabolite    | Ligand-receptor signaling | Positive (activating) | Not specified             | NA                 | Cell-cell communication resource      | No/Unknown                  | Very high                | GPCR; Positive (activating)               | gpcr_Ligand-Receptor                 |
+| HMDB0006111 | 12-HETE            | 5283155 | Eicosanoids                               | O00270  | GPR31       | “gpcr”          | Stitch      |        0 |                0 |            907 |   0 | Ligand-Receptor        | NA                  | Binding            | gpcr               | GPCR           | Receptor-metabolite    | Ligand-receptor signaling | Neutral (binding)     | Not specified             | NA                 | Chemical-protein interaction resource | No/Unknown                  | Very high                | GPCR; Neutral (binding)                   | gpcr_Ligand-Receptor                 |
 
 Preview of the metabolite-receptor and metabolite-transporter sets.
 
@@ -473,7 +476,9 @@ clearly.
     #> Please use `theme()` to construct themes.
     #> Note: Could not render upset plot to screen due to theme compatibility issues. Plot was saved to file successfully.
 
-![](prior-knowledge.Rmd_compare-pk.svg)  
+    #> <img src="prior-knowledge.Rmd_compare-pk.svg" width="100%" style="display:block; margin:0 auto;"/>
+
+  
 The table includes all features of the three PK resources we decided to
 compare. Additionally, it includes a column for each PK resource with
 value 1 if the feature is present in the PK resource and 0 if it is not.
@@ -569,7 +574,9 @@ what to expect, when linking the data to prior knowledge.
     #> Please use `theme()` to construct themes.
     #> Note: Could not render upset plot to screen due to theme compatibility issues. Plot was saved to file successfully.
 
-![](prior-knowledge.Rmd_compare-pk-2.svg)  
+    #> <img src="prior-knowledge.Rmd_compare-pk-2.svg" width="100%" style="display:block; margin:0 auto;"/>
+
+  
 
 | TrivialName | CHEBI | HMDB | LIMID | None | Class               |
 |:------------|------:|-----:|------:|-----:|:--------------------|
@@ -680,10 +687,10 @@ metadata_info = c(InputID="HMDB", PriorID="hmdb", grouping_variable=NULL))
 #> MetaLinksDB, : 4 duplicated IDs were removed from column HMDB
 #> No metadata_info grouping_variable provided. If this was not intentional, please check your input.
 #> Warning in checkmatch_pk_to_data(data = FeatureMetadata_Biocrates, input_pk =
-#> MetaLinksDB, : 40766 duplicated IDs were removed from PK column hmdb
+#> MetaLinksDB, : 35390 duplicated IDs were removed from PK column hmdb
 #> data has multiple IDs per measurement = TRUE. input_pk has multiple IDs per entry = FALSE.
 #> data has 762 unique entries with 2027 unique HMDB IDs. Of those IDs, 176 match, which is 8.68278243709916%.
-#> input_pk has 1128 unique entries with 1128 unique hmdb IDs. Of those IDs, 176 are detected in the data, which is 15.6028368794326%.
+#> input_pk has 1116 unique entries with 1116 unique hmdb IDs. Of those IDs, 176 are detected in the data, which is 15.7706093189964%.
 #> Warning in checkmatch_pk_to_data(data = FeatureMetadata_Biocrates, input_pk =
 #> MetaLinksDB, : There are cases where multiple detected IDs match to multiple
 #> prior knowledge IDs of the same category
@@ -797,10 +804,10 @@ metadata_info = c(InputID="HMDB_single", PriorID="hmdb", grouping_variable=NULL)
 #> 49 duplicated IDs were removed from column HMDB_single
 #> No metadata_info grouping_variable provided. If this was not intentional, please check your input.
 #> Warning in checkmatch_pk_to_data(data = FeatureMetadata_Biocrates_singleHMDB, :
-#> 40766 duplicated IDs were removed from PK column hmdb
+#> 35390 duplicated IDs were removed from PK column hmdb
 #> data has multiple IDs per measurement = FALSE. input_pk has multiple IDs per entry = FALSE.
 #> data has 717 unique entries with 717 unique HMDB_single IDs. Of those IDs, 147 match, which is 20.5020920502092%.
-#> input_pk has 1128 unique entries with 1128 unique hmdb IDs. Of those IDs, 147 are detected in the data, which is 13.031914893617%.
+#> input_pk has 1116 unique entries with 1116 unique hmdb IDs. Of those IDs, 147 are detected in the data, which is 13.1720430107527%.
 
 
 #Number of matches:
@@ -897,7 +904,9 @@ pk_comp_res_keggtrans <- compare_pk(data = list(kegg_translated = KEGG_Pathways_
                                                 plot_name = "IDs available after KEGG ID Translation")
 ```
 
-![](prior-knowledge.Rmd_compare-pk-3.svg)  
+    #> <img src="prior-knowledge.Rmd_compare-pk-3.svg" width="100%" style="display:block; margin:0 auto;"/>
+
+  
 We can also note from the previous table that it becomes apparent that
 the translation of IDs is not a one-to-one mapping, but rather a
 one-to-many mapping. In fact it is very common that an ID from one
@@ -928,7 +937,7 @@ would in turn inflate/deflate the enrichment results and hence it would
 be desired to keep the number of metabolites in a pathway consistent.  
 
 ![Fig. 2: Mapping problems in prior knowledge metabolite-sets when
-translating metabolite IDs.](Fig.2.png)
+translating metabolite IDs.](../Fig.2.png)
 
 Fig. 2: Mapping problems in prior knowledge metabolite-sets when
 translating metabolite IDs.
@@ -1041,7 +1050,7 @@ the next release, so stay tuned.
 
 ![Fig. 3: Mapping problems in prior knowledge metabolite-sets when
 translating metabolite IDs and the connection to detected (measured
-input metabolites).](Fig.3.png)
+input metabolites).](../Fig.3.png)
 
 Fig. 3: Mapping problems in prior knowledge metabolite-sets when
 translating metabolite IDs and the connection to detected (measured
@@ -1149,47 +1158,47 @@ Tissue_TvsN_Young <- tissue_dma_young
     #> [1] stats     graphics  grDevices utils     datasets  methods   base     
     #> 
     #> other attached packages:
-    #> [1] tibble_3.3.1       stringr_1.6.0      dplyr_1.1.4        purrr_1.2.1        rlang_1.1.7        magrittr_2.0.4    
-    #> [7] MetaProViz_3.99.32 BiocStyle_2.38.0  
+    #> [1] tibble_3.3.1       stringr_1.6.0      dplyr_1.2.0        purrr_1.2.1        rlang_1.1.7        magrittr_2.0.4    
+    #> [7] MetaProViz_3.99.51 BiocStyle_2.38.0  
     #> 
     #> loaded via a namespace (and not attached):
-    #>   [1] splines_4.5.2               later_1.4.5                 R.oo_1.27.1                 cellranger_1.1.0           
-    #>   [5] polyclip_1.10-7             XML_3.99-0.20               factoextra_1.0.7            lifecycle_1.0.5            
+    #>   [1] splines_4.5.2               later_1.4.8                 R.oo_1.27.1                 cellranger_1.1.0           
+    #>   [5] polyclip_1.10-7             XML_3.99-0.23               factoextra_2.0.0            lifecycle_1.0.5            
     #>   [9] httr2_1.2.2                 tcltk_4.5.2                 rstatix_0.7.3               lattice_0.22-7             
-    #>  [13] vroom_1.6.7                 MASS_7.3-65                 backports_1.5.0             limma_3.66.0               
-    #>  [17] sass_0.4.10                 rmarkdown_2.30              jquerylib_0.1.4             yaml_2.3.12                
+    #>  [13] vroom_1.7.0                 MASS_7.3-65                 backports_1.5.0             limma_3.66.0               
+    #>  [17] sass_0.4.10                 rmarkdown_2.31              jquerylib_0.1.4             yaml_2.3.12                
     #>  [21] otel_0.2.0                  zip_2.3.3                   sessioninfo_1.2.3           EnhancedVolcano_1.29.1     
-    #>  [25] qcc_2.7                     DBI_1.2.3                   RColorBrewer_1.1-3          lubridate_1.9.4            
+    #>  [25] qcc_2.7                     DBI_1.3.0                   RColorBrewer_1.1-3          lubridate_1.9.5            
     #>  [29] abind_1.4-8                 rvest_1.0.5                 GenomicRanges_1.62.1        R.utils_2.13.0             
     #>  [33] ggraph_2.2.2                BiocGenerics_0.56.0         hash_2.2.6.4                tweenr_2.0.3               
-    #>  [37] rappdirs_0.3.4              IRanges_2.44.0              S4Vectors_0.48.0            ggrepel_0.9.6              
+    #>  [37] rappdirs_0.3.4              IRanges_2.44.0              S4Vectors_0.48.0            ggrepel_0.9.8              
     #>  [41] pheatmap_1.0.13             parallelly_1.46.1           pkgdown_2.2.0               svglite_2.2.2              
     #>  [45] codetools_0.2-20            DelayedArray_0.36.0         xml2_1.5.2                  ggforce_0.5.0              
     #>  [49] tidyselect_1.2.1            farver_2.1.2                viridis_0.6.5               ComplexUpset_1.3.3         
     #>  [53] matrixStats_1.5.0           stats4_4.5.2                Seqinfo_1.0.0               jsonlite_2.0.0             
-    #>  [57] tidygraph_1.3.1             Formula_1.2-5               systemfonts_1.3.1           tools_4.5.2                
-    #>  [61] progress_1.2.3              ragg_1.5.0                  Rcpp_1.1.1                  glue_1.8.0                 
-    #>  [65] gridExtra_2.3               SparseArray_1.10.8          xfun_0.56                   decoupleR_2.16.0           
+    #>  [57] tidygraph_1.3.1             Formula_1.2-5               systemfonts_1.3.2           tools_4.5.2                
+    #>  [61] progress_1.2.3              ragg_1.5.2                  Rcpp_1.1.1                  glue_1.8.0                 
+    #>  [65] gridExtra_2.3               SparseArray_1.10.9          xfun_0.57                   decoupleR_2.16.0           
     #>  [69] qvalue_2.42.0               MatrixGenerics_1.22.0       ggfortify_0.4.19            withr_3.0.2                
-    #>  [73] BiocManager_1.30.27         fastmap_1.2.0               digest_0.6.39               timechange_0.3.0           
-    #>  [77] R6_2.6.1                    textshaping_1.0.4           colorspace_2.1-2            lpSolve_5.6.23             
-    #>  [81] gtools_3.9.5                RSQLite_2.4.5               R.methodsS3_1.8.2           tidyr_1.3.2                
-    #>  [85] generics_0.1.4              prettyunits_1.2.0           graphlayouts_1.2.2          httr_1.4.7                 
-    #>  [89] htmlwidgets_1.6.4           S4Arrays_1.10.1             scatterplot3d_0.3-44        inflection_1.3.7           
+    #>  [73] BiocManager_1.30.27         fastmap_1.2.0               digest_0.6.39               timechange_0.4.0           
+    #>  [77] R6_2.6.1                    textshaping_1.0.5           colorspace_2.1-2            lpSolve_5.6.23             
+    #>  [81] gtools_3.9.5                RSQLite_2.4.6               R.methodsS3_1.8.2           tidyr_1.3.2                
+    #>  [85] generics_0.1.4              prettyunits_1.2.0           graphlayouts_1.2.3          httr_1.4.8                 
+    #>  [89] htmlwidgets_1.6.4           S4Arrays_1.10.1             scatterplot3d_0.3-45        inflection_1.3.7           
     #>  [93] pkgconfig_2.0.3             gtable_0.3.6                blob_1.3.0                  S7_0.2.1                   
-    #>  [97] XVector_0.50.0              OmnipathR_3.19.6            htmltools_0.5.9             carData_3.0-5              
+    #>  [97] XVector_0.50.0              OmnipathR_3.19.12           htmltools_0.5.9             carData_3.0-6              
     #> [101] bookdown_0.46               scales_1.4.0                kableExtra_1.4.0            Biobase_2.70.0             
     #> [105] knitr_1.51                  rstudioapi_0.18.0           rjson_0.2.23                tzdb_0.5.0                 
-    #> [109] reshape2_1.4.5              checkmate_2.3.3             curl_7.0.0                  cachem_1.1.0               
-    #> [113] Polychrome_1.5.4            parallel_4.5.2              vipor_0.4.7                 cosmosR_1.18.0             
+    #> [109] reshape2_1.4.5              checkmate_2.3.4             curl_7.0.0                  cachem_1.1.0               
+    #> [113] Polychrome_1.5.4            parallel_4.5.2              vipor_0.4.7                 cosmosR_1.18.1             
     #> [117] desc_1.4.3                  pillar_1.11.1               grid_4.5.2                  logger_0.4.1               
-    #> [121] vctrs_0.7.1                 ggpubr_0.6.2                car_3.1-3                   beeswarm_0.4.0             
-    #> [125] evaluate_1.0.5              readr_2.1.6                 cli_3.6.5                   compiler_4.5.2             
+    #> [121] vctrs_0.7.2                 ggpubr_0.6.3                car_3.1-5                   beeswarm_0.4.0             
+    #> [125] evaluate_1.0.5              readr_2.2.0                 cli_3.6.5                   compiler_4.5.2             
     #> [129] crayon_1.5.3                ggsignif_0.6.4              labeling_0.4.3              plyr_1.8.9                 
-    #> [133] fs_1.6.6                    ggbeeswarm_0.7.3            writexl_1.5.4               stringi_1.8.7              
-    #> [137] viridisLite_0.4.2           BiocParallel_1.44.0         Matrix_1.7-4                hms_1.1.4                  
-    #> [141] patchwork_1.3.2             bit64_4.6.0-1               ggplot2_4.0.1               statmod_1.5.1              
-    #> [145] SummarizedExperiment_1.40.0 CARNIVAL_2.20.0             igraph_2.2.1                broom_1.0.11               
+    #> [133] fs_2.0.1                    ggbeeswarm_0.7.3            writexl_1.5.4               stringi_1.8.7              
+    #> [137] viridisLite_0.4.3           BiocParallel_1.44.0         Matrix_1.7-4                hms_1.1.4                  
+    #> [141] patchwork_1.3.2             bit64_4.6.0-1               ggplot2_4.0.2               statmod_1.5.1              
+    #> [145] SummarizedExperiment_1.40.0 CARNIVAL_2.20.0             igraph_2.2.2                broom_1.0.12               
     #> [149] memoise_2.0.1               bslib_0.10.0                bit_4.6.0                   readxl_1.4.5
 
 ## Bibliography

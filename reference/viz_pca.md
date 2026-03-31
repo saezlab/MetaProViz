@@ -123,14 +123,10 @@ List with two elements: Plot and Plot_Sized
 ``` r
 data(intracell_raw_se)
 Res <- viz_pca(intracell_raw_se)
-#> Warning: ggrepel: 36 unlabeled data points (too many overlaps). Consider increasing max.overlaps
-#> Warning: ggrepel: 38 unlabeled data points (too many overlaps). Consider increasing max.overlaps
 
 
 data(intracell_raw)
 Intra <- intracell_raw[, -c(2:4)] %>% tibble::column_to_rownames("Code")
 Res <- viz_pca(Intra)
-#> Warning: ggrepel: 36 unlabeled data points (too many overlaps). Consider increasing max.overlaps
-#> Warning: ggrepel: 38 unlabeled data points (too many overlaps). Consider increasing max.overlaps
 
 ```
