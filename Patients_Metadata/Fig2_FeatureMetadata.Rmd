@@ -218,6 +218,220 @@ Plot1_PubChem <- MetaProViz::count_id(MetaboliteIDs,
                                    path= "MetaProViz_Results/PK/PK_PUBCHEM/Original")
 ```
 
+```{r}
+########################
+### HELPER functions for id_summary table and deltas
+
+## Helper: extract one summary row from count_id() output
+extract_id_counts <- function(count_obj, row_name) {
+  ## count_obj must be an object returned by MetaProViz::count_id()
+  
+  tbl <- count_obj$Table
+  
+  ## Count how many features fall into each ID class
+  counts_wide <- tbl %>%
+    count(id_label, name = "n") %>%
+    mutate(
+      id_label = recode(
+        id_label,
+        "No ID" = "no_ID",
+        "Single ID" = "Single_ID",
+        "Multiple IDs" = "Multiple_IDs"
+      )
+    ) %>%
+    pivot_wider(
+      names_from = id_label,
+      values_from = n,
+      values_fill = 0
+    )
+  
+  ## Make sure all expected columns exist
+  ## This avoids errors if one class is absent in a given dataset
+  for (col in c("no_ID", "Single_ID", "Multiple_IDs")) {
+    if (!col %in% names(counts_wide)) {
+      counts_wide[[col]] <- 0L
+    }
+  }
+  
+  ## Build one clean summary row
+  tibble(
+    row_name = row_name,
+    no_ID = as.integer(counts_wide$no_ID[1]),
+    Single_ID = as.integer(counts_wide$Single_ID[1]),
+    Multiple_IDs = as.integer(counts_wide$Multiple_IDs[1]),
+    Total_IDs = as.integer(sum(tbl$entry_count, na.rm = TRUE))
+  )
+}
+
+
+
+## Helper: append one summary row to id_count_df
+append_id_counts <- function(df, count_obj, row_name) {
+  bind_rows(df, extract_id_counts(count_obj, row_name))
+}
+
+## Helper: calculate deltas within each database only
+
+## Example:
+## HMDB_cleaned - HMDB_Original
+## KEGG_cleaned - KEGG_Original
+## PUBCHEM_cleaned - PUBCHEM_Original
+
+## This does not compare across databases.
+calculate_id_deltas <- function(df, from_category, to_category) {
+  
+  df %>%
+    separate(row_name, into = c("id_type", "category"), sep = "_", remove = FALSE) %>%
+    select(-row_name) %>%
+    pivot_wider(
+      names_from = category,
+      values_from = c(no_ID, Single_ID, Multiple_IDs, Total_IDs)
+    ) %>%
+    transmute(
+      row_name = paste0("delta_", id_type, "_", from_category, "_", id_type, "_", to_category),
+      no_ID = .data[[paste0("no_ID_", to_category)]] - .data[[paste0("no_ID_", from_category)]],
+      Single_ID = .data[[paste0("Single_ID_", to_category)]] - .data[[paste0("Single_ID_", from_category)]],
+      Multiple_IDs = .data[[paste0("Multiple_IDs_", to_category)]] - .data[[paste0("Multiple_IDs_", from_category)]],
+      Total_IDs = .data[[paste0("Total_IDs_", to_category)]] - .data[[paste0("Total_IDs_", from_category)]]
+    )
+}
+
+## Helper: count features with no HMDB, KEGG, or PUBCHEM
+## This works on the original category dataframe, not on count_id() output.
+## Example inputs:  MetaboliteIDs    or   MetaboliteID_Translated
+count_none_all_ids <- function(df) {
+  sum(
+    (is.na(df$HMDB)    | trimws(as.character(df$HMDB)) %in% c("", "NA")) &
+    (is.na(df$KEGG)    | trimws(as.character(df$KEGG)) %in% c("", "NA")) &
+    (is.na(df$PUBCHEM) | trimws(as.character(df$PUBCHEM)) %in% c("", "NA")),
+    na.rm = TRUE
+  )
+}
+
+## Helper: append one row to none_summary_df
+append_none_summary <- function(df, input_df, row_name) {
+  bind_rows(
+    df,
+    tibble(
+      row_name = row_name,
+      No_database_ID = as.integer(count_none_all_ids(input_df))
+    )
+  )
+}
+
+## Helper: calculate delta for the "none at all" summary
+## Example:  ## cleaned - Original
+calculate_none_delta <- function(df, from_category, to_category) {
+  
+  tibble(
+    row_name = paste0("delta_", from_category, "_", to_category),
+    No_database_ID =
+      df$No_database_ID[df$row_name == to_category] -
+      df$No_database_ID[df$row_name == from_category]
+  )
+}
+
+```
+
+
+```{r}
+
+## Initialise the main per-database summary dataframe
+
+## This table stores one row per database and category, for example:
+## HMDB_Original, KEGG_cleaned, PUBCHEM_Original, etc.
+##
+## Column meanings:
+## no_ID         = number of features with no ID in that database
+## Single_ID     = number of features with exactly one ID in that database
+## Multiple_IDs  = number of features with more than one ID in that database
+## Total_IDs     = total number of IDs assigned in that database
+##                 calculated as sum(entry_count)
+
+id_count_df <- tibble(
+  row_name      = character(),
+  no_ID         = integer(),
+  Single_ID     = integer(),
+  Multiple_IDs  = integer(),
+  Total_IDs     = integer()
+)
+
+
+
+## Fill the main table with categories
+
+## Original
+id_count_df <- append_id_counts(id_count_df, Plot1_HMDB,    "HMDB_Original")
+id_count_df <- append_id_counts(id_count_df, Plot1_KEGG,    "KEGG_Original")
+id_count_df <- append_id_counts(id_count_df, Plot1_PubChem, "PUBCHEM_Original")
+
+## cleaned
+id_count_df <- append_id_counts(id_count_df, Plot2_HMDB,    "HMDB_cleaned")
+id_count_df <- append_id_counts(id_count_df, Plot2_KEGG,    "KEGG_cleaned")
+id_count_df <- append_id_counts(id_count_df, Plot2_PubChem, "PUBCHEM_cleaned")
+
+
+## Calculate delta rows
+delta_df <- calculate_id_deltas(id_count_df, "Original", "cleaned")
+
+## Optional: append delta rows into the main summary table
+id_count_df <- bind_rows(id_count_df, delta_df)
+
+
+
+## Initialise the cross-database "none at all" summary
+
+## This is a separate dataframe because it is not database-specific.
+## It counts features with no HMDB, no KEGG, and no PUBCHEM whatsoever.
+none_summary_df <- tibble(
+  row_name = character(),
+  No_database_ID = integer()
+)
+
+
+## Fill the cross-database summary table
+
+## Original category dataframe
+none_summary_df <- append_none_summary(none_summary_df, MetaboliteIDs, "Original")
+
+## cleaned category dataframe
+none_summary_df <- append_none_summary(none_summary_df, MetaboliteID_Translated, "cleaned")
+
+
+
+## Calculate delta row
+none_delta_df <- calculate_none_delta(none_summary_df, "Original", "cleaned")
+
+## Optional: append delta row into the summary table
+none_summary_df <- bind_rows(none_summary_df, none_delta_df)
+
+
+
+## Final objects
+## id_count_df:
+## per-database summary including optional delta rows
+##
+## none_summary_df:
+## category-level count of features with no HMDB, KEGG, or PUBCHEM at all,
+## including optional delta row
+
+id_count_df
+none_summary_df
+
+
+
+
+
+
+
+## NOTE:   the cleaned version is not correct yet, it is only for illustrating how to use.
+##         work in progress @Jannik
+
+
+```
+
+
+
 3.ID compatibility check
 @Jannik
 ```{r}
@@ -420,62 +634,62 @@ write.csv(
 ##            all incompatible but manually solved
 ##            at least one seed_id pair compatible, incompatible pairs removed, feature kept
 
-MetaboliteIDs_filtered <- MetaboliteIDs_pair_compatibility_filtered_manually %>%
-  group_by(original_row_id) %>%
-  summarise(
-    Metabolite    = first(Metabolite),
-    CAS           = first(CAS),
-    SUPER_PATHWAY = first(SUPER_PATHWAY),
-    SUB_PATHWAY   = first(SUB_PATHWAY),
-    COMP_ID       = first(COMP_ID),
-    PLATFORM      = first(PLATFORM),
-    RI            = first(RI),
-    MASS          = first(MASS),
-    
-    PUBCHEM = {
-      x <- trimws(as.character(PUBCHEM))
-      x[x == ""] <- NA_character_
-      x <- unique(na.omit(x))
-      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
-    },
-    
-    KEGG = {
-      x <- trimws(as.character(KEGG))
-      x[x == ""] <- NA_character_
-      x <- unique(na.omit(x))
-      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
-    },
-    
-    HMDB = {
-      x <- trimws(as.character(HMDB))
-      x[x == ""] <- NA_character_
-      x <- unique(na.omit(x))
-      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
-    },
-    
-    CHEBI = {
-      x <- trimws(as.character(CHEBI))
-      x[x == ""] <- NA_character_
-      x <- unique(na.omit(x))
-      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
-    },
-    
-    .groups = "drop"
-  ) %>%
-  select(
-    Metabolite,
-    CAS,
-    SUPER_PATHWAY,
-    SUB_PATHWAY,
-    COMP_ID,
-    PLATFORM,
-    RI,
-    MASS,
-    PUBCHEM,
-    KEGG,
-    HMDB,
-    CHEBI
-  )
+# MetaboliteIDs_filtered <- MetaboliteIDs_pair_compatibility_filtered_manually %>%
+#   group_by(original_row_id) %>%
+#   summarise(
+#     Metabolite    = first(Metabolite),
+#     CAS           = first(CAS),
+#     SUPER_PATHWAY = first(SUPER_PATHWAY),
+#     SUB_PATHWAY   = first(SUB_PATHWAY),
+#     COMP_ID       = first(COMP_ID),
+#     PLATFORM      = first(PLATFORM),
+#     RI            = first(RI),
+#     MASS          = first(MASS),
+#     
+#     PUBCHEM = {
+#       x <- trimws(as.character(PUBCHEM))
+#       x[x == ""] <- NA_character_
+#       x <- unique(na.omit(x))
+#       if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
+#     },
+#     
+#     KEGG = {
+#       x <- trimws(as.character(KEGG))
+#       x[x == ""] <- NA_character_
+#       x <- unique(na.omit(x))
+#       if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
+#     },
+#     
+#     HMDB = {
+#       x <- trimws(as.character(HMDB))
+#       x[x == ""] <- NA_character_
+#       x <- unique(na.omit(x))
+#       if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
+#     },
+#     
+#     CHEBI = {
+#       x <- trimws(as.character(CHEBI))
+#       x[x == ""] <- NA_character_
+#       x <- unique(na.omit(x))
+#       if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
+#     },
+#     
+#     .groups = "drop"
+#   ) %>%
+#   select(
+#     Metabolite,
+#     CAS,
+#     SUPER_PATHWAY,
+#     SUB_PATHWAY,
+#     COMP_ID,
+#     PLATFORM,
+#     RI,
+#     MASS,
+#     PUBCHEM,
+#     KEGG,
+#     HMDB,
+#     CHEBI
+#   )
 
 
 
