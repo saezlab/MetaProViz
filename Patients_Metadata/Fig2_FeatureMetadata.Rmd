@@ -132,6 +132,10 @@ if (!dir.exists("MetaProViz_Results/PK/PK_PUBCHEM/Traverse")) {
 if (!dir.exists("MetaProViz_Results/PK/Traverse")) {
   dir.create("MetaProViz_Results/PK/Traverse", recursive = TRUE)
 }
+
+if (!dir.exists("MetaProViz_Results/PK/ID_QC")) {
+  dir.create("MetaProViz_Results/PK/ID_QC", recursive = TRUE)
+}
 ```
 
 # 1. Loading the Feature metadata
@@ -218,6 +222,276 @@ Plot1_PubChem <- MetaProViz::count_id(MetaboliteIDs,
 @Jannik
 ```{r}
 
+MetaboliteIDs_compatibility_check <- seed_id_compatibility_check(
+    data = MetaboliteIDs,
+    id_types = c("HMDB", "KEGG", "CHEBI", "PUBCHEM"),
+    delimiter = ","
+)
+
+##  Note: the compatibility check does not assess CAS ID compatibility
+## Note: The input df does not contain ChEBI IDs. For the compatibility check, 
+##       ChEBI IDs are internally used as possible stepstones for ID compatibility
+
+## Look at the compatibility check results
+MetaboliteIDs_pair_compatibility <- MetaboliteIDs_compatibility_check$ID_pair_compatibility
+MetaboliteIDs_data_with_compatibility <- MetaboliteIDs_compatibility_check$data_with_compatibility
+
+## how many features of the "MetaboliteIDs" df have a completely compatible list of IDs? (only considering PUBCHEM, KEGG & HMDB)
+length(which(MetaboliteIDs_data_with_compatibility$all_seed_ids_compatible == TRUE))
+# 503
+
+## how many features are not completely compatible (can still have partial compatibility)?
+length(which(MetaboliteIDs_data_with_compatibility$all_seed_ids_compatible == FALSE))
+# 74
+
+## for all ID pairs across features,
+## how many direct matches were there?
+length(which(MetaboliteIDs_pair_compatibility$compatibility_path == "direct"))
+#790
+
+## how many secondary matches were there?
+length(which(MetaboliteIDs_pair_compatibility$compatibility_path == "secondary"))
+# 47
+
+## how many were no_match? -> these contain rows, which only had CAS or only one of HMDB, KEGG, PUBCHEM but not two
+length(which(MetaboliteIDs_pair_compatibility$compatibility_path == "no_match"))
+# 351
+
+
+```
+
+
+```{r}
+## assess ID compatibility and remove incompatible IDs
+
+
+# Option 1: 
+#   go through the pair_compatibility permutation table
+#   exclude all incompatible ID pairs
+#       - sometimes there is less than two HMDB, KEGG, PUBCHEM seed IDs.
+#         Maybe there is only a CAS or only one of the other ID types.
+#         In this case, we don't want to exclude them, because we can not really
+#         assess compatibility. Therefore, "all_seed_ids_compatible" is TRUE
+#         -> keep all where "all_seed_ids_compatible" == TRUE
+#       - in the Results_Traverse$ID_pair_compatibility (traverse_ID_pair_compatibility),
+#         we have the column "original_row_id" to re-group seed_id-pairs later
+#       - we need to exclude seed_id combinations without a match for all rows where
+#         "all_seed_ids_compatible" == FALSE
+#       - manually decide for features with multiple, all-incompatible IDs (this is the most important point here)
+
+## a good example is original_row_id == 99 of the original df, the metabolite 4-hydroxyglutamate
+
+# > MetaboliteIDs_pair_compatibility[MetaboliteIDs_pair_compatibility$"original_row_id" == "99", ]
+
+#   original_row_id Metabolite   CAS   SUPER_PATHWAY  ...   PUBCHEM KEGG  HMDB  CHEBI row_id seed1_type seed1_id seed2_type seed2_id pair_compatible compatibility_path n_seed_ids all_seed_ids_compatible
+#   <chr>           <chr>        <chr> <chr>          ...   <chr>   <chr> <chr> <chr>  <int> <chr>      <chr>    <chr>      <chr>    <lgl>           <chr>                   <int> <lgl>                  
+# 1 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 HMDB       HMDB000~ KEGG       C03079   FALSE           no_match                    4 FALSE
+# 2 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 HMDB       HMDB000~ PUBCHEM    5460078  FALSE           no_match                    4 FALSE
+# 3 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 HMDB       HMDB000~ PUBCHEM    5460800  FALSE           no_match                    4 FALSE
+# 4 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 KEGG       C03079   PUBCHEM    5460078  TRUE            direct                      4 FALSE 
+# 5 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 KEGG       C03079   PUBCHEM    5460800  TRUE            direct                      4 FALSE 
+# 6 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 PUBCHEM    5460078  PUBCHEM    5460800  TRUE            secondary                   4 FALSE 
+
+## here, we have "all_seed_ids_compatible" == FALSE, but we want to keep some of the combinations
+## we also have no_match direct and secondary matches, which makes it a good example
+## we want to keep all direct and secondary matches and discard no_match
+
+MetaboliteIDs_pair_compatibility_filtered <- MetaboliteIDs_pair_compatibility %>% 
+  filter( 
+    (all_seed_ids_compatible == TRUE) | 
+    (all_seed_ids_compatible == FALSE & compatibility_path == "direct") | 
+    (all_seed_ids_compatible == FALSE & compatibility_path == "secondary") 
+  )
+
+
+# let's assess, if we lost any whole features due to this filtering
+## these are these features:
+length(unique(MetaboliteIDs_pair_compatibility$Metabolite)) #577
+length(unique(MetaboliteIDs_pair_compatibility_filtered$Metabolite)) #544
+
+# that means, 33 whole features would get lost if we filter strictly like above
+
+# let's investigate these "lost" features and see why they are filtered out
+
+lost_Metabolites_after_filtering <- list( 
+  setdiff(
+      unique(MetaboliteIDs_pair_compatibility$Metabolite),
+      unique(MetaboliteIDs_pair_compatibility_filtered$Metabolite)
+  )
+)
+
+# now look at all seed_id compatibility checks of these lost features
+lost_id_pair_rows <- MetaboliteIDs_pair_compatibility[ MetaboliteIDs_pair_compatibility$Metabolite %in% lost_Metabolites_after_filtering[[1]]  , ]
+
+# length(unique(lost_id_pair_rows$Metabolite))
+# > 33
+
+## as we can see, these are exactly the 33 rows missing and they have one thing in common:
+## They have either 2 or 3 seed_ids AND -> all their seed_id pairs mismatched,
+## i.e. they had no single seed_id pair which was compatible
+
+## for these cases, we should not just delete them but handle them differently
+
+lost_id_pair_rows_with_cas <- lost_id_pair_rows[is.na(lost_id_pair_rows$CAS) == FALSE, ]
+lost_id_pair_rows_no_cas <- lost_id_pair_rows[is.na(lost_id_pair_rows$CAS) == TRUE, ]
+
+## add the original CAS name to the "lost_id_pair_rows_with_cas" table to check 
+## if the originally assigned CAS IDs match the tivial names
+
+# get CAS number to trivial Name mappings from CAS through OmnipathR
+RaMP_table_source <- OmnipathR::ramp_table("source")
+RaMP_table_CAS <- RaMP_table_source %>%
+  filter(IDtype == "CAS") %>%
+  mutate(
+    sourceId = sub("^CAS:", "", sourceId)
+  ) %>%
+  select(
+    sourceId,
+    commonName
+  )
+
+# join correct CAS commonName to lost_id_pair_rows_with_cas
+lost_id_pair_rows_with_cas <- lost_id_pair_rows_with_cas %>%
+  left_join(
+    RaMP_table_CAS %>%
+      rename(CAS_commonName = commonName),
+    by = c("CAS" = "sourceId")
+  ) %>%
+  relocate(CAS_commonName, .after = Metabolite)
+  
+## still, some CAS numbers do not match.
+
+## save the two tables:
+"MetaProViz_Results/PK/ID_QC"
+
+write.csv(
+  lost_id_pair_rows_with_cas,
+  "MetaProViz_Results/PK/ID_QC/lost_id_pair_rows_with_cas.csv"
+)
+write.csv(
+  lost_id_pair_rows_no_cas,
+  "MetaProViz_Results/PK/ID_QC/lost_id_pair_rows_no_cas.csv"
+) 
+
+
+#@Jannik
+## next steps:
+# - print the tables with and with no cas using kable extra in this Rmd
+# - @Christina manually resolves the IDs
+# - get back manually resolved IDs
+# - wrangle them back into a joint table for further analysis
+#     - join the table back together
+#     - keep "all_seed_ids_compatible"
+#     - flag:
+#         - all incompatible but CAS solved
+#         - all incompatible but manually solved
+#         - at least one seed_id pair compatible, incompatible pairs removed, feature kept
+
+# - make correct print messages for the knitted HTMLs
+# - build summary_counting table in the beginning
+#     - contains original, clean, translated(cas), tranverse, equivalent_id
+#       deltas, counts for noID, singleID, multipleID, totalIDs
+
+
+
+
+## some thoughts about manually resolving the IDs:
+
+# we will now manually investigate all of these cases and decide on IDs to keep
+# looking at lost_id_pair_rows, we decide on an ID to keep and edit the
+
+
+# How to resolve manually:
+# is the Metabolite name correct in comparison to the ID name?
+# is the CAS number compatible to one of the HMDB, KEGG or PUBCHEM IDs?
+# for features, which have all-incompatible HMDB-KEGG-PUBCHEM seed_ids, keep those with CAS
+
+
+
+
+
+
+### continue workflow HERE:
+
+## re-join the filtered and manually fit list into a new DF to proceed working
+
+## NOTE: keep "all_seed_ids_compatible"
+## also FLAG: all incompatible but CAS solved
+##            all incompatible but manually solved
+##            at least one seed_id pair compatible, incompatible pairs removed, feature kept
+
+MetaboliteIDs_filtered <- MetaboliteIDs_pair_compatibility_filtered_manually %>%
+  group_by(original_row_id) %>%
+  summarise(
+    Metabolite    = first(Metabolite),
+    CAS           = first(CAS),
+    SUPER_PATHWAY = first(SUPER_PATHWAY),
+    SUB_PATHWAY   = first(SUB_PATHWAY),
+    COMP_ID       = first(COMP_ID),
+    PLATFORM      = first(PLATFORM),
+    RI            = first(RI),
+    MASS          = first(MASS),
+    
+    PUBCHEM = {
+      x <- trimws(as.character(PUBCHEM))
+      x[x == ""] <- NA_character_
+      x <- unique(na.omit(x))
+      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
+    },
+    
+    KEGG = {
+      x <- trimws(as.character(KEGG))
+      x[x == ""] <- NA_character_
+      x <- unique(na.omit(x))
+      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
+    },
+    
+    HMDB = {
+      x <- trimws(as.character(HMDB))
+      x[x == ""] <- NA_character_
+      x <- unique(na.omit(x))
+      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
+    },
+    
+    CHEBI = {
+      x <- trimws(as.character(CHEBI))
+      x[x == ""] <- NA_character_
+      x <- unique(na.omit(x))
+      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
+    },
+    
+    .groups = "drop"
+  ) %>%
+  select(
+    Metabolite,
+    CAS,
+    SUPER_PATHWAY,
+    SUB_PATHWAY,
+    COMP_ID,
+    PLATFORM,
+    RI,
+    MASS,
+    PUBCHEM,
+    KEGG,
+    HMDB,
+    CHEBI
+  )
+
+
+
+```
+
+```{r}
+# run plots again
+
+
+
+
+#@Jannik
+
+
+# then initialize counting table with No id, singleID, multipleID, totalIDs
+# then after every step, run count_id functions again and expand the counting table with the new steps
 
 ```
 
@@ -237,7 +511,7 @@ features_no_ids <- MetaboliteIDs %>%
 features_no_ids_with_cas <- features_no_ids %>%
   dplyr::filter(!(is.na(CAS) | trimws(CAS) %in% c("", "NA")))
 
-#semicolon at the end needs ti be removed
+#semicolon at the end needs to be removed
 
 print(paste0("We have ", nrow(features_no_ids_with_cas), " features with CAS number but no other metabolite ID and ", nrow(features_no_ids)- nrow(features_no_ids_with_cas), " features with no CAS number and no other metabolite ID."))
 ```
@@ -386,6 +660,7 @@ Next, we fill the gaps by expanding the metabolite identifiers across HMDB, KEGG
 
 @Jannik
 ```{r}
+
 # Harmonize ID separators for traversal (function expects one delimiter)
 Input_Traverse <- MetaboliteID_Translated %>%
   dplyr::mutate(
@@ -397,9 +672,14 @@ Input_Traverse <- MetaboliteID_Translated %>%
 Results_Traverse <- MetaProViz::traverse_ids(
   data = Input_Traverse,
   id_types = c("HMDB", "KEGG", "CHEBI", "PUBCHEM"),
-  delimiter = ";",
+  delimiter = ",",
   path = "MetaProViz_Results/PK/Results_Traverse"
 )
+
+## inspect results
+traverse_ID_pair_compatibility <- Results_Traverse$ID_pair_compatibility
+traverse_ID_edges <- Results_Traverse$ID_Edges_prior_knowledge
+traverse_ID_ExpandedDF <- Results_Traverse$ExpandedDF
 
 
 ```
@@ -407,6 +687,159 @@ Results_Traverse <- MetaProViz::traverse_ids(
 First we need to take some decisions regarding detected incompatible seed IDs in 74 rows. Not all seed IDs in these rows are mutually reachable through IDEdges, suggesting they may map to different molecules. This can overexpanded the ID space during traversal. Please manually remove or correct incompatible seed IDs and rerun traverse_ids() freshly on a clean input table.
 ```{r}
 #How can I see what are compatible once for a feature? If e.g. 2 of 3 are, How can I ignore the one an exclude the new IDs coming from this?
+
+# @Christina: The above comment should be sorted out now that we have the pair_compatibility testing
+
+# How do we proceed from here?
+
+# Option 1: 
+#   go through the pair_compatibility permutation table
+#   exclude all incompatible ID pairs
+#       - sometimes there is less than two HMDB, KEGG, PUBCHEM seed IDs.
+#         Maybe there is only a CAS or only one of the other ID types.
+#         In this case, we don't want to exclude them, because we can not really
+#         assess compatibility. Therefore, "all_seed_ids_compatible" is TRUE
+#         -> keep all where "all_seed_ids_compatible" == TRUE
+#       - in the Results_Traverse$ID_pair_compatibility (traverse_ID_pair_compatibility),
+#         we have the column "original_row_id" to re-group seed_id-pairs later
+#       - we need to exclude seed_id combinations without a match for all rows where
+#         "all_seed_ids_compatible" == FALSE
+
+## a good example is original_row_id == 99 of the original df, the metabolite 4-hydroxyglutamate
+
+# > traverse_ID_pair_compatibility[traverse_ID_pair_compatibility$"original_row_id" == "99", ]
+
+#   original_row_id Metabolite   CAS   SUPER_PATHWAY  ...   PUBCHEM KEGG  HMDB  CHEBI row_id seed1_type seed1_id seed2_type seed2_id pair_compatible compatibility_path n_seed_ids all_seed_ids_compatible
+#   <chr>           <chr>        <chr> <chr>          ...   <chr>   <chr> <chr> <chr>  <int> <chr>      <chr>    <chr>      <chr>    <lgl>           <chr>                   <int> <lgl>                  
+# 1 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 HMDB       HMDB000~ KEGG       C03079   FALSE           no_match                    4 FALSE
+# 2 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 HMDB       HMDB000~ PUBCHEM    5460078  FALSE           no_match                    4 FALSE
+# 3 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 HMDB       HMDB000~ PUBCHEM    5460800  FALSE           no_match                    4 FALSE
+# 4 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 KEGG       C03079   PUBCHEM    5460078  TRUE            direct                      4 FALSE 
+# 5 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 KEGG       C03079   PUBCHEM    5460800  TRUE            direct                      4 FALSE 
+# 6 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 PUBCHEM    5460078  PUBCHEM    5460800  TRUE            secondary                   4 FALSE 
+
+## here, we have "all_seed_ids_compatible" == FALSE, but we want to keep some of the combinations
+## we also have no_match direct and secondary matches, which makes it a good example
+## we want to keep all direct and secondary matches and discard no_match
+
+traverse_ID_pair_compatibility_filtered <- traverse_ID_pair_compatibility %>% 
+  filter( 
+    (all_seed_ids_compatible == TRUE) | 
+    (all_seed_ids_compatible == FALSE & compatibility_path == "direct") | 
+    (all_seed_ids_compatible == FALSE & compatibility_path == "secondary") 
+  )
+
+
+# let's assess, if we lost any whole features due to this filtering
+## these are these features:
+length(unique(traverse_ID_pair_compatibility$Metabolite)) #577
+length(unique(traverse_ID_pair_compatibility_filtered$Metabolite)) #544
+
+# that means, 33 whole features would get lost if we filter strictly like above
+
+# let's investigate these "lost" features and see why they are filtered out
+
+lost_rows_after_filtering <- list( 
+  setdiff(
+      unique(traverse_ID_pair_compatibility$Metabolite),
+      unique(traverse_ID_pair_compatibility_filtered$Metabolite)
+  )
+)
+
+# now look at all seed_id compatibility checks of these lost features
+lost_id_pair_rows <- traverse_ID_pair_compatibility[ traverse_ID_pair_compatibility$Metabolite %in% lost_rows_after_filtering[[1]]  , ]
+
+# length(unique(lost_id_pair_rows$Metabolite))
+# > 33
+
+## as we can see, these are exactly the 33 rows missing and they have one thing in common:
+## They have either 2 or 3 seed_ids AND -> all their seed_id pairs mismatched,
+## i.e. they had no single seed_id pair which was compatible
+
+## for these cases, we should not just delete them but handle them differently
+
+# we will now manually investigate all of these cases and decide on one ID to keep
+# looking at lost_id_pair_rows, we dedice on an ID to keep and edit the 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# now we want to re-join the filtered seed_id pairs into the original wide-format table
+
+# re-group into a new dataframe "MetaboliteIDs_Translated_filtered" and
+# make it ordered in the same way as the "MetaboliteID_Translated" before
+
+MetaboliteIDs_filtered <- traverse_ID_pair_compatibility_filtered %>%
+  group_by(original_row_id) %>%
+  summarise(
+    Metabolite    = first(Metabolite),
+    CAS           = first(CAS),
+    SUPER_PATHWAY = first(SUPER_PATHWAY),
+    SUB_PATHWAY   = first(SUB_PATHWAY),
+    COMP_ID       = first(COMP_ID),
+    PLATFORM      = first(PLATFORM),
+    RI            = first(RI),
+    MASS          = first(MASS),
+    
+    PUBCHEM = {
+      x <- trimws(as.character(PUBCHEM))
+      x[x == ""] <- NA_character_
+      x <- unique(na.omit(x))
+      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
+    },
+    
+    KEGG = {
+      x <- trimws(as.character(KEGG))
+      x[x == ""] <- NA_character_
+      x <- unique(na.omit(x))
+      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
+    },
+    
+    HMDB = {
+      x <- trimws(as.character(HMDB))
+      x[x == ""] <- NA_character_
+      x <- unique(na.omit(x))
+      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
+    },
+    
+    CHEBI = {
+      x <- trimws(as.character(CHEBI))
+      x[x == ""] <- NA_character_
+      x <- unique(na.omit(x))
+      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
+    },
+    
+    .groups = "drop"
+  ) %>%
+  select(
+    Metabolite,
+    CAS,
+    SUPER_PATHWAY,
+    SUB_PATHWAY,
+    COMP_ID,
+    PLATFORM,
+    RI,
+    MASS,
+    PUBCHEM,
+    KEGG,
+    HMDB,
+    CHEBI
+  )
+
+
+
+
+
 
 
 
@@ -449,6 +882,8 @@ Plot3_PubChem <- MetaProViz::count_id(MetaboliteID_Traverse,
 We will start to compile a summary table that will include the number of IDs  (1,2,n) after each step taken to increase the feature space. So now we will add the new IDs from Traverse ID
 ```{r}
 
+## extend counting dataframe with traverse_id results
+
 
 ```
 
@@ -490,6 +925,12 @@ We will start to compile a summary table that will include the number of IDs  (1
 
 
 
+```{r}
+
+## summary couting table including all deltas as bargraph / lollipop graph
+
+
+```
 
 
 
