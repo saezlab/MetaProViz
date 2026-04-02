@@ -132,9 +132,13 @@ if (!dir.exists("MetaProViz_Results/PK/PK_PUBCHEM/Traverse")) {
 if (!dir.exists("MetaProViz_Results/PK/Traverse")) {
   dir.create("MetaProViz_Results/PK/Traverse", recursive = TRUE)
 }
-
+# saving intermediate tables which are needed from ID QC
 if (!dir.exists("MetaProViz_Results/PK/ID_QC")) {
   dir.create("MetaProViz_Results/PK/ID_QC", recursive = TRUE)
+}
+# saving the cleaned, manually curated MetaboliteIDs after running ID QC + manual fixes
+if (!dir.exists("MetaProViz_Results/PK/Cleaned")) {
+  dir.create("MetaProViz_Results/PK/Cleaned", recursive = TRUE)
 }
 ```
 
@@ -450,9 +454,6 @@ MetaboliteIDs_compatibility_check <- seed_id_compatibility_check(
 MetaboliteIDs_pair_compatibility <- MetaboliteIDs_compatibility_check$ID_pair_compatibility
 MetaboliteIDs_data_with_compatibility <- MetaboliteIDs_compatibility_check$data_with_compatibility
 
-MetaboliteIDs_pair_compatibility <- MetaboliteIDs_pair_compatibility %>%
-    mutate(pair_row_id = row_number())
-
 ## how many features of the "MetaboliteIDs" df have a completely compatible list of IDs? (only considering PUBCHEM, KEGG & HMDB)
 length(which(MetaboliteIDs_data_with_compatibility$all_seed_ids_compatible == TRUE))
 # 503
@@ -698,20 +699,20 @@ write.csv(
 ## This has different reasons
 
 # read in the two manually curated dataframes again
-
 # the ones which were lost due to compeltely incompatible seed ids
+
 # lost_id_pair_rows_with_cas.csv
+completely_incompatible_manual_with_cas <- read.csv("Patients_Metadata/lost_id_pair_rows_with_cas_manualcuration.csv")
 
 # lost_id_pair_rows_no_cas.csv
+completely_incompatible_manual_no_cas <- read.csv("Patients_Metadata/lost_id_pair_rows_no_cas_manualcuration.csv")
 
 
 
 
 
 
-
-
-## Summary: 
+## Summary:  IDEAL CASE
 # 1. we assessed all id pairs and split them into the following categories:
 #  - fully compatible features         ->  fully_compatible_id_pair_rows
 #  - partially compatible features     ->  partially_compatible_id_pair_rows
@@ -746,7 +747,186 @@ write.csv(
 #    Should we add manual edges to the RaMP ID edge table?
 
 
+## WHAT WE ACTUALLY DO NOW:
 
+# time is pressing and resolving the 94 cases of mismatching ids for the
+# partially_compatible features is not feasible
+
+# Plan:
+#  - of course keep fully_compatible id_pairs
+#  - include manually curated id_pairs with flag
+#  - discard the no_match id_pairs from the partially_compatible features
+
+
+# change structure of manually curated dfs
+
+completely_incompatible_manual_no_cas %<>%
+    mutate(
+        PUBCHEM = PUBCHEM_Corrected,
+        KEGG = KEGG_Corrected,
+        HMDB = HMDB_Corrected
+    ) %>%
+    select(
+        - PUBCHEM_Corrected,
+        - KEGG_Corrected,
+        - HMDB_Corrected,
+        - X,
+        - IncompatibilityReason,
+        - Correction,
+        - Manual_ID_Check
+    ) %>%
+    mutate(
+        manual_correction = TRUE,
+        correction_tbl = "completely_incompatible_manual_no_cas"
+    )
+
+completely_incompatible_manual_with_cas %<>%
+    mutate(
+        PUBCHEM = PUBCHEM_Corrected,
+        KEGG = KEGG_Corrected,
+        HMDB = HMDB_Corrected
+    ) %>%
+    select(
+        - CAS_commonName,
+        - PUBCHEM_Corrected,
+        - KEGG_Corrected,
+        - HMDB_Corrected,
+        - X,
+        - IncompatibilityReason,
+        - Correction,
+        - Manual_CAS_Check,
+        - Manual_CommonName_Check,
+        - Manual_ID_Check
+    ) %>%
+    mutate(
+        manual_correction = TRUE,
+        correction_tbl = "completely_incompatible_manual_with_cas"
+    )
+
+partially_compatible_id_pair_rows %<>%
+    filter(
+        compatibility_path != "no_match"   #only keep matches
+    ) %>%
+    mutate(
+        manual_correction = TRUE,
+        correction_tbl = "keeping_only_compatible_for_partially_compatible_features"
+    ) %>%
+    select(
+        - CAS_commonName
+    )
+
+fully_compatible_id_pair_rows %<>%
+    mutate(
+        manual_correction = FALSE,
+        correction_tbl = NA
+    )
+    
+
+## all same structure?
+all( names(completely_incompatible_manual_no_cas) == names(completely_incompatible_manual_with_cas) ) #1&2
+all( names(partially_compatible_id_pair_rows) == names(fully_compatible_id_pair_rows) ) #3&4
+all( names(completely_incompatible_manual_no_cas) == names(partially_compatible_id_pair_rows) ) #1&3
+# yes
+
+## now we have these four dataframes in the exact same structure:
+# - completely_incompatible_manual_no_cas
+# - completely_incompatible_manual_with_cas
+# - partially_compatible_id_pair_rows
+# - fully_compatible_id_pair_rows
+
+
+## now lets summarize them again
+
+combined_tables <- 
+    rbind(
+        completely_incompatible_manual_no_cas,
+        completely_incompatible_manual_with_cas,
+        partially_compatible_id_pair_rows,
+        fully_compatible_id_pair_rows
+    )
+
+## how many id_pairs are left there?
+nrow(combined_tables)
+
+## how many features were preserved?
+length(unique(combined_tables$Metabolite))
+# 577 . perfect
+
+## save this table
+write.csv(
+    combined_tables,
+    "MetaProViz_Results/PK/ID_QC/joined_and_manually_cleaned_id_pair_tables.csv"
+)
+
+
+## join back together based on "original_row_id", summarizing the IDs per type
+MetaboliteIDs_clean <- combined_tables %>%
+  group_by(original_row_id) %>%
+  summarise(
+    Metabolite    = first(Metabolite),
+    CAS           = first(CAS),
+    SUPER_PATHWAY = first(SUPER_PATHWAY),
+    SUB_PATHWAY   = first(SUB_PATHWAY),
+    COMP_ID       = first(COMP_ID),
+    PLATFORM      = first(PLATFORM),
+    RI            = first(RI),
+    MASS          = first(MASS),
+
+    PUBCHEM = {
+      x <- trimws(as.character(PUBCHEM))
+      x[x == ""] <- NA_character_
+      x <- unique(na.omit(x))
+      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
+    },
+
+    KEGG = {
+      x <- trimws(as.character(KEGG))
+      x[x == ""] <- NA_character_
+      x <- unique(na.omit(x))
+      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
+    },
+
+    HMDB = {
+      x <- trimws(as.character(HMDB))
+      x[x == ""] <- NA_character_
+      x <- unique(na.omit(x))
+      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
+    },
+
+    CHEBI = {
+      x <- trimws(as.character(CHEBI))
+      x[x == ""] <- NA_character_
+      x <- unique(na.omit(x))
+      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
+    },
+    
+    manual_correction = first(manual_correction),
+    correction_tbl = first(correction_tbl),
+
+    .groups = "drop"
+  ) %>%
+  select(
+    Metabolite,
+    CAS,
+    SUPER_PATHWAY,
+    SUB_PATHWAY,
+    COMP_ID,
+    PLATFORM,
+    RI,
+    MASS,
+    PUBCHEM,
+    KEGG,
+    HMDB,
+    CHEBI,
+    manual_correction,
+    correction_tbl
+  )
+
+## save this table
+write.csv(
+    MetaboliteIDs_clean,
+    "MetaProViz_Results/PK/Cleaned/MetaboliteIDs_clean.csv"
+)
 
 
 
@@ -760,105 +940,21 @@ write.csv(
 # DONE - print the tables with and with no cas using kable extra in this Rmd
 # - @Christina manually resolves the IDs
 # DONE - get another table, containing the other features, where there was at least one 
-#   seed_id pair incompatiibility
+# DONE   seed_id pair incompatiibility
 # DONE - get back manually resolved IDs
-# - wrangle them back into a joint table for further analysis
-#     - join the table back together
-#     - keep "all_seed_ids_compatible"
-#     - flag:
-#         - all incompatible but CAS solved
-#         - all incompatible but manually solved
-#         - at least one seed_id pair compatible, incompatible pairs removed, feature kept
+# DONE - wrangle them back into a joint table for further analysis
+# DONE     - join the table back together
+# DONE     - keep "all_seed_ids_compatible"
+# DONE     - flag whether these ids were manually curated and how
 
-# - make correct print messages for the knitted HTMLs
-# - build summary_counting table in the beginning
-#     - contains original, clean, translated(cas), tranverse, equivalent_id
-#       deltas, counts for noID, singleID, multipleID, totalIDs
+# - make correct print messages for the knitted HTMLs for everything above
+# DONE - build summary_counting table in the beginning
+# DONE     - contains original, clean, translated(cas), tranverse, equivalent_id
+# DONE       deltas, counts for noID, singleID, multipleID, totalIDs
+# - save necessary tables above from the ID QC
 
 
 
-
-## some thoughts about manually resolving the IDs:
-
-# we will now manually investigate all of these cases and decide on IDs to keep
-# looking at lost_id_pair_rows, we decide on an ID to keep and edit the
-
-
-# How to resolve manually:
-# is the Metabolite name correct in comparison to the ID name?
-# is the CAS number compatible to one of the HMDB, KEGG or PUBCHEM IDs?
-# for features, which have all-incompatible HMDB-KEGG-PUBCHEM seed_ids, keep those with CAS
-
-
-
-
-
-
-### continue workflow HERE:
-
-## re-join the filtered and manually fit list into a new DF to proceed working
-
-## NOTE: keep "all_seed_ids_compatible"
-## also FLAG: all incompatible but CAS solved
-##            all incompatible but manually solved
-##            at least one seed_id pair compatible, incompatible pairs removed, feature kept
-
-# MetaboliteIDs_filtered <- MetaboliteIDs_pair_compatibility_filtered_manually %>%
-#   group_by(original_row_id) %>%
-#   summarise(
-#     Metabolite    = first(Metabolite),
-#     CAS           = first(CAS),
-#     SUPER_PATHWAY = first(SUPER_PATHWAY),
-#     SUB_PATHWAY   = first(SUB_PATHWAY),
-#     COMP_ID       = first(COMP_ID),
-#     PLATFORM      = first(PLATFORM),
-#     RI            = first(RI),
-#     MASS          = first(MASS),
-#     
-#     PUBCHEM = {
-#       x <- trimws(as.character(PUBCHEM))
-#       x[x == ""] <- NA_character_
-#       x <- unique(na.omit(x))
-#       if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
-#     },
-#     
-#     KEGG = {
-#       x <- trimws(as.character(KEGG))
-#       x[x == ""] <- NA_character_
-#       x <- unique(na.omit(x))
-#       if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
-#     },
-#     
-#     HMDB = {
-#       x <- trimws(as.character(HMDB))
-#       x[x == ""] <- NA_character_
-#       x <- unique(na.omit(x))
-#       if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
-#     },
-#     
-#     CHEBI = {
-#       x <- trimws(as.character(CHEBI))
-#       x[x == ""] <- NA_character_
-#       x <- unique(na.omit(x))
-#       if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
-#     },
-#     
-#     .groups = "drop"
-#   ) %>%
-#   select(
-#     Metabolite,
-#     CAS,
-#     SUPER_PATHWAY,
-#     SUB_PATHWAY,
-#     COMP_ID,
-#     PLATFORM,
-#     RI,
-#     MASS,
-#     PUBCHEM,
-#     KEGG,
-#     HMDB,
-#     CHEBI
-#   )
 
 
 
