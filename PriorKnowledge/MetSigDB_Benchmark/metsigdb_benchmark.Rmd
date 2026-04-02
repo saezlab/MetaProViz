@@ -46,6 +46,7 @@ suppressPackageStartupMessages({
   library(openxlsx)
   library(svglite)
   library(ggbreak)
+  library(ggpattern)
 })
 
 if (!exists("metsigdb_kegg", mode = "function")) {
@@ -61,6 +62,10 @@ if (!exists("metsigdb_kegg", mode = "function")) {
 
 if (!requireNamespace("ggbreak", quietly = TRUE)) {
   stop("Package `ggbreak` is required for the split y-axis footprint plot. Please install it first.")
+}
+
+if (!requireNamespace("ggpattern", quietly = TRUE)) {
+  stop("Package `ggpattern` is required for the patterned stacked footprint plot. Please install it first.")
 }
 ```
 
@@ -683,6 +688,61 @@ p_resource_footprint <- ggplot(resource_footprint_plot_data, aes(x = ResourcePlo
   ) +
   mpv_theme
 
+p_resource_footprint_stacked <- ggplot(
+  resource_footprint_plot_data,
+  aes(
+    x = ResourcePlot,
+    y = Value,
+    fill = `Interaction Type`,
+    pattern = Metric
+  )
+) +
+  ggpattern::geom_col_pattern(
+    position = "stack",
+    width = 0.8,
+    color = "grey35",
+    pattern_fill = "grey20",
+    pattern_colour = "grey20",
+    pattern_angle = 45,
+    pattern_density = 0.25,
+    pattern_spacing = 0.03,
+    pattern_key_scale_factor = 0.7
+  ) +
+  geom_text(
+    aes(
+      label = Value,
+      group = interaction(`Interaction Type`, Metric)
+    ),
+    position = position_stack(vjust = 0.5),
+    size = 2.4,
+    color = "black"
+  ) +
+  scale_fill_manual(values = interaction_type_colors, drop = FALSE) +
+  ggpattern::scale_pattern_manual(
+    values = c(
+      `Distinct Terms` = "none",
+      `Distinct Targets` = "stripe",
+      `Distinct Interactions` = "crosshatch"
+    ),
+    drop = FALSE
+  ) +
+  labs(
+    title = "Stacked Resource Footprint Across Terms, Targets, and Interactions",
+    x = "Resource",
+    y = "Count",
+    fill = "Interaction Type",
+    pattern = "Metric"
+  ) +
+  mpv_theme
+
+resource_footprint_stacked_totals <- resource_footprint_plot_data %>%
+  dplyr::group_by(ResourcePlot) %>%
+  dplyr::summarise(TotalValue = sum(Value), .groups = "drop")
+
+p_resource_footprint_stacked_split <- p_resource_footprint_stacked +
+  ggbreak::scale_y_break(c(1500, 30000), scales = 25 / 70, space = 1) +
+  labs(title = "Stacked Resource Footprint Across Terms, Targets, and Interactions (Y-axis split)")
+
 # Same footprint plot with a y-axis break to improve visibility of lower bars.
 p_resource_footprint_split <- ggplot(resource_footprint_plot_data, aes(x = ResourcePlot, y = Value, fill = `Interaction Type`)) +
   geom_col(position = position_dodge(width = 0.9), width = 0.8) +
@@ -810,26 +870,13 @@ p_degree_bucket <- ggplot(degree_bucket_plot_data, aes(x = ResourcePlot, y = `Sh
   ) +
   mpv_theme
 
-plot_files <- c(
-  save_svg_plot(p_delta_targets, "exclusion_pct_delta_targets.svg", width = 13, height = 6),
-  save_svg_plot(p_delta_interactions, "exclusion_pct_delta_interactions.svg", width = 13, height = 6),
-  save_svg_plot(p_resource_footprint, "resource_footprint_faceted.svg", width = 14, height = 8),
-  save_svg_plot(p_resource_footprint_split, "resource_footprint_faceted_split.svg", width = 14, height = 8),
-  save_svg_plot(p_resource_footprint_terms_split, "resource_footprint_terms_split.svg", width = 14, height = 8),
-  save_svg_plot(p_resource_footprint_targets_split, "resource_footprint_targets_split.svg", width = 14, height = 8),
-  save_svg_plot(p_resource_footprint_interactions_split, "resource_footprint_interactions_split.svg", width = 14, height = 8),
-  save_svg_plot(p_set_level_mean, "set_level_mean_targets.svg", width = 13, height = 6),
-  save_svg_plot(p_set_level_median, "set_level_median_targets.svg", width = 13, height = 6),
-  save_svg_plot(p_degree_bucket, "degree_bucket_composition.svg", width = 13, height = 7)
-)
-
-cat("Saved plot files:\n", paste(plot_files, collapse = "\n"), "\n", sep = "")
-
-plot_index_tbl <- tibble::tibble(
+plot_manifest <- tibble::tibble(
   Plot = c(
     "Relative Change in Targets",
     "Relative Change in Interactions",
     "Resource Footprint",
+    "Stacked Resource Footprint",
+    "Stacked Resource Footprint (Y-axis split)",
     "Resource Footprint (Y-axis split)",
     "Distinct Terms by Resource (Y-axis split)",
     "Distinct Targets by Resource (Y-axis split)",
@@ -838,9 +885,53 @@ plot_index_tbl <- tibble::tibble(
     "Median Targets per Term",
     "Membership Composition"
   ),
-  SVG_File = basename(plot_files),
-  Relative_Path = file.path("plots", basename(plot_files))
+  PlotObject = list(
+    p_delta_targets,
+    p_delta_interactions,
+    p_resource_footprint,
+    p_resource_footprint_stacked,
+    p_resource_footprint_stacked_split,
+    p_resource_footprint_split,
+    p_resource_footprint_terms_split,
+    p_resource_footprint_targets_split,
+    p_resource_footprint_interactions_split,
+    p_set_level_mean,
+    p_set_level_median,
+    p_degree_bucket
+  ),
+  SVG_File = c(
+    "exclusion_pct_delta_targets.svg",
+    "exclusion_pct_delta_interactions.svg",
+    "resource_footprint_faceted.svg",
+    "resource_footprint_stacked.svg",
+    "resource_footprint_stacked_split.svg",
+    "resource_footprint_faceted_split.svg",
+    "resource_footprint_terms_split.svg",
+    "resource_footprint_targets_split.svg",
+    "resource_footprint_interactions_split.svg",
+    "set_level_mean_targets.svg",
+    "set_level_median_targets.svg",
+    "degree_bucket_composition.svg"
+  ),
+  Width = c(13, 13, 14, 14, 14, 14, 14, 14, 14, 13, 13, 13),
+  Height = c(6, 6, 8, 8, 8, 8, 8, 8, 8, 6, 6, 7)
 )
+
+plot_files <- purrr::pmap_chr(
+  plot_manifest[c("PlotObject", "SVG_File", "Width", "Height")],
+  function(PlotObject, SVG_File, Width, Height) {
+    save_svg_plot(PlotObject, SVG_File, width = Width, height = Height)
+  }
+)
+
+cat("Saved plot files:\n", paste(plot_files, collapse = "\n"), "\n", sep = "")
+
+plot_index_tbl <- plot_manifest %>%
+  dplyr::transmute(
+    Plot = Plot,
+    SVG_File = basename(plot_files),
+    Relative_Path = file.path("plots", SVG_File)
+  )
 ```
 
 ```{r export-excel}
@@ -915,6 +1006,14 @@ knitr::kable(tbl_resource_level, digits = 3)
 
 ```{r test-1-resource-footprint-plot, fig.width=14, fig.height=8}
 p_resource_footprint
+```
+
+```{r test-1-resource-footprint-stacked-plot, fig.width=14, fig.height=8}
+p_resource_footprint_stacked
+```
+
+```{r test-1-resource-footprint-stacked-split-plot, fig.width=14, fig.height=8}
+p_resource_footprint_stacked_split
 ```
 
 ```{r test-1-resource-footprint-plot-split, fig.width=14, fig.height=8}
