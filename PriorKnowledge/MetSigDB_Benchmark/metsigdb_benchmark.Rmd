@@ -1,5 +1,9 @@
 ---
 title: "MetSigDB benchmark (v4)"
+author:
+  - name: Jannik Franken
+    affiliation:
+    - Heidelberg University
 output:
   html_document:
     toc: true
@@ -8,6 +12,8 @@ output:
     df_print: paged
 bibliography: metsigdb_resources.bib
 link-citations: true
+editor_options: 
+  chunk_output_type: console
 ---
 
 ```{r setup, include=FALSE}
@@ -56,6 +62,7 @@ if (!exists("metsigdb_kegg", mode = "function")) {
 # Benchmark implementation (v4)
 
 ```{r benchmark-implementation}
+#Establish needed functions:
 metsigdb_groups <- function() {
   tibble::tribble(
     ~resource,                  ~group,
@@ -69,7 +76,9 @@ metsigdb_groups <- function() {
     "metsigdb_metalinks__receptor_metabolite",      "Interaction resources",
     "metsigdb_metalinks__enzyme_metabolite",        "Interaction resources",
     "metsigdb_macdb",                                 "Cancer association resources",
-    "make_gene_metab_set_merged","Derived pathway resources"
+    #"make_gene_metab_set_merged","Derived pathway resources"
+    "metsigdb_hallmarks", "Derived pathway resources",
+    "metsigdb_gaude_pathways", "Derived pathway resources"
   )
 }
 
@@ -109,28 +118,34 @@ expand_metalinks_resources <- function(df) {
   )
 }
 
-fetch_make_gene_metab_merged <- function(exclude_metabolites = "all") {
+fetch_metsigdb_hallmarks <- function(exclude_metabolites = "all") {
   data("hallmarks", package = "MetaProViz")
-  data("gaude_pathways", package = "MetaProViz")
 
-  hall <- make_gene_metab_set(
+  make_gene_metab_set(
     input_pk = hallmarks,
     metadata_info = c(Target = "gene"),
     pk_name = "hallmarks",
     save_table = NULL,
     exclude_metabolites = exclude_metabolites
-  )$GeneMetabSet %>% mutate(gene_metab_source = "hallmarks")
+  )$GeneMetabSet %>%
+    mutate(
+      gene_metab_source = "hallmarks",
+      interaction_type = if_else(grepl("^HMDB", feature), "pathway-metabolite", "pathway-metabolic_enzyme")
+    )
+}
 
-  gaude <- make_gene_metab_set(
+fetch_metsigdb_gaude_pathways <- function(exclude_metabolites = "all") {
+  data("gaude_pathways", package = "MetaProViz")
+
+  make_gene_metab_set(
     input_pk = gaude_pathways,
     metadata_info = c(Target = "gene"),
     pk_name = "gaude_pathways",
     save_table = NULL,
     exclude_metabolites = exclude_metabolites
-  )$GeneMetabSet %>% mutate(gene_metab_source = "gaude_pathways")
-
-  bind_rows(hall, gaude) %>%
+  )$GeneMetabSet %>%
     mutate(
+      gene_metab_source = "gaude_pathways",
       interaction_type = if_else(grepl("^HMDB", feature), "pathway-metabolite", "pathway-metabolic_enzyme")
     )
 }
@@ -293,7 +308,7 @@ standardise_metsigdb <- function(df, resource, groups_tbl) {
     ))
   }
 
-  if (resource == "make_gene_metab_set_merged") {
+  if (resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways")) {
     return(df %>% transmute(
       resource = resource,
       group = "Derived pathway resources",
@@ -373,7 +388,8 @@ benchmark_metsigdb <- function(
     metsigdb_wikipathways = fetch_wikipathways_from_csv(exclude_metabolites = exclude_metabolites),
     # metsigdb_wikipathways = metsigdb_wikipathways(species = wikipathways_species, exclude_metabolites = exclude_metabolites),
     metsigdb_macdb = metsigdb_macdb(exclude_metabolites = exclude_metabolites),
-    make_gene_metab_set_merged = fetch_make_gene_metab_merged(exclude_metabolites = exclude_metabolites)
+    metsigdb_hallmarks = fetch_metsigdb_hallmarks(exclude_metabolites = exclude_metabolites),
+    metsigdb_gaude_pathways = fetch_metsigdb_gaude_pathways(exclude_metabolites = exclude_metabolites)
   )
 
   metalinks_expanded <- expand_metalinks_resources(
@@ -534,6 +550,8 @@ tbl_set_level <- format_set_level(res$set_level) %>%
 tbl_degree_buckets <- format_degree_buckets(res$degree_buckets) %>%
   arrange(`Resource Group`, Resource, `Interaction Type`, `Membership Bucket`)
 
+```
+
 ```{r generate-plots}
 # Grouped bar: exclusion deltas for targets.
 delta_targets_plot_data <- tbl_exclusion_compare %>%
@@ -543,7 +561,7 @@ delta_targets_plot_data <- tbl_exclusion_compare %>%
     label = scales::percent(value, accuracy = 0.1),
     label_y = value + if_else(value >= 0, 0.03, -0.03),
     line_y = value + if_else(value >= 0, 0.02, -0.02),
-    ResourcePlot = if_else(Resource == "make_gene_metab_set_merged", paste0(Resource, "\n", `Interaction Type`), Resource)
+    ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource)
   )
 
 p_delta_targets <- ggplot(delta_targets_plot_data, aes(x = ResourcePlot, y = value, fill = `Interaction Type`)) +
@@ -575,7 +593,12 @@ p_delta_targets <- ggplot(delta_targets_plot_data, aes(x = ResourcePlot, y = val
     fill = "Interaction Type"
   ) +
   theme_minimal(base_size = 11) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "right",
+    legend.box = "vertical",
+    legend.box.margin = margin(10, 10, 10, 10)
+  )
 
 # Grouped bar: exclusion deltas for interactions.
 delta_interactions_plot_data <- tbl_exclusion_compare %>%
@@ -585,7 +608,7 @@ delta_interactions_plot_data <- tbl_exclusion_compare %>%
     label = scales::percent(value, accuracy = 0.1),
     label_y = value + if_else(value >= 0, 0.03, -0.03),
     line_y = value + if_else(value >= 0, 0.02, -0.02),
-    ResourcePlot = if_else(Resource == "make_gene_metab_set_merged", paste0(Resource, "\n", `Interaction Type`), Resource)
+    ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource)
   )
 
 p_delta_interactions <- ggplot(delta_interactions_plot_data, aes(x = ResourcePlot, y = value, fill = `Interaction Type`)) +
@@ -617,11 +640,16 @@ p_delta_interactions <- ggplot(delta_interactions_plot_data, aes(x = ResourcePlo
     fill = "Interaction Type"
   ) +
   theme_minimal(base_size = 11) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "right",
+    legend.box = "vertical",
+    legend.box.margin = margin(10, 10, 10, 10)
+  )
 
 # Grouped and faceted footprint plot.
 resource_footprint_plot_data <- tbl_resource_level %>%
-  mutate(ResourcePlot = if_else(Resource == "make_gene_metab_set_merged", paste0(Resource, "\n", `Interaction Type`), Resource)) %>%
+  mutate(ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource)) %>%
   pivot_longer(
     cols = c(`Distinct Terms`, `Distinct Targets`, `Distinct Interactions`),
     names_to = "Metric",
@@ -645,14 +673,19 @@ p_resource_footprint <- ggplot(resource_footprint_plot_data, aes(x = ResourcePlo
     fill = "Interaction Type"
   ) +
   theme_minimal(base_size = 11) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1),
+    legend.position = "right",
+    legend.box = "vertical",
+    legend.box.margin = margin(10, 10, 10, 10)
+  )
 
 # Grouped bar: mean targets per term.
 set_level_plot_data <- tbl_set_level %>%
   mutate(
     mean_label = round(`Mean Targets per Term`, 2),
     median_label = round(`Median Targets per Term`, 2),
-    ResourcePlot = if_else(Resource == "make_gene_metab_set_merged", paste0(Resource, "\n", `Interaction Type`), Resource)
+    ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource)
   )
 
 p_set_level_mean <- ggplot(set_level_plot_data, aes(x = ResourcePlot, y = `Mean Targets per Term`, fill = `Interaction Type`)) +
@@ -696,7 +729,7 @@ p_set_level_median <- ggplot(set_level_plot_data, aes(x = ResourcePlot, y = `Med
 degree_bucket_plot_data <- tbl_degree_buckets %>%
   mutate(
     `Share Label` = scales::percent(`Share of Targets`, accuracy = 0.1),
-    ResourcePlot = if_else(Resource == "make_gene_metab_set_merged", paste0(Resource, "\n", `Interaction Type`), Resource)
+    ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Membership Bucket`), Resource)
   )
 
 p_degree_bucket <- ggplot(degree_bucket_plot_data, aes(x = ResourcePlot, y = `Share of Targets`, fill = `Membership Bucket`)) +
