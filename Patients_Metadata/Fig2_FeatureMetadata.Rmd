@@ -450,6 +450,9 @@ MetaboliteIDs_compatibility_check <- seed_id_compatibility_check(
 MetaboliteIDs_pair_compatibility <- MetaboliteIDs_compatibility_check$ID_pair_compatibility
 MetaboliteIDs_data_with_compatibility <- MetaboliteIDs_compatibility_check$data_with_compatibility
 
+MetaboliteIDs_pair_compatibility <- MetaboliteIDs_pair_compatibility %>%
+    mutate(pair_row_id = row_number())
+
 ## how many features of the "MetaboliteIDs" df have a completely compatible list of IDs? (only considering PUBCHEM, KEGG & HMDB)
 length(which(MetaboliteIDs_data_with_compatibility$all_seed_ids_compatible == TRUE))
 # 503
@@ -461,7 +464,7 @@ length(which(MetaboliteIDs_data_with_compatibility$all_seed_ids_compatible == FA
 ## for all ID pairs across features,
 ## how many direct matches were there?
 length(which(MetaboliteIDs_pair_compatibility$compatibility_path == "direct"))
-#790
+# 790
 
 ## how many secondary matches were there?
 length(which(MetaboliteIDs_pair_compatibility$compatibility_path == "secondary"))
@@ -520,8 +523,10 @@ MetaboliteIDs_pair_compatibility_filtered <- MetaboliteIDs_pair_compatibility %>
 
 # let's assess, if we lost any whole features due to this filtering
 ## these are these features:
-length(unique(MetaboliteIDs_pair_compatibility$Metabolite)) #577
-length(unique(MetaboliteIDs_pair_compatibility_filtered$Metabolite)) #544
+length(unique(MetaboliteIDs_pair_compatibility$Metabolite)) 
+#577
+length(unique(MetaboliteIDs_pair_compatibility_filtered$Metabolite)) 
+#544
 
 # that means, 33 whole features would get lost if we filter strictly like above
 
@@ -573,10 +578,9 @@ lost_id_pair_rows_with_cas <- lost_id_pair_rows_with_cas %>%
   ) %>%
   relocate(CAS_commonName, .after = Metabolite)
   
-## still, some CAS numbers do not match.
 
 ## save the two tables:
-"MetaProViz_Results/PK/ID_QC"
+# "MetaProViz_Results/PK/ID_QC"
 
 write.csv(
   lost_id_pair_rows_with_cas,
@@ -588,11 +592,176 @@ write.csv(
 ) 
 
 
+## we identified the completely incompatible features now.
+
+## Let's retrieve the fully compatible features
+fully_compatible_metabolites <- MetaboliteIDs_data_with_compatibility[MetaboliteIDs_data_with_compatibility$all_seed_ids_compatible == TRUE, "Metabolite"]
+
+## how many are these?
+length(unlist(fully_compatible_metabolites))
+# 503
+
+## retrieve the id_pairs for these fully_compatibly features
+fully_compatible_id_pair_rows <- 
+    MetaboliteIDs_pair_compatibility %>%
+    filter(
+      Metabolite %in% unlist(fully_compatible_metabolites)
+    )
+
+# this should also contain 503 distinct features
+length(unique(fully_compatible_id_pair_rows$Metabolite))
+# 503. checks out
+
+# how many id pairs are there for these fully compatible features?
+nrow(fully_compatible_id_pair_rows)
+# 998
+
+## save as csv
+write.csv(
+  fully_compatible_id_pair_rows,
+  "MetaProViz_Results/PK/ID_QC/fully_compatible_id_pair_rows.csv"
+)
+
+
+
+## next, we are going to investigate the features, which were only partially compatible
+## from 74 features which were not fully compatible, we subtract the 33 fully incompatible ones
+## and get the partially compatible features.
+
+## get the permutation_df for the partially_compatible features
+
+partially_compatible_metabolites <- 
+    MetaboliteIDs_data_with_compatibility %>%
+        filter(
+            all_seed_ids_compatible == FALSE
+        ) %>%
+        filter(
+            ! Metabolite %in% unlist(lost_Metabolites_after_filtering)
+        )
+
+
+## This approach leaves us with the 41 metabolite names which are partially compatible
+length(unique(partially_compatible_metabolites$Metabolite))
+## 41
+
+## get the id_pair compatibility for those
+partially_compatible_id_pair_rows <- 
+    MetaboliteIDs_pair_compatibility %>%
+    filter(
+        Metabolite %in% partially_compatible_metabolites$Metabolite
+    )
+
+## how many are these?
+nrow(partially_compatible_id_pair_rows)
+# 147
+
+## add RaMP CAS numbers to this df
+partially_compatible_id_pair_rows <- partially_compatible_id_pair_rows %>%
+  left_join(
+    RaMP_table_CAS %>%
+      rename(CAS_commonName = commonName),
+    by = c("CAS" = "sourceId")
+  ) %>%
+  relocate(CAS_commonName, .after = Metabolite)
+
+
+## how many of these id_pairs are compatible and how many aren't?
+
+## compatible
+length(which(partially_compatible_id_pair_rows$compatibility_path != "no_match"))
+# 59
+
+## incompatible
+length(which(partially_compatible_id_pair_rows$compatibility_path == "no_match"))
+# 94
+
+## Now for those 94 id pairs, which are non-compatible, we also need to check if some of them can be rescued
+
+# save them as csv
+
+# I saw that some of the rows of the columns contain semicolons which messes up the csv
+partially_compatible_id_pair_rows$Metabolite %<>%
+    gsub(";", ",", .)
+partially_compatible_id_pair_rows$SUB_PATHWAY %<>%
+    gsub(";", ",", .)
+
+write.csv(
+  partially_compatible_id_pair_rows,
+  "MetaProViz_Results/PK/ID_QC/partially_compatible_id_pair_rows_with_cas.csv"
+)
+
+
+
+## so we retrieved the 33 "lost" features and went back to manually
+## check all their ID pairs against each other. We found many cases, in which the 
+## IDs do not match via RaMP mapping table, but should be the same.
+## This has different reasons
+
+# read in the two manually curated dataframes again
+
+# the ones which were lost due to compeltely incompatible seed ids
+# lost_id_pair_rows_with_cas.csv
+
+# lost_id_pair_rows_no_cas.csv
+
+
+
+
+
+
+
+
+## Summary: 
+# 1. we assessed all id pairs and split them into the following categories:
+#  - fully compatible features         ->  fully_compatible_id_pair_rows
+#  - partially compatible features     ->  partially_compatible_id_pair_rows
+#  - completely incompatible features  ->  lost_id_pair_rows_no_cas
+#                                      ->  lost_id_pair_rows_with cas
+
+# 2. Then, we manually went over the id_pairs for partially compatible
+#    and completely incompatible features, trying to rescue id_pairs
+#    while assessing why they mismatched correctly or why they should match but show mismatches
+
+# 3. We store the csv files we manually checked in this folder
+# 4. We read them back in and append a flag column, to keep track of them
+#         - "completely_incompatible_no_cas"
+#         - "completely_incompatible_with_cas"
+#         - "partially_compatible"
+#    We discard the other columns from out manual curation, since we can find them again in the saved dfs
+#    We substitute the "old" PUCBCHEM, KEGG, HMDB columns with the
+#    correct versions in "PUBCHEM_corrected", "KEGG_Corrected" & "HMDB_Corrected"
+#    Then we discard the correct-columns and the rest.
+#    The manually curated id_pairs are then in the same format as before with the additional flag column
+
+# 5. We stitch back together all the tables which are all id_pair rows (from the permutations)
+
+# 6. We summarize the stitched dataframe based on the "original_row_id", 
+#    creating a list of unique PUBCHEM, KEGG and HMDB ID lists per feature on the way
+
+# 7. When we run the ID QC again now, we will not see the actual mismatching id_pairs,
+#    since we manually reviewed them and agreed to their deletion
+#    BUT we will see manually RESCUED id_pairs, which are still "technically incompatible",
+#    judging from the RaMP ID mapping tables point-of-view
+
+#    Should we add manual edges to the RaMP ID edge table?
+
+
+
+
+
+
+
+
+
+
+
 #@Jannik
 ## next steps:
-# - print the tables with and with no cas using kable extra in this Rmd
+# DONE - print the tables with and with no cas using kable extra in this Rmd
 # - @Christina manually resolves the IDs
-# - get back manually resolved IDs
+# DONE - get another table, containing the other features, where there was at least one 
+#   seed_id pair incompatiibility
+# DONE - get back manually resolved IDs
 # - wrangle them back into a joint table for further analysis
 #     - join the table back together
 #     - keep "all_seed_ids_compatible"
