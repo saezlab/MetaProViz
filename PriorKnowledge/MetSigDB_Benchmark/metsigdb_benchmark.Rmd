@@ -45,6 +45,7 @@ suppressPackageStartupMessages({
   library(scales)
   library(openxlsx)
   library(svglite)
+  library(ggbreak)
 })
 
 if (!exists("metsigdb_kegg", mode = "function")) {
@@ -56,6 +57,10 @@ if (!exists("metsigdb_kegg", mode = "function")) {
       "Install MetaProViz or load the required functions before knitting."
     )
   }
+}
+
+if (!requireNamespace("ggbreak", quietly = TRUE)) {
+  stop("Package `ggbreak` is required for the split y-axis footprint plot. Please install it first.")
 }
 ```
 
@@ -463,6 +468,8 @@ excel_file <- file.path(run_dir, paste0("metsigdb_benchmark_", run_stamp, ".xlsx
 
 save_svg_plot <- function(plot_obj, filename, width = 12, height = 6) {
   out_file <- file.path(plots_dir, filename)
+  if (!dir.exists(plots_dir)) dir.create(plots_dir, recursive = TRUE)
+
   ggplot2::ggsave(
     filename = out_file,
     plot = plot_obj,
@@ -470,6 +477,11 @@ save_svg_plot <- function(plot_obj, filename, width = 12, height = 6) {
     height = height,
     device = svglite::svglite
   )
+
+  if (!file.exists(out_file)) {
+    stop("Failed to save plot: ", out_file)
+  }
+
   out_file
 }
 
@@ -564,6 +576,15 @@ delta_targets_plot_data <- tbl_exclusion_compare %>%
     ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource)
   )
 
+mpv_theme <- theme_classic(base_size = 11) +
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    legend.position = "right",
+    legend.box = "vertical",
+    legend.box.margin = margin(10, 10, 10, 10)
+  )
+
 p_delta_targets <- ggplot(delta_targets_plot_data, aes(x = ResourcePlot, y = value, fill = `Interaction Type`)) +
   geom_col(position = position_dodge(width = 0.9), width = 0.8) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "grey40") +
@@ -592,13 +613,7 @@ p_delta_targets <- ggplot(delta_targets_plot_data, aes(x = ResourcePlot, y = val
     y = "% Delta Targets",
     fill = "Interaction Type"
   ) +
-  theme_minimal(base_size = 11) +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    legend.position = "right",
-    legend.box = "vertical",
-    legend.box.margin = margin(10, 10, 10, 10)
-  )
+  mpv_theme
 
 # Grouped bar: exclusion deltas for interactions.
 delta_interactions_plot_data <- tbl_exclusion_compare %>%
@@ -639,13 +654,7 @@ p_delta_interactions <- ggplot(delta_interactions_plot_data, aes(x = ResourcePlo
     y = "% Delta Interactions",
     fill = "Interaction Type"
   ) +
-  theme_minimal(base_size = 11) +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    legend.position = "right",
-    legend.box = "vertical",
-    legend.box.margin = margin(10, 10, 10, 10)
-  )
+  mpv_theme
 
 # Grouped and faceted footprint plot.
 resource_footprint_plot_data <- tbl_resource_level %>%
@@ -672,13 +681,67 @@ p_resource_footprint <- ggplot(resource_footprint_plot_data, aes(x = ResourcePlo
     y = "Count",
     fill = "Interaction Type"
   ) +
-  theme_minimal(base_size = 11) +
-  theme(
-    axis.text.x = element_text(angle = 45, hjust = 1),
-    legend.position = "right",
-    legend.box = "vertical",
-    legend.box.margin = margin(10, 10, 10, 10)
-  )
+  mpv_theme
+
+# Same footprint plot with a y-axis break to improve visibility of lower bars.
+p_resource_footprint_split <- ggplot(resource_footprint_plot_data, aes(x = ResourcePlot, y = Value, fill = `Interaction Type`)) +
+  geom_col(position = position_dodge(width = 0.9), width = 0.8) +
+  geom_text(
+    aes(label = Value, group = `Interaction Type`),
+    position = position_dodge(width = 0.9),
+    vjust = -0.15,
+    size = 2.6
+  ) +
+  facet_wrap(~Metric, scales = "free_y") +
+  ggbreak::scale_y_break(c(4000, 14000), scales = 25 / 70, space = 1) +
+  scale_fill_manual(values = interaction_type_colors, drop = FALSE) +
+  labs(
+    title = "Resource Footprint Across Terms, Targets, and Interactions (Y-axis split)",
+    x = "Resource",
+    y = "Count",
+    fill = "Interaction Type"
+  ) +
+  mpv_theme
+
+make_resource_footprint_split_single <- function(metric_name, break_start, break_end) {
+  resource_footprint_plot_data %>%
+    dplyr::filter(Metric == metric_name) %>%
+    ggplot(aes(x = ResourcePlot, y = Value, fill = `Interaction Type`)) +
+    geom_col(position = position_dodge(width = 0.9), width = 0.8) +
+    geom_text(
+      aes(label = Value, group = `Interaction Type`),
+      position = position_dodge(width = 0.9),
+      vjust = -0.15,
+      size = 2.6
+    ) +
+    ggbreak::scale_y_break(c(break_start, break_end), scales = 25 / 70, space = 1) +
+    scale_fill_manual(values = interaction_type_colors, drop = FALSE) +
+    labs(
+      title = paste0(metric_name, " by Resource (Y-axis split)"),
+      x = "Resource",
+      y = "Count",
+      fill = "Interaction Type"
+    ) +
+    mpv_theme
+}
+
+p_resource_footprint_terms_split <- make_resource_footprint_split_single(
+  metric_name = "Distinct Terms",
+  break_start = 4000,
+  break_end = 15000
+)
+
+p_resource_footprint_targets_split <- make_resource_footprint_split_single(
+  metric_name = "Distinct Targets",
+  break_start = 8000,
+  break_end = 40000
+)
+
+p_resource_footprint_interactions_split <- make_resource_footprint_split_single(
+  metric_name = "Distinct Interactions",
+  break_start = 25000,
+  break_end = 40000
+)
 
 # Grouped bar: mean targets per term.
 set_level_plot_data <- tbl_set_level %>%
@@ -703,8 +766,7 @@ p_set_level_mean <- ggplot(set_level_plot_data, aes(x = ResourcePlot, y = `Mean 
     y = "Mean Targets per Term",
     fill = "Interaction Type"
   ) +
-  theme_minimal(base_size = 11) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  mpv_theme
 
 # Grouped bar: median targets per term.
 p_set_level_median <- ggplot(set_level_plot_data, aes(x = ResourcePlot, y = `Median Targets per Term`, fill = `Interaction Type`)) +
@@ -722,8 +784,7 @@ p_set_level_median <- ggplot(set_level_plot_data, aes(x = ResourcePlot, y = `Med
     y = "Median Targets per Term",
     fill = "Interaction Type"
   ) +
-  theme_minimal(base_size = 11) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  mpv_theme
 
 # Stacked bar: membership composition.
 degree_bucket_plot_data <- tbl_degree_buckets %>%
@@ -747,23 +808,32 @@ p_degree_bucket <- ggplot(degree_bucket_plot_data, aes(x = ResourcePlot, y = `Sh
     y = "Share of Targets",
     fill = "Membership Bucket"
   ) +
-  theme_minimal(base_size = 11) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  mpv_theme
 
 plot_files <- c(
   save_svg_plot(p_delta_targets, "exclusion_pct_delta_targets.svg", width = 13, height = 6),
   save_svg_plot(p_delta_interactions, "exclusion_pct_delta_interactions.svg", width = 13, height = 6),
   save_svg_plot(p_resource_footprint, "resource_footprint_faceted.svg", width = 14, height = 8),
+  save_svg_plot(p_resource_footprint_split, "resource_footprint_faceted_split.svg", width = 14, height = 8),
+  save_svg_plot(p_resource_footprint_terms_split, "resource_footprint_terms_split.svg", width = 14, height = 8),
+  save_svg_plot(p_resource_footprint_targets_split, "resource_footprint_targets_split.svg", width = 14, height = 8),
+  save_svg_plot(p_resource_footprint_interactions_split, "resource_footprint_interactions_split.svg", width = 14, height = 8),
   save_svg_plot(p_set_level_mean, "set_level_mean_targets.svg", width = 13, height = 6),
   save_svg_plot(p_set_level_median, "set_level_median_targets.svg", width = 13, height = 6),
   save_svg_plot(p_degree_bucket, "degree_bucket_composition.svg", width = 13, height = 7)
 )
+
+cat("Saved plot files:\n", paste(plot_files, collapse = "\n"), "\n", sep = "")
 
 plot_index_tbl <- tibble::tibble(
   Plot = c(
     "Relative Change in Targets",
     "Relative Change in Interactions",
     "Resource Footprint",
+    "Resource Footprint (Y-axis split)",
+    "Distinct Terms by Resource (Y-axis split)",
+    "Distinct Targets by Resource (Y-axis split)",
+    "Distinct Interactions by Resource (Y-axis split)",
     "Average Targets per Term",
     "Median Targets per Term",
     "Membership Composition"
@@ -845,6 +915,22 @@ knitr::kable(tbl_resource_level, digits = 3)
 
 ```{r test-1-resource-footprint-plot, fig.width=14, fig.height=8}
 p_resource_footprint
+```
+
+```{r test-1-resource-footprint-plot-split, fig.width=14, fig.height=8}
+p_resource_footprint_split
+```
+
+```{r test-1-distinct-terms-split-plot, fig.width=14, fig.height=8}
+p_resource_footprint_terms_split
+```
+
+```{r test-1-distinct-targets-split-plot, fig.width=14, fig.height=8}
+p_resource_footprint_targets_split
+```
+
+```{r test-1-distinct-interactions-split-plot, fig.width=14, fig.height=8}
+p_resource_footprint_interactions_split
 ```
 
 # Test 2: Term size distribution
