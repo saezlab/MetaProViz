@@ -160,6 +160,19 @@ if (!dir.exists("MetaProViz_Results/PK/PK_PUBCHEM/Traverse")) {
 if (!dir.exists("MetaProViz_Results/PK/PK_PUBCHEM/EquivalentID")) {
   dir.create("MetaProViz_Results/PK/PK_PUBCHEM/EquivalentID", recursive = TRUE)
 }
+
+## CHEBI
+if (!dir.exists("MetaProViz_Results/PK/PK_CHEBI")) {
+  dir.create("MetaProViz_Results/PK/PK_CHEBI", recursive = TRUE)
+}
+
+if (!dir.exists("MetaProViz_Results/PK/PK_CHEBI/Traverse")) {
+  dir.create("MetaProViz_Results/PK/PK_CHEBI/Traverse", recursive = TRUE)
+}
+
+if (!dir.exists("MetaProViz_Results/PK/PK_CHEBI/EquivalentID")) {
+  dir.create("MetaProViz_Results/PK/PK_CHEBI/EquivalentID", recursive = TRUE)
+}
 ```
 
 # 1. Loading the Feature metadata
@@ -460,7 +473,6 @@ none_summary_df
 
 
 3.ID compatibility check
-@Jannik
 ```{r}
 
 MetaboliteIDs_compatibility_check <- seed_id_compatibility_check(
@@ -1017,7 +1029,15 @@ write.csv2(
 
 ```
 
-## Now run the count_ID plots again, this time with the "Clean" data from MetabliteIDs_clean
+## Now run the compare_pk and  count_ID plots again, this time with the "Clean" data from MetabliteIDs_clean
+
+```{r}
+ccRCC_CompareIDs_cleaned <- MetaProViz::compare_pk(data = list(Biocft = MetaboliteIDs_cleaned |> dplyr::rename("Class"="SUPER_PATHWAY")),
+                                           name_col = "Metabolite",
+                                           metadata_info = list(Biocft = c("KEGG", "HMDB", "PUBCHEM")),
+                                           plot_name = "Overlap of ID types in ccRCC data",
+                                           path= "MetaProViz_Results/PK/Cleaned")
+```
 
 HMDB:
 ```{r}
@@ -1270,14 +1290,10 @@ none_delta_df <- rbind(
 ```
 
 
-@CURRENTLY DONE ABOVE
-
-
 
 ## Traverse ID
 Next, we fill the gaps by expanding the metabolite identifiers across HMDB, KEGG and PubChem by building and traversing a metabolite ID graph (see methods for details).  This fills the gaps by iteratively going through the cross-database mappings and collecting all connected IDs whilst additionally adding ChEBI IDs to the features.
 
-@Jannik
 ```{r}
 
 # Harmonize ID separators for traversal (function expects one delimiter)
@@ -1409,6 +1425,12 @@ Plot4_PubChem <- MetaProViz::count_id(MetaboliteIDs_traverse,
                                    "PUBCHEM",
                                    path= "MetaProViz_Results/PK/PK_PUBCHEM/Traverse")
 
+Plot4_CHEBI <- MetaProViz::count_id(MetaboliteIDs_traverse,
+                                   delimiter = id_separator,
+                                   fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
+                                   "CHEBI",
+                                   path= "MetaProViz_Results/PK/PK_CHEBI/Traverse")
+
 ```
 
 
@@ -1421,6 +1443,8 @@ We will start to compile a summary table that will include the number of IDs  (1
 id_count_df <- append_id_counts(id_count_df, Plot4_HMDB,    "HMDB_Traverse")
 id_count_df <- append_id_counts(id_count_df, Plot4_KEGG,    "KEGG_Traverse")
 id_count_df <- append_id_counts(id_count_df, Plot4_PubChem, "PUBCHEM_Traverse")
+id_count_df <- append_id_counts(id_count_df, Plot4_CHEBI, "CHEBI_Traverse")
+
 
 ## Calculate delta rows
 delta_df <- rbind(
@@ -1447,7 +1471,6 @@ none_delta_df <- rbind(
 
 
 ## Eqivalent ID
-@Jannik --> Do we already have them from traverse?
 
 ```{r}
 ## prepare inputs for equivalent_id:
@@ -1707,6 +1730,12 @@ Plot5_PubChem <- MetaProViz::count_id(MetaboliteIDs_addEquivalent,
                                    "PUBCHEM",
                                    path= "MetaProViz_Results/PK/PK_PUBCHEM/EquivalentID")
 
+Plot5_CHEBI <- MetaProViz::count_id(MetaboliteIDs_addEquivalent,
+                                   delimiter = id_separator,
+                                   fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
+                                   "CHEBI",
+                                   path= "MetaProViz_Results/PK/PK_CHEBI/EquivalentID")
+
 ```
 
 \
@@ -1720,6 +1749,8 @@ We will start to compile a summary table that will include the number of IDs  (1
 id_count_df <- append_id_counts(id_count_df, Plot5_HMDB,    "HMDB_addEquivalent")
 id_count_df <- append_id_counts(id_count_df, Plot5_KEGG,    "KEGG_addEquivalent")
 id_count_df <- append_id_counts(id_count_df, Plot5_PubChem, "PUBCHEM_addEquivalent")
+id_count_df <- append_id_counts(id_count_df, Plot5_CHEBI, "CHEBI_addEquivalent")
+
 
 ## Calculate delta rows
 delta_df <- rbind(
@@ -1748,7 +1779,180 @@ none_delta_df <- rbind(
 
 ```{r}
 
-## summary couting table including all deltas as bargraph / lollipop graph
+## summary counting table including all deltas as bargraph / lollipop graph
+
+## save everything to:     MetaProViz_Results\PK\id_summary_plots
+if (!dir.exists("MetaProViz_Results/PK/id_summary_plots")) {
+  dir.create("MetaProViz_Results/PK/id_summary_plots", recursive = TRUE)
+}
+
+## ID summary plots
+library(ggplot2)
+
+id_types <- c("HMDB", "KEGG", "PUBCHEM", "CHEBI")
+data_versions <- c("Original", "Cleaned", "Translated", "Traverse", "addEquivalent")
+
+id_summary_plot_df <- id_count_df %>%
+  mutate(
+    id_type = sub("_.*$", "", row_name),
+    data_version = sub("^[^_]+_", "", row_name)
+  ) %>%
+  filter(id_type %in% id_types, data_version %in% data_versions) %>%
+  mutate(
+    id_type = factor(id_type, levels = id_types),
+    data_version = factor(data_version, levels = data_versions)
+  ) %>%
+  complete(
+    id_type,
+    data_version,
+    fill = list(no_ID = 0L, Single_ID = 0L, Multiple_IDs = 0L, Total_IDs = 0L)
+  )
+
+version_levels <- unlist(lapply(data_versions, function(v) c(paste(v, id_types, sep = " | "), paste(v, "spacer", sep = " | "))))
+version_levels <- version_levels[seq_len(length(version_levels) - 1)]
+
+type_levels <- unlist(lapply(id_types, function(t) c(paste(t, data_versions, sep = " | "), paste(t, "spacer", sep = " | "))))
+type_levels <- type_levels[seq_len(length(type_levels) - 1)]
+
+id_summary_plot_df <- id_summary_plot_df %>%
+  mutate(
+    group_by_version = factor(paste(as.character(data_version), as.character(id_type), sep = " | "), levels = version_levels),
+    group_by_type = factor(paste(as.character(id_type), as.character(data_version), sep = " | "), levels = type_levels)
+  )
+
+stacked_long_version <- id_summary_plot_df %>%
+  pivot_longer(
+    cols = c(no_ID, Single_ID, Multiple_IDs),
+    names_to = "id_bucket",
+    values_to = "count"
+  ) %>%
+  mutate(id_bucket = factor(id_bucket, levels = c("Multiple_IDs", "Single_ID", "no_ID"))) %>%
+  group_by(group_by_version) %>%
+  arrange(id_bucket, .by_group = TRUE) %>%
+  mutate(label_y = cumsum(count) - count / 2 - 2) %>%
+  ungroup()
+
+stacked_long_type <- id_summary_plot_df %>%
+  pivot_longer(
+    cols = c(no_ID, Single_ID, Multiple_IDs),
+    names_to = "id_bucket",
+    values_to = "count"
+  ) %>%
+  mutate(id_bucket = factor(id_bucket, levels = c("Multiple_IDs", "Single_ID", "no_ID"))) %>%
+  group_by(group_by_type) %>%
+  arrange(id_bucket, .by_group = TRUE) %>%
+  mutate(label_y = cumsum(count) - count / 2 - 2) %>%
+  ungroup()
+
+p_id_stacked_by_version <- ggplot(stacked_long_version, aes(x = group_by_version, y = count, fill = id_bucket)) +
+  geom_col(width = 0.8) +
+  geom_text(
+    aes(y = label_y, label = ifelse(count == 0, "", count)),
+    color = "black",
+    size = 2.8
+  ) +
+  scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
+  labs(
+    title = "ID Summary by Data Version and ID Type",
+    x = "Data Version and ID Type",
+    y = "Feature Count",
+    fill = "ID Count Class"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+p_total_ids_by_version <- ggplot(id_summary_plot_df, aes(x = group_by_version, y = Total_IDs, fill = id_type)) +
+  geom_col(width = 0.8, show.legend = FALSE) +
+  geom_text(
+    aes(y = pmax(Total_IDs - 5, 0), label = ifelse(Total_IDs == 0, "", Total_IDs)),
+    color = "black",
+    size = 2.8,
+    fontface = "bold"
+  ) +
+  scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
+  labs(
+    title = "Total IDs by Data Version and ID Type",
+    x = "Data Version and ID Type",
+    y = "Total_IDs"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+p_id_stacked_by_type <- ggplot(stacked_long_type, aes(x = group_by_type, y = count, fill = id_bucket)) +
+  geom_col(width = 0.8) +
+  geom_text(
+    aes(y = label_y, label = ifelse(count == 0, "", count)),
+    color = "black",
+    size = 2.8
+  ) +
+  scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
+  labs(
+    title = "ID Summary by ID Type and Data Version",
+    x = "ID Type and Data Version",
+    y = "Feature Count",
+    fill = "ID Count Class"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+p_total_ids_by_type <- ggplot(id_summary_plot_df, aes(x = group_by_type, y = Total_IDs, fill = id_type)) +
+  geom_col(width = 0.8, show.legend = FALSE) +
+  geom_text(
+    aes(y = pmax(Total_IDs - 5, 0), label = ifelse(Total_IDs == 0, "", Total_IDs)),
+    color = "black",
+    size = 2.8,
+    fontface = "bold"
+  ) +
+  scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
+  labs(
+    title = "Total IDs by ID Type and Data Version",
+    x = "ID Type and Data Version",
+    y = "Total_IDs"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+print(p_id_stacked_by_version)
+print(p_total_ids_by_version)
+print(p_id_stacked_by_type)
+print(p_total_ids_by_type)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_stacked_by_data_version.png",
+  plot = p_id_stacked_by_version,
+  width = 16,
+  height = 8,
+  dpi = 300
+)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_total_ids_by_data_version.png",
+  plot = p_total_ids_by_version,
+  width = 16,
+  height = 8,
+  dpi = 300
+)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_stacked_by_id_type.png",
+  plot = p_id_stacked_by_type,
+  width = 16,
+  height = 8,
+  dpi = 300
+)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_total_ids_by_id_type.png",
+  plot = p_total_ids_by_type,
+  width = 16,
+  height = 8,
+  dpi = 300
+)
+
+
+
+
+
 
 
 ```
