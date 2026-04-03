@@ -79,8 +79,16 @@ if (!dir.exists("MetaProViz_Results/PK/PK_HMDB/Original")) {
   dir.create("MetaProViz_Results/PK/PK_HMDB/Original", recursive = TRUE)
 }
 
+if (!dir.exists("MetaProViz_Results/PK/PK_HMDB/Cleaned")) {
+  dir.create("MetaProViz_Results/PK/PK_HMDB/Cleaned", recursive = TRUE)
+}
+
 if (!dir.exists("MetaProViz_Results/PK/PK_HMDB/Translated")) {
   dir.create("MetaProViz_Results/PK/PK_HMDB/Translated", recursive = TRUE)
+}
+
+if (!dir.exists("MetaProViz_Results/PK/PK_HMDB/Traverse")) {
+  dir.create("MetaProViz_Results/PK/PK_HMDB/Traverse", recursive = TRUE)
 }
 
 ## KEGG
@@ -92,8 +100,16 @@ if (!dir.exists("MetaProViz_Results/PK/PK_KEGG/Original")) {
   dir.create("MetaProViz_Results/PK/PK_KEGG/Original", recursive = TRUE)
 }
 
+if (!dir.exists("MetaProViz_Results/PK/PK_KEGG/Cleaned")) {
+  dir.create("MetaProViz_Results/PK/PK_KEGG/Cleaned", recursive = TRUE)
+}
+
 if (!dir.exists("MetaProViz_Results/PK/PK_KEGG/Translated")) {
   dir.create("MetaProViz_Results/PK/PK_KEGG/Translated", recursive = TRUE)
+}
+
+if (!dir.exists("MetaProViz_Results/PK/PK_KEGG/Traverse")) {
+  dir.create("MetaProViz_Results/PK/PK_KEGG/Traverse", recursive = TRUE)
 }
 
 ## PUBCHEM
@@ -105,9 +121,22 @@ if (!dir.exists("MetaProViz_Results/PK/PK_PUBCHEM/Original")) {
   dir.create("MetaProViz_Results/PK/PK_PUBCHEM/Original", recursive = TRUE)
 }
 
+if (!dir.exists("MetaProViz_Results/PK/PK_PUBCHEM/Cleaned")) {
+  dir.create("MetaProViz_Results/PK/PK_PUBCHEM/Cleaned", recursive = TRUE)
+}
+
 if (!dir.exists("MetaProViz_Results/PK/PK_PUBCHEM/Translated")) {
   dir.create("MetaProViz_Results/PK/PK_PUBCHEM/Translated", recursive = TRUE)
 }
+
+if (!dir.exists("MetaProViz_Results/PK/PK_PUBCHEM/Traverse")) {
+  dir.create("MetaProViz_Results/PK/PK_PUBCHEM/Traverse", recursive = TRUE)
+}
+
+## General
+
+# @Jannik  @Christina
+## to-do: make sense of these folders below
 
 if (!dir.exists("MetaProViz_Results/PK/Translated")) {
   dir.create("MetaProViz_Results/PK/Translated", recursive = TRUE)
@@ -117,21 +146,10 @@ if (!dir.exists("MetaProViz_Results/PK/Results_Traverse")) {
   dir.create("MetaProViz_Results/PK/Results_Traverse", recursive = TRUE)
 }
 
-if (!dir.exists("MetaProViz_Results/PK/PK_HMDB/Traverse")) {
-  dir.create("MetaProViz_Results/PK/PK_HMDB/Traverse", recursive = TRUE)
-}
-
-if (!dir.exists("MetaProViz_Results/PK/PK_KEGG/Traverse")) {
-  dir.create("MetaProViz_Results/PK/PK_KEGG/Traverse", recursive = TRUE)
-}
-
-if (!dir.exists("MetaProViz_Results/PK/PK_PUBCHEM/Traverse")) {
-  dir.create("MetaProViz_Results/PK/PK_PUBCHEM/Traverse", recursive = TRUE)
-}
-
 if (!dir.exists("MetaProViz_Results/PK/Traverse")) {
   dir.create("MetaProViz_Results/PK/Traverse", recursive = TRUE)
 }
+
 # saving intermediate tables which are needed from ID QC
 if (!dir.exists("MetaProViz_Results/PK/ID_QC")) {
   dir.create("MetaProViz_Results/PK/ID_QC", recursive = TRUE)
@@ -175,7 +193,13 @@ MetaboliteIDs <- tissue_meta %>%
     HMDB = normalize_id_cell(HMDB),
     KEGG = normalize_id_cell(KEGG),
     PUBCHEM = normalize_id_cell(PUBCHEM)
-  )
+  ) 
+
+# make sure there are no more semicolons in any cell of the MetaboliteIDs df
+# because this will become a problem in the csv file saving
+
+MetaboliteIDs <- MetaboliteIDs %>%
+  mutate(across(where(is.character), ~ gsub(";", ",", .x)))
 ```
 
 # 2. MetaProViz Metabolite ID workflow
@@ -194,6 +218,8 @@ Here we notice that 76 features have no metabolite ID assigned, yet have a trivi
 2. Metabolite IDs per feature:
 2.0. Harmonize ID separators:
 We use one separator convention (`; `) across all ID columns (CAS, HMDB, KEGG, PUBCHEM) from this point onward.
+
+@Christina: is 2.0 above true? or is it still a to-do? Because "id_separator is currently = ", "
 
 2.1. HMDB:
 ```{r}
@@ -369,17 +395,20 @@ id_count_df <- append_id_counts(id_count_df, Plot1_HMDB,    "HMDB_Original")
 id_count_df <- append_id_counts(id_count_df, Plot1_KEGG,    "KEGG_Original")
 id_count_df <- append_id_counts(id_count_df, Plot1_PubChem, "PUBCHEM_Original")
 
-## cleaned
-id_count_df <- append_id_counts(id_count_df, Plot2_HMDB,    "HMDB_cleaned")
-id_count_df <- append_id_counts(id_count_df, Plot2_KEGG,    "KEGG_cleaned")
-id_count_df <- append_id_counts(id_count_df, Plot2_PubChem, "PUBCHEM_cleaned")
 
+# how to go on after a new version of the data:
 
-## Calculate delta rows
-delta_df <- calculate_id_deltas(id_count_df, "Original", "cleaned")
-
-## Optional: append delta rows into the main summary table
-id_count_df <- bind_rows(id_count_df, delta_df)
+# ## cleaned
+# id_count_df <- append_id_counts(id_count_df, Plot2_HMDB,    "HMDB_cleaned")
+# id_count_df <- append_id_counts(id_count_df, Plot2_KEGG,    "KEGG_cleaned")
+# id_count_df <- append_id_counts(id_count_df, Plot2_PubChem, "PUBCHEM_cleaned")
+# 
+# 
+# ## Calculate delta rows
+# delta_df <- calculate_id_deltas(id_count_df, "Original", "cleaned")
+# 
+# ## Optional: append delta rows into the main summary table
+# id_count_df <- bind_rows(id_count_df, delta_df)
 
 
 
@@ -398,16 +427,16 @@ none_summary_df <- tibble(
 ## Original category dataframe
 none_summary_df <- append_none_summary(none_summary_df, MetaboliteIDs, "Original")
 
-## cleaned category dataframe
-none_summary_df <- append_none_summary(none_summary_df, MetaboliteID_Translated, "cleaned")
-
-
-
-## Calculate delta row
-none_delta_df <- calculate_none_delta(none_summary_df, "Original", "cleaned")
-
-## Optional: append delta row into the summary table
-none_summary_df <- bind_rows(none_summary_df, none_delta_df)
+## how to go on with a new version of the data:
+# 
+# ## cleaned category dataframe
+# none_summary_df <- append_none_summary(none_summary_df, MetaboliteID_Translated, "cleaned")
+# 
+# ## Calculate delta row
+# none_delta_df <- calculate_none_delta(none_summary_df, "Original", "cleaned")
+# 
+# ## Optional: append delta row into the summary table
+# none_summary_df <- bind_rows(none_summary_df, none_delta_df)
 
 
 
@@ -421,16 +450,6 @@ none_summary_df <- bind_rows(none_summary_df, none_delta_df)
 
 id_count_df
 none_summary_df
-
-
-
-
-
-
-
-## NOTE:   the cleaned version is not correct yet, it is only for illustrating how to use.
-##         work in progress @Jannik
-
 
 ```
 
@@ -580,11 +599,11 @@ lost_id_pair_rows_with_cas <- lost_id_pair_rows_with_cas %>%
 ## save the two tables:
 # "MetaProViz_Results/PK/ID_QC"
 
-write.csv(
+write.csv2(
   lost_id_pair_rows_with_cas,
   "MetaProViz_Results/PK/ID_QC/lost_id_pair_rows_with_cas.csv"
 )
-write.csv(
+write.csv2(
   lost_id_pair_rows_no_cas,
   "MetaProViz_Results/PK/ID_QC/lost_id_pair_rows_no_cas.csv"
 ) 
@@ -612,7 +631,7 @@ cat("Distinct features in fully_compatible_id_pair_rows:", length(unique(fully_c
 cat("ID pairs in fully compatible features:", nrow(fully_compatible_id_pair_rows), "\n")
 
 ## save as csv
-write.csv(
+write.csv2(
   fully_compatible_id_pair_rows,
   "MetaProViz_Results/PK/ID_QC/fully_compatible_id_pair_rows.csv"
 )
@@ -669,14 +688,7 @@ cat("Non-compatible ID pairs within partially compatible features:", length(whic
 ## Now for those 94 id pairs, which are non-compatible, we also need to check if some of them can be rescued
 
 # save them as csv
-
-# I saw that some of the rows of the columns contain semicolons which messes up the csv
-partially_compatible_id_pair_rows$Metabolite %<>%
-    gsub(";", ",", .)
-partially_compatible_id_pair_rows$SUB_PATHWAY %<>%
-    gsub(";", ",", .)
-
-write.csv(
+write.csv2(
   partially_compatible_id_pair_rows,
   "MetaProViz_Results/PK/ID_QC/partially_compatible_id_pair_rows_with_cas.csv"
 )
@@ -752,6 +764,11 @@ completely_incompatible_manual_no_cas <- read.csv("Patients_Metadata/lost_id_pai
 
 completely_incompatible_manual_no_cas %<>%
     mutate(
+        across(
+            c(PUBCHEM_Corrected, KEGG_Corrected, HMDB_Corrected),
+            ~ replace(.x, .x == FALSE, NA)
+        )
+    ) %>% mutate(
         PUBCHEM = PUBCHEM_Corrected,
         KEGG = KEGG_Corrected,
         HMDB = HMDB_Corrected
@@ -772,6 +789,12 @@ completely_incompatible_manual_no_cas %<>%
 
 completely_incompatible_manual_with_cas %<>%
     mutate(
+        across(
+            c(PUBCHEM_Corrected, KEGG_Corrected, HMDB_Corrected),
+            ~ replace(.x, .x == FALSE, NA)
+        )
+    ) %>%
+    mutate(
         PUBCHEM = PUBCHEM_Corrected,
         KEGG = KEGG_Corrected,
         HMDB = HMDB_Corrected
@@ -791,7 +814,7 @@ completely_incompatible_manual_with_cas %<>%
     mutate(
         manual_correction = TRUE,
         correction_tbl = "completely_incompatible_manual_with_cas"
-    )
+    ) 
 
 partially_compatible_id_pair_rows %<>%
     filter(
@@ -838,17 +861,17 @@ combined_tables <-
 cat("ID pairs left after combining all tables:", nrow(combined_tables), "\n")
 
 ## how many features were preserved?
-cat("Preserved features after stitching:", length(unique(combined_tables$Metabolite)), "(perfect)\n")
+cat("Preserved features after stitching:", length(unique(combined_tables$Metabolite)))
 
 ## save this table
-write.csv(
+write.csv2(
     combined_tables,
     "MetaProViz_Results/PK/ID_QC/joined_and_manually_cleaned_id_pair_tables.csv"
 )
 
 
 ## join back together based on "original_row_id", summarizing the IDs per type
-MetaboliteIDs_clean <- combined_tables %>%
+MetaboliteIDs_cleaned <- combined_tables %>%
   group_by(original_row_id) %>%
   summarise(
     Metabolite    = first(Metabolite),
@@ -911,9 +934,9 @@ MetaboliteIDs_clean <- combined_tables %>%
   )
 
 ## save this table
-write.csv(
-    MetaboliteIDs_clean,
-    "MetaProViz_Results/PK/Cleaned/MetaboliteIDs_clean.csv"
+write.csv2(
+    MetaboliteIDs_cleaned,
+    "MetaProViz_Results/PK/Cleaned/MetaboliteIDs_cleaned.csv"
 )
 
 
@@ -990,19 +1013,55 @@ write.csv(
 
 ```
 
+## Now run the count_ID plots again, this time with the "Clean" data from MetabliteIDs_clean
+
+HMDB:
 ```{r}
-# run plots again
+Plot2_HMDB <- MetaProViz::count_id(MetaboliteIDs_cleaned, 
+                                   delimiter = id_separator,
+                                   "HMDB",
+                                   fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
+                                   path = "MetaProViz_Results/PK/PK_HMDB/Cleaned")
+```
+
+KEGG:
+```{r}
+Plot2_KEGG <- MetaProViz::count_id(MetaboliteIDs_cleaned, 
+                                   delimiter = id_separator,
+                                   fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
+                                   "KEGG",
+                                   path= "MetaProViz_Results/PK/PK_KEGG/Cleaned")
+```
+
+PubChem:
+```{r}
+Plot2_PubChem <- MetaProViz::count_id(MetaboliteIDs_cleaned,
+                                   delimiter = id_separator,
+                                   fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
+                                   "PUBCHEM",
+                                   path= "MetaProViz_Results/PK/PK_PUBCHEM/Cleaned")
+```
+
+```{r}
+# append the new "Cleaned" ID counts
 
 
+## cleaned
+id_count_df <- append_id_counts(id_count_df, Plot2_HMDB,    "HMDB_Cleaned")
+id_count_df <- append_id_counts(id_count_df, Plot2_KEGG,    "KEGG_Cleaned")
+id_count_df <- append_id_counts(id_count_df, Plot2_PubChem, "PUBCHEM_Cleaned")
 
 
-#@Jannik
+## Calculate delta rows
+delta_df <- calculate_id_deltas(id_count_df, "Original", "Cleaned")
 
+## Optional: append delta rows into the main summary table
+# id_count_df <- bind_rows(id_count_df, delta_df)
 
-# then initialize counting table with No id, singleID, multipleID, totalIDs
-# then after every step, run count_id functions again and expand the counting table with the new steps
 
 ```
+
+
 
 
 ## Translate Cas to metabolite ID
@@ -1061,20 +1120,20 @@ ccRCC_CompareIDs_Translated <- MetaProViz::compare_pk(data = list(Biocft = Metab
                                            plot_name = "Overlap of ID types in ccRCC data",
                                            path= "MetaProViz_Results/PK/Translated")
 
-Plot2_HMDB <- MetaProViz::count_id(MetaboliteID_Translated,
+Plot3_HMDB <- MetaProViz::count_id(MetaboliteID_Translated,
                                    delimiter = id_separator,
                                    "HMDB",
                                    fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
                                    binwidth = 1,
                                    path = "MetaProViz_Results/PK/PK_HMDB/Translated")
 
-Plot2_KEGG <- MetaProViz::count_id(MetaboliteID_Translated,
+Plot3_KEGG <- MetaProViz::count_id(MetaboliteID_Translated,
                                    delimiter = id_separator,
                                    fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
                                    "KEGG",
                                    path= "MetaProViz_Results/PK/PK_KEGG/Translated")
 
-Plot2_PubChem <- MetaProViz::count_id(MetaboliteID_Translated,
+Plot3_PubChem <- MetaProViz::count_id(MetaboliteID_Translated,
                                    delimiter = id_separator,
                                    fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
                                    "PUBCHEM",
@@ -1194,163 +1253,6 @@ traverse_ID_ExpandedDF <- Results_Traverse$ExpandedDF
 ```
 \
 First we need to take some decisions regarding detected incompatible seed IDs in 74 rows. Not all seed IDs in these rows are mutually reachable through IDEdges, suggesting they may map to different molecules. This can overexpanded the ID space during traversal. Please manually remove or correct incompatible seed IDs and rerun traverse_ids() freshly on a clean input table.
-```{r}
-#How can I see what are compatible once for a feature? If e.g. 2 of 3 are, How can I ignore the one an exclude the new IDs coming from this?
-
-# @Christina: The above comment should be sorted out now that we have the pair_compatibility testing
-
-# How do we proceed from here?
-
-# Option 1: 
-#   go through the pair_compatibility permutation table
-#   exclude all incompatible ID pairs
-#       - sometimes there is less than two HMDB, KEGG, PUBCHEM seed IDs.
-#         Maybe there is only a CAS or only one of the other ID types.
-#         In this case, we don't want to exclude them, because we can not really
-#         assess compatibility. Therefore, "all_seed_ids_compatible" is TRUE
-#         -> keep all where "all_seed_ids_compatible" == TRUE
-#       - in the Results_Traverse$ID_pair_compatibility (traverse_ID_pair_compatibility),
-#         we have the column "original_row_id" to re-group seed_id-pairs later
-#       - we need to exclude seed_id combinations without a match for all rows where
-#         "all_seed_ids_compatible" == FALSE
-
-## a good example is original_row_id == 99 of the original df, the metabolite 4-hydroxyglutamate
-
-# > traverse_ID_pair_compatibility[traverse_ID_pair_compatibility$"original_row_id" == "99", ]
-
-#   original_row_id Metabolite   CAS   SUPER_PATHWAY  ...   PUBCHEM KEGG  HMDB  CHEBI row_id seed1_type seed1_id seed2_type seed2_id pair_compatible compatibility_path n_seed_ids all_seed_ids_compatible
-#   <chr>           <chr>        <chr> <chr>          ...   <chr>   <chr> <chr> <chr>  <int> <chr>      <chr>    <chr>      <chr>    <lgl>           <chr>                   <int> <lgl>                  
-# 1 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 HMDB       HMDB000~ KEGG       C03079   FALSE           no_match                    4 FALSE
-# 2 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 HMDB       HMDB000~ PUBCHEM    5460078  FALSE           no_match                    4 FALSE
-# 3 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 HMDB       HMDB000~ PUBCHEM    5460800  FALSE           no_match                    4 FALSE
-# 4 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 KEGG       C03079   PUBCHEM    5460078  TRUE            direct                      4 FALSE 
-# 5 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 KEGG       C03079   PUBCHEM    5460800  TRUE            direct                      4 FALSE 
-# 6 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 PUBCHEM    5460078  PUBCHEM    5460800  TRUE            secondary                   4 FALSE 
-
-## here, we have "all_seed_ids_compatible" == FALSE, but we want to keep some of the combinations
-## we also have no_match direct and secondary matches, which makes it a good example
-## we want to keep all direct and secondary matches and discard no_match
-
-traverse_ID_pair_compatibility_filtered <- traverse_ID_pair_compatibility %>% 
-  filter( 
-    (all_seed_ids_compatible == TRUE) | 
-    (all_seed_ids_compatible == FALSE & compatibility_path == "direct") | 
-    (all_seed_ids_compatible == FALSE & compatibility_path == "secondary") 
-  )
-
-
-# let's assess, if we lost any whole features due to this filtering
-## these are these features:
-length(unique(traverse_ID_pair_compatibility$Metabolite)) #577
-length(unique(traverse_ID_pair_compatibility_filtered$Metabolite)) #544
-
-# that means, 33 whole features would get lost if we filter strictly like above
-
-# let's investigate these "lost" features and see why they are filtered out
-
-lost_rows_after_filtering <- list( 
-  setdiff(
-      unique(traverse_ID_pair_compatibility$Metabolite),
-      unique(traverse_ID_pair_compatibility_filtered$Metabolite)
-  )
-)
-
-# now look at all seed_id compatibility checks of these lost features
-lost_id_pair_rows <- traverse_ID_pair_compatibility[ traverse_ID_pair_compatibility$Metabolite %in% lost_rows_after_filtering[[1]]  , ]
-
-# length(unique(lost_id_pair_rows$Metabolite))
-# > 33
-
-## as we can see, these are exactly the 33 rows missing and they have one thing in common:
-## They have either 2 or 3 seed_ids AND -> all their seed_id pairs mismatched,
-## i.e. they had no single seed_id pair which was compatible
-
-## for these cases, we should not just delete them but handle them differently
-
-# we will now manually investigate all of these cases and decide on one ID to keep
-# looking at lost_id_pair_rows, we dedice on an ID to keep and edit the 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# now we want to re-join the filtered seed_id pairs into the original wide-format table
-
-# re-group into a new dataframe "MetaboliteIDs_Translated_filtered" and
-# make it ordered in the same way as the "MetaboliteID_Translated" before
-
-MetaboliteIDs_filtered <- traverse_ID_pair_compatibility_filtered %>%
-  group_by(original_row_id) %>%
-  summarise(
-    Metabolite    = first(Metabolite),
-    CAS           = first(CAS),
-    SUPER_PATHWAY = first(SUPER_PATHWAY),
-    SUB_PATHWAY   = first(SUB_PATHWAY),
-    COMP_ID       = first(COMP_ID),
-    PLATFORM      = first(PLATFORM),
-    RI            = first(RI),
-    MASS          = first(MASS),
-    
-    PUBCHEM = {
-      x <- trimws(as.character(PUBCHEM))
-      x[x == ""] <- NA_character_
-      x <- unique(na.omit(x))
-      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
-    },
-    
-    KEGG = {
-      x <- trimws(as.character(KEGG))
-      x[x == ""] <- NA_character_
-      x <- unique(na.omit(x))
-      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
-    },
-    
-    HMDB = {
-      x <- trimws(as.character(HMDB))
-      x[x == ""] <- NA_character_
-      x <- unique(na.omit(x))
-      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
-    },
-    
-    CHEBI = {
-      x <- trimws(as.character(CHEBI))
-      x[x == ""] <- NA_character_
-      x <- unique(na.omit(x))
-      if (length(x) == 0) NA_character_ else paste(x, collapse = ", ")
-    },
-    
-    .groups = "drop"
-  ) %>%
-  select(
-    Metabolite,
-    CAS,
-    SUPER_PATHWAY,
-    SUB_PATHWAY,
-    COMP_ID,
-    PLATFORM,
-    RI,
-    MASS,
-    PUBCHEM,
-    KEGG,
-    HMDB,
-    CHEBI
-  )
-
-
-
-
-
-
-
 
 #Final Output:
 MetaboliteID_Traverse <- Results_Traverse[["ExpandedDF"]]
@@ -1366,20 +1268,20 @@ ccRCC_CompareIDs_Traverse <- MetaProViz::compare_pk(data = list(Biocft = Metabol
                                            plot_name = "Overlap of ID types in ccRCC data",
                                            path= "MetaProViz_Results/PK/Traverse")
 
-Plot3_HMDB <- MetaProViz::count_id(MetaboliteID_Traverse,
+Plot4_HMDB <- MetaProViz::count_id(MetaboliteID_Traverse,
                                    delimiter = id_separator,
                                    "HMDB",
                                    fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
                                    binwidth = 1,
                                    path = "MetaProViz_Results/PK/PK_HMDB/Traverse")
 
-Plot3_KEGG <- MetaProViz::count_id(MetaboliteID_Traverse,
+Plot4_KEGG <- MetaProViz::count_id(MetaboliteID_Traverse,
                                    delimiter = id_separator,
                                    fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
                                    "KEGG",
                                    path= "MetaProViz_Results/PK/PK_KEGG/Traverse")
 
-Plot3_PubChem <- MetaProViz::count_id(MetaboliteID_Traverse,
+Plot4_PubChem <- MetaProViz::count_id(MetaboliteID_Traverse,
                                    delimiter = id_separator,
                                    fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
                                    "PUBCHEM",
