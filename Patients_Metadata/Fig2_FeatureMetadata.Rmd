@@ -80,6 +80,10 @@ if (!dir.exists("MetaProViz_Results/PK/Traverse")) {
   dir.create("MetaProViz_Results/PK/Traverse", recursive = TRUE)
 }
 
+if (!dir.exists("MetaProViz_Results/PK/EquivalentID")) {
+  dir.create("MetaProViz_Results/PK/EquivalentID", recursive = TRUE)
+}
+
 ##------------------------------------------------------------------
 # Individual DBs
 ## HMDB
@@ -103,6 +107,10 @@ if (!dir.exists("MetaProViz_Results/PK/PK_HMDB/Traverse")) {
   dir.create("MetaProViz_Results/PK/PK_HMDB/Traverse", recursive = TRUE)
 }
 
+if (!dir.exists("MetaProViz_Results/PK/PK_HMDB/EquivalentID")) {
+  dir.create("MetaProViz_Results/PK/PK_HMDB/EquivalentID", recursive = TRUE)
+}
+
 ## KEGG
 if (!dir.exists("MetaProViz_Results/PK/PK_KEGG")) {
   dir.create("MetaProViz_Results/PK/PK_KEGG", recursive = TRUE)
@@ -122,6 +130,10 @@ if (!dir.exists("MetaProViz_Results/PK/PK_KEGG/Translated")) {
 
 if (!dir.exists("MetaProViz_Results/PK/PK_KEGG/Traverse")) {
   dir.create("MetaProViz_Results/PK/PK_KEGG/Traverse", recursive = TRUE)
+}
+
+if (!dir.exists("MetaProViz_Results/PK/PK_KEGG/EquivalentID")) {
+  dir.create("MetaProViz_Results/PK/PK_KEGG/EquivalentID", recursive = TRUE)
 }
 
 ## PUBCHEM
@@ -145,6 +157,9 @@ if (!dir.exists("MetaProViz_Results/PK/PK_PUBCHEM/Traverse")) {
   dir.create("MetaProViz_Results/PK/PK_PUBCHEM/Traverse", recursive = TRUE)
 }
 
+if (!dir.exists("MetaProViz_Results/PK/PK_PUBCHEM/EquivalentID")) {
+  dir.create("MetaProViz_Results/PK/PK_PUBCHEM/EquivalentID", recursive = TRUE)
+}
 ```
 
 # 1. Loading the Feature metadata
@@ -1335,7 +1350,7 @@ MetaboliteIDs_traverse <-
         PUBCHEM = {
             PUBCHEM_translated %>%
                 normalize_id_cell() %>%
-                gsub("^CID", "", .)
+                gsub("CID", "", .)
         },
         KEGG = KEGG_translated %>% normalize_id_cell(),
         HMDB = HMDB_translated %>% normalize_id_cell(),
@@ -1394,7 +1409,6 @@ Plot4_PubChem <- MetaProViz::count_id(MetaboliteIDs_traverse,
                                    "PUBCHEM",
                                    path= "MetaProViz_Results/PK/PK_PUBCHEM/Traverse")
 
-
 ```
 
 
@@ -1433,40 +1447,303 @@ none_delta_df <- rbind(
 
 
 ## Eqivalent ID
-@Jannik --> Do we already have them from tarverse?
+@Jannik --> Do we already have them from traverse?
 
 ```{r}
+## prepare inputs for equivalent_id:
+## make long format table from ID types, keep COMP_ID as grouping variable
+## to join back together afterwards
+
+## HMDB
+Input_HMDB <- MetaboliteIDs_traverse %>%
+    select(
+        COMP_ID,
+        HMDB
+    ) %>%
+    separate_rows(
+        HMDB, sep = ","
+    ) %>%
+    mutate(
+        HMDB = str_trim(HMDB)
+    ) %>%
+    filter(
+        HMDB != ""
+    )
+
+## KEGG
+Input_KEGG <- MetaboliteIDs_traverse %>%
+    select(
+        COMP_ID,
+        KEGG
+    ) %>%
+    separate_rows(
+        KEGG, sep = ","
+    ) %>%
+    mutate(
+        KEGG = str_trim(KEGG)
+    ) %>%
+    filter(
+        KEGG != ""
+    )
+
+## PUBCHEM
+Input_PUBCHEM <- MetaboliteIDs_traverse %>%
+    select(
+        COMP_ID,
+        PUBCHEM
+    ) %>%
+    separate_rows(
+        PUBCHEM, sep = ","
+    ) %>%
+    mutate(
+        PUBCHEM = str_trim(PUBCHEM)
+    ) %>%
+    filter(
+        PUBCHEM != ""
+    )
+
+## CHEBI
+Input_CHEBI <- MetaboliteIDs_traverse %>%
+    select(
+        COMP_ID,
+        CHEBI
+    ) %>%
+    separate_rows(
+        CHEBI, sep = ","
+    ) %>%
+    mutate(
+        CHEBI = str_trim(CHEBI)
+    ) %>%
+    filter(
+        CHEBI != ""
+    ) %>%
+    mutate(  ## remove "CHEBI:" prefix for equivalent_id
+        CHEBI = gsub("^CHEBI:", "", CHEBI)
+    )
+
+```
+
+````{r}
+# before adding equivalent IDs, it is important to note, that the function
+# equivalent_id internally drops duplicated IDs from the metadata_info["Input_ID"]
+
+# in our case, we have some features which share the same HMDB ID, which was added
+# through traverse_ids() and therefore we would drop this info
+
+# one example is HMDB0001496 and C03594.
+# Both these IDs point to a molecule called "7-alpha-hydroxycholesterol"
+# There is also "7-beta-hydroxycholesterol" in the data and through traverse_ids(),
+# this molecule also received the same IDs: MDB0001496 and C03594
+
+# The only difference in these two molecules is stereochemistry, therefore it may
+# be discussed whether these ID mappings actually do make sense or not.
+
+# In any case, we are going to keep the IDs as they are, therefore we'll
+# compute equivalent_id on a unique ID set and map the expanded IDs back via the original ID
+
+
+## HMDB
+
+distinct_HMDB <- Input_HMDB %>% distinct(HMDB, .keep_all = FALSE)
+
+equivalent_id_res_HMDB <- MetaProViz::equivalent_id(data= distinct_HMDB,
+                                                    metadata_info = c(InputID="HMDB"),
+                                                    from = "hmdb",
+                                                    path = "MetaProViz_Results/PK/PK_HMDB/EquivalentID")
+
+## there is one HMDB (HMDB0031818) which is now duplicated after the equivalent_id function
+equivalent_id_res_HMDB_clean <-
+    equivalent_id_res_HMDB %>%
+    group_by(HMDB) %>%
+    summarise(
+        across(
+            c(PotentialAdditionalIDs, AllIDs), ~{
+                ids <- strsplit(as.character(.x), ",\\s*")
+                ids <- trimws(unlist(ids, use.names = FALSE))
+                ids <- ids[!is.na(ids) & ids != "" & ids != "NA"]
+                if (length(ids) == 0) NA_character_ else paste(unique(ids), collapse = ", ")
+            }
+        ),
+        .groups = "drop"
+    )
+
+# now map the cleaned output from equivalent_id back to the COMP_ID
+output_HMDB <- Input_HMDB %>%
+    left_join(
+        equivalent_id_res_HMDB_clean %>%
+            select(
+                HMDB,
+                PotentialAdditionalIDs,
+                AllIDs
+            ),
+        by = "HMDB"
+      ) %>%
+      group_by(COMP_ID) %>%
+      summarise(
+          HMDB = {
+              ids <- unlist(strsplit(paste(AllIDs, collapse = ", "), ",\\s*"))
+              ids <- trimws(ids)
+              ids <- unique(ids[!is.na(ids) & ids != "" & ids != "NA"])
+              if (length(ids) == 0) NA_character_ else paste(ids, collapse = ", ")
+          },
+          .groups = "drop"
+      )
+
+
+## KEGG
+
+distinct_KEGG <- Input_KEGG %>% distinct(KEGG, .keep_all = FALSE)
+
+equivalent_id_res_KEGG <- MetaProViz::equivalent_id(data= distinct_KEGG,
+                                                    metadata_info = c(InputID="KEGG"),
+                                                    from = "kegg",
+                                                    path = "MetaProViz_Results/PK/PK_KEGG/EquivalentID")
+
+equivalent_id_res_KEGG_clean <-
+    equivalent_id_res_KEGG %>%
+    group_by(KEGG) %>%
+    summarise(
+        across(
+            c(PotentialAdditionalIDs, AllIDs), ~{
+                ids <- strsplit(as.character(.x), ",\\s*")
+                ids <- trimws(unlist(ids, use.names = FALSE))
+                ids <- ids[!is.na(ids) & ids != "" & ids != "NA"]
+                if (length(ids) == 0) NA_character_ else paste(unique(ids), collapse = ", ")
+            }
+        ),
+        .groups = "drop"
+    )
+
+# now map the cleaned output from equivalent_id back to the COMP_ID
+output_KEGG <- Input_KEGG %>%
+    left_join(
+        equivalent_id_res_KEGG_clean %>%
+            select(
+                KEGG,
+                PotentialAdditionalIDs,
+                AllIDs
+            ),
+        by = "KEGG"
+      ) %>%
+      group_by(COMP_ID) %>%
+      summarise(
+          KEGG = {
+              ids <- unlist(strsplit(paste(AllIDs, collapse = ", "), ",\\s*"))
+              ids <- trimws(ids)
+              ids <- unique(ids[!is.na(ids) & ids != "" & ids != "NA"])
+              if (length(ids) == 0) NA_character_ else paste(ids, collapse = ", ")
+          },
+          .groups = "drop"
+      )
 
 
 
 
+## IMPORTANT NOTE:
 
-# Add equivalent IDs:
-Res_Equivalent <- MetaProViz::equivalent_id(data= Input_HMDB,
-                                                           metadata_info = c(InputID="HMDB"),# ID in the measured data, here we use the HMDB ID
-                                                           from = "hmdb",
-                                                     path= "MetaProViz_Results/PK/PK_HMDB/PlusEquivalentIDs")
+# in the function equivalent_id, there is a hard-coded part:
+# OtherIDs <- merge(OtherIDs, EquivalentFeatures_Long, by.x = metadata_info[["InputID"]], by.y = "hmdb", ...
+# where the merge happend explicitly on the "hmdb" column.
+
+# if not provided, then there is an error
+# BUT the function also works for KEGG input, since then this hard-coded block is not executed at all
+
+# best way: fix it so the expression says:   by.y = from
+# for now: only use equivalent_id on HMDB and KEGG
 
 
+# CONTINUE
+
+# now HMDB and KEGG IDs were expanded and we are going to join them back into a new
+# df, MetaboliteIDs_add_eqivalent
+
+MetaboliteIDs_addEquivalent <-
+    MetaboliteIDs_traverse %>%
+        select(
+            -any_of(c("HMDB", "KEGG"))
+        ) %>%
+        left_join(
+            output_HMDB, by = "COMP_ID"
+        ) %>%
+        left_join(
+            output_KEGG, by = "COMP_ID"
+        ) %>%
+        relocate(PUBCHEM, KEGG, HMDB, .after = COMP_ID)
+
+
+## save this table
+write.csv2(
+    MetaboliteIDs_addEquivalent,
+    "MetaProViz_Results/PK/EquivalentID/MetaboliteIDs_addEquivalent.csv"
+)
 ```
 
 \
 We will repeat the `count_id` and `compare_pk` plot after every change to the number of metabolite IDs:
 ```{r}
 
+ccRCC_CompareIDs_addEquivalent <- MetaProViz::compare_pk(data = list(Biocft = MetaboliteIDs_addEquivalent |> dplyr::rename("Class"="SUPER_PATHWAY")),
+                                                         name_col = "Metabolite",
+                                                         metadata_info = list(Biocft = c("KEGG", "HMDB", "PUBCHEM", "CHEBI")),
+                                                         plot_name = "Overlap of ID types in ccRCC data",
+                                                         path= "MetaProViz_Results/PK/EquivalentID")
+
+Plot5_HMDB <- MetaProViz::count_id(MetaboliteIDs_addEquivalent,
+                                   delimiter = id_separator,
+                                   "HMDB",
+                                   fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
+                                   binwidth = 1,
+                                   path = "MetaProViz_Results/PK/PK_HMDB/EquivalentID")
+
+Plot5_KEGG <- MetaProViz::count_id(MetaboliteIDs_addEquivalent,
+                                   delimiter = id_separator,
+                                   fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
+                                   "KEGG",
+                                   path= "MetaProViz_Results/PK/PK_KEGG/EquivalentID")
+
+Plot5_PubChem <- MetaProViz::count_id(MetaboliteIDs_addEquivalent,
+                                   delimiter = id_separator,
+                                   fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
+                                   "PUBCHEM",
+                                   path= "MetaProViz_Results/PK/PK_PUBCHEM/EquivalentID")
 
 ```
+
 \
 We will start to compile a summary table that will include the number of IDs  (1,2,n) after each step taken to increase the feature space. So now we will add the The CAS IDs
 ```{r}
 
 
+## extend counting dataframe with traverse_id results
+
+## traverse
+id_count_df <- append_id_counts(id_count_df, Plot5_HMDB,    "HMDB_addEquivalent")
+id_count_df <- append_id_counts(id_count_df, Plot5_KEGG,    "KEGG_addEquivalent")
+id_count_df <- append_id_counts(id_count_df, Plot5_PubChem, "PUBCHEM_addEquivalent")
+
+## Calculate delta rows
+delta_df <- rbind(
+  delta_df,
+  calculate_id_deltas(id_count_df, "Original", "addEquivalent"),
+  calculate_id_deltas(id_count_df, "Cleaned", "addEquivalent"),
+  calculate_id_deltas(id_count_df, "Translated", "addEquivalent"),
+  calculate_id_deltas(id_count_df, "Traverse", "addEquivalent")
+)
+
+
+## cleaned category dataframe
+none_summary_df <- append_none_summary(none_summary_df, MetaboliteIDs_traverse, "addEquivalent")
+
+## Calculate delta row
+none_delta_df <- rbind(
+  none_delta_df,
+  calculate_none_delta(none_summary_df, "Original", "addEquivalent"),
+  calculate_none_delta(none_summary_df, "Cleaned", "addEquivalent"),
+  calculate_none_delta(none_summary_df, "Translated", "addEquivalent"),
+  calculate_none_delta(none_summary_df, "Traverse", "addEquivalent")
+)
+
 ```
-
-
-
-
-
 
 
 ```{r}
