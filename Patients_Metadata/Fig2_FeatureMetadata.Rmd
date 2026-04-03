@@ -1829,7 +1829,7 @@ stacked_long_version <- id_summary_plot_df %>%
   mutate(id_bucket = factor(id_bucket, levels = c("Multiple_IDs", "Single_ID", "no_ID"))) %>%
   group_by(group_by_version) %>%
   arrange(id_bucket, .by_group = TRUE) %>%
-  mutate(label_y = cumsum(count) - count / 2 - 2) %>%
+  mutate(label_y = cumsum(count) - count / 2) %>%
   ungroup()
 
 stacked_long_type <- id_summary_plot_df %>%
@@ -1841,7 +1841,7 @@ stacked_long_type <- id_summary_plot_df %>%
   mutate(id_bucket = factor(id_bucket, levels = c("Multiple_IDs", "Single_ID", "no_ID"))) %>%
   group_by(group_by_type) %>%
   arrange(id_bucket, .by_group = TRUE) %>%
-  mutate(label_y = cumsum(count) - count / 2 - 2) %>%
+  mutate(label_y = cumsum(count) - count / 2) %>%
   ungroup()
 
 p_id_stacked_by_version <- ggplot(stacked_long_version, aes(x = group_by_version, y = count, fill = id_bucket)) +
@@ -1926,11 +1926,25 @@ ggsave(
 )
 
 ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_stacked_by_data_version.svg",
+  plot = p_id_stacked_by_version,
+  width = 16,
+  height = 8
+)
+
+ggsave(
   filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_total_ids_by_data_version.png",
   plot = p_total_ids_by_version,
   width = 16,
   height = 8,
   dpi = 300
+)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_total_ids_by_data_version.svg",
+  plot = p_total_ids_by_version,
+  width = 16,
+  height = 8
 )
 
 ggsave(
@@ -1942,11 +1956,25 @@ ggsave(
 )
 
 ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_stacked_by_id_type.svg",
+  plot = p_id_stacked_by_type,
+  width = 16,
+  height = 8
+)
+
+ggsave(
   filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_total_ids_by_id_type.png",
   plot = p_total_ids_by_type,
   width = 16,
   height = 8,
   dpi = 300
+)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_total_ids_by_id_type.svg",
+  plot = p_total_ids_by_type,
+  width = 16,
+  height = 8
 )
 
 
@@ -1955,6 +1983,323 @@ ggsave(
 
 
 
+## ID summary plots with delta annotations (delta vs Original)
+
+id_summary_with_delta_df <- id_summary_plot_df %>%
+  group_by(id_type) %>%
+  arrange(data_version, .by_group = TRUE) %>%
+  mutate(
+    delta_no_ID = no_ID - lag(no_ID, default = first(no_ID)),
+    delta_Single_ID = Single_ID - lag(Single_ID, default = first(Single_ID)),
+    delta_Multiple_IDs = Multiple_IDs - lag(Multiple_IDs, default = first(Multiple_IDs)),
+    delta_Total_IDs = Total_IDs - lag(Total_IDs, default = first(Total_IDs))
+  ) %>%
+  ungroup()
+
+stacked_long_version_delta <- id_summary_with_delta_df %>%
+  pivot_longer(
+    cols = c(no_ID, Single_ID, Multiple_IDs),
+    names_to = "id_bucket",
+    values_to = "count"
+  ) %>%
+  mutate(
+    id_bucket = factor(id_bucket, levels = c("Multiple_IDs", "Single_ID", "no_ID")),
+    delta_value = case_when(
+      id_bucket == "no_ID" ~ delta_no_ID,
+      id_bucket == "Single_ID" ~ delta_Single_ID,
+      id_bucket == "Multiple_IDs" ~ delta_Multiple_IDs
+    )
+  ) %>%
+  group_by(group_by_version) %>%
+  arrange(id_bucket, .by_group = TRUE) %>%
+  mutate(label_y = cumsum(count) - count / 2) %>%
+  ungroup()
+
+stacked_long_type_delta <- id_summary_with_delta_df %>%
+  pivot_longer(
+    cols = c(no_ID, Single_ID, Multiple_IDs),
+    names_to = "id_bucket",
+    values_to = "count"
+  ) %>%
+  mutate(
+    id_bucket = factor(id_bucket, levels = c("Multiple_IDs", "Single_ID", "no_ID")),
+    delta_value = case_when(
+      id_bucket == "no_ID" ~ delta_no_ID,
+      id_bucket == "Single_ID" ~ delta_Single_ID,
+      id_bucket == "Multiple_IDs" ~ delta_Multiple_IDs
+    )
+  ) %>%
+  group_by(group_by_type) %>%
+  arrange(id_bucket, .by_group = TRUE) %>%
+  mutate(label_y = cumsum(count) - count / 2) %>%
+  ungroup()
+
+p_id_stacked_by_version_with_delta <- ggplot(stacked_long_version_delta, aes(x = group_by_version, y = count, fill = id_bucket)) +
+  geom_col(width = 0.8) +
+  geom_text(
+    aes(
+      y = label_y,
+      label = ifelse(count == 0 & delta_value == 0, "", paste0(count, "\nΔ", sprintf("%+d", delta_value)))
+    ),
+    color = "black",
+    size = 2.5,
+    lineheight = 0.9
+  ) +
+  scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
+  labs(
+    title = "ID Summary by Data Version and ID Type (with Δ vs Original)",
+    x = "Data Version and ID Type",
+    y = "Feature Count",
+    fill = "ID Count Class"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+p_total_ids_by_version_with_delta <- ggplot(id_summary_with_delta_df, aes(x = group_by_version, y = Total_IDs, fill = id_type)) +
+  geom_col(width = 0.8, show.legend = FALSE) +
+  geom_text(
+    aes(
+      y = pmax(Total_IDs - 8, 0),
+      label = ifelse(Total_IDs == 0 & delta_Total_IDs == 0, "", paste0(Total_IDs, "\nΔ", sprintf("%+d", delta_Total_IDs)))
+    ),
+    color = "black",
+    size = 2.6,
+    fontface = "bold",
+    lineheight = 0.9
+  ) +
+  scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
+  labs(
+    title = "Total IDs by Data Version and ID Type (with Δ vs Original)",
+    x = "Data Version and ID Type",
+    y = "Total_IDs"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+p_id_stacked_by_type_with_delta <- ggplot(stacked_long_type_delta, aes(x = group_by_type, y = count, fill = id_bucket)) +
+  geom_col(width = 0.8) +
+  geom_text(
+    aes(
+      y = label_y,
+      label = ifelse(count == 0 & delta_value == 0, "", paste0(count, "\nΔ", sprintf("%+d", delta_value)))
+    ),
+    color = "black",
+    size = 2.5,
+    lineheight = 0.9
+  ) +
+  scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
+  labs(
+    title = "ID Summary by ID Type and Data Version (with Δ vs Original)",
+    x = "ID Type and Data Version",
+    y = "Feature Count",
+    fill = "ID Count Class"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+p_total_ids_by_type_with_delta <- ggplot(id_summary_with_delta_df, aes(x = group_by_type, y = Total_IDs, fill = id_type)) +
+  geom_col(width = 0.8, show.legend = FALSE) +
+  geom_text(
+    aes(
+      y = pmax(Total_IDs - 8, 0),
+      label = ifelse(Total_IDs == 0 & delta_Total_IDs == 0, "", paste0(Total_IDs, "\nΔ", sprintf("%+d", delta_Total_IDs)))
+    ),
+    color = "black",
+    size = 2.6,
+    fontface = "bold",
+    lineheight = 0.9
+  ) +
+  scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
+  labs(
+    title = "Total IDs by ID Type and Data Version (with Δ vs Original)",
+    x = "ID Type and Data Version",
+    y = "Total_IDs"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+print(p_id_stacked_by_version_with_delta)
+print(p_total_ids_by_version_with_delta)
+print(p_id_stacked_by_type_with_delta)
+print(p_total_ids_by_type_with_delta)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_stacked_by_data_version_with_delta.png",
+  plot = p_id_stacked_by_version_with_delta,
+  width = 16,
+  height = 8,
+  dpi = 300
+)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_stacked_by_data_version_with_delta.svg",
+  plot = p_id_stacked_by_version_with_delta,
+  width = 16,
+  height = 8
+)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_total_ids_by_data_version_with_delta.png",
+  plot = p_total_ids_by_version_with_delta,
+  width = 16,
+  height = 8,
+  dpi = 300
+)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_total_ids_by_data_version_with_delta.svg",
+  plot = p_total_ids_by_version_with_delta,
+  width = 16,
+  height = 8
+)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_stacked_by_id_type_with_delta.png",
+  plot = p_id_stacked_by_type_with_delta,
+  width = 16,
+  height = 8,
+  dpi = 300
+)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_stacked_by_id_type_with_delta.svg",
+  plot = p_id_stacked_by_type_with_delta,
+  width = 16,
+  height = 8
+)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_total_ids_by_id_type_with_delta.png",
+  plot = p_total_ids_by_type_with_delta,
+  width = 16,
+  height = 8,
+  dpi = 300
+)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/id_summary_total_ids_by_id_type_with_delta.svg",
+  plot = p_total_ids_by_type_with_delta,
+  width = 16,
+  height = 8
+)
+## delta_df visualizations (baseline = Original)
+
+baseline_steps <- tibble::tribble(
+  ~from_version, ~to_version, ~step_label,
+  "Original", "Cleaned", "Original -> Cleaned",
+  "Original", "Translated", "Original -> Translated",
+  "Original", "Traverse", "Original -> Traverse",
+  "Original", "addEquivalent", "Original -> addEquivalent"
+)
+
+delta_plot_df <- delta_df %>%
+  mutate(parts = stringr::str_split(row_name, "_", simplify = TRUE)) %>%
+  mutate(
+    id_type = parts[, 2],
+    from_version = parts[, 3],
+    to_id_type = parts[, 4],
+    to_version = parts[, 5]
+  ) %>%
+  select(-parts) %>%
+  filter(
+    id_type %in% id_types,
+    from_version %in% data_versions,
+    to_version %in% data_versions
+  ) %>%
+  left_join(baseline_steps, by = c("from_version", "to_version")) %>%
+  filter(!is.na(step_label)) %>%
+  mutate(
+    id_type = factor(id_type, levels = id_types),
+    step_label = factor(step_label, levels = baseline_steps$step_label)
+  ) %>%
+  mutate(across(c(no_ID, Single_ID, Multiple_IDs, Total_IDs), ~ tidyr::replace_na(., 0)))
+
+## Plot 1: Total_IDs deltas vs Original (line plot)
+delta_total_df <- delta_plot_df %>%
+  filter(!is.na(Total_IDs))
+
+p_delta_total_vs_original <- ggplot(delta_total_df, aes(x = step_label, y = Total_IDs, color = id_type, group = id_type)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey40") +
+  geom_line(linewidth = 0.9) +
+  geom_point(size = 2.4) +
+  geom_text(
+    aes(label = Total_IDs),
+    vjust = ifelse(delta_total_df$Total_IDs >= 0, -0.55, 1.25),
+    size = 2.8,
+    color = "black"
+  ) +
+  labs(
+    title = "Delta Total_IDs vs Original",
+    x = "Comparison",
+    y = "Delta Total_IDs",
+    color = "ID Type"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
+## Plot 2: no_ID / Single_ID / Multiple_IDs deltas vs Original (line plot)
+delta_comp_long <- delta_plot_df %>%
+  select(id_type, step_label, no_ID, Single_ID, Multiple_IDs) %>%
+  pivot_longer(
+    cols = c(no_ID, Single_ID, Multiple_IDs),
+    names_to = "metric",
+    values_to = "delta"
+  ) %>%
+  filter(!is.na(delta)) %>%
+  mutate(metric = factor(metric, levels = c("no_ID", "Single_ID", "Multiple_IDs")))
+
+p_delta_comp_vs_original <- ggplot(delta_comp_long, aes(x = step_label, y = delta, color = metric, group = metric)) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey40") +
+  geom_line(linewidth = 0.8) +
+  geom_point(size = 2) +
+  geom_text(
+    aes(label = ifelse(delta == 0, "", delta)),
+    vjust = ifelse(delta_comp_long$delta >= 0, -0.45, 1.15),
+    size = 2.3,
+    color = "black"
+  ) +
+  facet_wrap(~ id_type, ncol = 2) +
+  labs(
+    title = "Delta Composition vs Original",
+    x = "Comparison",
+    y = "Delta Count",
+    color = "Metric"
+  ) +
+  theme_bw() +
+  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+
+print(p_delta_total_vs_original)
+print(p_delta_comp_vs_original)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/delta_total_vs_original.png",
+  plot = p_delta_total_vs_original,
+  width = 12,
+  height = 7,
+  dpi = 300
+)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/delta_total_vs_original.svg",
+  plot = p_delta_total_vs_original,
+  width = 12,
+  height = 7
+)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/delta_composition_vs_original.png",
+  plot = p_delta_comp_vs_original,
+  width = 14,
+  height = 8,
+  dpi = 300
+)
+
+ggsave(
+  filename = "MetaProViz_Results/PK/id_summary_plots/delta_composition_vs_original.svg",
+  plot = p_delta_comp_vs_original,
+  width = 14,
+  height = 8
+)
 ```
 
 
