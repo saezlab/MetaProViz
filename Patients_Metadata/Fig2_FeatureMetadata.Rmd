@@ -455,25 +455,20 @@ MetaboliteIDs_pair_compatibility <- MetaboliteIDs_compatibility_check$ID_pair_co
 MetaboliteIDs_data_with_compatibility <- MetaboliteIDs_compatibility_check$data_with_compatibility
 
 ## how many features of the "MetaboliteIDs" df have a completely compatible list of IDs? (only considering PUBCHEM, KEGG & HMDB)
-length(which(MetaboliteIDs_data_with_compatibility$all_seed_ids_compatible == TRUE))
-# 503
+cat("Fully compatible features (PUBCHEM/KEGG/HMDB):", length(which(MetaboliteIDs_data_with_compatibility$all_seed_ids_compatible == TRUE)), "\n")
 
 ## how many features are not completely compatible (can still have partial compatibility)?
-length(which(MetaboliteIDs_data_with_compatibility$all_seed_ids_compatible == FALSE))
-# 74
+cat("Not fully compatible features (can still be partially compatible):", length(which(MetaboliteIDs_data_with_compatibility$all_seed_ids_compatible == FALSE)), "\n")
 
 ## for all ID pairs across features,
 ## how many direct matches were there?
-length(which(MetaboliteIDs_pair_compatibility$compatibility_path == "direct"))
-# 790
+cat("ID-pair direct matches:", length(which(MetaboliteIDs_pair_compatibility$compatibility_path == "direct")), "\n")
 
 ## how many secondary matches were there?
-length(which(MetaboliteIDs_pair_compatibility$compatibility_path == "secondary"))
-# 47
+cat("ID-pair secondary matches:", length(which(MetaboliteIDs_pair_compatibility$compatibility_path == "secondary")), "\n")
 
 ## how many were no_match? -> these contain rows, which only had CAS or only one of HMDB, KEGG, PUBCHEM but not two
-length(which(MetaboliteIDs_pair_compatibility$compatibility_path == "no_match"))
-# 351
+cat("ID-pair no_match cases:", length(which(MetaboliteIDs_pair_compatibility$compatibility_path == "no_match")), "\n")
 
 
 ```
@@ -483,9 +478,8 @@ length(which(MetaboliteIDs_pair_compatibility$compatibility_path == "no_match"))
 ## assess ID compatibility and remove incompatible IDs
 
 
-# Option 1: 
 #   go through the pair_compatibility permutation table
-#   exclude all incompatible ID pairs
+#   Question: do we exclude all incompatible ID pairs?
 #       - sometimes there is less than two HMDB, KEGG, PUBCHEM seed IDs.
 #         Maybe there is only a CAS or only one of the other ID types.
 #         In this case, we don't want to exclude them, because we can not really
@@ -493,8 +487,9 @@ length(which(MetaboliteIDs_pair_compatibility$compatibility_path == "no_match"))
 #         -> keep all where "all_seed_ids_compatible" == TRUE
 #       - in the Results_Traverse$ID_pair_compatibility (traverse_ID_pair_compatibility),
 #         we have the column "original_row_id" to re-group seed_id-pairs later
-#       - we need to exclude seed_id combinations without a match for all rows where
-#         "all_seed_ids_compatible" == FALSE
+#       - if we need to exclude seed_id combinations without a match for all rows where
+#         "all_seed_ids_compatible" == FALSE, we may loose a lot of pairs and even whole features
+#       - decide what to do for partially-compatible features
 #       - manually decide for features with multiple, all-incompatible IDs (this is the most important point here)
 
 ## a good example is original_row_id == 99 of the original df, the metabolite 4-hydroxyglutamate
@@ -510,9 +505,13 @@ length(which(MetaboliteIDs_pair_compatibility$compatibility_path == "no_match"))
 # 5 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 KEGG       C03079   PUBCHEM    5460800  TRUE            direct                      4 FALSE 
 # 6 99              4-hydroxygl~ 2485~ Amino acid     ...   546007~ C030~ HMDB~ NA        99 PUBCHEM    5460078  PUBCHEM    5460800  TRUE            secondary                   4 FALSE 
 
+# this would be a partially compatible feature
+
 ## here, we have "all_seed_ids_compatible" == FALSE, but we want to keep some of the combinations
 ## we also have no_match direct and secondary matches, which makes it a good example
-## we want to keep all direct and secondary matches and discard no_match
+
+
+## What if we we were to keep all direct and secondary matches and discard no_match?
 
 MetaboliteIDs_pair_compatibility_filtered <- MetaboliteIDs_pair_compatibility %>% 
   filter( 
@@ -524,10 +523,8 @@ MetaboliteIDs_pair_compatibility_filtered <- MetaboliteIDs_pair_compatibility %>
 
 # let's assess, if we lost any whole features due to this filtering
 ## these are these features:
-length(unique(MetaboliteIDs_pair_compatibility$Metabolite)) 
-#577
-length(unique(MetaboliteIDs_pair_compatibility_filtered$Metabolite)) 
-#544
+cat("Distinct metabolites before compatibility filtering:", length(unique(MetaboliteIDs_pair_compatibility$Metabolite)), "\n")
+cat("Distinct metabolites after compatibility filtering:", length(unique(MetaboliteIDs_pair_compatibility_filtered$Metabolite)), "\n")
 
 # that means, 33 whole features would get lost if we filter strictly like above
 
@@ -599,8 +596,7 @@ write.csv(
 fully_compatible_metabolites <- MetaboliteIDs_data_with_compatibility[MetaboliteIDs_data_with_compatibility$all_seed_ids_compatible == TRUE, "Metabolite"]
 
 ## how many are these?
-length(unlist(fully_compatible_metabolites))
-# 503
+cat("Fully compatible metabolites retrieved:", length(unlist(fully_compatible_metabolites)), "\n")
 
 ## retrieve the id_pairs for these fully_compatibly features
 fully_compatible_id_pair_rows <- 
@@ -610,12 +606,10 @@ fully_compatible_id_pair_rows <-
     )
 
 # this should also contain 503 distinct features
-length(unique(fully_compatible_id_pair_rows$Metabolite))
-# 503. checks out
+cat("Distinct features in fully_compatible_id_pair_rows:", length(unique(fully_compatible_id_pair_rows$Metabolite)), "(checks out)\n")
 
 # how many id pairs are there for these fully compatible features?
-nrow(fully_compatible_id_pair_rows)
-# 998
+cat("ID pairs in fully compatible features:", nrow(fully_compatible_id_pair_rows), "\n")
 
 ## save as csv
 write.csv(
@@ -642,8 +636,7 @@ partially_compatible_metabolites <-
 
 
 ## This approach leaves us with the 41 metabolite names which are partially compatible
-length(unique(partially_compatible_metabolites$Metabolite))
-## 41
+cat("Partially compatible metabolite names:", length(unique(partially_compatible_metabolites$Metabolite)), "\n")
 
 ## get the id_pair compatibility for those
 partially_compatible_id_pair_rows <- 
@@ -653,8 +646,7 @@ partially_compatible_id_pair_rows <-
     )
 
 ## how many are these?
-nrow(partially_compatible_id_pair_rows)
-# 147
+cat("ID pairs for partially compatible metabolites:", nrow(partially_compatible_id_pair_rows), "\n")
 
 ## add RaMP CAS numbers to this df
 partially_compatible_id_pair_rows <- partially_compatible_id_pair_rows %>%
@@ -669,12 +661,10 @@ partially_compatible_id_pair_rows <- partially_compatible_id_pair_rows %>%
 ## how many of these id_pairs are compatible and how many aren't?
 
 ## compatible
-length(which(partially_compatible_id_pair_rows$compatibility_path != "no_match"))
-# 59
+cat("Compatible ID pairs within partially compatible features:", length(which(partially_compatible_id_pair_rows$compatibility_path != "no_match")), "\n")
 
 ## incompatible
-length(which(partially_compatible_id_pair_rows$compatibility_path == "no_match"))
-# 94
+cat("Non-compatible ID pairs within partially compatible features:", length(which(partially_compatible_id_pair_rows$compatibility_path == "no_match")), "\n")
 
 ## Now for those 94 id pairs, which are non-compatible, we also need to check if some of them can be rescued
 
@@ -823,10 +813,9 @@ fully_compatible_id_pair_rows %<>%
     
 
 ## all same structure?
-all( names(completely_incompatible_manual_no_cas) == names(completely_incompatible_manual_with_cas) ) #1&2
-all( names(partially_compatible_id_pair_rows) == names(fully_compatible_id_pair_rows) ) #3&4
-all( names(completely_incompatible_manual_no_cas) == names(partially_compatible_id_pair_rows) ) #1&3
-# yes
+cat("Structure check (1&2):", all( names(completely_incompatible_manual_no_cas) == names(completely_incompatible_manual_with_cas) ), "\n")
+cat("Structure check (3&4):", all( names(partially_compatible_id_pair_rows) == names(fully_compatible_id_pair_rows) ), "\n")
+cat("Structure check (1&3):", all( names(completely_incompatible_manual_no_cas) == names(partially_compatible_id_pair_rows) ), "\n")
 
 ## now we have these four dataframes in the exact same structure:
 # - completely_incompatible_manual_no_cas
@@ -846,11 +835,10 @@ combined_tables <-
     )
 
 ## how many id_pairs are left there?
-nrow(combined_tables)
+cat("ID pairs left after combining all tables:", nrow(combined_tables), "\n")
 
 ## how many features were preserved?
-length(unique(combined_tables$Metabolite))
-# 577 . perfect
+cat("Preserved features after stitching:", length(unique(combined_tables$Metabolite)), "(perfect)\n")
 
 ## save this table
 write.csv(
@@ -930,8 +918,50 @@ write.csv(
 
 
 
+## AI summary of the above code:
 
-
+# 1. Start from pairwise ID compatibility
+#    (MetaboliteIDs_pair_compatibility) and ask
+#    how aggressively to drop incompatible pairs.
+# 2. Test a strict rule: keep fully compatible
+#    features, and for not-fully-compatible ones
+#    keep only direct/secondary pairs (drop
+#    no_match).
+# 3. Observe this loses whole features, then
+#    explicitly inspect those lost metabolites.
+# 4. Split lost cases into with/without CAS,
+#    enrich CAS cases with CAS common names from
+#    RaMP, and export both tables for manual
+#    review.
+# 5. Keep fully compatible features as a “safe”
+#    set and export them.
+# 6. Define partially compatible features as non-
+#    fully-compatible minus fully-incompatible
+#    lost set; compute compatible vs non-
+#    compatible pair counts; export for curation.
+# 7. Re-import manually curated files for
+#    completely incompatible cases.
+# 8. Document the “ideal” process, then switch to
+#    a pragmatic plan:
+#     - keep fully compatible pairs,
+#     - include manually curated incompatible
+#       pairs,
+#     - for partially compatible features keep
+#       only non-no_match pairs.
+# 9. Normalize curated table schemas (replace old
+#    IDs with corrected IDs, drop curation helper
+#    columns, add provenance flags).
+# 10. Validate column structure alignment, rbind
+#    all 4 pair tables, and export combined pair-
+#    level QC output.
+# 11. Collapse back to feature-level
+#    (group_by(original_row_id)), rebuild unique
+#    comma-separated ID lists per DB, preserve
+#    manual flags, and export final cleaned table
+#    MetaboliteIDs_clean.csv.
+# 12. End with TODO/DONE notes confirming this is
+#    an iterative QC + manual-curation integration
+#    workflow.
 
 
 
