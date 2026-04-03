@@ -60,12 +60,24 @@ if (!dir.exists("MetaProViz_Results/PK")) {
   dir.create("MetaProViz_Results/PK", recursive = TRUE)
 }
 
+if (!dir.exists("MetaProViz_Results/PK/ID_QC")) {
+  dir.create("MetaProViz_Results/PK/ID_QC", recursive = TRUE)
+}
+
 if (!dir.exists("MetaProViz_Results/PK/Original")) {
   dir.create("MetaProViz_Results/PK/Original", recursive = TRUE)
 }
 
-if (!dir.exists("MetaProViz_Results/PK/PlusTranslatedIDs_FromCAS")) {
-  dir.create("MetaProViz_Results/PK/PlusTranslatedIDs_FromCAS", recursive = TRUE)
+if (!dir.exists("MetaProViz_Results/PK/Cleaned")) {
+  dir.create("MetaProViz_Results/PK/Cleaned", recursive = TRUE)
+}
+
+if (!dir.exists("MetaProViz_Results/PK/Translated")) {
+  dir.create("MetaProViz_Results/PK/Translated", recursive = TRUE)
+}
+
+if (!dir.exists("MetaProViz_Results/PK/Traverse")) {
+  dir.create("MetaProViz_Results/PK/Traverse", recursive = TRUE)
 }
 
 ##------------------------------------------------------------------
@@ -133,31 +145,6 @@ if (!dir.exists("MetaProViz_Results/PK/PK_PUBCHEM/Traverse")) {
   dir.create("MetaProViz_Results/PK/PK_PUBCHEM/Traverse", recursive = TRUE)
 }
 
-## General
-
-# @Jannik  @Christina
-## to-do: make sense of these folders below
-
-if (!dir.exists("MetaProViz_Results/PK/Translated")) {
-  dir.create("MetaProViz_Results/PK/Translated", recursive = TRUE)
-}
-
-if (!dir.exists("MetaProViz_Results/PK/Results_Traverse")) {
-  dir.create("MetaProViz_Results/PK/Results_Traverse", recursive = TRUE)
-}
-
-if (!dir.exists("MetaProViz_Results/PK/Traverse")) {
-  dir.create("MetaProViz_Results/PK/Traverse", recursive = TRUE)
-}
-
-# saving intermediate tables which are needed from ID QC
-if (!dir.exists("MetaProViz_Results/PK/ID_QC")) {
-  dir.create("MetaProViz_Results/PK/ID_QC", recursive = TRUE)
-}
-# saving the cleaned, manually curated MetaboliteIDs after running ID QC + manual fixes
-if (!dir.exists("MetaProViz_Results/PK/Cleaned")) {
-  dir.create("MetaProViz_Results/PK/Cleaned", recursive = TRUE)
-}
 ```
 
 # 1. Loading the Feature metadata
@@ -1002,11 +989,11 @@ write.csv2(
 # DONE     - keep "all_seed_ids_compatible"
 # DONE     - flag whether these ids were manually curated and how
 
-# - make correct print messages for the knitted HTMLs for everything above
+# DONE - make correct print messages for the knitted HTMLs for everything above
 # DONE - build summary_counting table in the beginning
 # DONE     - contains original, clean, translated(cas), tranverse, equivalent_id
 # DONE       deltas, counts for noID, singleID, multipleID, totalIDs
-# - save necessary tables above from the ID QC
+# DONE - save necessary tables above from the ID QC
 
 
 
@@ -1094,7 +1081,7 @@ features_ids_from_cas <- MetaProViz::translate_id(data = features_no_ids_with_ca
                                                   metadata_info = list(InputID = "CAS", grouping_variable = "SUPER_PATHWAY"), 
                                                   from = "cas", 
                                                   to = c("hmdb", "kegg", "pubchem"), 
-                                                  path="MetaProViz_Results/PK/PlusTranslatedIDs_FromCAS")
+                                                  path="MetaProViz_Results/PK/Translated")
 
 # Keep only rows where at least one new ID was actually found
 cas_ids_found <- features_ids_from_cas[["TranslatedDF"]] %>%
@@ -1114,6 +1101,14 @@ cas_ids_found <- features_ids_from_cas[["TranslatedDF"]] %>%
 # Merge back: update matching rows in MetaboliteIDs by COMP_ID
 MetaboliteIDs_Translated <- MetaboliteIDs_cleaned %>%
   dplyr::rows_update(cas_ids_found, by = "COMP_ID")
+
+
+## save as csv
+write.csv2(
+    MetaboliteIDs_Translated,
+    "MetaProViz_Results/PK/Translated/MetaboliteIDs_Translated.csv"
+)
+
 ```
 \
 We will repeat the `count_id` and `compare_pk` plot after every change to the number of metabolite IDs:
@@ -1123,7 +1118,9 @@ ccRCC_CompareIDs_Translated <- MetaProViz::compare_pk(data = list(Biocft = Metab
                                            metadata_info = list(Biocft = c("KEGG", "HMDB", "PUBCHEM")),
                                            plot_name = "Overlap of ID types in ccRCC data",
                                            path= "MetaProViz_Results/PK/Translated")
+```
 
+```{r}
 Plot3_HMDB <- MetaProViz::count_id(MetaboliteIDs_Translated,
                                    delimiter = id_separator,
                                    "HMDB",
@@ -1146,84 +1143,84 @@ Plot3_PubChem <- MetaProViz::count_id(MetaboliteIDs_Translated,
 \
 We will start to compile a summary table that will include the number of IDs  (1,2,n) after each step taken to increase the feature space. So now we will add the The CAS IDs
 ```{r}
-# Helper: count features with at least one ID in one DB from count_id output
-count_present <- function(count_id_obj) {
-  tbl <- count_id_obj[["Table"]]
-  sum(tbl$id_label %in% c("Single ID", "Multiple IDs"), na.rm = TRUE)
-}
-
-# Helper: count features with no HMDB, KEGG and PUBCHEM ID at all
-count_none_all <- function(df) {
-  sum(
-    (is.na(df$HMDB)    | trimws(df$HMDB) %in% c("", "NA")) &
-    (is.na(df$KEGG)    | trimws(df$KEGG) %in% c("", "NA")) &
-    (is.na(df$PUBCHEM) | trimws(df$PUBCHEM) %in% c("", "NA")),
-    na.rm = TRUE
-  )
-}
-
-CAS_ID_Summary <- tibble::tibble(
-  HMDB_Original = count_present(Plot1_HMDB),
-  HMDB_Translated = count_present(Plot2_HMDB),
-  HMDB_deltaOT = HMDB_Translated - HMDB_Original,
-  KEGG_Original = count_present(Plot1_KEGG),
-  KEGG_Translated = count_present(Plot2_KEGG),
-  KEGG_deltaOT = KEGG_Translated - KEGG_Original,
-  PUBCHEM_Original = count_present(Plot1_PubChem),
-  PUBCHEM_Translated = count_present(Plot2_PubChem),
-  PUBCHEM_deltaOT = PUBCHEM_Translated - PUBCHEM_Original,
-  None_Original = count_none_all(MetaboliteIDs),
-  None_Translated = count_none_all(MetaboliteID_Translated),
-  None_deltaOT = None_Translated - None_Original
-)
-
-CAS_ID_Summary
-
-# Optional detailed distribution (No ID / Single ID / Multiple IDs) by DB
-CAS_ID_Label_Summary <- dplyr::bind_rows(
-  Plot1_HMDB[["Table"]] %>% dplyr::count(id_label, name = "HMDB_Original"),
-  Plot2_HMDB[["Table"]] %>% dplyr::count(id_label, name = "HMDB_Translated")
-) %>%
-  dplyr::group_by(id_label) %>%
-  dplyr::summarise(
-    HMDB_Original = sum(dplyr::coalesce(HMDB_Original, 0L)),
-    HMDB_Translated = sum(dplyr::coalesce(HMDB_Translated, 0L)),
-    .groups = "drop"
-  ) %>%
-  dplyr::left_join(
-    dplyr::bind_rows(
-      Plot1_KEGG[["Table"]] %>% dplyr::count(id_label, name = "KEGG_Original"),
-      Plot2_KEGG[["Table"]] %>% dplyr::count(id_label, name = "KEGG_Translated")
-    ) %>%
-      dplyr::group_by(id_label) %>%
-      dplyr::summarise(
-        KEGG_Original = sum(dplyr::coalesce(KEGG_Original, 0L)),
-        KEGG_Translated = sum(dplyr::coalesce(KEGG_Translated, 0L)),
-        .groups = "drop"
-      ),
-    by = "id_label"
-  ) %>%
-  dplyr::left_join(
-    dplyr::bind_rows(
-      Plot1_PubChem[["Table"]] %>% dplyr::count(id_label, name = "PUBCHEM_Original"),
-      Plot2_PubChem[["Table"]] %>% dplyr::count(id_label, name = "PUBCHEM_Translated")
-    ) %>%
-      dplyr::group_by(id_label) %>%
-      dplyr::summarise(
-        PUBCHEM_Original = sum(dplyr::coalesce(PUBCHEM_Original, 0L)),
-        PUBCHEM_Translated = sum(dplyr::coalesce(PUBCHEM_Translated, 0L)),
-        .groups = "drop"
-      ),
-    by = "id_label"
-  ) %>%
-  dplyr::mutate(
-    HMDB_deltaOT = HMDB_Translated - HMDB_Original,
-    KEGG_deltaOT = KEGG_Translated - KEGG_Original,
-    PUBCHEM_deltaOT = PUBCHEM_Translated - PUBCHEM_Original
-  ) %>%
-  dplyr::arrange(factor(id_label, levels = c("No ID", "Single ID", "Multiple IDs")))
-
-CAS_ID_Label_Summary
+# # Helper: count features with at least one ID in one DB from count_id output
+# count_present <- function(count_id_obj) {
+#   tbl <- count_id_obj[["Table"]]
+#   sum(tbl$id_label %in% c("Single ID", "Multiple IDs"), na.rm = TRUE)
+# }
+# 
+# # Helper: count features with no HMDB, KEGG and PUBCHEM ID at all
+# count_none_all <- function(df) {
+#   sum(
+#     (is.na(df$HMDB)    | trimws(df$HMDB) %in% c("", "NA")) &
+#     (is.na(df$KEGG)    | trimws(df$KEGG) %in% c("", "NA")) &
+#     (is.na(df$PUBCHEM) | trimws(df$PUBCHEM) %in% c("", "NA")),
+#     na.rm = TRUE
+#   )
+# }
+# 
+# CAS_ID_Summary <- tibble::tibble(
+#   HMDB_Original = count_present(Plot1_HMDB),
+#   HMDB_Translated = count_present(Plot2_HMDB),
+#   HMDB_deltaOT = HMDB_Translated - HMDB_Original,
+#   KEGG_Original = count_present(Plot1_KEGG),
+#   KEGG_Translated = count_present(Plot2_KEGG),
+#   KEGG_deltaOT = KEGG_Translated - KEGG_Original,
+#   PUBCHEM_Original = count_present(Plot1_PubChem),
+#   PUBCHEM_Translated = count_present(Plot2_PubChem),
+#   PUBCHEM_deltaOT = PUBCHEM_Translated - PUBCHEM_Original,
+#   None_Original = count_none_all(MetaboliteIDs),
+#   None_Translated = count_none_all(MetaboliteID_Translated),
+#   None_deltaOT = None_Translated - None_Original
+# )
+# 
+# CAS_ID_Summary
+# 
+# # Optional detailed distribution (No ID / Single ID / Multiple IDs) by DB
+# CAS_ID_Label_Summary <- dplyr::bind_rows(
+#   Plot1_HMDB[["Table"]] %>% dplyr::count(id_label, name = "HMDB_Original"),
+#   Plot2_HMDB[["Table"]] %>% dplyr::count(id_label, name = "HMDB_Translated")
+# ) %>%
+#   dplyr::group_by(id_label) %>%
+#   dplyr::summarise(
+#     HMDB_Original = sum(dplyr::coalesce(HMDB_Original, 0L)),
+#     HMDB_Translated = sum(dplyr::coalesce(HMDB_Translated, 0L)),
+#     .groups = "drop"
+#   ) %>%
+#   dplyr::left_join(
+#     dplyr::bind_rows(
+#       Plot1_KEGG[["Table"]] %>% dplyr::count(id_label, name = "KEGG_Original"),
+#       Plot2_KEGG[["Table"]] %>% dplyr::count(id_label, name = "KEGG_Translated")
+#     ) %>%
+#       dplyr::group_by(id_label) %>%
+#       dplyr::summarise(
+#         KEGG_Original = sum(dplyr::coalesce(KEGG_Original, 0L)),
+#         KEGG_Translated = sum(dplyr::coalesce(KEGG_Translated, 0L)),
+#         .groups = "drop"
+#       ),
+#     by = "id_label"
+#   ) %>%
+#   dplyr::left_join(
+#     dplyr::bind_rows(
+#       Plot1_PubChem[["Table"]] %>% dplyr::count(id_label, name = "PUBCHEM_Original"),
+#       Plot2_PubChem[["Table"]] %>% dplyr::count(id_label, name = "PUBCHEM_Translated")
+#     ) %>%
+#       dplyr::group_by(id_label) %>%
+#       dplyr::summarise(
+#         PUBCHEM_Original = sum(dplyr::coalesce(PUBCHEM_Original, 0L)),
+#         PUBCHEM_Translated = sum(dplyr::coalesce(PUBCHEM_Translated, 0L)),
+#         .groups = "drop"
+#       ),
+#     by = "id_label"
+#   ) %>%
+#   dplyr::mutate(
+#     HMDB_deltaOT = HMDB_Translated - HMDB_Original,
+#     KEGG_deltaOT = KEGG_Translated - KEGG_Original,
+#     PUBCHEM_deltaOT = PUBCHEM_Translated - PUBCHEM_Original
+#   ) %>%
+#   dplyr::arrange(factor(id_label, levels = c("No ID", "Single ID", "Multiple IDs")))
+# 
+# CAS_ID_Label_Summary
 
 ```
 
@@ -1232,7 +1229,7 @@ CAS_ID_Label_Summary
 
 # append the new "Translated" ID counts
 
-## cleaned
+## translated
 id_count_df <- append_id_counts(id_count_df, Plot3_HMDB,    "HMDB_Translated")
 id_count_df <- append_id_counts(id_count_df, Plot3_KEGG,    "KEGG_Translated")
 id_count_df <- append_id_counts(id_count_df, Plot3_PubChem, "PUBCHEM_Translated")
@@ -1269,7 +1266,7 @@ Next, we fill the gaps by expanding the metabolite identifiers across HMDB, KEGG
 ```{r}
 
 # Harmonize ID separators for traversal (function expects one delimiter)
-Input_Traverse <- MetaboliteID_Translated %>%
+Input_Traverse <- MetaboliteIDs_Translated %>%
   dplyr::mutate(
     HMDB = normalize_id_cell(HMDB),
     KEGG = normalize_id_cell(KEGG),
@@ -1280,7 +1277,7 @@ Results_Traverse <- MetaProViz::traverse_ids(
   data = Input_Traverse,
   id_types = c("HMDB", "KEGG", "CHEBI", "PUBCHEM"),
   delimiter = ",",
-  path = "MetaProViz_Results/PK/Results_Traverse"
+  path = "MetaProViz_Results/PK/Traverse"
 )
 
 ## inspect results
@@ -1288,36 +1285,110 @@ traverse_ID_pair_compatibility <- Results_Traverse$ID_pair_compatibility
 traverse_ID_edges <- Results_Traverse$ID_Edges_prior_knowledge
 traverse_ID_ExpandedDF <- Results_Traverse$ExpandedDF
 
+## save as csv
+write.csv2(
+    traverse_ID_ExpandedDF,
+    "MetaProViz_Results/PK/Traverse/Traverse_IDs_Result___ExpandedDF.csv"
+)
+write.csv2(
+    traverse_ID_edges,
+    "MetaProViz_Results/PK/Traverse/Traverse_IDs_Result___ID_edges_prior_knowledge.csv"
+)
+write.csv2(
+    traverse_ID_pair_compatibility,
+    "MetaProViz_Results/PK/Traverse/Traverse_IDs_Result___ID_pair_compatibility.csv"
+)
+```
+
+
+```{r}
+# sanity checks after running traverse_ids()
+
+# we manually curated id pair mismatches and sometimes kept mismatching ID pairs
+# therefore, we dont the new ID QC (run within traverse_ids()) to only return
+# "all_seed_ids_compatible" = TRUE
+# now comes into play why we kept the "manual_curation" and "correction_tbl" columns
+
+
+## how many features of the traverse_ID_ExpandedDF are all_seed_ids_compatible?
+cat("Fully compatible features (PUBCHEM/KEGG/HMDB):", length(which(traverse_ID_ExpandedDF$all_seed_ids_compatible == TRUE)), "\n")
+
+## how many features of the traverse_ID_ExpandedDF are NOT all_seed_ids_compatible?
+cat("NOT fully compatible features (PUBCHEM/KEGG/HMDB):", length(which(traverse_ID_ExpandedDF$all_seed_ids_compatible == FALSE)), "\n")
+
+## how many of these features with at least some incompatibility were NOT manually curated?
+cat("NOT fully compatible features (PUBCHEM/KEGG/HMDB) WITHOUT a 'manual_curation' tag:", length(which(traverse_ID_ExpandedDF$all_seed_ids_compatible == FALSE & traverse_ID_ExpandedDF$manual_curation == FALSE)), "\n")
+
+## Zero. This is great, since it means that all features with non-compatible IDs 
+# have been manually curated and therefore we trust the ID space, even though 
+# some are flagged as non-compatible
 
 ```
-\
-First we need to take some decisions regarding detected incompatible seed IDs in 74 rows. Not all seed IDs in these rows are mutually reachable through IDEdges, suggesting they may map to different molecules. This can overexpanded the ID space during traversal. Please manually remove or correct incompatible seed IDs and rerun traverse_ids() freshly on a clean input table.
 
+
+```{r}
+# Incorporate the newly added features into a new df "MetaboliteIDs_traverse"
+
+MetaboliteIDs_traverse <- 
+    traverse_ID_ExpandedDF %>%
+    mutate(
+        PUBCHEM = {
+            PUBCHEM_translated %>%
+                normalize_id_cell() %>%
+                gsub("^CID", "", .)
+        },
+        KEGG = KEGG_translated %>% normalize_id_cell(),
+        HMDB = HMDB_translated %>% normalize_id_cell(),
+        CHEBI = CHEBI_translated %>% normalize_id_cell()
+    ) %>%
+    select(
+        - all_seed_ids_compatible,
+        - row_id,
+        - HMDB_translated,
+        - KEGG_translated,
+        - CHEBI_translated,
+        - PUBCHEM_translated,
+        - n_seed_ids,
+        - n_HMDB_translated,
+        - n_KEGG_translated,
+        - n_CHEBI_translated,
+        - n_PUBCHEM_translated,
+        - mapping_expanded,
+        - ambiguous_seed,
+        - large_mapping
+    )
+
+## save as csv
+write.csv2(
+    MetaboliteIDs_traverse,
+    "MetaProViz_Results/PK/Traverse/MetaboliteIDs_traverse.csv"
+)
+```
 
 
 \
 We will repeat the `count_id` and `compare_pk` plot after every change to the number of metabolite IDs:
 ```{r}
-ccRCC_CompareIDs_Traverse <- MetaProViz::compare_pk(data = list(Biocft = MetaboliteID_Traverse |> dplyr::rename("Class"="SUPER_PATHWAY")),
+ccRCC_CompareIDs_Traverse <- MetaProViz::compare_pk(data = list(Biocft = MetaboliteIDs_traverse |> dplyr::rename("Class"="SUPER_PATHWAY")),
                                            name_col = "Metabolite",
                                            metadata_info = list(Biocft = c("KEGG", "HMDB", "PUBCHEM", "CHEBI")),
                                            plot_name = "Overlap of ID types in ccRCC data",
                                            path= "MetaProViz_Results/PK/Traverse")
 
-Plot4_HMDB <- MetaProViz::count_id(MetaboliteID_Traverse,
+Plot4_HMDB <- MetaProViz::count_id(MetaboliteIDs_traverse,
                                    delimiter = id_separator,
                                    "HMDB",
                                    fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
                                    binwidth = 1,
                                    path = "MetaProViz_Results/PK/PK_HMDB/Traverse")
 
-Plot4_KEGG <- MetaProViz::count_id(MetaboliteID_Traverse,
+Plot4_KEGG <- MetaProViz::count_id(MetaboliteIDs_traverse,
                                    delimiter = id_separator,
                                    fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
                                    "KEGG",
                                    path= "MetaProViz_Results/PK/PK_KEGG/Traverse")
 
-Plot4_PubChem <- MetaProViz::count_id(MetaboliteID_Traverse,
+Plot4_PubChem <- MetaProViz::count_id(MetaboliteIDs_traverse,
                                    delimiter = id_separator,
                                    fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
                                    "PUBCHEM",
@@ -1332,6 +1403,30 @@ We will start to compile a summary table that will include the number of IDs  (1
 
 ## extend counting dataframe with traverse_id results
 
+## traverse
+id_count_df <- append_id_counts(id_count_df, Plot4_HMDB,    "HMDB_Traverse")
+id_count_df <- append_id_counts(id_count_df, Plot4_KEGG,    "KEGG_Traverse")
+id_count_df <- append_id_counts(id_count_df, Plot4_PubChem, "PUBCHEM_Traverse")
+
+## Calculate delta rows
+delta_df <- rbind(
+  delta_df,
+  calculate_id_deltas(id_count_df, "Original", "Traverse"),
+  calculate_id_deltas(id_count_df, "Cleaned", "Traverse"),
+  calculate_id_deltas(id_count_df, "Translated", "Traverse")
+)
+
+
+## cleaned category dataframe
+none_summary_df <- append_none_summary(none_summary_df, MetaboliteIDs_traverse, "Traverse")
+
+## Calculate delta row
+none_delta_df <- rbind(
+  none_delta_df,
+  calculate_none_delta(none_summary_df, "Original", "Traverse"),
+  calculate_none_delta(none_summary_df, "Cleaned", "Traverse"),
+  calculate_none_delta(none_summary_df, "Translated", "Traverse")
+)
 
 
 ```
