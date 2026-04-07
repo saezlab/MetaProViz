@@ -709,7 +709,7 @@ equivalent_id <- function(
                 OtherIDs,
                 EquivalentFeatures_Long,
                 by.x = metadata_info[["InputID"]],
-                by.y = "hmdb",
+                by.y = from,
                 all.x = TRUE
             ) %>%
             rowwise() %>%
