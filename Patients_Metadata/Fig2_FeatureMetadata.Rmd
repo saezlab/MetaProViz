@@ -1843,7 +1843,27 @@ if (!dir.exists("MetaProViz_Results/PK/id_summary_plots")) {
 library(ggplot2)
 
 id_types <- c("HMDB", "KEGG", "PUBCHEM", "CHEBI")
+id_type_colors <- c(
+  HMDB = "#bbcc33",
+  KEGG = "#99ddff",
+  PUBCHEM = "#feaf16",
+  CHEBI = "#d03293"
+)
 data_versions <- c("Original", "Cleaned", "Translated", "Traverse", "addEquivalent")
+theme_no_grid <- theme_bw() +
+  theme(
+    panel.grid.major = element_blank(),
+    panel.grid.minor = element_blank()
+  )
+mpv_theme <- theme_classic(base_size = 11) +
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    legend.position = "right",
+    legend.box = "vertical",
+    legend.box.margin = margin(10, 10, 10, 10)
+  )
+plot_theme <- theme_no_grid + mpv_theme
 
 id_summary_plot_df <- id_count_df %>%
   mutate(
@@ -1911,8 +1931,7 @@ p_id_stacked_by_version <- ggplot(stacked_long_version, aes(x = group_by_version
     y = "Feature Count",
     fill = "ID Count Class"
   ) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  plot_theme
 
 p_total_ids_by_version <- ggplot(id_summary_plot_df, aes(x = group_by_version, y = Total_IDs, fill = id_type)) +
   geom_col(width = 0.8, show.legend = FALSE) +
@@ -1922,14 +1941,14 @@ p_total_ids_by_version <- ggplot(id_summary_plot_df, aes(x = group_by_version, y
     size = 2.8,
     fontface = "bold"
   ) +
+  scale_fill_manual(values = id_type_colors) +
   scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
   labs(
     title = "Total IDs by Data Version and ID Type",
     x = "Data Version and ID Type",
     y = "Total_IDs"
   ) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  plot_theme
 
 p_id_stacked_by_type <- ggplot(stacked_long_type, aes(x = group_by_type, y = count, fill = id_bucket)) +
   geom_col(width = 0.8) +
@@ -1945,8 +1964,7 @@ p_id_stacked_by_type <- ggplot(stacked_long_type, aes(x = group_by_type, y = cou
     y = "Feature Count",
     fill = "ID Count Class"
   ) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  plot_theme
 
 p_total_ids_by_type <- ggplot(id_summary_plot_df, aes(x = group_by_type, y = Total_IDs, fill = id_type)) +
   geom_col(width = 0.8, show.legend = FALSE) +
@@ -1956,14 +1974,14 @@ p_total_ids_by_type <- ggplot(id_summary_plot_df, aes(x = group_by_type, y = Tot
     size = 2.8,
     fontface = "bold"
   ) +
+  scale_fill_manual(values = id_type_colors) +
   scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
   labs(
     title = "Total IDs by ID Type and Data Version",
     x = "ID Type and Data Version",
     y = "Total_IDs"
   ) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  plot_theme
 
 print(p_id_stacked_by_version)
 print(p_total_ids_by_version)
@@ -2105,8 +2123,7 @@ p_id_stacked_by_version_with_delta <- ggplot(stacked_long_version_delta, aes(x =
     y = "Feature Count",
     fill = "ID Count Class"
   ) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  plot_theme
 
 p_total_ids_by_version_with_delta <- ggplot(id_summary_with_delta_df, aes(x = group_by_version, y = Total_IDs, fill = id_type)) +
   geom_col(width = 0.8, show.legend = FALSE) +
@@ -2120,14 +2137,14 @@ p_total_ids_by_version_with_delta <- ggplot(id_summary_with_delta_df, aes(x = gr
     fontface = "bold",
     lineheight = 0.9
   ) +
+  scale_fill_manual(values = id_type_colors) +
   scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
   labs(
     title = "Total IDs by Data Version and ID Type (with Δ vs Original)",
     x = "Data Version and ID Type",
     y = "Total_IDs"
   ) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  plot_theme
 
 p_id_stacked_by_type_with_delta <- ggplot(stacked_long_type_delta, aes(x = group_by_type, y = count, fill = id_bucket)) +
   geom_col(width = 0.8) +
@@ -2147,8 +2164,7 @@ p_id_stacked_by_type_with_delta <- ggplot(stacked_long_type_delta, aes(x = group
     y = "Feature Count",
     fill = "ID Count Class"
   ) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  plot_theme
 
 p_total_ids_by_type_with_delta <- ggplot(id_summary_with_delta_df, aes(x = group_by_type, y = Total_IDs, fill = id_type)) +
   geom_col(width = 0.8, show.legend = FALSE) +
@@ -2162,14 +2178,14 @@ p_total_ids_by_type_with_delta <- ggplot(id_summary_with_delta_df, aes(x = group
     fontface = "bold",
     lineheight = 0.9
   ) +
+  scale_fill_manual(values = id_type_colors) +
   scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
   labs(
     title = "Total IDs by ID Type and Data Version (with Δ vs Original)",
     x = "ID Type and Data Version",
     y = "Total_IDs"
   ) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+  plot_theme
 
 print(p_id_stacked_by_version_with_delta)
 print(p_total_ids_by_version_with_delta)
@@ -2287,8 +2303,7 @@ p_delta_total_vs_original <- ggplot(delta_total_df, aes(x = step_label, y = Tota
     y = "Delta Total_IDs",
     color = "ID Type"
   ) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+  plot_theme
 
 ## Plot 2: no_ID / Single_ID / Multiple_IDs deltas vs Original (line plot)
 delta_comp_long <- delta_plot_df %>%
@@ -2318,8 +2333,7 @@ p_delta_comp_vs_original <- ggplot(delta_comp_long, aes(x = step_label, y = delt
     y = "Delta Count",
     color = "Metric"
   ) +
-  theme_bw() +
-  theme(axis.text.x = element_text(angle = 30, hjust = 1))
+  plot_theme
 
 print(p_delta_total_vs_original)
 print(p_delta_comp_vs_original)
