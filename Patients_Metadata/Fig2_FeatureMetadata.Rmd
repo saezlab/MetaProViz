@@ -2430,6 +2430,155 @@ ggsave(
 
 
 
+
+```{r}
+## Sized barplots using MetaProViz internal sizing helpers
+## (kept separate so existing plotting code remains untouched)
+if (!exists("p_id_stacked_by_version") ||
+    !exists("p_total_ids_by_version") ||
+    !exists("p_id_stacked_by_type") ||
+    !exists("p_total_ids_by_type") ||
+    !exists("p_id_stacked_by_version_with_delta") ||
+    !exists("p_total_ids_by_version_with_delta") ||
+    !exists("p_id_stacked_by_type_with_delta") ||
+    !exists("p_total_ids_by_type_with_delta")) {
+  stop("Expected barplot objects were not found. Run the previous plotting chunk first.")
+}
+
+if (!("plot_grob_superplot" %in% getNamespaceExports("MetaProViz") ||
+      exists("plot_grob_superplot", where = asNamespace("MetaProViz"), inherits = FALSE))) {
+  stop("MetaProViz:::plot_grob_superplot is not available in this session.")
+}
+
+clean_plot_for_sizing <- function(plot_obj) {
+  is_group_annotation_layer <- function(layer) {
+    is_text <- inherits(layer$geom, "GeomText")
+    has_own_data <- isFALSE(layer$inherit.aes)
+    has_data <- !is.null(layer$data) && is.data.frame(layer$data)
+    has_group_cols <- has_data && any(c("data_version", "id_type") %in% names(layer$data))
+    is_text && has_own_data && has_group_cols
+  }
+
+  keep_layer <- vapply(plot_obj$layers, function(layer) !is_group_annotation_layer(layer), logical(1))
+  plot_obj$layers <- plot_obj$layers[keep_layer]
+
+  # Remove off-panel rendering side-effects added for manual group labels.
+  plot_obj <- plot_obj +
+    ggplot2::coord_cartesian(clip = "on") +
+    ggplot2::theme(plot.margin = ggplot2::margin(5.5, 5.5, 5.5, 5.5))
+
+  plot_obj
+}
+
+size_bar_plot <- function(plot_obj, plot_name, out_base) {
+  x_var <- rlang::as_name(plot_obj$mapping$x)
+  if (is.null(plot_obj$data) || !(x_var %in% names(plot_obj$data))) {
+    stop("Could not infer x-axis variable from plot data for: ", plot_name)
+  }
+
+  x_values <- plot_obj$data[[x_var]]
+  x_levels <- if (is.factor(x_values)) levels(x_values) else unique(as.character(x_values))
+  x_levels <- x_levels[!is.na(x_levels) & x_levels != ""]
+
+  if (length(x_levels) == 0) {
+    stop("No x-axis levels extracted for sizing helper in: ", plot_name)
+  }
+
+  # Use short synthetic condition labels for sizing internals.
+  # This preserves count-driven width while preventing oversized axis-b spacing.
+  metadata_sample <- tibble::tibble(
+    Conditions = sprintf("c%03d", seq_along(x_levels))
+  )
+
+  plot_for_sizing <- clean_plot_for_sizing(plot_obj)
+
+  plot_sized_gtable <- MetaProViz:::plot_grob_superplot(
+    input_plot = plot_for_sizing,
+    metadata_info = NULL,
+    metadata_sample = metadata_sample,
+    subtitle = NULL,
+    plot_name = plot_name,
+    plot_type = "Bar"
+  )
+
+  width_cm <- sum(grid::convertUnit(plot_sized_gtable$width, "cm", valueOnly = TRUE))
+  height_cm <- sum(grid::convertUnit(plot_sized_gtable$height, "cm", valueOnly = TRUE))
+
+  # Add safety padding to avoid clipping at top/right edges on export devices.
+  width_cm_padded <- width_cm + max(0.8, width_cm * 0.06)
+  height_cm_padded <- height_cm + max(1.2, height_cm * 0.12)
+
+  ggplot2::ggsave(
+    filename = file.path("MetaProViz_Results/PK/id_summary_plots", paste0(out_base, "_sized.png")),
+    plot = plot_sized_gtable,
+    width = width_cm_padded,
+    height = height_cm_padded,
+    units = "cm",
+    dpi = 300
+  )
+
+  ggplot2::ggsave(
+    filename = file.path("MetaProViz_Results/PK/id_summary_plots", paste0(out_base, "_sized.svg")),
+    plot = plot_sized_gtable,
+    width = width_cm_padded,
+    height = height_cm_padded,
+    units = "cm"
+  )
+
+  invisible(list(
+    Plot_Sized = plot_sized_gtable,
+    Plot_Sized_gtable = plot_sized_gtable,
+    width_cm = width_cm,
+    height_cm = height_cm,
+    width_cm_padded = width_cm_padded,
+    height_cm_padded = height_cm_padded
+  ))
+}
+
+sized_barplots <- list(
+  id_summary_stacked_by_data_version = size_bar_plot(
+    p_id_stacked_by_version,
+    plot_name = "ID Summary by Data Version and ID Type",
+    out_base = "id_summary_stacked_by_data_version"
+  ),
+  id_summary_total_ids_by_data_version = size_bar_plot(
+    p_total_ids_by_version,
+    plot_name = "Total IDs by Data Version and ID Type",
+    out_base = "id_summary_total_ids_by_data_version"
+  ),
+  id_summary_stacked_by_id_type = size_bar_plot(
+    p_id_stacked_by_type,
+    plot_name = "ID Summary by ID Type and Data Version",
+    out_base = "id_summary_stacked_by_id_type"
+  ),
+  id_summary_total_ids_by_id_type = size_bar_plot(
+    p_total_ids_by_type,
+    plot_name = "Total IDs by ID Type and Data Version",
+    out_base = "id_summary_total_ids_by_id_type"
+  ),
+  id_summary_stacked_by_data_version_with_delta = size_bar_plot(
+    p_id_stacked_by_version_with_delta,
+    plot_name = "ID Summary by Data Version and ID Type (with Δ vs Original)",
+    out_base = "id_summary_stacked_by_data_version_with_delta"
+  ),
+  id_summary_total_ids_by_data_version_with_delta = size_bar_plot(
+    p_total_ids_by_version_with_delta,
+    plot_name = "Total IDs by Data Version and ID Type (with Δ vs Original)",
+    out_base = "id_summary_total_ids_by_data_version_with_delta"
+  ),
+  id_summary_stacked_by_id_type_with_delta = size_bar_plot(
+    p_id_stacked_by_type_with_delta,
+    plot_name = "ID Summary by ID Type and Data Version (with Δ vs Original)",
+    out_base = "id_summary_stacked_by_id_type_with_delta"
+  ),
+  id_summary_total_ids_by_id_type_with_delta = size_bar_plot(
+    p_total_ids_by_type_with_delta,
+    plot_name = "Total IDs by ID Type and Data Version (with Δ vs Original)",
+    out_base = "id_summary_total_ids_by_id_type_with_delta"
+  )
+)
+```
+
 # 3. Integrate feature IDs with prior knowledge
 
 Update below (is from revision branch). Here we also need to create a summary table according to reviewers request!
