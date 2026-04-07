@@ -668,7 +668,14 @@ resource_footprint_plot_data <- tbl_resource_level %>%
     cols = c(`Distinct Terms`, `Distinct Targets`, `Distinct Interactions`),
     names_to = "Metric",
     values_to = "Value"
-  )
+  ) %>%
+  group_by(ResourcePlot) %>%
+  mutate(
+    stack_total = sum(Value),
+    stack_share = if_else(stack_total > 0, Value / stack_total, 0),
+    ValueLabel = if_else(stack_share >= 0.04, scales::comma(Value), NA_character_)
+  ) %>%
+  ungroup()
 
 p_resource_footprint <- ggplot(resource_footprint_plot_data, aes(x = ResourcePlot, y = Value, fill = `Interaction Type`)) +
   geom_col(position = position_dodge(width = 0.9), width = 0.8) +
@@ -715,7 +722,8 @@ p_resource_footprint_stacked <- ggplot(
     ),
     position = position_stack(vjust = 0.5),
     size = 2.4,
-    color = "black"
+    color = "black",
+    na.rm = TRUE
   ) +
   scale_fill_manual(values = interaction_type_colors, drop = FALSE) +
   ggpattern::scale_pattern_manual(
@@ -848,9 +856,13 @@ p_set_level_median <- ggplot(set_level_plot_data, aes(x = ResourcePlot, y = `Med
 
 # Stacked bar: membership composition.
 degree_bucket_plot_data <- tbl_degree_buckets %>%
+  group_by(Resource) %>%
+  mutate(n_interaction_types = n_distinct(`Interaction Type`)) %>%
+  ungroup() %>%
   mutate(
+    `Membership Bucket` = factor(`Membership Bucket`, levels = c("in 1 term", "in 2 terms", "in >2 terms")),
     `Share Label` = scales::percent(`Share of Targets`, accuracy = 0.1),
-    ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Membership Bucket`), Resource)
+    ResourcePlot = if_else(n_interaction_types > 1, paste0(Resource, "\n", `Interaction Type`), Resource)
   )
 
 p_degree_bucket <- ggplot(degree_bucket_plot_data, aes(x = ResourcePlot, y = `Share of Targets`, fill = `Membership Bucket`)) +
