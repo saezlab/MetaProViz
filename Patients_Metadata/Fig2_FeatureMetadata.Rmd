@@ -1881,11 +1881,44 @@ id_summary_plot_df <- id_count_df %>%
     fill = list(no_ID = 0L, Single_ID = 0L, Multiple_IDs = 0L, Total_IDs = 0L)
   )
 
-version_levels <- unlist(lapply(data_versions, function(v) c(paste(v, id_types, sep = " | "), paste(v, "spacer", sep = " | "))))
-version_levels <- version_levels[seq_len(length(version_levels) - 1)]
+version_levels <- unlist(lapply(data_versions, function(v) paste(v, id_types, sep = " | ")))
+type_levels <- unlist(lapply(id_types, function(t) paste(t, data_versions, sep = " | ")))
 
-type_levels <- unlist(lapply(id_types, function(t) c(paste(t, data_versions, sep = " | "), paste(t, "spacer", sep = " | "))))
-type_levels <- type_levels[seq_len(length(type_levels) - 1)]
+compact_bar_labels <- function(x) sub("^.*\\|\\s*", "", x)
+
+version_group_labels <- tibble(
+  data_version = data_versions,
+  x = ((seq_along(data_versions) - 1) * length(id_types)) + (length(id_types) + 1) / 2
+)
+
+type_group_labels <- tibble(
+  id_type = id_types,
+  x = ((seq_along(id_types) - 1) * length(data_versions)) + (length(data_versions) + 1) / 2
+)
+
+version_group_annotation <- geom_text(
+  data = version_group_labels,
+  aes(x = x, y = -Inf, label = data_version),
+  inherit.aes = FALSE,
+  vjust = 3.0,
+  fontface = "bold",
+  size = 3.2
+)
+
+type_group_annotation <- geom_text(
+  data = type_group_labels,
+  aes(x = x, y = -Inf, label = id_type),
+  inherit.aes = FALSE,
+  vjust = 3.0,
+  fontface = "bold",
+  size = 3.2
+)
+
+bar_plot_theme <- plot_theme +
+  theme(
+    axis.text.x = element_text(angle = 0, hjust = 0.5),
+    plot.margin = margin(5.5, 5.5, 28, 5.5)
+  )
 
 id_summary_plot_df <- id_summary_plot_df %>%
   mutate(
@@ -1924,14 +1957,16 @@ p_id_stacked_by_version <- ggplot(stacked_long_version, aes(x = group_by_version
     color = "black",
     size = 2.8
   ) +
-  scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
+  scale_x_discrete(drop = FALSE, labels = compact_bar_labels) +
   labs(
     title = "ID Summary by Data Version and ID Type",
     x = "Data Version and ID Type",
     y = "Feature Count",
     fill = "ID Count Class"
   ) +
-  plot_theme
+  version_group_annotation +
+  coord_cartesian(clip = "off") +
+  bar_plot_theme
 
 p_total_ids_by_version <- ggplot(id_summary_plot_df, aes(x = group_by_version, y = Total_IDs, fill = id_type)) +
   geom_col(width = 0.8, show.legend = FALSE) +
@@ -1942,13 +1977,15 @@ p_total_ids_by_version <- ggplot(id_summary_plot_df, aes(x = group_by_version, y
     fontface = "bold"
   ) +
   scale_fill_manual(values = id_type_colors) +
-  scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
+  scale_x_discrete(drop = FALSE, labels = compact_bar_labels) +
   labs(
     title = "Total IDs by Data Version and ID Type",
     x = "Data Version and ID Type",
     y = "Total_IDs"
   ) +
-  plot_theme
+  version_group_annotation +
+  coord_cartesian(clip = "off") +
+  bar_plot_theme
 
 p_id_stacked_by_type <- ggplot(stacked_long_type, aes(x = group_by_type, y = count, fill = id_bucket)) +
   geom_col(width = 0.8) +
@@ -1957,14 +1994,16 @@ p_id_stacked_by_type <- ggplot(stacked_long_type, aes(x = group_by_type, y = cou
     color = "black",
     size = 2.8
   ) +
-  scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
+  scale_x_discrete(drop = FALSE, labels = compact_bar_labels) +
   labs(
     title = "ID Summary by ID Type and Data Version",
     x = "ID Type and Data Version",
     y = "Feature Count",
     fill = "ID Count Class"
   ) +
-  plot_theme
+  type_group_annotation +
+  coord_cartesian(clip = "off") +
+  bar_plot_theme
 
 p_total_ids_by_type <- ggplot(id_summary_plot_df, aes(x = group_by_type, y = Total_IDs, fill = id_type)) +
   geom_col(width = 0.8, show.legend = FALSE) +
@@ -1975,13 +2014,15 @@ p_total_ids_by_type <- ggplot(id_summary_plot_df, aes(x = group_by_type, y = Tot
     fontface = "bold"
   ) +
   scale_fill_manual(values = id_type_colors) +
-  scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
+  scale_x_discrete(drop = FALSE, labels = compact_bar_labels) +
   labs(
     title = "Total IDs by ID Type and Data Version",
     x = "ID Type and Data Version",
     y = "Total_IDs"
   ) +
-  plot_theme
+  type_group_annotation +
+  coord_cartesian(clip = "off") +
+  bar_plot_theme
 
 print(p_id_stacked_by_version)
 print(p_total_ids_by_version)
@@ -2116,14 +2157,16 @@ p_id_stacked_by_version_with_delta <- ggplot(stacked_long_version_delta, aes(x =
     size = 2.5,
     lineheight = 0.9
   ) +
-  scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
+  scale_x_discrete(drop = FALSE, labels = compact_bar_labels) +
   labs(
     title = "ID Summary by Data Version and ID Type (with Δ vs Original)",
     x = "Data Version and ID Type",
     y = "Feature Count",
     fill = "ID Count Class"
   ) +
-  plot_theme
+  version_group_annotation +
+  coord_cartesian(clip = "off") +
+  bar_plot_theme
 
 p_total_ids_by_version_with_delta <- ggplot(id_summary_with_delta_df, aes(x = group_by_version, y = Total_IDs, fill = id_type)) +
   geom_col(width = 0.8, show.legend = FALSE) +
@@ -2138,13 +2181,15 @@ p_total_ids_by_version_with_delta <- ggplot(id_summary_with_delta_df, aes(x = gr
     lineheight = 0.9
   ) +
   scale_fill_manual(values = id_type_colors) +
-  scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
+  scale_x_discrete(drop = FALSE, labels = compact_bar_labels) +
   labs(
     title = "Total IDs by Data Version and ID Type (with Δ vs Original)",
     x = "Data Version and ID Type",
     y = "Total_IDs"
   ) +
-  plot_theme
+  version_group_annotation +
+  coord_cartesian(clip = "off") +
+  bar_plot_theme
 
 p_id_stacked_by_type_with_delta <- ggplot(stacked_long_type_delta, aes(x = group_by_type, y = count, fill = id_bucket)) +
   geom_col(width = 0.8) +
@@ -2157,14 +2202,16 @@ p_id_stacked_by_type_with_delta <- ggplot(stacked_long_type_delta, aes(x = group
     size = 2.5,
     lineheight = 0.9
   ) +
-  scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
+  scale_x_discrete(drop = FALSE, labels = compact_bar_labels) +
   labs(
     title = "ID Summary by ID Type and Data Version (with Δ vs Original)",
     x = "ID Type and Data Version",
     y = "Feature Count",
     fill = "ID Count Class"
   ) +
-  plot_theme
+  type_group_annotation +
+  coord_cartesian(clip = "off") +
+  bar_plot_theme
 
 p_total_ids_by_type_with_delta <- ggplot(id_summary_with_delta_df, aes(x = group_by_type, y = Total_IDs, fill = id_type)) +
   geom_col(width = 0.8, show.legend = FALSE) +
@@ -2179,13 +2226,15 @@ p_total_ids_by_type_with_delta <- ggplot(id_summary_with_delta_df, aes(x = group
     lineheight = 0.9
   ) +
   scale_fill_manual(values = id_type_colors) +
-  scale_x_discrete(drop = FALSE, labels = function(x) ifelse(grepl("spacer$", x), "", gsub(" \\| ", "\n", x))) +
+  scale_x_discrete(drop = FALSE, labels = compact_bar_labels) +
   labs(
     title = "Total IDs by ID Type and Data Version (with Δ vs Original)",
     x = "ID Type and Data Version",
     y = "Total_IDs"
   ) +
-  plot_theme
+  type_group_annotation +
+  coord_cartesian(clip = "off") +
+  bar_plot_theme
 
 print(p_id_stacked_by_version_with_delta)
 print(p_total_ids_by_version_with_delta)
