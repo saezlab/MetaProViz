@@ -84,6 +84,10 @@ if (!dir.exists("MetaProViz_Results/PK/EquivalentID")) {
   dir.create("MetaProViz_Results/PK/EquivalentID", recursive = TRUE)
 }
 
+if (!dir.exists("MetaProViz_Results/PK/id_summary")) {
+  dir.create("MetaProViz_Results/PK/id_summary", recursive = TRUE)
+}
+
 ##------------------------------------------------------------------
 # Individual DBs
 ## HMDB
@@ -803,7 +807,13 @@ completely_incompatible_manual_no_cas %<>%
         correction_tbl = "completely_incompatible_manual_no_cas"
     )
 
-completely_incompatible_manual_with_cas %<>%
+completely_incompatible_manual_with_cas %<>%v
+    mutate(
+        across(
+            c(PUBCHEM_Corrected),
+            ~ replace(.x, .x == "FALSE, 7020632", "7020632")
+        )
+    ) %>%
     mutate(
         across(
             c(PUBCHEM_Corrected, KEGG_Corrected, HMDB_Corrected),
@@ -1174,89 +1184,6 @@ Plot3_PubChem <- MetaProViz::count_id(MetaboliteIDs_Translated,
                                    fill_colors = c(`No ID` = "#006384", `Single ID` = "#9F0162", `Multiple IDs` = "#BEBEBE"),
                                    "PUBCHEM",
                                    path= "MetaProViz_Results/PK/PK_PUBCHEM/Translated")
-```
-\
-We will start to compile a summary table that will include the number of IDs  (1,2,n) after each step taken to increase the feature space. So now we will add the The CAS IDs
-```{r}
-# # Helper: count features with at least one ID in one DB from count_id output
-# count_present <- function(count_id_obj) {
-#   tbl <- count_id_obj[["Table"]]
-#   sum(tbl$id_label %in% c("Single ID", "Multiple IDs"), na.rm = TRUE)
-# }
-# 
-# # Helper: count features with no HMDB, KEGG and PUBCHEM ID at all
-# count_none_all <- function(df) {
-#   sum(
-#     (is.na(df$HMDB)    | trimws(df$HMDB) %in% c("", "NA")) &
-#     (is.na(df$KEGG)    | trimws(df$KEGG) %in% c("", "NA")) &
-#     (is.na(df$PUBCHEM) | trimws(df$PUBCHEM) %in% c("", "NA")),
-#     na.rm = TRUE
-#   )
-# }
-# 
-# CAS_ID_Summary <- tibble::tibble(
-#   HMDB_Original = count_present(Plot1_HMDB),
-#   HMDB_Translated = count_present(Plot2_HMDB),
-#   HMDB_deltaOT = HMDB_Translated - HMDB_Original,
-#   KEGG_Original = count_present(Plot1_KEGG),
-#   KEGG_Translated = count_present(Plot2_KEGG),
-#   KEGG_deltaOT = KEGG_Translated - KEGG_Original,
-#   PUBCHEM_Original = count_present(Plot1_PubChem),
-#   PUBCHEM_Translated = count_present(Plot2_PubChem),
-#   PUBCHEM_deltaOT = PUBCHEM_Translated - PUBCHEM_Original,
-#   None_Original = count_none_all(MetaboliteIDs),
-#   None_Translated = count_none_all(MetaboliteID_Translated),
-#   None_deltaOT = None_Translated - None_Original
-# )
-# 
-# CAS_ID_Summary
-# 
-# # Optional detailed distribution (No ID / Single ID / Multiple IDs) by DB
-# CAS_ID_Label_Summary <- dplyr::bind_rows(
-#   Plot1_HMDB[["Table"]] %>% dplyr::count(id_label, name = "HMDB_Original"),
-#   Plot2_HMDB[["Table"]] %>% dplyr::count(id_label, name = "HMDB_Translated")
-# ) %>%
-#   dplyr::group_by(id_label) %>%
-#   dplyr::summarise(
-#     HMDB_Original = sum(dplyr::coalesce(HMDB_Original, 0L)),
-#     HMDB_Translated = sum(dplyr::coalesce(HMDB_Translated, 0L)),
-#     .groups = "drop"
-#   ) %>%
-#   dplyr::left_join(
-#     dplyr::bind_rows(
-#       Plot1_KEGG[["Table"]] %>% dplyr::count(id_label, name = "KEGG_Original"),
-#       Plot2_KEGG[["Table"]] %>% dplyr::count(id_label, name = "KEGG_Translated")
-#     ) %>%
-#       dplyr::group_by(id_label) %>%
-#       dplyr::summarise(
-#         KEGG_Original = sum(dplyr::coalesce(KEGG_Original, 0L)),
-#         KEGG_Translated = sum(dplyr::coalesce(KEGG_Translated, 0L)),
-#         .groups = "drop"
-#       ),
-#     by = "id_label"
-#   ) %>%
-#   dplyr::left_join(
-#     dplyr::bind_rows(
-#       Plot1_PubChem[["Table"]] %>% dplyr::count(id_label, name = "PUBCHEM_Original"),
-#       Plot2_PubChem[["Table"]] %>% dplyr::count(id_label, name = "PUBCHEM_Translated")
-#     ) %>%
-#       dplyr::group_by(id_label) %>%
-#       dplyr::summarise(
-#         PUBCHEM_Original = sum(dplyr::coalesce(PUBCHEM_Original, 0L)),
-#         PUBCHEM_Translated = sum(dplyr::coalesce(PUBCHEM_Translated, 0L)),
-#         .groups = "drop"
-#       ),
-#     by = "id_label"
-#   ) %>%
-#   dplyr::mutate(
-#     HMDB_deltaOT = HMDB_Translated - HMDB_Original,
-#     KEGG_deltaOT = KEGG_Translated - KEGG_Original,
-#     PUBCHEM_deltaOT = PUBCHEM_Translated - PUBCHEM_Original
-#   ) %>%
-#   dplyr::arrange(factor(id_label, levels = c("No ID", "Single ID", "Multiple IDs")))
-# 
-# CAS_ID_Label_Summary
-
 ```
 
 
@@ -1660,6 +1587,100 @@ output_KEGG <- Input_KEGG %>%
       )
 
 
+## PUBCHEM
+
+distinct_PUBCHEM <- Input_PUBCHEM %>% distinct(PUBCHEM, .keep_all = FALSE)
+
+equivalent_id_res_PUBCHEM <- MetaProViz::equivalent_id(data= distinct_PUBCHEM,
+                                                    metadata_info = c(InputID="PUBCHEM"),
+                                                    from = "pubchem",
+                                                    path = "MetaProViz_Results/PK/PK_PUBCHEM/EquivalentID")
+
+equivalent_id_res_PUBCHEM_clean <-
+    equivalent_id_res_PUBCHEM %>%
+    group_by(PUBCHEM) %>%
+    summarise(
+        across(
+            c(PotentialAdditionalIDs, AllIDs), ~{
+                ids <- strsplit(as.character(.x), ",\\s*")
+                ids <- trimws(unlist(ids, use.names = FALSE))
+                ids <- ids[!is.na(ids) & ids != "" & ids != "NA"]
+                if (length(ids) == 0) NA_character_ else paste(unique(ids), collapse = ", ")
+            }
+        ),
+        .groups = "drop"
+    )
+
+# now map the cleaned output from equivalent_id back to the COMP_ID
+output_PUBCHEM <- Input_PUBCHEM %>%
+    left_join(
+        equivalent_id_res_PUBCHEM_clean %>%
+            select(
+                PUBCHEM,
+                PotentialAdditionalIDs,
+                AllIDs
+            ),
+        by = "PUBCHEM"
+      ) %>%
+      group_by(COMP_ID) %>%
+      summarise(
+          PUBCHEM = {
+              ids <- unlist(strsplit(paste(AllIDs, collapse = ", "), ",\\s*"))
+              ids <- trimws(ids)
+              ids <- unique(ids[!is.na(ids) & ids != "" & ids != "NA"])
+              if (length(ids) == 0) NA_character_ else paste(ids, collapse = ", ")
+          },
+          .groups = "drop"
+      )
+
+
+## CHEBI
+
+distinct_CHEBI <- Input_CHEBI %>% distinct(CHEBI, .keep_all = FALSE)
+
+equivalent_id_res_CHEBI <- MetaProViz::equivalent_id(data= distinct_CHEBI,
+                                                    metadata_info = c(InputID="CHEBI"),
+                                                    from = "chebi",
+                                                    path = "MetaProViz_Results/PK/PK_CHEBI/EquivalentID")
+
+equivalent_id_res_CHEBI_clean <-
+    equivalent_id_res_CHEBI %>%
+    group_by(CHEBI) %>%
+    summarise(
+        across(
+            c(PotentialAdditionalIDs, AllIDs), ~{
+                ids <- strsplit(as.character(.x), ",\\s*")
+                ids <- trimws(unlist(ids, use.names = FALSE))
+                ids <- ids[!is.na(ids) & ids != "" & ids != "NA"]
+                if (length(ids) == 0) NA_character_ else paste(unique(ids), collapse = ", ")
+            }
+        ),
+        .groups = "drop"
+    )
+
+# now map the cleaned output from equivalent_id back to the COMP_ID
+output_CHEBI <- Input_CHEBI %>%
+    left_join(
+        equivalent_id_res_CHEBI_clean %>%
+            select(
+                CHEBI,
+                PotentialAdditionalIDs,
+                AllIDs
+            ),
+        by = "CHEBI"
+      ) %>%
+      group_by(COMP_ID) %>%
+      summarise(
+          CHEBI = {
+              ids <- unlist(strsplit(paste(AllIDs, collapse = ", "), ",\\s*"))
+              ids <- trimws(ids)
+              ids <- unique(ids[!is.na(ids) & ids != "" & ids != "NA"])
+              if (length(ids) == 0) NA_character_ else paste(ids, collapse = ", ")
+          },
+          .groups = "drop"
+      )
+
+
 
 
 ## IMPORTANT NOTE:
@@ -1683,7 +1704,7 @@ output_KEGG <- Input_KEGG %>%
 MetaboliteIDs_addEquivalent <-
     MetaboliteIDs_traverse %>%
         select(
-            -any_of(c("HMDB", "KEGG"))
+            -any_of(c("HMDB", "KEGG", "PUBCHEM", "CHEBI"))
         ) %>%
         left_join(
             output_HMDB, by = "COMP_ID"
@@ -1691,7 +1712,13 @@ MetaboliteIDs_addEquivalent <-
         left_join(
             output_KEGG, by = "COMP_ID"
         ) %>%
-        relocate(PUBCHEM, KEGG, HMDB, .after = COMP_ID)
+        left_join(
+            output_PUBCHEM, by = "COMP_ID"
+        ) %>%
+        left_join(
+            output_CHEBI, by = "COMP_ID"
+        ) %>%
+        relocate(PUBCHEM, KEGG, HMDB, CHEBI, .after = COMP_ID)
 
 
 ## save this table
@@ -1772,6 +1799,32 @@ none_delta_df <- rbind(
   calculate_none_delta(none_summary_df, "Cleaned", "addEquivalent"),
   calculate_none_delta(none_summary_df, "Translated", "addEquivalent"),
   calculate_none_delta(none_summary_df, "Traverse", "addEquivalent")
+)
+
+```
+
+```{r}
+
+# save id summary tables
+
+write.csv2(
+    id_count_df,
+    "MetaProViz_Results/PK/id_summary/id_count_df.csv"
+)
+
+write.csv2(
+    delta_df,
+    "MetaProViz_Results/PK/id_summary/delta_df.csv"
+)
+
+write.csv2(
+    none_summary_df,
+    "MetaProViz_Results/PK/id_summary/none_summary_df.csv"
+)
+
+write.csv2(
+    none_delta_df,
+    "MetaProViz_Results/PK/id_summary/none_delta_df.csv"
 )
 
 ```
