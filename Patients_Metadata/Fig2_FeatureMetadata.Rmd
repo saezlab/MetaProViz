@@ -2642,11 +2642,7 @@ SelectedIDs <- ccRCC_to_KEGGPathways[["data_summary"]]%>%
   ) %>%
   select(  ## remove temp column
       -InputID_before
-  )  
-
-
-# @Jannik --> Any actions we take we somehow need to record within the final results file by adding an additional column like "checkmatch_removed"
-
+  )
 
 ## We identified that in some cases in our data, there are two MetaboliteIDs with e.g. stereochemical differences but they map to multiple pathways. 
 ## Therefore, we are going to remember them here and later remove them from the Pathway PK
