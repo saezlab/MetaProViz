@@ -4,6 +4,9 @@ author:
   - name: Christina Schmidt
     affiliation:
     - Heidelberg University
+  - name: Jannik Franken
+    affiliation:
+    - Heidelberg University
 output:
   html_document:
     self_contained: true
@@ -233,12 +236,6 @@ ccRCC_CompareIDs <- MetaProViz::compare_pk(data = list(Biocft = MetaboliteIDs |>
 ```
 \
 Here we notice that 76 features have no metabolite ID assigned, yet have a trivial name and a metabolite class assigned. For 135 metabolites we only have a pubchem ID, yet no HMDB or KEGG ID. 
-
-2. Metabolite IDs per feature:
-2.0. Harmonize ID separators:
-We use one separator convention (`; `) across all ID columns (CAS, HMDB, KEGG, PUBCHEM) from this point onward.
-
-@Christina: is 2.0 above true? or is it still a to-do? Because "id_separator is currently = ", "
 
 2.1. HMDB:
 ```{r}
@@ -1011,32 +1008,6 @@ write.csv2(
 # 12. End with TODO/DONE notes confirming this is
 #    an iterative QC + manual-curation integration
 #    workflow.
-
-
-
-#@Jannik
-## next steps:
-# DONE - print the tables with and with no cas using kable extra in this Rmd
-# - @Christina manually resolves the IDs
-# DONE - get another table, containing the other features, where there was at least one 
-# DONE   seed_id pair incompatiibility
-# DONE - get back manually resolved IDs
-# DONE - wrangle them back into a joint table for further analysis
-# DONE     - join the table back together
-# DONE     - keep "all_seed_ids_compatible"
-# DONE     - flag whether these ids were manually curated and how
-
-# DONE - make correct print messages for the knitted HTMLs for everything above
-# DONE - build summary_counting table in the beginning
-# DONE     - contains original, clean, translated(cas), tranverse, equivalent_id
-# DONE       deltas, counts for noID, singleID, multipleID, totalIDs
-# DONE - save necessary tables above from the ID QC
-
-
-
-
-
-
 ```
 
 ## Now run the compare_pk and  count_ID plots again, this time with the "Clean" data from MetabliteIDs_clean
@@ -2648,14 +2619,14 @@ SelectedIDs <- ccRCC_to_KEGGPathways[["data_summary"]]%>%
     Action_Specific == "KeepOneID" & matches ==  "C00065, C00716, C00740" ~ "C00065", # L-Serine vs Serine vs D-Serine
     Action_Specific == "KeepOneID" & matches ==  "C00072, C01041"         ~ "C00072", # Ascorbate vs Monodehydroascorbate. almost same molecule, just one H molecule more in Ascorbate. Keep C00072 since in more pathways
     Action_Specific == "KeepOneID" & matches ==  "C00077, C00515"         ~ "C00077", # L-Ornithine vs D-Ornithine. Keep L-Ornithine
-    Action_Specific == "KeepOneID" & matches ==  "C00092, C00668"         ~ "C00092", # D-Glucose 6-phosphate vs alpha-D-Glucose 6-phosphate. @Christina they are both present in lots of KEGG_Pathways, with a very low intersection of pathway terms between them
+    Action_Specific == "KeepOneID" & matches ==  "C00092, C00668"         ~ "C00092", # D-Glucose 6-phosphate vs alpha-D-Glucose 6-phosphate. Both present in lots of KEGG_Pathways, with a very low intersection of pathway terms between them @Jannik in how many? --> Remove one of the two from Pathways with both. 
     Action_Specific == "KeepOneID" & matches ==  "C00221, C00031, C00267" ~ "C00031", # These are D- and L-Glucose and alpha-D-Glucose. We have human samples, so in this conflict we will maintain L-Glucose
     Action_Specific == "KeepOneID" & matches ==  "C00258, C01921"         ~ "C00258", # D-Glycerate vs Glycocholate. This is an ID mismatch, since they are clearly very different molecules. C01921 was added at some translation step, discard it
     Action_Specific == "KeepOneID" & matches ==  "C00309, C00508"         ~ "C00309", # D-Ribulose vs L-Ribulose. Keep C00309, since both map to the same two pathways, so it is irrelevant
     Action_Specific == "KeepOneID" & matches ==  "C00379, C01904"         ~ "C00379", # Xylitol vs D-Arabitol/D-Lyxitol. Stereochemic difference only.  C00379 maps to one more pathway
     Action_Specific == "KeepOneID" & matches ==  "C00474, C00532, C01904" ~ "C00474", # Ribitol/Adonitol vs L-Arabitol vs D-Arabitol. C00474 maps to one more pathway
-    Action_Specific == "KeepOneID" & matches ==  "C00502, C05411"         ~ "C00502", # D-Xylonate vs L-Xylonate. Both map to two pathways. @Christina, which one do we keep?
-    Action_Specific == "KeepOneID" & matches ==  "C01087, C02630"         ~ "C01087", # (R)-2-Hydroxyglutarate vs 2-Hydroxyglutarate. Both map to three pathways. @Christina, which one do we keep?
+    Action_Specific == "KeepOneID" & matches ==  "C00502, C05411"         ~ "C00502", # D-Xylonate vs L-Xylonate. Both map to two pathways, one overlapping. We keep L 
+    Action_Specific == "KeepOneID" & matches ==  "C01087, C02630"         ~ "C01087", # (R)-2-Hydroxyglutarate vs 2-Hydroxyglutarate. Both map to three pathways, one overlapping. --> Remove (R)-2-Hydroxyglutarate from KEGG pathway "Metabolic Pathways"
     Action_Specific == "KeepOneID" & matches ==  "C03242, C16522"         ~ "C03242", # Dihomo-gamma-linolenate vs Icosatrienoic acid. Both fatty acids with different double bonds. C03242 maps to two more pathways.
     Action_Specific == "KeepOneID" & matches ==  "C03460, C03722"         ~ "C03722", # 2-Methylprop-2-enoyl-CoA versus Quinolinate. No evidence, hence we keep the one present in more pathways ( C03722=7 pathways, C03460=2 pathway)
     Action_Specific == "KeepOneID" & matches ==  "C05793, C05794"         ~ "C05793", # L-Urobilin vs Urobilin. C05793 was in originally assigned, keep it.
@@ -2664,6 +2635,8 @@ SelectedIDs <- ccRCC_to_KEGGPathways[["data_summary"]]%>%
     TRUE ~ InputID_select
   )) 
 
+
+# @Jannik --> Any actions we take we somehow need to record within the final results file by adding an additional column like "checkmatch_removed"
 ```
 \
 Lastly, we need to add the column including our selected IDs to the metadata table:
