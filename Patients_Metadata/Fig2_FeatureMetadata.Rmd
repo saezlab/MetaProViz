@@ -2420,17 +2420,6 @@ ggsave(
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 ```{r}
 ## Sized barplots using MetaProViz internal sizing helpers
 ## (kept separate so existing plotting code remains untouched)
@@ -2591,29 +2580,51 @@ Given that in some cases we have multiple KEGG IDs for a measured feature, we wi
 #Load Kegg pathways:
 KEGG_Pathways <- metsigdb_kegg()
 
-#check mapping with metadata
+## from the latest "MetaboliteIDs_addEquivalent", build the input_df for checkmatch_pk_to_data
+Tissue_MetaData_Extended <- 
+    as.data.frame(
+        MetaboliteIDs_addEquivalent
+    ) %>%
+    select(
+        Metabolite,
+        KEGG,
+        manual_correction,
+        correction_tbl
+    )
 
+#check mapping with metadata
 ccRCC_to_KEGGPathways <- MetaProViz::checkmatch_pk_to_data(data = Tissue_MetaData_Extended,
                                                            input_pk = KEGG_Pathways,
                                                            metadata_info = c(InputID = "KEGG", PriorID = "MetaboliteID", grouping_variable = "term"))
+# console out >>
+# data has multiple IDs per measurement = TRUE. input_pk has multiple IDs per entry = FALSE.
+# data has 319 unique entries with 357 unique KEGG IDs. Of those IDs, 256 match, which is 71.7086834733894%.
+# input_pk has 6586 unique entries with 6586 unique MetaboliteID IDs. Of those IDs, 256 are detected in the data, which is 3.88703310051625%.
+# [2026-04-08 09:55:51] [WARN]    [MetaProViz] There are cases where multiple detected IDs match to multiple prior knowledge IDs of the same category
 
-problems_terms <- ccRCC_to_KEGGPathways[["GroupingVariable_summary"]]%>%
+# inspect results
+ccRCC_to_KEGGPathways_data_summary <- ccRCC_to_KEGGPathways$data_summary
+ccRCC_to_KEGGPathways_GroupingVariable_summary <- ccRCC_to_KEGGPathways$GroupingVariable_summary
+
+problems_terms <- ccRCC_to_KEGGPathways[["GroupingVariable_summary"]] %>%
   filter(!Group_Conflict_Notes== "None")
 ```
+
 ```{r, echo=FALSE}
-problems_terms[,c(1,5:8)]%>%
+problems_terms[,c("KEGG", "original_count", "matches_count", "MetaboliteID", "term")] %>%
   kableExtra::kbl(caption = "Terms in KEGG pathways where the same measured feature mapps with more than one ID, which will inflate the enrichment analysis.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
 \
-Dependent on the biological question and the organism and prior knowledge, one can either maintain the metabolite ID of the more likely metabolite (e.g. in human its moire likely that we have L-aminoacid than D-aminoacid) or the metabolite ID that is represented in more/less pathways (specificity). If we are looking into the cases where we do have multiple IDs, for cases with no match to the prior knowledge we can just maintain one ID, whilst for cases with exactly one match we should maintain the ID that is found in the prior knowledge. 
+Dependent on the biological question and the organism and prior knowledge, one can either maintain the metabolite ID of the more likely metabolite (e.g. in human its more likely that we have L-aminoacid than D-aminoacid) or the metabolite ID that is represented in more/less pathways (specificity). If we are looking into the cases where we do have multiple IDs, for cases with no match to the prior knowledge we can just maintain one ID, whilst for cases with exactly one match we should maintain the ID that is found in the prior knowledge. 
 ```{r}
 # Select the cases where a feature has multiple IDs
 multipleIDs <- ccRCC_to_KEGGPathways[["data_summary"]]%>%
   filter(original_count>1)
 ```
+
 ```{r, echo=FALSE}
-multipleIDs[,c(1,12, 5:6, 3, 9, 11, 13)]%>%
+multipleIDs[,c("KEGG","InputID_select", "original_count", "matches_count", "matches", "Group_Conflict_Notes", "ActionRequired", "Action_Specific")] %>%
   kableExtra::kbl(caption = "Terms in KEGG pathways where the same measured feature mapps with more than one ID, which may inflate the enrichment analysis.") %>%
   kableExtra::kable_classic(full_width = F, html_font = "Cambria", font_size = 12)
 ```
@@ -2626,30 +2637,49 @@ SelectedIDs <- ccRCC_to_KEGGPathways[["data_summary"]]%>%
   separate_rows(matches_split, sep = ",\\s*") %>%
   mutate(InputID_select = if_else(Action_Specific  == "KeepEachID", matches_split, InputID_select)) %>%
   select(-matches_split) %>%
+  left_join(      # add the manual_correction and correction_tbl columns
+      Tissue_MetaData_Extended %>%
+          dplyr::select(KEGG, manual_correction, correction_tbl),
+      by = "KEGG"
+  ) %>%
   #Select one ID for AcionSpecific==KeepOneID
   dplyr::mutate(InputID_select = case_when(
-    Action_Specific == "KeepOneID" & matches == "C03460, C03722" ~ "C03722", # 2-Methylprop-2-enoyl-CoA versus Quinolinate. No evidence, hence we keep the one present in more pathways ( C03722=7 pathways, C03460=2 pathway)
-    Action_Specific == "KeepOneID" & matches ==  "C00221, C00031" ~ "C00031", # These are D- and L-Glucose. We have human samples, so in this conflict we will maintain L-Glucose
-    Action_Specific == "KeepOneID" & matches ==  "C17737, C00695" ~ "C00695", # Allocholic acid versus Cholic acid. No evidence, hence we keep the one present in more pathways (C00695 = 4 pathways, C17737 = 1 pathway)
+    Action_Specific == "KeepOneID" & matches ==  "C00025, C00217, C00302" ~ "C00025", # L-Glutamate vs D-Glutamate vs Glutamate compounds. Keep L-Glutamate, most prevalent in KEGG pathways
+    Action_Specific == "KeepOneID" & matches ==  "C00065, C00716, C00740" ~ "C00065", # L-Serine vs Serine vs D-Serine
+    Action_Specific == "KeepOneID" & matches ==  "C00072, C01041"         ~ "C00072", # Ascorbate vs Monodehydroascorbate. almost same molecule, just one H molecule more in Ascorbate. Keep C00072 since in more pathways
+    Action_Specific == "KeepOneID" & matches ==  "C00077, C00515"         ~ "C00077", # L-Ornithine vs D-Ornithine. Keep L-Ornithine
+    Action_Specific == "KeepOneID" & matches ==  "C00092, C00668"         ~ "C00092", # D-Glucose 6-phosphate vs alpha-D-Glucose 6-phosphate. @Christina they are both present in lots of KEGG_Pathways, with a very low intersection of pathway terms between them
+    Action_Specific == "KeepOneID" & matches ==  "C00221, C00031, C00267" ~ "C00031", # These are D- and L-Glucose and alpha-D-Glucose. We have human samples, so in this conflict we will maintain L-Glucose
+    Action_Specific == "KeepOneID" & matches ==  "C00258, C01921"         ~ "C00258", # D-Glycerate vs Glycocholate. This is an ID mismatch, since they are clearly very different molecules. C01921 was added at some translation step, discard it
+    Action_Specific == "KeepOneID" & matches ==  "C00309, C00508"         ~ "C00309", # D-Ribulose vs L-Ribulose. Keep C00309, since both map to the same two pathways, so it is irrelevant
+    Action_Specific == "KeepOneID" & matches ==  "C00379, C01904"         ~ "C00379", # Xylitol vs D-Arabitol/D-Lyxitol. Stereochemic difference only.  C00379 maps to one more pathway
+    Action_Specific == "KeepOneID" & matches ==  "C00474, C00532, C01904" ~ "C00474", # Ribitol/Adonitol vs L-Arabitol vs D-Arabitol. C00474 maps to one more pathway
+    Action_Specific == "KeepOneID" & matches ==  "C00502, C05411"         ~ "C00502", # D-Xylonate vs L-Xylonate. Both map to two pathways. @Christina, which one do we keep?
+    Action_Specific == "KeepOneID" & matches ==  "C01087, C02630"         ~ "C01087", # (R)-2-Hydroxyglutarate vs 2-Hydroxyglutarate. Both map to three pathways. @Christina, which one do we keep?
+    Action_Specific == "KeepOneID" & matches ==  "C03242, C16522"         ~ "C03242", # Dihomo-gamma-linolenate vs Icosatrienoic acid. Both fatty acids with different double bonds. C03242 maps to two more pathways.
+    Action_Specific == "KeepOneID" & matches ==  "C03460, C03722"         ~ "C03722", # 2-Methylprop-2-enoyl-CoA versus Quinolinate. No evidence, hence we keep the one present in more pathways ( C03722=7 pathways, C03460=2 pathway)
+    Action_Specific == "KeepOneID" & matches ==  "C05793, C05794"         ~ "C05793", # L-Urobilin vs Urobilin. C05793 was in originally assigned, keep it.
+    Action_Specific == "KeepOneID" & matches ==  "C17737, C00695"         ~ "C00695", # Allocholic acid versus Cholic acid. No evidence, hence we keep the one present in more pathways (C00695 = 4 pathways, C17737 = 1 pathway)
     Action_Specific == "KeepOneID" ~ InputID_select,  # Keep NA where not matched manually
     TRUE ~ InputID_select
   )) 
+
 ```
 \
 Lastly, we need to add the column including our selected IDs to the metadata table:
 ```{r}
-Tissue_MetaData_Extended <- merge(x= SelectedIDs %>%
-                                        dplyr::select(KEGG, InputID_select),
-                                  y= Tissue_MetaData_Extended,
-                                  by= "KEGG",
-                                  all.y=TRUE)
+Tissue_MetaData_Extended_cleaned <- 
+  merge(
+    x = SelectedIDs %>% 
+        select(KEGG, InputID_select),
+    y = Tissue_MetaData_Extended,
+    by = "KEGG",
+    all.y = TRUE
+  )
 ```
 
 
 This final table will be used as input for the enrichment analysis
-
-
-
 
 
 # Session information
