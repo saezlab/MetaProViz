@@ -53,6 +53,7 @@ library(rlang)
 library(tidyr)
 library(tibble)
 library(stringr)
+library(readxl)
 ```
 
 ```{r}
@@ -61,17 +62,66 @@ if (!dir.exists("MetaProViz_Results/Enrichment")) {
   dir.create("MetaProViz_Results/Enrichment", recursive = TRUE)
 }
 
+```
+
+```{r}
+# Convert All Text to UTF-8
+sanitize_df <- function(df) {
+  df[] <- lapply(df, function(col) {
+    if (is.character(col)) {
+      col <- ifelse(is.na(col), NA, col)  # Ensure NAs remain NAs
+      col <- iconv(col, from = "UTF-8", to = "UTF-8", sub = "")  # Remove non-UTF-8 characters
+      col <- gsub("[[:cntrl:]]", "", col)  # Remove control characters (but not NA)
+      col <- substr(col, 1, 30000)  # Truncate long cells
+    }
+    return(col)
+  })
+  return(df)
+}
+
+# Open Excel file from BioRxiv branch and read in the data
+read_xlsx_all <- function(url) {
+  tmp <- tempfile(fileext = ".xlsx")
+  download.file(url, tmp, mode = "wb")
+  
+  sheets <- readxl::excel_sheets(tmp)
+  lapply(sheets, function(s) read_excel(tmp, sheet = s)) |>
+    setNames(sheets)
+}
+
 
 ```
 
 # Load results
 ## 1. Loading the Feature metadata
 Result from Fig2_FeatureMetadata, which include the feature metadata table with extended metabolite IDs and solved ambiguity issues for mapping KEGG IDs to KEGG pathways.
-@Jannik, this is not fisnished yet. 
+@Jannik
+
+```{r}
+# load Results from Fig2_FeatureMetadata
+
+Tissue_MetaData_Extended_cleaned <- 
+    read.csv2(
+        "MetaProViz_Results/PK/End_Result_Fig2/Tissue_MetaData_Extended_cleaned.csv"
+    )
+
+```
 
 
-## 2. Biological regulated clustering Results 
+## 2. Biological regulated clustering Results
 @Jannik: Load Extended Data Table 1 , Load Sheet 9 from BiorXiv
+
+```{r}
+Extended_Data_Table_1 <- read_xlsx_all(
+  "https://raw.githubusercontent.com/saezlab/MetaProViz/BioRxiv/Extended%20Data%20Table%201_PatientsTissue_Metabolomics.xlsx"
+)
+
+# names(Extended_Data_Table_1)
+DMA_TUMOR_vs_NORMAL_Old <- Extended_Data_Table_1$"DMA_TUMOR_vs_NORMAL_Old"
+DMA_TUMOR_vs_NORMAL_Young <- Extended_Data_Table_1$"DMA_TUMOR_vs_NORMAL_Young"
+MCA2Cond_Old_Young <- Extended_Data_Table_1$"MCA2Cond_Old-Young"
+```
+
 
 
 # Pathway enrichment
@@ -82,33 +132,54 @@ Below is the previously used code:
 Next, we perform Over Representation Analysis (`ORA`) using KEGG pathways for each comparison.\
 ```{r, warning=FALSE}
 # Since we have performed multiple comparisons (all_vs_HK2), we will run ORA for each of this comparison
-DM_ORA_res<- list()
+DM_ORA_res <- list()
 
 KEGG_Pathways <- MetaProViz::metsigdb_kegg()
 
-for(comparison in names(ResList)){
-  dma_res <- merge(x= Tissue_MetaData_Extended,
-                   y=ResList[[comparison]][["dma"]][["TUMOR_vs_NORMAL"]], 
-                   by="Metabolite", 
-                   all=TRUE)
+## manually clean up KEGG_Pathways with the few instances we saw in Fig2 during checkmatch_pk_to_data
+## to-do @Jannik
+
+
+# continue
+# comparison = "Old"
+for(comparison in c("Old", "Young")){
   
-  #Ensure unique IDs and full background --> we include measured features that do not have a KEGG ID.
-  dma_res <- dma_res[,c(3,21:25)]%>%
-    dplyr::mutate(InputID_select = if_else(
-      is.na(InputID_select),
-      paste0("NA_", cumsum(is.na(InputID_select))),
-      InputID_select
-      ))%>% #remove duplications and keep the higher Log2FC measurement
-    group_by(InputID_select) %>%
-    slice_max(order_by = Log2FC, n = 1, with_ties = FALSE) %>%
-    ungroup()%>%
-    remove_rownames()%>%
-    tibble::column_to_rownames("InputID_select")
+  dma_res <- merge(
+      x = Tissue_MetaData_Extended_cleaned,
+      y = case_when(
+              comparison == "Old" ~ DMA_TUMOR_vs_NORMAL_Old,
+              comparison == "Young" ~ DMA_TUMOR_vs_NORMAL_Young
+          ),
+      by = "Metabolite",
+      all = TRUE
+  )
+  
+  # Ensure unique IDs and full background --> we include measured features that do not have a KEGG ID.
+  dma_res <- 
+      dma_res[,c(3,21:25)] %>%
+      mutate(  # remove duplications and keep the higher Log2FC measurement
+          InputID_select = if_else(
+              is.na(InputID_select),
+              paste0("NA_", cumsum(is.na(InputID_select))),
+              InputID_select
+              )
+      ) %>%
+      group_by(
+          InputID_select
+      ) %>%
+      slice_max(
+          order_by = Log2FC, n = 1, with_ties = FALSE
+      ) %>%
+      ungroup() %>%
+      remove_rownames() %>%
+      tibble::column_to_rownames(
+          "InputID_select"
+      )
   
   
   #Perform ORA
   set.seed(100)
-  Res <- MetaProViz::standard_ora(data= dma_res, #Input data requirements: column `t.val` and column `Metabolite`
+  Res <- MetaProViz::standard_ora(data = dma_res, #Input data requirements: column `t.val` and column `Metabolite`
                                  metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "MetaboliteID"),
                                  input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
                                  pathway_name=paste0("KEGG_", comparison, sep=""),
