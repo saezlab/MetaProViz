@@ -2662,6 +2662,16 @@ Tissue_MetaData_Extended_cleaned <-
     by = "KEGG",
     all.y = TRUE
   )
+
+
+if (!dir.exists("MetaProViz_Results/PK/End_Result_Fig2")) {
+  dir.create("MetaProViz_Results/PK/End_Result_Fig2", recursive = TRUE)
+}
+
+write.csv2(
+    Tissue_MetaData_Extended_cleaned,
+    "MetaProViz_Results/PK/End_Result_Fig2/Tissue_MetaData_Extended_cleaned.csv"
+)
 ```
 
 
