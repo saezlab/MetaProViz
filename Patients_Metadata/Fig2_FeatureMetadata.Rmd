@@ -2613,30 +2613,47 @@ SelectedIDs <- ccRCC_to_KEGGPathways[["data_summary"]]%>%
           dplyr::select(KEGG, manual_correction, correction_tbl),
       by = "KEGG"
   ) %>%
+  mutate(  # remember IDs before to compare at the end of this pipe chain
+      InputID_before = InputID_select
+  ) %>%
   #Select one ID for AcionSpecific==KeepOneID
-  dplyr::mutate(InputID_select = case_when(
-    Action_Specific == "KeepOneID" & matches ==  "C00025, C00217, C00302" ~ "C00025", # L-Glutamate vs D-Glutamate vs Glutamate compounds. Keep L-Glutamate, most prevalent in KEGG pathways
-    Action_Specific == "KeepOneID" & matches ==  "C00065, C00716, C00740" ~ "C00065", # L-Serine vs Serine vs D-Serine
-    Action_Specific == "KeepOneID" & matches ==  "C00072, C01041"         ~ "C00072", # Ascorbate vs Monodehydroascorbate. almost same molecule, just one H molecule more in Ascorbate. Keep C00072 since in more pathways
-    Action_Specific == "KeepOneID" & matches ==  "C00077, C00515"         ~ "C00077", # L-Ornithine vs D-Ornithine. Keep L-Ornithine
-    Action_Specific == "KeepOneID" & matches ==  "C00092, C00668"         ~ "C00092", # D-Glucose 6-phosphate vs alpha-D-Glucose 6-phosphate. Both present in lots of KEGG_Pathways, with a very low intersection of pathway terms between them @Jannik in how many? --> Remove one of the two from Pathways with both. 
-    Action_Specific == "KeepOneID" & matches ==  "C00221, C00031, C00267" ~ "C00031", # These are D- and L-Glucose and alpha-D-Glucose. We have human samples, so in this conflict we will maintain L-Glucose
-    Action_Specific == "KeepOneID" & matches ==  "C00258, C01921"         ~ "C00258", # D-Glycerate vs Glycocholate. This is an ID mismatch, since they are clearly very different molecules. C01921 was added at some translation step, discard it
-    Action_Specific == "KeepOneID" & matches ==  "C00309, C00508"         ~ "C00309", # D-Ribulose vs L-Ribulose. Keep C00309, since both map to the same two pathways, so it is irrelevant
-    Action_Specific == "KeepOneID" & matches ==  "C00379, C01904"         ~ "C00379", # Xylitol vs D-Arabitol/D-Lyxitol. Stereochemic difference only.  C00379 maps to one more pathway
-    Action_Specific == "KeepOneID" & matches ==  "C00474, C00532, C01904" ~ "C00474", # Ribitol/Adonitol vs L-Arabitol vs D-Arabitol. C00474 maps to one more pathway
-    Action_Specific == "KeepOneID" & matches ==  "C00502, C05411"         ~ "C00502", # D-Xylonate vs L-Xylonate. Both map to two pathways, one overlapping. We keep L 
-    Action_Specific == "KeepOneID" & matches ==  "C01087, C02630"         ~ "C01087", # (R)-2-Hydroxyglutarate vs 2-Hydroxyglutarate. Both map to three pathways, one overlapping. --> Remove (R)-2-Hydroxyglutarate from KEGG pathway "Metabolic Pathways"
-    Action_Specific == "KeepOneID" & matches ==  "C03242, C16522"         ~ "C03242", # Dihomo-gamma-linolenate vs Icosatrienoic acid. Both fatty acids with different double bonds. C03242 maps to two more pathways.
-    Action_Specific == "KeepOneID" & matches ==  "C03460, C03722"         ~ "C03722", # 2-Methylprop-2-enoyl-CoA versus Quinolinate. No evidence, hence we keep the one present in more pathways ( C03722=7 pathways, C03460=2 pathway)
-    Action_Specific == "KeepOneID" & matches ==  "C05793, C05794"         ~ "C05793", # L-Urobilin vs Urobilin. C05793 was in originally assigned, keep it.
-    Action_Specific == "KeepOneID" & matches ==  "C17737, C00695"         ~ "C00695", # Allocholic acid versus Cholic acid. No evidence, hence we keep the one present in more pathways (C00695 = 4 pathways, C17737 = 1 pathway)
-    Action_Specific == "KeepOneID" ~ InputID_select,  # Keep NA where not matched manually
-    TRUE ~ InputID_select
-  )) 
+  dplyr::mutate(
+      InputID_select = case_when(
+          Action_Specific == "KeepOneID" & matches ==  "C00025, C00217, C00302" ~ "C00025", # L-Glutamate vs D-Glutamate vs Glutamate compounds. Keep L-Glutamate, most prevalent in KEGG pathways
+          Action_Specific == "KeepOneID" & matches ==  "C00065, C00716, C00740" ~ "C00065", # L-Serine vs Serine vs D-Serine
+          Action_Specific == "KeepOneID" & matches ==  "C00072, C01041"         ~ "C00072", # Ascorbate vs Monodehydroascorbate. almost same molecule, just one H molecule more in Ascorbate. Keep C00072 since in more pathways
+          Action_Specific == "KeepOneID" & matches ==  "C00077, C00515"         ~ "C00077", # L-Ornithine vs D-Ornithine. Keep L-Ornithine
+          Action_Specific == "KeepOneID" & matches ==  "C00092, C00668"         ~ "C00092, C00668", # D-Glucose 6-phosphate vs alpha-D-Glucose 6-phosphate. Both present in lots of KEGG_Pathways, with a very low intersection of pathway terms between them. 2 shared pathways and 16 non-shared ones. Remove one of the KEGG IDs from pathways which include both
+          Action_Specific == "KeepOneID" & matches ==  "C00221, C00031, C00267" ~ "C00031", # These are D- and L-Glucose and alpha-D-Glucose. We have human samples, so in this conflict we will maintain L-Glucose
+          Action_Specific == "KeepOneID" & matches ==  "C00258, C01921"         ~ "C00258", # D-Glycerate vs Glycocholate. This is an ID mismatch, since they are clearly very different molecules. C01921 was added at some translation step, discard it
+          Action_Specific == "KeepOneID" & matches ==  "C00309, C00508"         ~ "C00309", # D-Ribulose vs L-Ribulose. Keep C00309, since both map to the same two pathways, so it is irrelevant
+          Action_Specific == "KeepOneID" & matches ==  "C00379, C01904"         ~ "C00379", # Xylitol vs D-Arabitol/D-Lyxitol. Stereochemic difference only.  C00379 maps to one more pathway
+          Action_Specific == "KeepOneID" & matches ==  "C00474, C00532, C01904" ~ "C00474", # Ribitol/Adonitol vs L-Arabitol vs D-Arabitol. C00474 maps to one more pathway
+          Action_Specific == "KeepOneID" & matches ==  "C00502, C05411"         ~ "C05411", # D-Xylonate vs L-Xylonate. Both map to two pathways, one overlapping. We keep L 
+          Action_Specific == "KeepOneID" & matches ==  "C01087, C02630"         ~ "C01087, C02630", # (R)-2-Hydroxyglutarate vs 2-Hydroxyglutarate. Both map to three pathways, one overlapping. --> Remove (R)-2-Hydroxyglutarate from KEGG pathway "Metabolic Pathways"
+          Action_Specific == "KeepOneID" & matches ==  "C03242, C16522"         ~ "C03242", # Dihomo-gamma-linolenate vs Icosatrienoic acid. Both fatty acids with different double bonds. C03242 maps to two more pathways.
+          Action_Specific == "KeepOneID" & matches ==  "C03460, C03722"         ~ "C03722", # 2-Methylprop-2-enoyl-CoA versus Quinolinate. No evidence, hence we keep the one present in more pathways (C03722=7 pathways, C03460=2 pathway)
+          Action_Specific == "KeepOneID" & matches ==  "C05793, C05794"         ~ "C05793", # L-Urobilin vs Urobilin. C05793 was in originally assigned, keep it.
+          Action_Specific == "KeepOneID" & matches ==  "C17737, C00695"         ~ "C00695", # Allocholic acid versus Cholic acid. No evidence, hence we keep the one present in more pathways (C00695 = 4 pathways, C17737 = 1 pathway)
+          Action_Specific == "KeepOneID" ~ InputID_select,  # Keep NA where not matched manually
+          TRUE ~ InputID_select
+      ),
+      corrected_during_checkmatch = is.na(InputID_before) ## flag whether changed above
+  ) %>%
+  select(  ## remove temp column
+      -InputID_before
+  )  
 
 
 # @Jannik --> Any actions we take we somehow need to record within the final results file by adding an additional column like "checkmatch_removed"
+
+
+## We identified that in some cases in our data, there are two MetaboliteIDs with e.g. stereochemical differences but they map to multiple pathways. 
+## Therefore, we are going to remember them here and later remove them from the Pathway PK
+
+# Remove (R)-2-Hydroxyglutarate (C01087) from KEGG pathway "Metabolic Pathways"
+# C00092, C00668: remove one of both IDs from Pathways which contain both of them
+
 ```
 \
 Lastly, we need to add the column including our selected IDs to the metadata table:
@@ -2644,7 +2661,7 @@ Lastly, we need to add the column including our selected IDs to the metadata tab
 Tissue_MetaData_Extended_cleaned <- 
   merge(
     x = SelectedIDs %>% 
-        select(KEGG, InputID_select),
+        select(KEGG, InputID_select, corrected_during_checkmatch),
     y = Tissue_MetaData_Extended,
     by = "KEGG",
     all.y = TRUE
