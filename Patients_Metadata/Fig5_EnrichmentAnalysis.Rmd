@@ -317,6 +317,52 @@ for(comparison in c("Old", "Young")){
 
 ```{r}
 
+cluster_pk_input <- 
+    DM_ORA_res$Young$ClusterGosummary %>%
+      filter(
+          p.adjust < 0.05   # same p..adjust cutoff as in the volcanos above
+      )
+
+cluster_pk_res <- 
+    cluster_pk(
+        cluster_pk_input,
+        metadata_info = c(
+            metabolite_column = "Metabolites_in_pathway",
+            pathway_column = "ID"
+        ),
+        input_format = "enrichment",
+        similarity = "jaccard",
+        threshold = 0.6,
+        plot_threshold = 0.4,
+        clust = "community",
+        min = 1,
+        node_size_column = "percentage_of_Pathway_detected",
+        save_plot = NULL,
+        plot_name = "Enrichment_example",
+        print_plot = FALSE,
+        min_degree = 0,
+        show_density = TRUE,
+        max_nodes = 1000
+    )
+
+head(cluster_pk_res$cluster_summary)
+cluster_pk_res$graph_plot
+
+set.seed(123)
+viz_graph(
+    similarity_matrix = cluster_pk_res$similarity_matrix,
+    clusters = cluster_pk_res$clusters,
+    plot_threshold = 0,
+    plot_name = "Enrichment_example_plot_threshold_0",
+    max_nodes = 1000,
+    min_degree = 0,
+    node_sizes = cluster_pk_res$node_sizes,
+    show_density = TRUE,
+    save_plot = "svg",
+    print_plot = FALSE,
+    path = "MetaProViz_Results/Enrichment"
+)
+
 ```
 
 
