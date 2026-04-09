@@ -1,0 +1,594 @@
+"";"KEGG";"InputID_select";"corrected_during_checkmatch";"Metabolite";"manual_correction";"correction_tbl"
+"1";"C00003";"KEGG";FALSE;"nicotinamide adenine dinucleotide (NAD+)";FALSE;NA
+"2";"C00004";"KEGG";FALSE;"nicotinamide adenine dinucleotide reduced (NADH)";FALSE;NA
+"3";"C00009";"KEGG";FALSE;"phosphate";FALSE;NA
+"4";"C00013";"KEGG";FALSE;"pyrophosphate (PPi)";FALSE;NA
+"5";"C00016";"KEGG";FALSE;"flavin adenine dinucleotide (FAD)";FALSE;NA
+"6";"C00020";"KEGG";FALSE;"adenosine 5'-monophosphate (AMP)";FALSE;NA
+"7";"C00021";"KEGG";FALSE;"S-adenosylhomocysteine (SAH)";FALSE;NA
+"8";"C00025, C00217, C00302";"C00025";TRUE;"glutamate";TRUE;"completely_incompatible_manual_with_cas"
+"9";"C00032";"KEGG";FALSE;"heme";FALSE;NA
+"10";"C00037";"KEGG";FALSE;"glycine";FALSE;NA
+"11";"C00041";"KEGG";FALSE;"alanine";FALSE;NA
+"12";"C00042";"KEGG";FALSE;"succinate";FALSE;NA
+"13";"C00047";"KEGG";FALSE;"lysine";FALSE;NA
+"14";"C00049";"KEGG";FALSE;"aspartate";FALSE;NA
+"15";"C00051";"KEGG";FALSE;"glutathione, reduced (GSH)";FALSE;NA
+"16";"C00055";"KEGG";FALSE;"cytidine 5'-monophosphate (5'-CMP)";FALSE;NA
+"17";"C00062";"KEGG";FALSE;"arginine";FALSE;NA
+"18";"C00064";"KEGG";FALSE;"glutamine";FALSE;NA
+"19";"C00065, C00716, C00740";"C00065";TRUE;"serine";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"20";"C00072, C01041";"C00072";TRUE;"ascorbate (Vitamin C)";TRUE;"completely_incompatible_manual_with_cas"
+"21";"C00073";"KEGG";FALSE;"methionine";FALSE;NA
+"22";"C00074";"KEGG";FALSE;"phosphoenolpyruvate (PEP)";FALSE;NA
+"23";"C00077, C00515";"C00077";TRUE;"ornithine";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"24";"C00078";"KEGG";FALSE;"tryptophan";FALSE;NA
+"25";"C00079";"KEGG";FALSE;"phenylalanine";FALSE;NA
+"26";"C00082";"KEGG";FALSE;"tyrosine";FALSE;NA
+"27";"C00086";"KEGG";FALSE;"urea";FALSE;NA
+"28";"C00092, C00668";"C00092, C00668";TRUE;"glucose-6-phosphate (G6P)";TRUE;"completely_incompatible_manual_with_cas"
+"29";"C00093, C03189";"C00093";FALSE;"glycerol 3-phosphate (G3P)";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"30";"C00095, C02336";"C00095";FALSE;"fructose";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"31";"C00097";"KEGG";FALSE;"cysteine";FALSE;NA
+"32";"C00099";"KEGG";FALSE;"beta-alanine";FALSE;NA
+"33";"C00103";"KEGG";FALSE;"glucose 1-phosphate";FALSE;NA
+"34";"C00106";"KEGG";FALSE;"uracil";FALSE;NA
+"35";"C00116";"KEGG";FALSE;"glycerol";FALSE;NA
+"36";"C00121";"KEGG";FALSE;"ribose";FALSE;NA
+"37";"C00122";"KEGG";FALSE;"fumarate";FALSE;NA
+"38";"C00123";"KEGG";FALSE;"leucine";FALSE;NA
+"39";"C00127";"KEGG";FALSE;"cysteine-glutathione disulfide";FALSE;NA
+"40";"C00127";"KEGG";FALSE;"glutathione, oxidized (GSSG)";FALSE;NA
+"41";"C00127";"KEGG";FALSE;"cysteine-glutathione disulfide";FALSE;NA
+"42";"C00127";"KEGG";FALSE;"glutathione, oxidized (GSSG)";FALSE;NA
+"43";"C00134";"KEGG";FALSE;"putrescine";FALSE;NA
+"44";"C00135";"KEGG";FALSE;"histidine";FALSE;NA
+"45";"C00137";"KEGG";FALSE;"myo-inositol";FALSE;NA
+"46";"C00140, C03878";"C00140";FALSE;"N-acetylglucosamine";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"47";"C00147";"KEGG";FALSE;"adenine";FALSE;NA
+"48";"C00148";"KEGG";FALSE;"proline";FALSE;NA
+"49";"C00149";"KEGG";FALSE;"malate";FALSE;NA
+"50";"C00152";"KEGG";FALSE;"asparagine";FALSE;NA
+"51";"C00153";"KEGG";FALSE;"nicotinamide";FALSE;NA
+"52";"C00155, C05330";"C00155";FALSE;"homocysteine";FALSE;NA
+"53";"C00158";"KEGG";FALSE;"citrate";FALSE;NA
+"54";"C00159, C00936";"C00159";FALSE;"mannose";TRUE;"completely_incompatible_manual_with_cas"
+"55";"C00160, C03547";"C00160";FALSE;"glycolate (hydroxyacetate)";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"56";"C00160, C03547";"C03547";FALSE;"glycolate (hydroxyacetate)";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"57";"C00168";"KEGG";FALSE;"beta-hydroxypyruvate";FALSE;NA
+"58";"C00170";"KEGG";FALSE;"5-methylthioadenosine (MTA)";FALSE;NA
+"59";"C00178";"KEGG";FALSE;"thymine";FALSE;NA
+"60";"C00179";"KEGG";FALSE;"agmatine";FALSE;NA
+"61";"C00180, C00539";"C00180";FALSE;"benzoate";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"62";"C00181";"KEGG";FALSE;"xylose";FALSE;NA
+"63";"C00183";"KEGG";FALSE;"valine";FALSE;NA
+"64";"C00184";"KEGG";FALSE;"1,3-dihydroxyacetone";FALSE;NA
+"65";"C00186";"KEGG";FALSE;"lactate";FALSE;NA
+"66";"C00187";"KEGG";FALSE;"cholesterol";FALSE;NA
+"67";"C00188";"KEGG";FALSE;"threonine";FALSE;NA
+"68";"C00189";"KEGG";FALSE;"ethanolamine";FALSE;NA
+"69";"C00191";"KEGG";FALSE;"glucuronate";FALSE;NA
+"70";"C00208, C00897";"C00208";FALSE;"maltose";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"71";"C00212";"KEGG";FALSE;"adenosine";FALSE;NA
+"72";"C00213";"KEGG";FALSE;"sarcosine (N-Methylglycine)";FALSE;NA
+"73";"C00214";"KEGG";FALSE;"thymidine";FALSE;NA
+"74";"C00219";"KEGG";FALSE;"arachidonate (20:4n6)";FALSE;NA
+"75";"C00221, C00031, C00267";"C00031";TRUE;"glucose";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"76";"C00233";"KEGG";FALSE;"4-methyl-2-oxopentanoate";FALSE;NA
+"77";"C00242";"KEGG";FALSE;"guanine";FALSE;NA
+"78";"C00245";"KEGG";FALSE;"taurine";FALSE;NA
+"79";"C00249";"KEGG";FALSE;"palmitate (16:0)";FALSE;NA
+"80";"C00250";"KEGG";FALSE;"pyridoxal";FALSE;NA
+"81";"C00252";"KEGG";FALSE;"valylasparagine";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"82";"C00253";"KEGG";FALSE;"nicotinate";FALSE;NA
+"83";"C00255";"KEGG";FALSE;"riboflavin (Vitamin B2)";FALSE;NA
+"84";"C00257";"KEGG";FALSE;"gluconate";FALSE;NA
+"85";"C00258, C01921";"C00258";TRUE;"glycerate";FALSE;NA
+"86";"C00262";"KEGG";FALSE;"hypoxanthine";FALSE;NA
+"87";"C00263";"KEGG";FALSE;"homoserine";FALSE;NA
+"88";"C00270, C19910";"C00270";FALSE;"N-acetylneuraminate";TRUE;"completely_incompatible_manual_with_cas"
+"89";"C00275";"KEGG";FALSE;"mannose-6-phosphate";FALSE;NA
+"90";"C00294";"KEGG";FALSE;"inosine";FALSE;NA
+"91";"C00296";"KEGG";FALSE;"quinate";FALSE;NA
+"92";"C00299";"KEGG";FALSE;"uridine";FALSE;NA
+"93";"C00300";"KEGG";FALSE;"creatine";FALSE;NA
+"94";"C00309, C00508";"C00309";TRUE;"ribulose";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"95";"C00310";"KEGG";FALSE;"xylulose";FALSE;NA
+"96";"C00315";"KEGG";FALSE;"spermidine";FALSE;NA
+"97";"C00318";"KEGG";FALSE;"carnitine";FALSE;NA
+"98";"C00319";"KEGG";FALSE;"sphingosine";FALSE;NA
+"99";"C00327";"KEGG";FALSE;"citrulline";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"100";"C00328";"KEGG";FALSE;"kynurenine";FALSE;NA
+"101";"C00330";"KEGG";FALSE;"2'-deoxyguanosine";FALSE;NA
+"102";"C00334";"KEGG";FALSE;"gamma-aminobutyrate (GABA)";FALSE;NA
+"103";"C00345";"KEGG";FALSE;"6-phosphogluconate";FALSE;NA
+"104";"C00346";"KEGG";FALSE;"phosphoethanolamine";FALSE;NA
+"105";"C00357";"KEGG";FALSE;"N-acetylglucosamine 6-phosphate";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"106";"C00366";"KEGG";FALSE;"urate";FALSE;NA
+"107";"C00379, C01904";"C00379";TRUE;"xylitol";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"108";"C00385";"KEGG";FALSE;"xanthine";FALSE;NA
+"109";"C00387";"KEGG";FALSE;"guanosine";FALSE;NA
+"110";"C00388";"KEGG";FALSE;"histamine";FALSE;NA
+"111";"C00392";"KEGG";FALSE;"mannitol";FALSE;NA
+"112";"C00407";"KEGG";FALSE;"isoleucine";FALSE;NA
+"113";"C00408";"KEGG";FALSE;"pipecolate";FALSE;NA
+"114";"C00417";"KEGG";FALSE;"cis-aconitate";FALSE;NA
+"115";"C00429";"KEGG";FALSE;"5,6-dihydrouracil";FALSE;NA
+"116";"C00431";"KEGG";FALSE;"5-aminovalerate";FALSE;NA
+"117";"C00437";"KEGG";FALSE;"N-acetylornithine";FALSE;NA
+"118";"C00440";"KEGG";FALSE;"5-methyltetrahydrofolate (5MeTHF)";FALSE;NA
+"119";"C00449";"KEGG";FALSE;"saccharopine";FALSE;NA
+"120";"C00455";"KEGG";FALSE;"nicotinamide ribonucleotide (NMN)";FALSE;NA
+"121";"C00474";"KEGG";FALSE;"ribitol";FALSE;NA
+"122";"C00474, C00532, C01904";"C00474";TRUE;"arabitol";TRUE;"completely_incompatible_manual_with_cas"
+"123";"C00475";"KEGG";FALSE;"cytidine";FALSE;NA
+"124";"C00486";"KEGG";FALSE;"bilirubin (E,E)*";FALSE;NA
+"125";"C00486";"KEGG";FALSE;"bilirubin (Z,Z)";FALSE;NA
+"126";"C00486";"KEGG";FALSE;"bilirubin (E,E)*";FALSE;NA
+"127";"C00486";"KEGG";FALSE;"bilirubin (Z,Z)";FALSE;NA
+"128";"C00489";"KEGG";FALSE;"glutarate (pentanedioate)";FALSE;NA
+"129";"C00491, C01420";"C00491";FALSE;"cystine";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"130";"C00502, C05411";"C05411";TRUE;"xylonate";TRUE;"completely_incompatible_manual_with_cas"
+"131";"C00503";"KEGG";FALSE;"erythritol";FALSE;NA
+"132";"C00519";"KEGG";FALSE;"hypotaurine";FALSE;NA
+"133";"C00535";"KEGG";FALSE;"testosterone";FALSE;NA
+"134";"C00581";"KEGG";FALSE;"guanidinoacetate";FALSE;NA
+"135";"C00583, C02912";"C00583";FALSE;"1,2-propanediol";TRUE;"completely_incompatible_manual_with_cas"
+"136";"C00584";"KEGG";FALSE;"prostaglandin E2";FALSE;NA
+"137";"C00597";"KEGG";FALSE;"3-phosphoglycerate";FALSE;NA
+"138";"C00631";"KEGG";FALSE;"2-phosphoglycerate";FALSE;NA
+"139";"C00642";"KEGG";FALSE;"4-hydroxyphenylacetate";FALSE;NA
+"140";"C00669";"KEGG";FALSE;"gamma-glutamylcysteine";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"141";"C00670";"KEGG";FALSE;"glycerophosphorylcholine (GPC)";FALSE;NA
+"142";"C00671, C06008";"C00671";FALSE;"3-methyl-2-oxovalerate";FALSE;NA
+"143";"C00712";"KEGG";FALSE;"oleate (18:1n9)";FALSE;NA
+"144";"C00719";"KEGG";FALSE;"betaine";FALSE;NA
+"145";"C00735";"KEGG";FALSE;"cortisol";FALSE;NA
+"146";"C00750";"KEGG";FALSE;"spermine";FALSE;NA
+"147";"C00751";"KEGG";FALSE;"squalene";FALSE;NA
+"148";"C00762";"KEGG";FALSE;"cortisone";FALSE;NA
+"149";"C00785";"KEGG";FALSE;"trans-urocanate";FALSE;NA
+"150";"C00788";"KEGG";FALSE;"epinephrine";FALSE;NA
+"151";"C00791";"KEGG";FALSE;"creatinine";FALSE;NA
+"152";"C00794";"KEGG";FALSE;"sorbitol";FALSE;NA
+"153";"C00805";"KEGG";FALSE;"salicylate";FALSE;NA
+"154";"C00815";"KEGG";FALSE;"citramalate";FALSE;NA
+"155";"C00818";"KEGG";FALSE;"glucarate (saccharate)";FALSE;NA
+"156";"C00836";"KEGG";FALSE;"sphinganine";FALSE;NA
+"157";"C00847";"KEGG";FALSE;"pyridoxate";FALSE;NA
+"158";"C00864";"KEGG";FALSE;"pantothenate";FALSE;NA
+"159";"C00878";"KEGG";FALSE;"arabonate";FALSE;NA
+"160";"C00882";"KEGG";FALSE;"3'-dephosphocoenzyme A";FALSE;NA
+"161";"C00898";"KEGG";FALSE;"tartarate";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"162";"C00946";"KEGG";FALSE;"adenosine 2'-monophosphate (2'-AMP)";FALSE;NA
+"163";"C00954";"KEGG";FALSE;"indoleacetate";FALSE;NA
+"164";"C00956";"KEGG";FALSE;"2-aminoadipate";FALSE;NA
+"165";"C00993";"KEGG";FALSE;"alanylalanine";FALSE;NA
+"166";"C01004";"KEGG";FALSE;"trigonelline (N'-methylnicotinate)";FALSE;NA
+"167";"C01019";"KEGG";FALSE;"fucose";FALSE;NA
+"168";"C01026";"KEGG";FALSE;"dimethylglycine";FALSE;NA
+"169";"C01035";"KEGG";FALSE;"4-guanidinobutanoate";FALSE;NA
+"170";"C01040, C05410";"C01040";FALSE;"gulono-1,4-lactone";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"171";"C01042";"KEGG";FALSE;"N-acetylaspartate (NAA)";FALSE;NA
+"172";"C01046";"KEGG";FALSE;"N-methylglutamate";FALSE;NA
+"173";"C01087, C02630";"C01087, C02630";TRUE;"2-hydroxyglutarate";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"174";"C01089";"KEGG";FALSE;"3-hydroxybutyrate (BHBA)";FALSE;NA
+"175";"C01094";"KEGG";FALSE;"fructose 1-phosphate";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"176";"C01096, C02810";"C01096";FALSE;"sorbitol 6-phosphate";TRUE;"completely_incompatible_manual_with_cas"
+"177";"C01152";"KEGG";FALSE;"3-methylhistidine";FALSE;NA
+"178";"C01157";"KEGG";FALSE;"trans-4-hydroxyproline";FALSE;NA
+"179";"C01177";"KEGG";FALSE;"inositol 1-phosphate (I1P)";FALSE;NA
+"180";"C01181";"KEGG";FALSE;"deoxycarnitine";FALSE;NA
+"181";"C01233";"KEGG";FALSE;"glycerophosphoethanolamine";FALSE;NA
+"182";"C01262";"KEGG";FALSE;"anserine";FALSE;NA
+"183";"C01367";"KEGG";FALSE;"adenosine 3'-monophosphate (3'-AMP)";FALSE;NA
+"184";"C01419";"KEGG";FALSE;"cysteinylglycine";FALSE;NA
+"185";"C01425";"KEGG";FALSE;"alpha-glutamylglutamate";FALSE;NA
+"186";"C01468";"KEGG";FALSE;"p-cresol sulfate";FALSE;NA
+"187";"C01517";"KEGG";FALSE;"naproxen";FALSE;NA
+"188";"C01530";"KEGG";FALSE;"stearate (18:0)";FALSE;NA
+"189";"C01571";"KEGG";FALSE;"caprate (10:0)";FALSE;NA
+"190";"C01582";"KEGG";FALSE;"galactose";TRUE;"completely_incompatible_manual_with_cas"
+"191";"C01585";"KEGG";FALSE;"caproate (6:0)";FALSE;NA
+"192";"C01585";"KEGG";FALSE;"hexanoylcarnitine";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"193";"C01585";"KEGG";FALSE;"caproate (6:0)";FALSE;NA
+"194";"C01585";"KEGG";FALSE;"hexanoylcarnitine";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"195";"C01586";"KEGG";FALSE;"hippurate";FALSE;NA
+"196";"C01595";"KEGG";FALSE;"linoleate (18:2n6)";FALSE;NA
+"197";"C01601";"KEGG";FALSE;"pelargonate (9:0)";FALSE;NA
+"198";"C01620";"KEGG";FALSE;"threonate";FALSE;NA
+"199";"C01762";"KEGG";FALSE;"xanthosine";FALSE;NA
+"200";"C01835, C00721, C00420";"C01835";FALSE;"maltotriose";FALSE;NA
+"201";"C01835, C00721, C00420";"C00721";FALSE;"maltotriose";FALSE;NA
+"202";"C01879";"KEGG";FALSE;"5-oxoproline";FALSE;NA
+"203";"C01936";"KEGG";FALSE;"maltohexaose";FALSE;NA
+"204";"C01991, C00989";"C00989";FALSE;"4-hydroxybutyrate (GHB)";FALSE;NA
+"205";"C02037";"KEGG";FALSE;"glycylglycine";FALSE;NA
+"206";"C02043";"KEGG";FALSE;"indolelactate";FALSE;NA
+"207";"C02052, C00464";"C00464";FALSE;"maltotetraose";FALSE;NA
+"208";"C02067";"KEGG";FALSE;"pseudouridine";FALSE;NA
+"209";"C02155";"KEGG";FALSE;"glycylleucine";FALSE;NA
+"210";"C02180";"KEGG";FALSE;"phenol sulfate";FALSE;NA
+"211";"C02261";"KEGG";FALSE;"2-aminobutyrate";FALSE;NA
+"212";"C02354";"KEGG";FALSE;"cytosine-2',3'-cyclic monophosphate";TRUE;"completely_incompatible_manual_with_cas"
+"213";"C02477";"KEGG";FALSE;"alpha-tocopherol";FALSE;NA
+"214";"C02483";"KEGG";FALSE;"gamma-tocopherol";FALSE;NA
+"215";"C02494";"KEGG";FALSE;"N1-methyladenosine";FALSE;NA
+"216";"C02504";"KEGG";FALSE;"2-isopropylmalate";FALSE;NA
+"217";"C02562";"KEGG";FALSE;"N-acetylarginine";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"218";"C02571";"KEGG";FALSE;"acetylcarnitine";FALSE;NA
+"219";"C02603";"KEGG";FALSE;"methyl-alpha-glucopyranoside";TRUE;"completely_incompatible_manual_with_cas"
+"220";"C02636";"KEGG";FALSE;"3-dehydrocarnitine*";FALSE;NA
+"221";"C02642";"KEGG";FALSE;"3-ureidopropionate";FALSE;NA
+"222";"C02678";"KEGG";FALSE;"dodecanedioate";FALSE;NA
+"223";"C02679";"KEGG";FALSE;"laurate (12:0)";FALSE;NA
+"224";"C02710";"KEGG";FALSE;"N-acetylleucine";FALSE;NA
+"225";"C02712";"KEGG";FALSE;"N-acetylmethionine";FALSE;NA
+"226";"C02716";"KEGG";FALSE;"N-acetylglutamine";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"227";"C02727";"KEGG";FALSE;"N6-acetyllysine";FALSE;NA
+"228";"C02847";"KEGG";FALSE;"N-acetylalanine";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"229";"C02862";"KEGG";FALSE;"butyrylcarnitine";FALSE;NA
+"230";"C02979";"KEGG";FALSE;"glycerol 2-phosphate";FALSE;NA
+"231";"C03017";"KEGG";FALSE;"propionylcarnitine";FALSE;NA
+"232";"C03079, C05947";"C05947";FALSE;"4-hydroxyglutamate";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"233";"C03137";"KEGG";FALSE;"N-acetyltryptophan";TRUE;"completely_incompatible_manual_with_cas"
+"234";"C03150";"KEGG";FALSE;"nicotinamide riboside*";FALSE;NA
+"235";"C03242, C16522";"C03242";TRUE;"dihomo-linolenate (20:3n3 or n6)";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"236";"C03406";"KEGG";FALSE;"argininosuccinate";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"237";"C03460, C03722";"C03722";TRUE;"quinolinate";FALSE;NA
+"238";"C03519";"KEGG";FALSE;"N-acetylphenylalanine";FALSE;NA
+"239";"C03594";"KEGG";FALSE;"7-alpha-hydroxycholesterol";FALSE;NA
+"240";"C03594";"KEGG";FALSE;"7-beta-hydroxycholesterol";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"241";"C03594";"KEGG";FALSE;"7-alpha-hydroxycholesterol";FALSE;NA
+"242";"C03594";"KEGG";FALSE;"7-beta-hydroxycholesterol";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"243";"C03626";"KEGG";FALSE;"dimethylarginine (SDMA + ADMA)";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"244";"C03672";"KEGG";FALSE;"3-(4-hydroxyphenyl)lactate";FALSE;NA
+"245";"C03793";"KEGG";FALSE;"N-6-trimethyllysine";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"246";"C03794";"KEGG";FALSE;"adenylosuccinate";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"247";"C03882";"KEGG";FALSE;"piperine";FALSE;NA
+"248";"C04100";"KEGG";FALSE;"1-linoleoylglycerophosphocholine";TRUE;"completely_incompatible_manual_no_cas"
+"249";"C04148, C05597";"C04148";FALSE;"phenylacetylglutamine";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"250";"C04230";"KEGG";FALSE;"1-stearoylglycerophosphocholine";FALSE;NA
+"251";"C04230";"KEGG";FALSE;"1-heptadecanoylglycerophosphocholine";FALSE;NA
+"252";"C04230";"KEGG";FALSE;"1-stearoylglycerophosphocholine";FALSE;NA
+"253";"C04230";"KEGG";FALSE;"1-heptadecanoylglycerophosphocholine";FALSE;NA
+"254";"C04295";"KEGG";FALSE;"4-androsten-3beta,17beta-diol disulfate 1*";FALSE;NA
+"255";"C04545";"KEGG";FALSE;"N1-methylguanosine";FALSE;NA
+"256";"C04555";"KEGG";FALSE;"androsterone sulfate";TRUE;"completely_incompatible_manual_with_cas"
+"257";"C04805";"KEGG";FALSE;"5-HETE";FALSE;NA
+"258";"C05010";"KEGG";FALSE;"histidylleucine";FALSE;NA
+"259";"C05145";"KEGG";FALSE;"3-aminoisobutyrate";FALSE;NA
+"260";"C05208";"KEGG";FALSE;"1-arachidonoylglycerophosphocholine*";FALSE;NA
+"261";"C05282";"KEGG";FALSE;"gamma-glutamylglutamate";FALSE;NA
+"262";"C05283";"KEGG";FALSE;"gamma-glutamylglutamine";FALSE;NA
+"263";"C05345";"KEGG";FALSE;"fructose-6-phosphate";TRUE;"completely_incompatible_manual_with_cas"
+"264";"C05382";"KEGG";FALSE;"sedoheptulose-7-phosphate";FALSE;NA
+"265";"C05484";"KEGG";FALSE;"pregnen-diol disulfate*";FALSE;NA
+"266";"C05512";"KEGG";FALSE;"2'-deoxyinosine";FALSE;NA
+"267";"C05519";"KEGG";FALSE;"allo-threonine";FALSE;NA
+"268";"C05551";"KEGG";FALSE;"penicillin G";FALSE;NA
+"269";"C05565";"KEGG";FALSE;"hydantoin-5-propionic acid";FALSE;NA
+"270";"C05570";"KEGG";FALSE;"ergothioneine";FALSE;NA
+"271";"C05576";"KEGG";FALSE;"3,4-dihydroxyphenethyleneglycol";FALSE;NA
+"272";"C05584";"KEGG";FALSE;"vanillylmandelate (VMA)";FALSE;NA
+"273";"C05793, C05794";"C05793";TRUE;"L-urobilin";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"274";"C05822";"KEGG";FALSE;"cytidine-3'-monophosphate (3'-CMP)";FALSE;NA
+"275";"C05828";"KEGG";FALSE;"1-methylimidazoleacetate";FALSE;NA
+"276";"C05842";"KEGG";FALSE;"N1-Methyl-2-pyridone-5-carboxamide";FALSE;NA
+"277";"C05953";"KEGG";FALSE;"prostaglandin A2";FALSE;NA
+"278";"C05961";"KEGG";FALSE;"6-keto prostaglandin F1alpha";FALSE;NA
+"279";"C05984";"KEGG";FALSE;"2-hydroxybutyrate (AHB)";FALSE;NA
+"280";"C06104";"KEGG";FALSE;"adipate";FALSE;NA
+"281";"C06153";"KEGG";FALSE;"scyllo-inositol";FALSE;NA
+"282";"C06174";"KEGG";FALSE;"codeine";FALSE;NA
+"283";"C06218";"KEGG";FALSE;"maltopentaose";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"284";"C06423";"KEGG";FALSE;"caprylate (8:0)";FALSE;NA
+"285";"C06424";"KEGG";FALSE;"myristate (14:0)";FALSE;NA
+"286";"C06425";"KEGG";FALSE;"arachidate (20:0)";FALSE;NA
+"287";"C06427";"KEGG";FALSE;"linolenate [alpha or gamma, (18:3n3 or 6)]";FALSE;NA
+"288";"C06428";"KEGG";FALSE;"eicosapentaenoate (EPA, 20:5n3)";FALSE;NA
+"289";"C06429";"KEGG";FALSE;"docosapentaenoate (n6 DPA, 22:5n6)";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"290";"C06429";"KEGG";FALSE;"docosahexaenoate (DHA, 22:6n3)";FALSE;NA
+"291";"C06429";"KEGG";FALSE;"docosapentaenoate (n6 DPA, 22:5n6)";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"292";"C06429";"KEGG";FALSE;"docosahexaenoate (DHA, 22:6n3)";FALSE;NA
+"293";"C06527";"KEGG";FALSE;"quinidine";FALSE;NA
+"294";"C06804";"KEGG";FALSE;"4-acetamidophenol";FALSE;NA
+"295";"C06804";"KEGG";FALSE;"4-acetaminophen sulfate";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"296";"C06804";"KEGG";FALSE;"4-acetamidophenol";FALSE;NA
+"297";"C06804";"KEGG";FALSE;"4-acetaminophen sulfate";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"298";"C06834";"KEGG";FALSE;"lipitor";FALSE;NA
+"299";"C07041";"KEGG";FALSE;"hydrochlorothiazide";FALSE;NA
+"300";"C07073";"KEGG";FALSE;"lidocaine";FALSE;NA
+"301";"C07151";"KEGG";FALSE;"metformin";FALSE;NA
+"302";"C07187";"KEGG";FALSE;"venlafaxine";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"303";"C07202";"KEGG";FALSE;"metoprolol";FALSE;NA
+"304";"C07326";"KEGG";FALSE;"1,5-anhydroglucitol (1,5-AG)";FALSE;NA
+"305";"C07415";"KEGG";FALSE;"paroxetine";FALSE;NA
+"306";"C07480";"KEGG";FALSE;"theobromine";FALSE;NA
+"307";"C07572";"KEGG";FALSE;"citalopram";FALSE;NA
+"308";"C07588";"KEGG";FALSE;"2-hydroxyhippurate (salicylurate)";FALSE;NA
+"309";"C07589";"KEGG";FALSE;"celecoxib";FALSE;NA
+"310";"C08257";"KEGG";FALSE;"quebrachitol";FALSE;NA
+"311";"C08261";"KEGG";FALSE;"azelate (nonanedioate)";FALSE;NA
+"312";"C08283";"KEGG";FALSE;"homostachydrine*";FALSE;NA
+"313";"C08316";"KEGG";FALSE;"erucate (22:1n9)";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"314";"C08322";"KEGG";FALSE;"myristoleate (14:1n5)";FALSE;NA
+"315";"C08323";"KEGG";FALSE;"nervonate (24:1n9)";FALSE;NA
+"316";"C08362";"KEGG";FALSE;"palmitoleate (16:1n7)";FALSE;NA
+"317";"C08367";"KEGG";FALSE;"cis-vaccenate (18:1n7)";FALSE;NA
+"318";"C09213";"KEGG";FALSE;"tryptophan betaine";FALSE;NA
+"319";"C10172";"KEGG";FALSE;"stachydrine";FALSE;NA
+"320";"C11301";"KEGG";FALSE;"glycolithocholate sulfate*";FALSE;NA
+"321";"C11332";"KEGG";FALSE;"leucylleucine";FALSE;NA
+"322";"C12144";"KEGG";FALSE;"phytosphingosine";FALSE;NA
+"323";"C12270";"KEGG";FALSE;"N-acetyl-aspartyl-glutamate (NAAG)";FALSE;NA
+"324";"C12600";"KEGG";FALSE;"phenol red";TRUE;"completely_incompatible_manual_with_cas"
+"325";"C12989";"KEGG";FALSE;"N2-acetyllysine";FALSE;NA
+"326";"C13857";"KEGG";FALSE;"1-arachidonylglycerol";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"327";"C14152";"KEGG";FALSE;"beta-tocopherol";FALSE;NA
+"328";"C14732";"KEGG";FALSE;"5-oxoETE";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"329";"C16300";"KEGG";FALSE;"stearidonate (18:4n3)";FALSE;NA
+"330";"C16513";"KEGG";FALSE;"docosapentaenoate (n3 DPA 22:5n3)";TRUE;"completely_incompatible_manual_with_cas"
+"331";"C16525";"KEGG";FALSE;"dihomo-linoleate (20:2n6)";FALSE;NA
+"332";"C16526";"KEGG";FALSE;"eicosenoate (20:1n9 or 11)";FALSE;NA
+"333";"C16527";"KEGG";FALSE;"adrenate (22:4n6)";TRUE;"keeping_only_compatible_for_partially_compatible_features"
+"334";"C16533";"KEGG";FALSE;"docosadienoate (22:2n6)";TRUE;"completely_incompatible_manual_with_cas"
+"335";"C16534";"KEGG";FALSE;"docosatrienoate (22:3n3)";FALSE;NA
+"336";"C16537";"KEGG";FALSE;"pentadecanoate (15:0)";FALSE;NA
+"337";"C16884";"KEGG";FALSE;"threitol";FALSE;NA
+"338";"C17337";"KEGG";FALSE;"7-alpha-hydroxy-3-oxo-4-cholestenoate (7-Hoca)";FALSE;NA
+"339";"C17737, C00695";"C00695";TRUE;"cholate";FALSE;NA
+"340";"C18218";"KEGG";FALSE;"16-hydroxypalmitate";FALSE;NA
+"341";"C19891";"KEGG";FALSE;"chiro-inositol";FALSE;NA
+"342";"C20522";"KEGG";FALSE;"imidazole propionate";FALSE;NA
+"343";NA;NA;NA;"glycylvaline";FALSE;NA
+"344";NA;NA;NA;"1-heptadecanoylglycerophosphoethanolamine*";FALSE;NA
+"345";NA;NA;NA;"4-hydroxyhippurate";FALSE;NA
+"346";NA;NA;NA;"1-stearoylglycerophosphoethanolamine";FALSE;NA
+"347";NA;NA;NA;"tyrosylhistidine";FALSE;NA
+"348";NA;NA;NA;"guanosine 5'- monophosphate (5'-GMP)";FALSE;NA
+"349";NA;NA;NA;"tyrosylleucine";TRUE;"completely_incompatible_manual_with_cas"
+"350";NA;NA;NA;"tyrosyllysine";FALSE;NA
+"351";NA;NA;NA;"palmitoyl sphingomyelin";FALSE;NA
+"352";NA;NA;NA;"palmitoylcarnitine";FALSE;NA
+"353";NA;NA;NA;"5-methyluridine (ribothymidine)";FALSE;NA
+"354";NA;NA;NA;"undecanedioate";FALSE;NA
+"355";NA;NA;NA;"1-linoleoylglycerol (1-monolinolein)";FALSE;NA
+"356";NA;NA;NA;"1-palmitoleoylglycerophosphocholine*";FALSE;NA
+"357";NA;NA;NA;"6'-sialyllactose";FALSE;NA
+"358";NA;NA;NA;"histidylphenylalanine";FALSE;NA
+"359";NA;NA;NA;"histidyltryptophan";FALSE;NA
+"360";NA;NA;NA;"histidyltyrosine";FALSE;NA
+"361";NA;NA;NA;"choline";FALSE;NA
+"362";NA;NA;NA;"choline phosphate";FALSE;NA
+"363";NA;NA;NA;"Ac-Ser-Asp-Lys-Pro-OH";FALSE;NA
+"364";NA;NA;NA;"C-glycosyltryptophan*";FALSE;NA
+"365";NA;NA;NA;"Isobar: fructose 1,6-diphosphate, glucose 1,6-diphosphate, myo-inositol 1,4 or 1,3-diphosphate";FALSE;NA
+"366";NA;NA;NA;"phenylalanylglutamate";FALSE;NA
+"367";NA;NA;NA;"Isobar: ribulose 5-phosphate, xylulose 5-phosphate";FALSE;NA
+"368";NA;NA;NA;"10-heptadecenoate (17:1n7)";FALSE;NA
+"369";NA;NA;NA;"2-arachidonoylglycerophosphocholine*";FALSE;NA
+"370";NA;NA;NA;"phenylalanylmethionine";FALSE;NA
+"371";NA;NA;NA;"phenylalanylphenylalanine";FALSE;NA
+"372";NA;NA;NA;"phenylalanylproline";FALSE;NA
+"373";NA;NA;NA;"N-acetylasparagine";FALSE;NA
+"374";NA;NA;NA;"isobutyrylcarnitine";FALSE;NA
+"375";NA;NA;NA;"phenylalanyltyrosine";FALSE;NA
+"376";NA;NA;NA;"isoleucylalanine";FALSE;NA
+"377";NA;NA;NA;"1-linoleoylglycerophosphoethanolamine*";FALSE;NA
+"378";NA;NA;NA;"1-palmitoylglycerol (1-monopalmitin)";FALSE;NA
+"379";NA;NA;NA;"N-acetylglycine";FALSE;NA
+"380";NA;NA;NA;"N-acetylisoleucine";FALSE;NA
+"381";NA;NA;NA;"isoleucylhistidine";FALSE;NA
+"382";NA;NA;NA;"cytidine 5'-diphosphocholine";FALSE;NA
+"383";NA;NA;NA;"isoleucylmethionine";FALSE;NA
+"384";NA;NA;NA;"isoleucylphenylalanine";FALSE;NA
+"385";NA;NA;NA;"isoleucylserine";FALSE;NA
+"386";NA;NA;NA;"N-acetylserine";FALSE;NA
+"387";NA;NA;NA;"N-acetylthreonine";TRUE;"completely_incompatible_manual_no_cas"
+"388";NA;NA;NA;"isoleucylvaline";FALSE;NA
+"389";NA;NA;NA;"1-palmitoylglycerophosphocholine";FALSE;NA
+"390";NA;NA;NA;"N-acetyltyrosine";FALSE;NA
+"391";NA;NA;NA;"N-acetylvaline";FALSE;NA
+"392";NA;NA;NA;"1-arachidonoylglycerophosphoinositol*";FALSE;NA
+"393";NA;NA;NA;"2-linoleoylglycerol (2-monolinolein)";FALSE;NA
+"394";NA;NA;NA;"laurylcarnitine";TRUE;"completely_incompatible_manual_no_cas"
+"395";NA;NA;NA;"2-linoleoylglycerophosphoethanolamine*";FALSE;NA
+"396";NA;NA;NA;"N2,N2-dimethylguanosine";FALSE;NA
+"397";NA;NA;NA;"leucylarginine";FALSE;NA
+"398";NA;NA;NA;"N2-methylguanosine";FALSE;NA
+"399";NA;NA;NA;"1-myristoylglycerophosphocholine";FALSE;NA
+"400";NA;NA;NA;"1-palmitoylglycerophosphoethanolamine";FALSE;NA
+"401";NA;NA;NA;"N6-carbamoylthreonyladenosine";FALSE;NA
+"402";NA;NA;NA;"leucylhistidine";FALSE;NA
+"403";NA;NA;NA;"S-adenosylmethionine (SAM)";FALSE;NA
+"404";NA;NA;NA;"S-methylcysteine";FALSE;NA
+"405";NA;NA;NA;"VGAHAGEYGAEALER*";FALSE;NA
+"406";NA;NA;NA;"erythronate*";FALSE;NA
+"407";NA;NA;NA;"leucyltryptophan";FALSE;NA
+"408";NA;NA;NA;"leucyltyrosine";FALSE;NA
+"409";NA;NA;NA;"2-stearoylglycerophosphocholine*";FALSE;NA
+"410";NA;NA;NA;"1-myristoylglycerophosphoethanolamine";FALSE;NA
+"411";NA;NA;NA;"1-palmitoylglycerophosphoinositol*";FALSE;NA
+"412";NA;NA;NA;"valylhistidine";FALSE;NA
+"413";NA;NA;NA;"2-docosapentaenoylglycerophosphocholine*";FALSE;NA
+"414";NA;NA;NA;"1-docosahexaenoylglycerophosphocholine*";FALSE;NA
+"415";NA;NA;NA;"gabapentin";FALSE;NA
+"416";NA;NA;NA;"lysyllysine";FALSE;NA
+"417";NA;NA;NA;"lysylmethionine";FALSE;NA
+"418";NA;NA;NA;"lysyltyrosine";FALSE;NA
+"419";NA;NA;NA;"alanylglutamate";FALSE;NA
+"420";NA;NA;NA;"alanylglycine";FALSE;NA
+"421";NA;NA;NA;"1-oleoylglycerol (1-monoolein)";FALSE;NA
+"422";NA;NA;NA;"alanylisoleucine";FALSE;NA
+"423";NA;NA;NA;"alanylleucine";FALSE;NA
+"424";NA;NA;NA;"alanylmethionine";TRUE;"completely_incompatible_manual_no_cas"
+"425";NA;NA;NA;"alanylphenylalanine";FALSE;NA
+"426";NA;NA;NA;"alanylthreonine";FALSE;NA
+"427";NA;NA;NA;"alanyltryptophan";FALSE;NA
+"428";NA;NA;NA;"alanyltyrosine";FALSE;NA
+"429";NA;NA;NA;"alanylvaline";FALSE;NA
+"430";NA;NA;NA;"margarate (17:0)";FALSE;NA
+"431";NA;NA;NA;"dihydrocholesterol";FALSE;NA
+"432";NA;NA;NA;"1-oleoylglycerophosphocholine";FALSE;NA
+"433";NA;NA;NA;"alpha-glutamyltryptophan";FALSE;NA
+"434";NA;NA;NA;"alpha-glutamyltyrosine";FALSE;NA
+"435";NA;NA;NA;"alpha-hydroxyisovalerate";FALSE;NA
+"436";NA;NA;NA;"methionylasparagine";FALSE;NA
+"437";NA;NA;NA;"methionylaspartate";FALSE;NA
+"438";NA;NA;NA;"glutaroyl carnitine";FALSE;NA
+"439";NA;NA;NA;"methionylglycine";FALSE;NA
+"440";NA;NA;NA;"methionylleucine";FALSE;NA
+"441";NA;NA;NA;"methionylphenylalanine";FALSE;NA
+"442";NA;NA;NA;"valerylcarnitine";FALSE;NA
+"443";NA;NA;NA;"1-oleoylglycerophosphoethanolamine";FALSE;NA
+"444";NA;NA;NA;"methylphosphate";FALSE;NA
+"445";NA;NA;NA;"1-stearoylglycerol (1-monostearin)";FALSE;NA
+"446";NA;NA;NA;"arginylleucine";FALSE;NA
+"447";NA;NA;NA;"arginylmethionine";FALSE;NA
+"448";NA;NA;NA;"arginylphenylalanine";FALSE;NA
+"449";NA;NA;NA;"arginyltyrosine";FALSE;NA
+"450";NA;NA;NA;"arginylvaline";FALSE;NA
+"451";NA;NA;NA;"myristoylcarnitine";FALSE;NA
+"452";NA;NA;NA;"threonylvaline";FALSE;NA
+"453";NA;NA;NA;"valylisoleucine";FALSE;NA
+"454";NA;NA;NA;"glycylisoleucine";FALSE;NA
+"455";NA;NA;NA;"1-oleoylglycerophosphoinositol*";FALSE;NA
+"456";NA;NA;NA;"aspartate-glutamate";FALSE;NA
+"457";NA;NA;NA;"aspartylleucine";FALSE;NA
+"458";NA;NA;NA;"aspartylphenylalanine";FALSE;NA
+"459";NA;NA;NA;"aspartyltryptophan";FALSE;NA
+"460";NA;NA;NA;"aspartylvaline";FALSE;NA
+"461";NA;NA;NA;"atenolol";FALSE;NA
+"462";NA;NA;NA;"glycyltryptophan";TRUE;"completely_incompatible_manual_no_cas"
+"463";NA;NA;NA;"glycyltyrosine";FALSE;NA
+"464";NA;NA;NA;"oleoylcarnitine";FALSE;NA
+"465";NA;NA;NA;"ophthalmate";FALSE;NA
+"466";NA;NA;NA;"1-oleoylglycerophosphoserine";FALSE;NA
+"467";NA;NA;NA;"p-acetamidophenylglucuronide";TRUE;"completely_incompatible_manual_with_cas"
+"468";NA;NA;NA;"isoleucyltyrosine";FALSE;NA
+"469";NA;NA;NA;"pro-hydroxy-pro";FALSE;NA
+"470";NA;NA;NA;"isovalerylcarnitine";FALSE;NA
+"471";NA;NA;NA;"prolylglycine";FALSE;NA
+"472";NA;NA;NA;"tyrosylphenylalanine";FALSE;NA
+"473";NA;NA;NA;"tyrosyltyrosine";TRUE;"completely_incompatible_manual_with_cas"
+"474";NA;NA;NA;"tyrosylvaline";TRUE;"completely_incompatible_manual_with_cas"
+"475";NA;NA;NA;"2-linoleoylglycerophosphocholine*";FALSE;NA
+"476";NA;NA;NA;"catechol sulfate";TRUE;"completely_incompatible_manual_no_cas"
+"477";NA;NA;NA;"histidylmethionine";FALSE;NA
+"478";NA;NA;NA;"1-stearoylglycerophosphoinositol";FALSE;NA
+"479";NA;NA;NA;"leucylasparagine";FALSE;NA
+"480";NA;NA;NA;"leucylglutamate";TRUE;"completely_incompatible_manual_no_cas"
+"481";NA;NA;NA;"uridine monophosphate (5' or 3')";FALSE;NA
+"482";NA;NA;NA;"15-methylpalmitate (isobar with 2-methylpalmitate)";FALSE;NA
+"483";NA;NA;NA;"2-docosahexaenoylglycerophosphoethanolamine*";FALSE;NA
+"484";NA;NA;NA;"cinnamoylglycine";FALSE;NA
+"485";NA;NA;NA;"phenylalanylarginine";FALSE;NA
+"486";NA;NA;NA;"phenylalanylaspartate";FALSE;NA
+"487";NA;NA;NA;"valylaspartate";FALSE;NA
+"488";NA;NA;NA;"1-palmitoleoylglycerophosphoethanolamine*";FALSE;NA
+"489";NA;NA;NA;"phenylalanylleucine";FALSE;NA
+"490";NA;NA;NA;"valylglycine";FALSE;NA
+"491";NA;NA;NA;"2-stearoylglycerophosphoethanolamine*";FALSE;NA
+"492";NA;NA;NA;"threonylphenylalanine";TRUE;"completely_incompatible_manual_no_cas"
+"493";NA;NA;NA;"pregnanediol-3-glucuronide";FALSE;NA
+"494";NA;NA;NA;"phenylalanylserine";FALSE;NA
+"495";NA;NA;NA;"phenylalanyltryptophan";FALSE;NA
+"496";NA;NA;NA;"valylmethionine";FALSE;NA
+"497";NA;NA;NA;"phenylalanylvaline";FALSE;NA
+"498";NA;NA;NA;"isoleucylarginine";FALSE;NA
+"499";NA;NA;NA;"isoleucylglutamate";FALSE;NA
+"500";NA;NA;NA;"10-nonadecenoate (19:1n9)";FALSE;NA
+"501";NA;NA;NA;"isoleucylglycine";FALSE;NA
+"502";NA;NA;NA;"2-hydroxyisobutyrate";FALSE;NA
+"503";NA;NA;NA;"isoleucylisoleucine";FALSE;NA
+"504";NA;NA;NA;"gamma-glutamylleucine";FALSE;NA
+"505";NA;NA;NA;"pivaloylcarnitine";FALSE;NA
+"506";NA;NA;NA;"methionylglutamate";FALSE;NA
+"507";NA;NA;NA;"isoleucyltryptophan";FALSE;NA
+"508";NA;NA;NA;"tyrosylglycine";FALSE;NA
+"509";NA;NA;NA;"2-oleoylglycerophosphocholine*";FALSE;NA
+"510";NA;NA;NA;"2-oleoylglycerophosphoethanolamine*";FALSE;NA
+"511";NA;NA;NA;"methylglutaroylcarnitine";FALSE;NA
+"512";NA;NA;NA;"2-docosahexaenoylglycerophosphocholine*";FALSE;NA
+"513";NA;NA;NA;"prolylmethionine";TRUE;"completely_incompatible_manual_with_cas"
+"514";NA;NA;NA;"1-pentadecanoylglycerophosphocholine*";FALSE;NA
+"515";NA;NA;NA;"stearoylcarnitine";FALSE;NA
+"516";NA;NA;NA;"glutamate, gamma-methyl ester";FALSE;NA
+"517";NA;NA;NA;"leucylalanine";FALSE;NA
+"518";NA;NA;NA;"2-methylbutyroylcarnitine";FALSE;NA
+"519";NA;NA;NA;"gamma-glutamylphenylalanine";FALSE;NA
+"520";NA;NA;NA;"2-myristoylglycerophosphocholine*";FALSE;NA
+"521";NA;NA;NA;"leucylglycine";FALSE;NA
+"522";NA;NA;NA;"valylleucine";FALSE;NA
+"523";NA;NA;NA;"lysylleucine";FALSE;NA
+"524";NA;NA;NA;"3-(cystein-S-yl)acetaminophen*";FALSE;NA
+"525";NA;NA;NA;"leucylmethionine";FALSE;NA
+"526";NA;NA;NA;"leucylphenylalanine";FALSE;NA
+"527";NA;NA;NA;"leucylserine";FALSE;NA
+"528";NA;NA;NA;"2-palmitoylglycerophosphoethanolamine*";FALSE;NA
+"529";NA;NA;NA;"threonylleucine";FALSE;NA
+"530";NA;NA;NA;"threonylmethionine";FALSE;NA
+"531";NA;NA;NA;"glycocholenate sulfate*";FALSE;NA
+"532";NA;NA;NA;"2-methoxyacetaminophen sulfate*";FALSE;NA
+"533";NA;NA;NA;"gamma-glutamylvaline";FALSE;NA
+"534";NA;NA;NA;"tyrosylglutamine";FALSE;NA
+"535";NA;NA;NA;"pyroglutamine*";FALSE;NA
+"536";NA;NA;NA;"2-oleoylglycerol (2-monoolein)";FALSE;NA
+"537";NA;NA;NA;"valyllysine";FALSE;NA
+"538";NA;NA;NA;"glycyllysine";FALSE;NA
+"539";NA;NA;NA;"serylisoleucine*";FALSE;NA
+"540";NA;NA;NA;"serylleucine";FALSE;NA
+"541";NA;NA;NA;"malonylcarnitine";FALSE;NA
+"542";NA;NA;NA;"gamma-glutamylisoleucine*";FALSE;NA
+"543";NA;NA;NA;"1-palmitoylplasmenylethanolamine*";FALSE;NA
+"544";NA;NA;NA;"tryptophylleucine";FALSE;NA
+"545";NA;NA;NA;"3-hydroxyhippurate";FALSE;NA
+"546";NA;NA;NA;"2'-deoxyadenosine 3'-monophosphate";FALSE;NA
+"547";NA;NA;NA;"succinylcarnitine";FALSE;NA
+"548";NA;NA;NA;"2-docosapentaenoylglycerophosphoethanolamine*";FALSE;NA
+"549";NA;NA;NA;"3-indoxyl sulfate";FALSE;NA
+"550";NA;NA;NA;"2-hydroxypalmitate";FALSE;NA
+"551";NA;NA;NA;"2-oleoylglycerophosphoserine*";FALSE;NA
+"552";NA;NA;NA;"13-HODE + 9-HODE";FALSE;NA
+"553";NA;NA;NA;"valylarginine";FALSE;NA
+"554";NA;NA;NA;"2'-deoxycytidine 3'-monophosphate";FALSE;NA
+"555";NA;NA;NA;"methionylalanine";FALSE;NA
+"556";NA;NA;NA;"phenylalanylglycine";FALSE;NA
+"557";NA;NA;NA;"2-eicosatrienoylglycerophosphocholine*";FALSE;NA
+"558";NA;NA;NA;"3-hydroxyoctanoate";FALSE;NA
+"559";NA;NA;NA;"streptomycin";FALSE;NA
+"560";NA;NA;NA;"tyrosylalanine";TRUE;"completely_incompatible_manual_with_cas"
+"561";NA;NA;NA;"1-arachidonoylglycerophosphoethanolamine*";FALSE;NA
+"562";NA;NA;NA;"glycylmethionine";FALSE;NA
+"563";NA;NA;NA;"threonylglutamate";FALSE;NA
+"564";NA;NA;NA;"triethyleneglycol";FALSE;NA
+"565";NA;NA;NA;"phenylalanylalanine";FALSE;NA
+"566";NA;NA;NA;"valylglutamine";FALSE;NA
+"567";NA;NA;NA;"valylglutamate";FALSE;NA
+"568";NA;NA;NA;"metoprolol acid metabolite*";FALSE;NA
+"569";NA;NA;NA;"glycylthreonine";FALSE;NA
+"570";NA;NA;NA;"tryptophylasparagine";FALSE;NA
+"571";NA;NA;NA;"octanoylcarnitine";FALSE;NA
+"572";NA;NA;NA;"tryptophylglutamate";FALSE;NA
+"573";NA;NA;NA;"3-hydroxydecanoate";FALSE;NA
+"574";NA;NA;NA;"valylphenylalanine";FALSE;NA
+"575";NA;NA;NA;"3-(N-acetyl-L-cystein-S-yl) acetaminophen*";FALSE;NA
+"576";NA;NA;NA;"glycylphenylalanine";TRUE;"completely_incompatible_manual_with_cas"
+"577";NA;NA;NA;"glycylproline";FALSE;NA
+"578";NA;NA;NA;"ranitidine";FALSE;NA
+"579";NA;NA;NA;"valyltyrosine";FALSE;NA
+"580";NA;NA;NA;"serylvaline";FALSE;NA
+"581";NA;NA;NA;"nicotinate adenine dinucleotide (NAAD+)";FALSE;NA
+"582";NA;NA;NA;"valylvaline";FALSE;NA
+"583";NA;NA;NA;"valyltryptophan";FALSE;NA
+"584";NA;NA;NA;"2-ethylhexanoate";FALSE;NA
+"585";NA;NA;NA;"2-palmitoleoylglycerophosphocholine*";FALSE;NA
+"586";NA;NA;NA;"2-palmitoylglycerol (2-monopalmitin)";FALSE;NA
+"587";NA;NA;NA;"3-carboxy-4-methyl-5-propyl-2-furanpropanoate (CMPF)";FALSE;NA
+"588";NA;NA;NA;"2-palmitoylglycerophosphocholine*";FALSE;NA
+"589";NA;NA;NA;"valylserine";FALSE;NA
+"590";NA;NA;NA;"valylalanine";FALSE;NA
+"591";NA;NA;NA;"2-arachidonoylglycerophosphoethanolamine*";FALSE;NA
+"592";NA;NA;NA;"serylphenyalanine";FALSE;NA
+"593";NA;NA;NA;"2-hydroxyacetaminophen sulfate*";FALSE;NA
