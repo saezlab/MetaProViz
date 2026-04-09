@@ -103,7 +103,10 @@ Result from Fig2_FeatureMetadata, which include the feature metadata table with 
 Tissue_MetaData_Extended_cleaned <- 
     read.csv2(
         "MetaProViz_Results/PK/End_Result_Fig2/Tissue_MetaData_Extended_cleaned.csv"
-    )
+    ) %>%
+    select(
+        -X
+    ) 
 
 ```
 
@@ -119,15 +122,28 @@ Extended_Data_Table_1 <- read_xlsx_all(
 # names(Extended_Data_Table_1)
 DMA_TUMOR_vs_NORMAL_Old <- Extended_Data_Table_1$"DMA_TUMOR_vs_NORMAL_Old"
 DMA_TUMOR_vs_NORMAL_Young <- Extended_Data_Table_1$"DMA_TUMOR_vs_NORMAL_Young"
-MCA2Cond_Old_Young <- Extended_Data_Table_1$"MCA2Cond_Old-Young"
+
+
+# Some metabolite names in the Extended Data Table 1 contain semicolons, while they are substituted by commas in the Tissue_MetaData_Extended_cleaned
+# change semicolons in Metabolite column to commas
+
+DMA_TUMOR_vs_NORMAL_Old <- DMA_TUMOR_vs_NORMAL_Old %>%
+  mutate(
+      Metabolite = gsub(";", ",", Metabolite)
+  )
+
+DMA_TUMOR_vs_NORMAL_Young <- DMA_TUMOR_vs_NORMAL_Young %>%
+  mutate(
+      Metabolite = gsub(";", ",", Metabolite)
+  )
+
+Tissue_MetaData_Extended_cleaned[Tissue_MetaData_Extended_cleaned$Metabolite == "docosapentaenoate (n3 DPA 22:5n3)", "Metabolite"] <- "docosapentaenoate (n3 DPA, 22:5n3)"
+
 ```
 
 
 
 # Pathway enrichment
-@Jannik: This needs to be rerun --> new sheet 11 and 12
-Below is the previously used code:
-
 
 Next, we perform Over Representation Analysis (`ORA`) using KEGG pathways for each comparison.\
 ```{r, warning=FALSE}
@@ -139,81 +155,169 @@ KEGG_Pathways <- MetaProViz::metsigdb_kegg()
 ## manually clean up KEGG_Pathways with the few instances we saw in Fig2 during checkmatch_pk_to_data
 ## to-do @Jannik
 
+KEGG_Pathways_clean <- 
+    KEGG_Pathways %>%
+    filter(
+        !(MetaboliteID == "C01087" & term == "Metabolic pathways"),  # Remove (R)-2-Hydroxyglutarate (C01087) from KEGG pathway "Metabolic Pathways"
+        !(MetaboliteID == "C00668" & term %in% c(    # C00092, C00668: remove C00668 from Pathways which contain both of them
+            "Metabolic pathways",
+            "Biosynthesis of secondary metabolites"
+        ))
+    )
+
+
+
 
 # continue
-# comparison = "Old"
+# comparison = "Young"
 for(comparison in c("Old", "Young")){
+  
+  df_selected <- 
+    if (comparison == "Old") {
+        DMA_TUMOR_vs_NORMAL_Old
+    } else if (comparison == "Young") {
+        DMA_TUMOR_vs_NORMAL_Young
+    } else {
+        stop("Invalid comparison value")
+    }
   
   dma_res <- merge(
       x = Tissue_MetaData_Extended_cleaned,
-      y = case_when(
-              comparison == "Old" ~ DMA_TUMOR_vs_NORMAL_Old,
-              comparison == "Young" ~ DMA_TUMOR_vs_NORMAL_Young
-          ),
+      y = df_selected,
       by = "Metabolite",
       all = TRUE
   )
   
+  
+  #@Jannik:
+  # 1. Long DF --> Columns KEGG IDs, Log2FC, pval, tval, padj. --> duplicate based on mutliple KEGG IDS --> duplicated Log2fc etc.
+  # 2. For duplicated KEGG IDs --> keep higher absolute Log2FC
+  # 3. --> KEGG IDs as col names --> input for DMA
+  
+  
   # Ensure unique IDs and full background --> we include measured features that do not have a KEGG ID.
-  dma_res <- 
-      dma_res[,c(3,21:25)] %>%
-      mutate(  # remove duplications and keep the higher Log2FC measurement
-          InputID_select = if_else(
-              is.na(InputID_select),
-              paste0("NA_", cumsum(is.na(InputID_select))),
-              InputID_select
+  dma_res_clean <- 
+      dma_res %>%
+          select(
+              Metabolite,
+              KEGG,
+              InputID_select,
+              Log2FC,
+              t.val,
+              p.val,
+              p.adj
+          ) %>%
+          mutate(  # make one KEGG column from "KEGG" and "InputID_select"
+              KEGG = case_when(
+                  InputID_select == "KEGG" ~ KEGG,
+                  .default = InputID_select
               )
-      ) %>%
-      group_by(
-          InputID_select
-      ) %>%
-      slice_max(
-          order_by = Log2FC, n = 1, with_ties = FALSE
-      ) %>%
-      ungroup() %>%
-      remove_rownames() %>%
-      tibble::column_to_rownames(
-          "InputID_select"
-      )
+          ) %>%
+          select(
+              - InputID_select
+          ) %>%
+          mutate(  # mark original rows
+              .row_id = row_number()
+          ) %>%
+          separate_rows(  # make long-format for cases with two KEGG IDs
+              KEGG,
+              sep = ",\\s*"
+          ) %>%
+          
+          group_by( # create index per original row
+              .row_id
+          ) %>%
+          mutate(
+            .dup_index = row_number(),
+            .n = n()
+          ) %>%
+          ungroup() %>%
+          mutate(   #  only add suffix if there was splitting (n > 1)
+              Metabolite = if_else(
+                  .n > 1,
+                  paste0(Metabolite, "_", .dup_index),
+                  Metabolite
+              )
+          ) %>%
+          mutate( 
+              KEGG = if_else(
+                  is.na(KEGG),
+                  paste0("NA_", cumsum(is.na(KEGG))),
+                  KEGG
+              )
+          ) %>%
+          group_by(   
+              KEGG
+          ) %>%
+          slice_max(    # For duplicated KEGG IDs --> keep higher absolute Log2FC
+              order_by = Log2FC, n = 1, with_ties = FALSE
+          ) %>%
+          ungroup() %>%
+          column_to_rownames(
+              "KEGG"
+          ) %>%
+          rename(
+              Metabolite_Name = Metabolite
+          ) %>%
+          select(
+              - ".row_id",
+              - ".dup_index",
+              - ".n"
+          )
   
   
   #Perform ORA
   set.seed(100)
-  Res <- MetaProViz::standard_ora(data = dma_res, #Input data requirements: column `t.val` and column `Metabolite`
-                                 metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "MetaboliteID"),
-                                 input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
-                                 pathway_name=paste0("KEGG_", comparison, sep=""),
-                                 min_gssize=3,
-                                 max_gssize=1000,
-                                 cutoff_stat=0.01,
-                                 cutoff_percentage=10)
+  Res <- MetaProViz::standard_ora(
+      data = dma_res_clean,    # Input data requirements: column `t.val` and column `Metabolite`
+      metadata_info = c(
+          pvalColumn = "p.adj",
+          percentageColumn = "t.val",
+          PathwayTerm = "term",
+          PathwayFeature = "MetaboliteID"
+      ),
+      input_pathway = KEGG_Pathways_clean,  # Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using MetaProViz::Load_KEGG()
+      pathway_name = paste0("KEGG_", comparison, sep=""),
+      min_gssize = 3,
+      max_gssize = 1000,
+      cutoff_stat = 0.01,
+      cutoff_percentage = 10
+  )
 
   DM_ORA_res[[comparison]] <- Res
 
   #Select to plot:
-  Res_Select <- Res[["ClusterGosummary"]]%>%
-    filter(p.adjust<0.1)%>%
+  Res_Select <- Res[["ClusterGosummary"]] %>%
+    filter(p.adjust < 0.1)%>%
     #filter(pvalue<0.05)%>%
-    filter(percentage_of_Pathway_detected>10)
+    filter(percentage_of_Pathway_detected > 10)
 
-  if(is.null(Res_Select)==FALSE){
-      MetaProViz::viz_volcano(plot_types="PEA",
-                       data= dma_res, #Must be the data you have used as an input for the pathway analysis
-                       data2=as.data.frame(Res_Select)%>%dplyr::rename("term"="ID"),
-                       metadata_info= c(PEA_Pathway="term",# Needs to be the same in both, metadata_feature and data2.
-                                       PEA_stat="p.adjust",#Column data2
-                                       PEA_score="GeneRatio",#Column data2
-                                       PEA_Feature="MetaboliteID"),# Column metadata_feature (needs to be the same as row names in data)
-                       metadata_feature= KEGG_Pathways,#Must be the pathways used for pathway analysis
-                       plot_name= paste("KEGG_", comparison, sep=""),
-                       select_label = NULL,
-                       subtitle= "PEA" )
+  if(!is.null(Res_Select)){
+      MetaProViz::viz_volcano(
+          plot_types = "PEA",
+          data = dma_res_clean, # Must be the data you have used as an input for the pathway analysis
+          data2 = as.data.frame(Res_Select) %>% dplyr::rename("term"="ID"),
+          metadata_info = c(
+              PEA_Pathway = "term",# Needs to be the same in both, metadata_feature and data2.
+              PEA_stat = "p.adjust",#Column data2
+              PEA_score = "GeneRatio",#Column data2
+              PEA_Feature = "MetaboliteID"
+          ), # Column metadata_feature (needs to be the same as row names in data)
+          metadata_feature = KEGG_Pathways,#Must be the pathways used for pathway analysis
+          plot_name = paste("KEGG_", comparison, sep = ""),
+          select_label = NULL,
+          subtitle = "PEA" 
+      )
   }
 }
 ```
 
 ## Use the results to showcase networks
 @Jannik here would be cluster_pk
+
+```{r}
+
+```
 
 
 # Save new Extended Data Table

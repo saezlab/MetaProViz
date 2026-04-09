@@ -2577,7 +2577,27 @@ ccRCC_to_KEGGPathways <- MetaProViz::checkmatch_pk_to_data(data = Tissue_MetaDat
 ccRCC_to_KEGGPathways_data_summary <- ccRCC_to_KEGGPathways$data_summary
 ccRCC_to_KEGGPathways_GroupingVariable_summary <- ccRCC_to_KEGGPathways$GroupingVariable_summary
 
-problems_terms <- ccRCC_to_KEGGPathways[["GroupingVariable_summary"]] %>%
+
+# There are some different features which share the same and ONLY KEGG ID.
+# Take Tissue_MetaData_Extended KEGG and Metabolite columns, left_join the 
+# ccRCC_to_KEGGPathways_data_summary results on there
+
+
+# merge the Metabolite name back into data_summary, because it was lost during checkmatch_pk_to_data
+ccRCC_to_KEGGPathways_data_summary <- 
+    Tissue_MetaData_Extended %>%
+        select(
+            Metabolite,
+            KEGG,
+            manual_correction,
+            correction_tbl
+        ) %>%
+        left_join(
+            ccRCC_to_KEGGPathways_data_summary,
+            by = "KEGG"
+        )
+
+problems_terms <- ccRCC_to_KEGGPathways_GroupingVariable_summary %>%
   filter(!Group_Conflict_Notes== "None")
 ```
 
@@ -2590,7 +2610,7 @@ problems_terms[,c("KEGG", "original_count", "matches_count", "MetaboliteID", "te
 Dependent on the biological question and the organism and prior knowledge, one can either maintain the metabolite ID of the more likely metabolite (e.g. in human its more likely that we have L-aminoacid than D-aminoacid) or the metabolite ID that is represented in more/less pathways (specificity). If we are looking into the cases where we do have multiple IDs, for cases with no match to the prior knowledge we can just maintain one ID, whilst for cases with exactly one match we should maintain the ID that is found in the prior knowledge. 
 ```{r}
 # Select the cases where a feature has multiple IDs
-multipleIDs <- ccRCC_to_KEGGPathways[["data_summary"]]%>%
+multipleIDs <- ccRCC_to_KEGGPathways_data_summary %>%
   filter(original_count>1)
 ```
 
@@ -2602,17 +2622,18 @@ multipleIDs[,c("KEGG","InputID_select", "original_count", "matches_count", "matc
 \
 In case of `ActionRequired=="Check"`, we can look into the column `Action_Specific` which contains additional information. In case of the entry `KeepEachID`, multiple matches to the prior knowledge were found, yet the features are in different pathways (=GroupingVariable). Yet, in case of `KeepOneID`, the different IDs map to the same pathway in the prior knowledge for at least one case and therefore keeping both would inflate the enrichment analysis.\
 ```{r}
-SelectedIDs <- ccRCC_to_KEGGPathways[["data_summary"]]%>%
+SelectedIDs <- ccRCC_to_KEGGPathways_data_summary %>%
   #Expand rows where Action == KeepEachID by splitting `matches`
-  dplyr::mutate(matches_split = if_else(Action_Specific == "KeepEachID", matches, NA_character_)) %>%
-  separate_rows(matches_split, sep = ",\\s*") %>%
-  mutate(InputID_select = if_else(Action_Specific  == "KeepEachID", matches_split, InputID_select)) %>%
-  select(-matches_split) %>%
-  left_join(      # add the manual_correction and correction_tbl columns
-      Tissue_MetaData_Extended %>%
-          dplyr::select(KEGG, manual_correction, correction_tbl),
-      by = "KEGG"
+  mutate(matches_split = if_else(Action_Specific == "KeepEachID", matches, NA_character_)) %>%
+  # separate_rows(matches_split, sep = ",\\s*") %>%
+  mutate(
+      InputID_select = if_else(
+          Action_Specific  == "KeepEachID", 
+          matches_split, 
+          InputID_select
+      )
   ) %>%
+  select(-matches_split) %>%
   mutate(  # remember IDs before to compare at the end of this pipe chain
       InputID_before = InputID_select
   ) %>%
@@ -2643,12 +2664,13 @@ SelectedIDs <- ccRCC_to_KEGGPathways[["data_summary"]]%>%
   select(  ## remove temp column
       -InputID_before
   )
+  
 
 ## We identified that in some cases in our data, there are two MetaboliteIDs with e.g. stereochemical differences but they map to multiple pathways. 
 ## Therefore, we are going to remember them here and later remove them from the Pathway PK
 
 # Remove (R)-2-Hydroxyglutarate (C01087) from KEGG pathway "Metabolic Pathways"
-# C00092, C00668: remove one of both IDs from Pathways which contain both of them
+# C00092, C00668: remove C00668 from Pathways which contain both of them
 
 ```
 \
@@ -2657,10 +2679,13 @@ Lastly, we need to add the column including our selected IDs to the metadata tab
 Tissue_MetaData_Extended_cleaned <- 
   merge(
     x = SelectedIDs %>% 
-        select(KEGG, InputID_select, corrected_during_checkmatch),
+        select(Metabolite, InputID_select, corrected_during_checkmatch),
     y = Tissue_MetaData_Extended,
-    by = "KEGG",
+    by = "Metabolite",
     all.y = TRUE
+  ) %>%
+  select(
+      Metabolite, KEGG, InputID_select, manual_correction, correction_tbl, corrected_during_checkmatch
   )
 
 
