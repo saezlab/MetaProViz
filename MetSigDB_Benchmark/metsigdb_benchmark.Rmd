@@ -735,7 +735,7 @@ p_resource_footprint_stacked <- ggplot(
   geom_col(
     position = "stack",
     width = 0.8,
-    color = "grey35"
+    color = NA
   ) +
   geom_text(
     aes(
@@ -775,7 +775,7 @@ resource_footprint_stacked_totals <- resource_footprint_plot_data %>%
   dplyr::summarise(TotalValue = sum(Value), .groups = "drop")
 
 p_resource_footprint_stacked_split <- p_resource_footprint_stacked +
-  ggbreak::scale_y_break(c(1500, 30000), scales = 25 / 70, space = 1) +
+  ggbreak::scale_y_break(c(30000, 100000), scales = 10 / 85, space = 1) +
   labs(title = "Stacked Resource Footprint Across Terms, Targets, and Interactions (Y-axis split)")
 
 # Same footprint plot with a y-axis break to improve visibility of lower bars.
@@ -788,7 +788,7 @@ p_resource_footprint_split <- ggplot(resource_footprint_plot_data, aes(x = Resou
     size = 2.6
   ) +
   facet_wrap(~Metric, scales = "free_y") +
-  ggbreak::scale_y_break(c(4000, 14000), scales = 25 / 70, space = 1) +
+  ggbreak::scale_y_break(c(25000, 120000), scales = 10 / 85, space = 1) +
   scale_fill_manual(values = interaction_type_colors, drop = FALSE) +
   labs(
     title = "Resource Footprint Across Terms, Targets, and Interactions (Y-axis split)",
@@ -809,7 +809,7 @@ make_resource_footprint_split_single <- function(metric_name, break_start, break
       vjust = -0.15,
       size = 2.6
     ) +
-    ggbreak::scale_y_break(c(break_start, break_end), scales = 25 / 70, space = 1) +
+    ggbreak::scale_y_break(c(break_start, break_end), scales = 10 / 85, space = 1) +
     scale_fill_manual(values = interaction_type_colors, drop = FALSE) +
     labs(
       title = paste0(metric_name, " by Resource (Y-axis split)"),
