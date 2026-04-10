@@ -1,0 +1,1098 @@
+---
+title: "MetSigDB benchmark (v4)"
+author:
+  - name: Jannik Franken
+    affiliation:
+    - Heidelberg University
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    number_sections: true
+    df_print: paged
+bibliography: metsigdb_resources.bib
+link-citations: true
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE,
+  message = FALSE,
+  warning = FALSE
+)
+```
+
+# Purpose
+
+This benchmark summarizes size, structure, and hub entities across MetSigDB prior-knowledge resources, including KEGG [@kanehisa2017kegg], Reactome [@milacic2024reactome], WikiPathways [@agrawal2024wikipathways], ClassyFire [@djoumbou2016classyfire], MetaLinksDB [@farr2024metalinksdb], and MACdb [@sun2023macdb], plus the merged `make_gene_metab_set()` resource.
+
+ID harmonization and mapping infrastructure used by the resource functions are informed by RaMP-DB 2.0 [@braisted2023rampdb] and OmnipathR-integrated knowledge workflows [@turei2021omnipathr].
+
+This version also benchmarks the effect of metabolite exclusion (`exclude_metabolites`) and then runs the full benchmark with exclusion enabled by default.
+
+# Libraries and package loading
+
+```{r libraries}
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(tidyr)
+  library(purrr)
+  library(tibble)
+  library(knitr)
+  library(ggplot2)
+  library(scales)
+  library(openxlsx)
+  library(svglite)
+  library(ggbreak)
+  library(ggpattern)
+})
+
+if (!exists("metsigdb_kegg", mode = "function")) {
+  if (requireNamespace("MetaProViz", quietly = TRUE)) {
+    suppressPackageStartupMessages(library(MetaProViz))
+  } else {
+    stop(
+      "Function `metsigdb_kegg` is unavailable and package `MetaProViz` is not installed. ",
+      "Install MetaProViz or load the required functions before knitting."
+    )
+  }
+}
+
+if (!requireNamespace("ggbreak", quietly = TRUE)) {
+  stop("Package `ggbreak` is required for the split y-axis footprint plot. Please install it first.")
+}
+
+if (!requireNamespace("ggpattern", quietly = TRUE)) {
+  stop("Package `ggpattern` is required for the patterned stacked footprint plot. Please install it first.")
+}
+```
+
+# Benchmark implementation (v4)
+
+```{r benchmark-implementation}
+#Establish needed functions:
+metsigdb_groups <- function() {
+  tibble::tribble(
+    ~resource,                  ~group,
+    "metsigdb_kegg",            "Pathway resources",
+    "metsigdb_reactome",        "Pathway resources",
+    "metsigdb_wikipathways",    "Pathway resources",
+    "metsigdb_chemicalclass",   "Annotation resources",
+    "metsigdb_metalinks",       "Interaction resources",
+    "metsigdb_metalinks__other_protein_metabolite", "Interaction resources",
+    "metsigdb_metalinks__transporter_metabolite",   "Interaction resources",
+    "metsigdb_metalinks__receptor_metabolite",      "Interaction resources",
+    "metsigdb_metalinks__enzyme_metabolite",        "Interaction resources",
+    "metsigdb_macdb",                                 "Cancer association resources",
+    #"make_gene_metab_set_merged","Derived pathway resources"
+    "metsigdb_hallmarks", "Derived pathway resources",
+    "metsigdb_gaude_pathways", "Derived pathway resources"
+  )
+}
+
+expand_metalinks_resources <- function(df) {
+  df <- tibble::as_tibble(df)
+  family_col <- "interaction_family"
+  allowed_families <- c(
+    "Other protein-metabolite",
+    "Transporter-metabolite",
+    "Receptor-metabolite",
+    "Enzyme-metabolite"
+  )
+
+  if (!family_col %in% names(df)) {
+    stop("`metsigdb_metalinks` output must contain `interaction_family`.")
+  }
+
+  unknown <- unique(df[[family_col]][!df[[family_col]] %in% allowed_families])
+  unknown <- unknown[!is.na(unknown)]
+  if (length(unknown) > 0L || any(is.na(df[[family_col]]))) {
+    stop(
+      "`interaction_family` contains missing or unexpected values. Allowed values are: ",
+      paste(allowed_families, collapse = ", ")
+    )
+  }
+
+  list(
+    metsigdb_metalinks = df,
+    metsigdb_metalinks__other_protein_metabolite =
+      dplyr::filter(df, interaction_family == "Other protein-metabolite"),
+    metsigdb_metalinks__transporter_metabolite =
+      dplyr::filter(df, interaction_family == "Transporter-metabolite"),
+    metsigdb_metalinks__receptor_metabolite =
+      dplyr::filter(df, interaction_family == "Receptor-metabolite"),
+    metsigdb_metalinks__enzyme_metabolite =
+      dplyr::filter(df, interaction_family == "Enzyme-metabolite")
+  )
+}
+
+fetch_metsigdb_hallmarks <- function(exclude_metabolites = "all") {
+  data("hallmarks", package = "MetaProViz")
+
+  make_gene_metab_set(
+    input_pk = hallmarks,
+    metadata_info = c(Target = "gene"),
+    pk_name = "hallmarks",
+    save_table = NULL,
+    exclude_metabolites = exclude_metabolites
+  )$GeneMetabSet %>%
+    mutate(
+      gene_metab_source = "hallmarks",
+      interaction_type = if_else(grepl("^HMDB", feature), "pathway-metabolite", "pathway-metabolic_enzyme")
+    )
+}
+
+fetch_metsigdb_gaude_pathways <- function(exclude_metabolites = "all") {
+  data("gaude_pathways", package = "MetaProViz")
+
+  make_gene_metab_set(
+    input_pk = gaude_pathways,
+    metadata_info = c(Target = "gene"),
+    pk_name = "gaude_pathways",
+    save_table = NULL,
+    exclude_metabolites = exclude_metabolites
+  )$GeneMetabSet %>%
+    mutate(
+      gene_metab_source = "gaude_pathways",
+      interaction_type = if_else(grepl("^HMDB", feature), "pathway-metabolite", "pathway-metabolic_enzyme")
+    )
+}
+
+fetch_wikipathways_from_csv <- function(exclude_metabolites = "all") {
+  csv_file <- if (is.null(exclude_metabolites)) {
+    "wikipathways_all_species_long.csv"
+  } else {
+    "wikipathways_all_species_excluded_long.csv"
+  }
+
+  if (!file.exists(csv_file)) {
+    stop("WikiPathways CSV not found: ", csv_file)
+  }
+
+  wp <- utils::read.csv(csv_file, stringsAsFactors = FALSE) %>%
+    tibble::as_tibble()
+
+  required_base <- c("pathway_id", "pathway_name")
+  missing_base <- setdiff(required_base, names(wp))
+  if (length(missing_base) > 0L) {
+    stop(
+      "WikiPathways CSV is missing required columns: ",
+      paste(missing_base, collapse = ", ")
+    )
+  }
+
+  if ("metabolite_id" %in% names(wp)) {
+    wp_long <- wp
+  } else if ("metabolites" %in% names(wp)) {
+    wp_long <- wp %>%
+      tidyr::separate_rows(metabolites, sep = ";\\s*") %>%
+      dplyr::mutate(metabolites = trimws(metabolites)) %>%
+      dplyr::rename(metabolite_id = metabolites)
+  } else {
+    stop("WikiPathways CSV must contain either `metabolite_id` or `metabolites`.")
+  }
+
+  wp_long %>%
+    dplyr::filter(!is.na(metabolite_id), metabolite_id != "")
+}
+
+normalize_wikipathways_id_columns <- function(raw_id) {
+  id <- as.character(raw_id)
+
+  chebi <- dplyr::if_else(
+    grepl("^CHEBI[:_][0-9]+$", id, ignore.case = TRUE),
+    paste0("CHEBI:", sub("(?i)^CHEBI[:_]([0-9]+)$", "\\1", id, perl = TRUE)),
+    NA_character_
+  )
+
+  pubchem <- dplyr::case_when(
+    grepl("^CID[0-9]+$", id, ignore.case = TRUE) ~ sub("(?i)^CID", "", id, perl = TRUE),
+    grepl("^PUBCHEM(?:\\.COMPOUND)?[:_][0-9]+$", id, ignore.case = TRUE) ~
+      sub("(?i)^PUBCHEM(?:\\.COMPOUND)?[:_]([0-9]+)$", "\\1", id, perl = TRUE),
+    TRUE ~ NA_character_
+  )
+
+  hmdb <- dplyr::if_else(grepl("^HMDB[0-9]+$", id, ignore.case = TRUE), id, NA_character_)
+
+  tibble::tibble(metabolite_id = hmdb, chebi_id = chebi, pubchem = pubchem)
+}
+
+standardise_metsigdb <- function(df, resource, groups_tbl) {
+  df <- tibble::as_tibble(df)
+
+  if (resource == "metsigdb_chemicalclass") {
+    return(df %>% transmute(
+      resource = resource,
+      group = "Annotation resources",
+      term_id = as.character(ClassyFire_class),
+      term_name = as.character(ClassyFire_class),
+      target_id = as.character(class_source_id),
+      target_type = "metabolite",
+      metabolite_id = as.character(class_source_id),
+      chebi_id = NA_character_,
+      pubchem = NA_character_,
+      metabolite_name = as.character(common_name),
+      source_dataset = NA_character_
+    ))
+  }
+
+  if (resource == "metsigdb_kegg") {
+    return(df %>% transmute(
+      resource = resource,
+      group = "Pathway resources",
+      term_id = as.character(Description),
+      term_name = as.character(term),
+      target_id = as.character(MetaboliteID),
+      target_type = "pathway-metabolite",
+      metabolite_id = as.character(MetaboliteID),
+      chebi_id = NA_character_,
+      pubchem = as.character(pubchem),
+      metabolite_name = as.character(Metabolite),
+      source_dataset = NA_character_
+    ))
+  }
+
+  if (resource == "metsigdb_reactome") {
+    return(df %>% transmute(
+      resource = resource,
+      group = "Pathway resources",
+      term_id = as.character(pathway_id),
+      term_name = as.character(pathway_name),
+      target_id = as.character(chebi_id),
+      target_type = "pathway-metabolite",
+      metabolite_id = as.character(chebi_id),
+      chebi_id = as.character(chebi_id),
+      pubchem = NA_character_,
+      metabolite_name = NA_character_,
+      source_dataset = NA_character_
+    ))
+  }
+
+  if (resource == "metsigdb_wikipathways") {
+    wp_ids <- normalize_wikipathways_id_columns(df$metabolite_id)
+    return(df %>%
+      transmute(
+        resource = resource,
+        group = "Pathway resources",
+        term_id = as.character(pathway_id),
+        term_name = as.character(pathway_name),
+        target_id = as.character(metabolite_id),
+        target_type = "pathway-metabolite",
+        metabolite_name = NA_character_,
+        source_dataset = NA_character_
+      ) %>%
+      bind_cols(wp_ids %>% select(metabolite_id, chebi_id, pubchem)))
+  }
+
+  if (resource == "metsigdb_metalinks" || grepl("^metsigdb_metalinks__", resource)) {
+    return(df %>% transmute(
+      resource = resource,
+      group = "Interaction resources",
+      term_id = as.character(uniprot),
+      term_name = as.character(gene_symbol),
+      target_id = as.character(hmdb),
+      target_type = "metabolite-protein",
+      metabolite_id = as.character(hmdb),
+      chebi_id = NA_character_,
+      pubchem = as.character(pubchem),
+      metabolite_name = as.character(metabolite),
+      source_dataset = NA_character_
+    ))
+  }
+
+  if (resource == "metsigdb_macdb") {
+    return(df %>% transmute(
+      resource = resource,
+      group = "Cancer association resources",
+      term_id = as.character(term),
+      term_name = dplyr::if_else(is.na(Description) | Description == "", as.character(term), as.character(Description)),
+      target_id = as.character(Metabolite_PubchemID),
+      target_type = "metabolite-cancer",
+      metabolite_id = NA_character_,
+      chebi_id = NA_character_,
+      pubchem = as.character(Metabolite_PubchemID),
+      metabolite_name = as.character(Metabolite),
+      source_dataset = NA_character_
+    ))
+  }
+
+  if (resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways")) {
+    return(df %>% transmute(
+      resource = resource,
+      group = "Derived pathway resources",
+      term_id = as.character(term),
+      term_name = as.character(term),
+      target_id = as.character(feature),
+      target_type = as.character(interaction_type),
+      metabolite_id = if_else(grepl("^HMDB", feature), as.character(feature), NA_character_),
+      chebi_id = NA_character_,
+      pubchem = NA_character_,
+      metabolite_name = NA_character_,
+      source_dataset = as.character(gene_metab_source)
+    ))
+  }
+
+  stop("Unsupported resource: ", resource)
+}
+
+resource_level_metrics <- function(edges) {
+  edges %>%
+    distinct(resource, group, target_type, term_id, target_id) %>%
+    group_by(resource, group, target_type) %>%
+    summarise(
+      n_terms = n_distinct(term_id),
+      n_targets = n_distinct(target_id),
+      n_interactions = n(),
+      avg_targets_per_term = n_interactions / n_terms,
+      avg_terms_per_target = n_interactions / n_targets,
+      .groups = "drop"
+    )
+}
+
+set_level_metrics <- function(edges) {
+  edges %>%
+    distinct(resource, group, target_type, term_id, term_name, target_id) %>%
+    count(resource, group, target_type, term_id, term_name, name = "n_targets_in_term") %>%
+    group_by(resource, group, target_type) %>%
+    summarise(
+      min_targets = min(n_targets_in_term, na.rm = TRUE),
+      median_targets = median(n_targets_in_term, na.rm = TRUE),
+      mean_targets = mean(n_targets_in_term, na.rm = TRUE),
+      max_targets = max(n_targets_in_term, na.rm = TRUE),
+      .groups = "drop"
+    )
+}
+
+target_degree_buckets <- function(edges) {
+  edges %>%
+    distinct(resource, group, target_type, target_id, term_id) %>%
+    count(resource, group, target_type, target_id, name = "degree") %>%
+    mutate(
+      degree_bucket = case_when(
+        degree == 1 ~ "in 1 term",
+        degree == 2 ~ "in 2 terms",
+        degree > 2  ~ "in >2 terms",
+        TRUE ~ NA_character_
+      )
+    ) %>%
+    count(resource, group, target_type, degree_bucket, name = "n_targets") %>%
+    group_by(resource, group, target_type) %>%
+    mutate(pct_targets = n_targets / sum(n_targets)) %>%
+    ungroup()
+}
+
+benchmark_metsigdb <- function(
+  reactome_species = NULL,
+  wikipathways_species = NULL,
+  exclude_metabolites = "all"
+) {
+  groups_tbl <- metsigdb_groups()
+
+  raw_base <- list(
+    metsigdb_chemicalclass = metsigdb_chemicalclass(exclude_metabolites = exclude_metabolites),
+    metsigdb_kegg = metsigdb_kegg(exclude_metabolites = exclude_metabolites),
+    metsigdb_reactome = metsigdb_reactome(species = reactome_species, exclude_metabolites = exclude_metabolites),
+    # Temporary local fallback: species argument is ignored while WikiPathways API is unavailable.
+    metsigdb_wikipathways = fetch_wikipathways_from_csv(exclude_metabolites = exclude_metabolites),
+    # metsigdb_wikipathways = metsigdb_wikipathways(species = wikipathways_species, exclude_metabolites = exclude_metabolites),
+    metsigdb_macdb = metsigdb_macdb(exclude_metabolites = exclude_metabolites),
+    metsigdb_hallmarks = fetch_metsigdb_hallmarks(exclude_metabolites = exclude_metabolites),
+    metsigdb_gaude_pathways = fetch_metsigdb_gaude_pathways(exclude_metabolites = exclude_metabolites)
+  )
+
+  metalinks_expanded <- expand_metalinks_resources(
+    metsigdb_metalinks(exclude_metabolites = exclude_metabolites)
+  )
+
+  raw <- c(raw_base, metalinks_expanded)
+
+  edges <- purrr::imap(raw, ~ standardise_metsigdb(.x, .y, groups_tbl = groups_tbl)) %>%
+    bind_rows()
+
+  list(
+    edges = edges,
+    resource_level = resource_level_metrics(edges),
+    set_level = set_level_metrics(edges),
+    degree_buckets = target_degree_buckets(edges)
+  )
+}
+
+format_resource_level <- function(tbl) {
+  tbl %>%
+    transmute(
+      Resource = resource,
+      `Resource Group` = group,
+      `Interaction Type` = target_type,
+      `Distinct Terms` = n_terms,
+      `Distinct Targets` = n_targets,
+      `Distinct Interactions` = n_interactions,
+      `Avg Targets per Term` = avg_targets_per_term,
+      `Avg Terms per Target` = avg_terms_per_target
+    )
+}
+
+format_set_level <- function(tbl) {
+  tbl %>%
+    transmute(
+      Resource = resource,
+      `Resource Group` = group,
+      `Interaction Type` = target_type,
+      `Min Targets per Term` = min_targets,
+      `Median Targets per Term` = median_targets,
+      `Mean Targets per Term` = mean_targets,
+      `Max Targets per Term` = max_targets
+    )
+}
+
+format_degree_buckets <- function(tbl) {
+  tbl %>%
+    transmute(
+      Resource = resource,
+      `Resource Group` = group,
+      `Interaction Type` = target_type,
+      `Membership Bucket` = degree_bucket,
+      `Number of Targets` = n_targets,
+      `Share of Targets` = pct_targets
+    )
+}
+```
+
+```{r output-config}
+output_root <- file.path(getwd(), "benchmark_results")
+run_stamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+run_dir <- file.path(output_root, paste0("metsigdb_benchmark_", run_stamp))
+plots_dir <- file.path(run_dir, "plots")
+
+for (d in c(output_root, run_dir, plots_dir)) {
+  if (!dir.exists(d)) dir.create(d, recursive = TRUE)
+}
+
+excel_file <- file.path(run_dir, paste0("metsigdb_benchmark_", run_stamp, ".xlsx"))
+
+save_svg_plot <- function(plot_obj, filename, width = 12, height = 6) {
+  out_file <- file.path(plots_dir, filename)
+  if (!dir.exists(plots_dir)) dir.create(plots_dir, recursive = TRUE)
+
+  ggplot2::ggsave(
+    filename = out_file,
+    plot = plot_obj,
+    width = width,
+    height = height,
+    device = svglite::svglite
+  )
+
+  if (!file.exists(out_file)) {
+    stop("Failed to save plot: ", out_file)
+  }
+
+  out_file
+}
+
+write_sheet_data <- function(wb, sheet_name, data_tbl) {
+  openxlsx::addWorksheet(wb, sheet_name)
+  openxlsx::writeData(wb, sheet_name, data_tbl)
+  openxlsx::freezePane(wb, sheet_name, firstRow = TRUE)
+}
+
+interaction_type_colors <- c(
+  "pathway-metabolite" = "#1F78B4",
+  "metabolite-protein" = "#E66101",
+  "pathway-metabolic_enzyme" = "#33A02C",
+  "metabolite-cancer" = "#E31A1C",
+  "metabolite" = "#7570B3"
+)
+```
+
+```{r prepare-benchmark-tables}
+res_no_excl <- benchmark_metsigdb(
+  reactome_species = NULL,
+  wikipathways_species = NULL,
+  exclude_metabolites = NULL
+)
+
+res_default_excl <- benchmark_metsigdb(
+  reactome_species = NULL,
+  wikipathways_species = NULL,
+  exclude_metabolites = "all"
+)
+
+res <- res_default_excl
+
+tbl_resource_groups <- metsigdb_groups() %>%
+  rename(Resource = resource, `Resource Group` = group) %>%
+  arrange(`Resource Group`, Resource)
+
+tbl_exclusion_compare <- bind_rows(
+  res_no_excl$resource_level %>% mutate(exclusion_mode = "none"),
+  res_default_excl$resource_level %>% mutate(exclusion_mode = "default_all")
+) %>%
+  select(resource, group, target_type, exclusion_mode, n_terms, n_targets, n_interactions) %>%
+  pivot_wider(
+    names_from = exclusion_mode,
+    values_from = c(n_terms, n_targets, n_interactions)
+  ) %>%
+  mutate(
+    delta_terms = n_terms_default_all - n_terms_none,
+    delta_targets = n_targets_default_all - n_targets_none,
+    delta_interactions = n_interactions_default_all - n_interactions_none,
+    pct_delta_targets = if_else(n_targets_none > 0, delta_targets / n_targets_none, NA_real_),
+    pct_delta_interactions = if_else(n_interactions_none > 0, delta_interactions / n_interactions_none, NA_real_)
+  ) %>%
+  transmute(
+    Resource = resource,
+    `Resource Group` = group,
+    `Interaction Type` = target_type,
+    `Terms (No Exclusion)` = n_terms_none,
+    `Terms (Default Exclusion)` = n_terms_default_all,
+    `Delta Terms` = delta_terms,
+    `Targets (No Exclusion)` = n_targets_none,
+    `Targets (Default Exclusion)` = n_targets_default_all,
+    `Delta Targets` = delta_targets,
+    `% Delta Targets` = pct_delta_targets,
+    `Interactions (No Exclusion)` = n_interactions_none,
+    `Interactions (Default Exclusion)` = n_interactions_default_all,
+    `Delta Interactions` = delta_interactions,
+    `% Delta Interactions` = pct_delta_interactions
+  ) %>%
+  arrange(`Resource Group`, Resource, `Interaction Type`)
+
+tbl_resource_level <- format_resource_level(res$resource_level) %>%
+  arrange(`Resource Group`, Resource, `Interaction Type`)
+
+tbl_set_level <- format_set_level(res$set_level) %>%
+  arrange(`Resource Group`, Resource, `Interaction Type`)
+
+tbl_degree_buckets <- format_degree_buckets(res$degree_buckets) %>%
+  arrange(`Resource Group`, Resource, `Interaction Type`, `Membership Bucket`)
+
+```
+
+```{r generate-plots}
+# Grouped bar: exclusion deltas for targets.
+delta_targets_plot_data <- tbl_exclusion_compare %>%
+  filter(!is.na(`% Delta Targets`)) %>%
+  mutate(
+    value = `% Delta Targets`,
+    label = scales::percent(value, accuracy = 0.1),
+    label_y = value + if_else(value >= 0, 0.03, -0.03),
+    line_y = value + if_else(value >= 0, 0.02, -0.02),
+    ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource)
+  )
+
+mpv_theme <- theme_classic(base_size = 11) +
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.text.x = element_text(angle = 90, hjust = 1),
+    legend.position = "right",
+    legend.box = "vertical",
+    legend.box.margin = margin(10, 10, 10, 10)
+  )
+
+p_delta_targets <- ggplot(delta_targets_plot_data, aes(x = ResourcePlot, y = value, fill = `Interaction Type`)) +
+  geom_col(position = position_dodge(width = 0.9), width = 0.8) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey40") +
+  geom_segment(
+    aes(
+      xend = ResourcePlot,
+      y = value,
+      yend = line_y,
+      group = `Interaction Type`
+    ),
+    position = position_dodge(width = 0.9),
+    linewidth = 0.3,
+    color = "grey35"
+  ) +
+  geom_text(
+    aes(y = label_y, label = label, group = `Interaction Type`),
+    position = position_dodge(width = 0.9),
+    size = 2.7,
+    vjust = ifelse(delta_targets_plot_data$value >= 0, 0, 1)
+  ) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_fill_manual(values = interaction_type_colors, drop = FALSE) +
+  labs(
+    title = "Relative Change in Targets After Default Exclusion",
+    x = "Resource",
+    y = "% Delta Targets",
+    fill = "Interaction Type"
+  ) +
+  mpv_theme
+
+# Grouped bar: exclusion deltas for interactions.
+delta_interactions_plot_data <- tbl_exclusion_compare %>%
+  filter(!is.na(`% Delta Interactions`)) %>%
+  mutate(
+    value = `% Delta Interactions`,
+    label = scales::percent(value, accuracy = 0.1),
+    label_y = value + if_else(value >= 0, 0.03, -0.03),
+    line_y = value + if_else(value >= 0, 0.02, -0.02),
+    ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource)
+  )
+
+p_delta_interactions <- ggplot(delta_interactions_plot_data, aes(x = ResourcePlot, y = value, fill = `Interaction Type`)) +
+  geom_col(position = position_dodge(width = 0.9), width = 0.8) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "grey40") +
+  geom_segment(
+    aes(
+      xend = ResourcePlot,
+      y = value,
+      yend = line_y,
+      group = `Interaction Type`
+    ),
+    position = position_dodge(width = 0.9),
+    linewidth = 0.3,
+    color = "grey35"
+  ) +
+  geom_text(
+    aes(y = label_y, label = label, group = `Interaction Type`),
+    position = position_dodge(width = 0.9),
+    size = 2.7,
+    vjust = ifelse(delta_interactions_plot_data$value >= 0, 0, 1)
+  ) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_fill_manual(values = interaction_type_colors, drop = FALSE) +
+  labs(
+    title = "Relative Change in Interactions After Default Exclusion",
+    x = "Resource",
+    y = "% Delta Interactions",
+    fill = "Interaction Type"
+  ) +
+  mpv_theme
+
+# Grouped and faceted footprint plot.
+resource_footprint_plot_data <- tbl_resource_level %>%
+  mutate(ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource)) %>%
+  pivot_longer(
+    cols = c(`Distinct Terms`, `Distinct Targets`, `Distinct Interactions`),
+    names_to = "Metric",
+    values_to = "Value"
+  ) %>%
+  group_by(ResourcePlot) %>%
+  mutate(
+    stack_total = sum(Value),
+    stack_share = if_else(stack_total > 0, Value / stack_total, 0),
+    ValueLabel = if_else(stack_share >= 0.04, scales::comma(Value), NA_character_)
+  ) %>%
+  ungroup()
+
+p_resource_footprint <- ggplot(resource_footprint_plot_data, aes(x = ResourcePlot, y = Value, fill = `Interaction Type`)) +
+  geom_col(position = position_dodge(width = 0.9), width = 0.8) +
+  geom_text(
+    aes(label = Value, group = `Interaction Type`),
+    position = position_dodge(width = 0.9),
+    vjust = -0.15,
+    size = 2.6
+  ) +
+  facet_wrap(~Metric, scales = "free_y") +
+  scale_fill_manual(values = interaction_type_colors, drop = FALSE) +
+  labs(
+    title = "Resource Footprint Across Terms, Targets, and Interactions",
+    x = "Resource",
+    y = "Count",
+    fill = "Interaction Type"
+  ) +
+  mpv_theme
+
+p_resource_footprint_stacked <- ggplot(
+  resource_footprint_plot_data,
+  aes(
+    x = ResourcePlot,
+    y = Value,
+    fill = `Interaction Type`,
+    pattern = Metric
+  )
+) +
+  ggpattern::geom_col_pattern(
+    position = "stack",
+    width = 0.8,
+    color = "grey35",
+    pattern_fill = "grey20",
+    pattern_colour = "grey20",
+    pattern_angle = 45,
+    pattern_density = 0.25,
+    pattern_spacing = 0.03,
+    pattern_key_scale_factor = 0.7
+  ) +
+  geom_text(
+    aes(
+      label = Value,
+      group = interaction(`Interaction Type`, Metric)
+    ),
+    position = position_stack(vjust = 0.5),
+    size = 2.4,
+    color = "black",
+    na.rm = TRUE
+  ) +
+  scale_fill_manual(values = interaction_type_colors, drop = FALSE) +
+  ggpattern::scale_pattern_manual(
+    values = c(
+      `Distinct Terms` = "none",
+      `Distinct Targets` = "stripe",
+      `Distinct Interactions` = "crosshatch"
+    ),
+    drop = FALSE
+  ) +
+  labs(
+    title = "Stacked Resource Footprint Across Terms, Targets, and Interactions",
+    x = "Resource",
+    y = "Count",
+    fill = "Interaction Type",
+    pattern = "Metric"
+  ) +
+  mpv_theme
+
+resource_footprint_stacked_totals <- resource_footprint_plot_data %>%
+  dplyr::group_by(ResourcePlot) %>%
+  dplyr::summarise(TotalValue = sum(Value), .groups = "drop")
+
+p_resource_footprint_stacked_split <- p_resource_footprint_stacked +
+  ggbreak::scale_y_break(c(1500, 30000), scales = 25 / 70, space = 1) +
+  labs(title = "Stacked Resource Footprint Across Terms, Targets, and Interactions (Y-axis split)")
+
+# Same footprint plot with a y-axis break to improve visibility of lower bars.
+p_resource_footprint_split <- ggplot(resource_footprint_plot_data, aes(x = ResourcePlot, y = Value, fill = `Interaction Type`)) +
+  geom_col(position = position_dodge(width = 0.9), width = 0.8) +
+  geom_text(
+    aes(label = Value, group = `Interaction Type`),
+    position = position_dodge(width = 0.9),
+    vjust = -0.15,
+    size = 2.6
+  ) +
+  facet_wrap(~Metric, scales = "free_y") +
+  ggbreak::scale_y_break(c(4000, 14000), scales = 25 / 70, space = 1) +
+  scale_fill_manual(values = interaction_type_colors, drop = FALSE) +
+  labs(
+    title = "Resource Footprint Across Terms, Targets, and Interactions (Y-axis split)",
+    x = "Resource",
+    y = "Count",
+    fill = "Interaction Type"
+  ) +
+  mpv_theme
+
+make_resource_footprint_split_single <- function(metric_name, break_start, break_end) {
+  resource_footprint_plot_data %>%
+    dplyr::filter(Metric == metric_name) %>%
+    ggplot(aes(x = ResourcePlot, y = Value, fill = `Interaction Type`)) +
+    geom_col(position = position_dodge(width = 0.9), width = 0.8) +
+    geom_text(
+      aes(label = Value, group = `Interaction Type`),
+      position = position_dodge(width = 0.9),
+      vjust = -0.15,
+      size = 2.6
+    ) +
+    ggbreak::scale_y_break(c(break_start, break_end), scales = 25 / 70, space = 1) +
+    scale_fill_manual(values = interaction_type_colors, drop = FALSE) +
+    labs(
+      title = paste0(metric_name, " by Resource (Y-axis split)"),
+      x = "Resource",
+      y = "Count",
+      fill = "Interaction Type"
+    ) +
+    mpv_theme
+}
+
+p_resource_footprint_terms_split <- make_resource_footprint_split_single(
+  metric_name = "Distinct Terms",
+  break_start = 4000,
+  break_end = 15000
+)
+
+p_resource_footprint_targets_split <- make_resource_footprint_split_single(
+  metric_name = "Distinct Targets",
+  break_start = 8000,
+  break_end = 40000
+)
+
+p_resource_footprint_interactions_split <- make_resource_footprint_split_single(
+  metric_name = "Distinct Interactions",
+  break_start = 25000,
+  break_end = 40000
+)
+
+# Grouped bar: mean targets per term.
+set_level_plot_data <- tbl_set_level %>%
+  mutate(
+    mean_label = round(`Mean Targets per Term`, 2),
+    median_label = round(`Median Targets per Term`, 2),
+    ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource)
+  )
+
+p_set_level_mean <- ggplot(set_level_plot_data, aes(x = ResourcePlot, y = `Mean Targets per Term`, fill = `Interaction Type`)) +
+  geom_col(position = position_dodge(width = 0.9), width = 0.8) +
+  geom_text(
+    aes(label = mean_label, group = `Interaction Type`),
+    position = position_dodge(width = 0.9),
+    vjust = -0.15,
+    size = 2.6
+  ) +
+  scale_fill_manual(values = interaction_type_colors, drop = FALSE) +
+  labs(
+    title = "Average Targets per Term by Resource",
+    x = "Resource",
+    y = "Mean Targets per Term",
+    fill = "Interaction Type"
+  ) +
+  mpv_theme
+
+# Grouped bar: median targets per term.
+p_set_level_median <- ggplot(set_level_plot_data, aes(x = ResourcePlot, y = `Median Targets per Term`, fill = `Interaction Type`)) +
+  geom_col(position = position_dodge(width = 0.9), width = 0.8) +
+  geom_text(
+    aes(label = median_label, group = `Interaction Type`),
+    position = position_dodge(width = 0.9),
+    vjust = -0.15,
+    size = 2.6
+  ) +
+  scale_fill_manual(values = interaction_type_colors, drop = FALSE) +
+  labs(
+    title = "Median Targets per Term by Resource",
+    x = "Resource",
+    y = "Median Targets per Term",
+    fill = "Interaction Type"
+  ) +
+  mpv_theme
+
+# Stacked bar: membership composition.
+degree_bucket_plot_data <- tbl_degree_buckets %>%
+  group_by(Resource) %>%
+  mutate(n_interaction_types = n_distinct(`Interaction Type`)) %>%
+  ungroup() %>%
+  mutate(
+    `Membership Bucket` = factor(`Membership Bucket`, levels = c("in 1 term", "in 2 terms", "in >2 terms")),
+    `Share Label` = scales::percent(`Share of Targets`, accuracy = 0.1),
+    ResourcePlot = if_else(n_interaction_types > 1, paste0(Resource, "\n", `Interaction Type`), Resource)
+  )
+
+p_degree_bucket <- ggplot(degree_bucket_plot_data, aes(x = ResourcePlot, y = `Share of Targets`, fill = `Membership Bucket`)) +
+  geom_col(position = "stack", width = 0.8) +
+  geom_text(
+    aes(label = `Share Label`),
+    position = position_stack(vjust = 0.5),
+    size = 2.6,
+    color = "black"
+  ) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  labs(
+    title = "Target Membership Composition per Resource",
+    x = "Resource",
+    y = "Share of Targets",
+    fill = "Membership Bucket"
+  ) +
+  mpv_theme
+
+plot_manifest <- tibble::tibble(
+  Plot = c(
+    "Relative Change in Targets",
+    "Relative Change in Interactions",
+    "Resource Footprint",
+    "Stacked Resource Footprint",
+    "Stacked Resource Footprint (Y-axis split)",
+    "Resource Footprint (Y-axis split)",
+    "Distinct Terms by Resource (Y-axis split)",
+    "Distinct Targets by Resource (Y-axis split)",
+    "Distinct Interactions by Resource (Y-axis split)",
+    "Average Targets per Term",
+    "Median Targets per Term",
+    "Membership Composition"
+  ),
+  PlotObject = list(
+    p_delta_targets,
+    p_delta_interactions,
+    p_resource_footprint,
+    p_resource_footprint_stacked,
+    p_resource_footprint_stacked_split,
+    p_resource_footprint_split,
+    p_resource_footprint_terms_split,
+    p_resource_footprint_targets_split,
+    p_resource_footprint_interactions_split,
+    p_set_level_mean,
+    p_set_level_median,
+    p_degree_bucket
+  ),
+  SVG_File = c(
+    "exclusion_pct_delta_targets.svg",
+    "exclusion_pct_delta_interactions.svg",
+    "resource_footprint_faceted.svg",
+    "resource_footprint_stacked.svg",
+    "resource_footprint_stacked_split.svg",
+    "resource_footprint_faceted_split.svg",
+    "resource_footprint_terms_split.svg",
+    "resource_footprint_targets_split.svg",
+    "resource_footprint_interactions_split.svg",
+    "set_level_mean_targets.svg",
+    "set_level_median_targets.svg",
+    "degree_bucket_composition.svg"
+  ),
+  Width = c(13, 13, 14, 14, 14, 14, 14, 14, 14, 13, 13, 13),
+  Height = c(6, 6, 8, 8, 8, 8, 8, 8, 8, 6, 6, 7)
+)
+
+plot_files <- purrr::pmap_chr(
+  plot_manifest[c("PlotObject", "SVG_File", "Width", "Height")],
+  function(PlotObject, SVG_File, Width, Height) {
+    save_svg_plot(PlotObject, SVG_File, width = Width, height = Height)
+  }
+)
+
+cat("Saved plot files:\n", paste(plot_files, collapse = "\n"), "\n", sep = "")
+
+plot_index_tbl <- plot_manifest %>%
+  dplyr::transmute(
+    Plot = Plot,
+    SVG_File = basename(plot_files),
+    Relative_Path = file.path("plots", SVG_File)
+  )
+```
+
+```{r export-excel}
+wb <- openxlsx::createWorkbook()
+
+overview_tbl <- tibble::tribble(
+  ~Section, ~Description,
+  "Resource_Groups", "Resource-to-group mapping used in this benchmark run.",
+  "Exclusion_Compare", "No exclusion vs default exclusion counts and deltas by resource and interaction type.",
+  "Resource_Level", "Distinct terms, targets, interactions, and average connectivity metrics.",
+  "Set_Level", "Per-resource distribution summary of targets per term.",
+  "Degree_Buckets", "Target membership composition across 1 term, 2 terms, and >2 terms.",
+  "Plot_Files", "SVG plot files generated for this run."
+)
+
+run_info_tbl <- tibble::tribble(
+  ~Item, ~Value,
+  "Run Timestamp", run_stamp,
+  "Output Folder", run_dir,
+  "Excel File", excel_file,
+  "Plot Folder", plots_dir,
+  "Exclusion Mode (main benchmark)", "default_all"
+)
+
+openxlsx::addWorksheet(wb, "Overview")
+openxlsx::writeData(wb, "Overview", x = run_info_tbl, startRow = 1)
+openxlsx::writeData(wb, "Overview", x = overview_tbl, startRow = 8)
+openxlsx::writeData(wb, "Overview", x = plot_index_tbl, startRow = 20)
+openxlsx::freezePane(wb, "Overview", firstRow = TRUE)
+
+write_sheet_data(wb, "Resource_Groups", tbl_resource_groups)
+write_sheet_data(wb, "Exclusion_Compare", tbl_exclusion_compare)
+write_sheet_data(wb, "Resource_Level", tbl_resource_level)
+write_sheet_data(wb, "Set_Level", tbl_set_level)
+write_sheet_data(wb, "Degree_Buckets", tbl_degree_buckets)
+
+openxlsx::saveWorkbook(wb, excel_file, overwrite = TRUE)
+```
+
+# Resource grouping
+
+The table below defines how each resource is classified into benchmark groups. This mapping controls aggregation and plot coloring throughout the report.
+
+```{r resource-groups}
+tbl_resource_groups %>%
+  knitr::kable()
+```
+
+# Exclusion effect (counts and deltas)
+
+The next table compares counts between no metabolite exclusion and the default exclusion. The most important fields are the signed deltas and percentage deltas, which indicate the exclusion effect magnitude.
+
+```{r exclusion-compare-table}
+knitr::kable(tbl_exclusion_compare, digits = 3)
+```
+
+```{r exclusion-delta-targets-plot, fig.width=13, fig.height=6}
+p_delta_targets
+```
+
+```{r exclusion-delta-interactions-plot, fig.width=13, fig.height=6}
+p_delta_interactions
+```
+
+# Test 1: Resource level summary
+
+The table below summarizes overall resource footprint under default exclusion. It reports distinct terms, distinct targets, interactions, and average connectivity metrics.
+
+```{r test-1-table}
+knitr::kable(tbl_resource_level, digits = 3)
+```
+
+```{r test-1-resource-footprint-plot, fig.width=14, fig.height=8}
+p_resource_footprint
+```
+
+```{r test-1-resource-footprint-stacked-plot, fig.width=14, fig.height=8}
+p_resource_footprint_stacked
+```
+
+```{r test-1-resource-footprint-stacked-split-plot, fig.width=14, fig.height=8}
+p_resource_footprint_stacked_split
+```
+
+```{r test-1-resource-footprint-plot-split, fig.width=14, fig.height=8}
+p_resource_footprint_split
+```
+
+```{r test-1-distinct-terms-split-plot, fig.width=14, fig.height=8}
+p_resource_footprint_terms_split
+```
+
+```{r test-1-distinct-targets-split-plot, fig.width=14, fig.height=8}
+p_resource_footprint_targets_split
+```
+
+```{r test-1-distinct-interactions-split-plot, fig.width=14, fig.height=8}
+p_resource_footprint_interactions_split
+```
+
+# Test 2: Term size distribution
+
+The table below describes term size distributions. Use mean/median targets per term to compare how broad resources are.
+
+```{r test-2-table}
+knitr::kable(tbl_set_level, digits = 3)
+```
+
+```{r test-2-set-level-plot, fig.width=13, fig.height=6}
+p_set_level_mean
+```
+
+```{r test-2-set-level-median-plot, fig.width=13, fig.height=6}
+p_set_level_median
+```
+
+# Test 3: Target membership buckets
+
+The next table shows how often targets recur across terms. The stacked plot highlights whether resources are dominated by single-term or multi-term targets.
+
+```{r test-3-table}
+knitr::kable(tbl_degree_buckets, digits = 3)
+```
+
+```{r test-3-degree-bucket-plot, fig.width=13, fig.height=7}
+p_degree_bucket
+```
+
+# Export summary
+
+The paths below show where all exported artifacts were written for this run.
+
+```{r export-summary}
+export_summary_tbl <- tibble::tribble(
+  ~Artifact, ~Path,
+  "Excel workbook", excel_file,
+  "Plot directory", plots_dir
+)
+
+knitr::kable(export_summary_tbl)
+```
+
+# References
+
+::: {#refs}
+:::
+
+# Session information
+
+```{r session-info}
+sessionInfo()
+```
