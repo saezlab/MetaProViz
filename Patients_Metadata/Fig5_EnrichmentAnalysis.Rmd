@@ -153,8 +153,6 @@ DM_ORA_res <- list()
 KEGG_Pathways <- MetaProViz::metsigdb_kegg()
 
 ## manually clean up KEGG_Pathways with the few instances we saw in Fig2 during checkmatch_pk_to_data
-## to-do @Jannik
-
 KEGG_Pathways_clean <- 
     KEGG_Pathways %>%
     filter(
@@ -313,7 +311,6 @@ for(comparison in c("Old", "Young")){
 ```
 
 ## Use the results to showcase networks
-@Jannik here would be cluster_pk
 
 ```{r}
 
@@ -366,8 +363,57 @@ viz_graph(
 ```
 
 
-# Save new Extended Data Table
-@Jannik now you would create the complete new Extended Datatable. We will need to include some of my results too, so we can discuss here once you have the previous order.
+# Save the results
+
+```{r}
+# Previous Extended Data Table 1 sheets:
+# "SheetOverview"
+# "Feature metadata"
+# "NormalisedData"
+# "MetaAnalysis_AOV"
+# "MetaAnalysis_Features"
+# "MetaAnalysis_TopBottom"
+# "DMA_TUMOR_vs_NORMAL"
+# "DMA_TUMOR_vs_NORMAL_Old"
+# "DMA_TUMOR_vs_NORMAL_Young"
+# "MCA2Cond_Old-Young"
+# "MCA2Cond_Summary"
+# "KEGG_PathwayEnrichment_Old"    -> replace
+# "KEGG_PathwayEnrichment_Young"  -> replace
+
+# new results generated here:
+# 1. DM_ORA_res$Old      -> replace old one
+# 2. DM_ORA_res$Young    -> replace old one
+# 3. cluster_pk_res
+#     a.  $data                   -> original data plus cluster association column
+#     b.  $cluster_summary        -> cluster, n_terms, pct_terms
+#     c.  $clusters               -> long format cluster to PK term mapping
+#     d.  $similarity_matrix      -> [0-1], 0 = no overlap, 1 = equality, diagonal 1
+#     e.  $distance_matrix        -> [0-1], = 1 - similarity matrix, diagonal 0
+#     f.  $node_sizes             -> long formal node_size to term mapping
+#     g.  $graph_plot             -> S3 igraph object
+
+write.csv2(
+    DM_ORA_res$Old$ClusterGosummary,
+    "MetaProViz_Results/Enrichment/DM_ORA_res_OLD.csv"
+)
+
+write.csv2(
+    DM_ORA_res$Young$ClusterGosummary,
+    "MetaProViz_Results/Enrichment/DM_ORA_res_YOUNG.csv"
+)
+
+write.csv2(
+    cluster_pk_res$data,
+    "MetaProViz_Results/Enrichment/data_with_clusters.csv"
+)
+
+write.csv2(
+    cluster_pk_res$cluster_summary,
+    "MetaProViz_Results/Enrichment/cluster_summary.csv"
+)
+
+```
 
 
 
