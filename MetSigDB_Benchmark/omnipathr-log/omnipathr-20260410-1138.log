@@ -1,0 +1,331 @@
+[2026-04-10 11:38:50] [TRACE]   [OmnipathR] Reading JSON from `C:\Users\janni\AppData\Local\cache\OmnipathR/cache.json` (encoding: UTF-8).
+[2026-04-10 11:38:50] [TRACE]   [OmnipathR] JSON validation successful: TRUE
+[2026-04-10 11:38:51] [INFO]    [OmnipathR] Initialized cache: `C:\Users\janni\AppData\Local\cache\OmnipathR`.
+[2026-04-10 11:38:51] [INFO]    [OmnipathR] Package `OmnipathR` packaged: 2026-03-26 17:31:09 UTC; Jannik
+[2026-04-10 11:38:51] [INFO]    [OmnipathR] Package `OmnipathR` date/publication: NA
+[2026-04-10 11:38:51] [INFO]    [OmnipathR] Package `OmnipathR` built: R 4.4.2; ; 2026-03-26 17:31:14 UTC; windows
+[2026-04-10 11:38:51] [INFO]    [OmnipathR] Package `OmnipathR` version: 3.19.12
+[2026-04-10 11:38:51] [INFO]    [OmnipathR] Package `OmnipathR` repository: NA
+[2026-04-10 11:38:51] [INFO]    [OmnipathR] Session info: [version=R version 4.4.2 (2024-10-31 ucrt); os=Windows 10 x64 (build 19045); system=x86_64, mingw32; ui=RTerm; language=(EN); collate=German_Germany.utf8; ctype=German_Germany.utf8; tz=Europe/Berlin; date=2026-04-10; pandoc=2.14.0.3 @ C:/Program Files/RStudio/bin/pandoc/ (via rmarkdown); quarto=NA]
+[2026-04-10 11:38:52] [INFO]    [OmnipathR] External libraries: [cairo=1.18.2; cairoFT=; pango=; png=1.6.44; jpeg=9.6; tiff=LIBTIFF, Version 4.7.0; tcl=8.6.13; curl=8.10.1; zlib=1.3.1; bzlib=1.0.8, 13-Jul-2019; xz=5.6.3; deflate=1.22; PCRE=10.44 2024-06-07; ICU=74.2; TRE=TRE 0.8.0 R_fixes (BSD); iconv=win_iconv; readline=; BLAS=; lapack=; lapack_version=3.12.0]
+[2026-04-10 11:38:52] [INFO]    [OmnipathR] Loaded packages: aplot 0.2.9(2025-09-12); backports 1.5.0(2024-05-23); bit 4.6.0(2025-03-06); bit64 4.6.0-1(2025-01-16); blob 1.3.0(2026-01-14); bslib 0.10.0(2026-01-26); cachem 1.1.0(2024-05-16); cellranger 1.1.0(2016-07-27); checkmate 2.3.3(2025-08-18); chromote 0.5.1(2025-04-24); cli 3.6.5(2025-04-23); colorspace 2.1-1(2024-07-26); ComplexUpset 1.3.3(2021-12-11); crayon 1.5.3(2024-06-20); curl 7.0.0(2025-08-19); DBI 1.3.0(2026-02-25); digest 0.6.37(2024-08-19); dplyr 1.1.4(2023-11-17); EnhancedVolcano 1.24.0(2024-10-29); evaluate 1.0.5(2025-08-27); farver 2.1.2(2024-05-13); fastmap 1.2.0(2024-05-15); fs 1.6.6(2025-04-12); generics 0.1.4(2025-05-09); ggbreak 0.1.7(2026-03-18); ggfun 0.2.0(2025-07-15); ggplot2 4.0.2(2026-02-03); ggplotify 0.1.3(2025-09-20); ggrepel 0.9.6(2024-09-07); glue 1.8.0(2024-09-30); gridGraphics 0.5-1(2020-12-13); gtable 0.3.6(2024-10-25); hms 1.1.4(2025-10-17); htmltools 0.5.8.1(2024-04-04); httr 1.4.8(2026-02-13); httr2 1.2.2(2025-12-08); igraph 2.2.1(2025-10-27); jquerylib 0.1.4(2021-04-26); jsonlite 2.0.0(2025-03-27); knitr 1.51(2025-12-20); later 1.4.4(2025-08-27); lifecycle 1.0.5(2026-01-08); logger 0.4.1(2025-09-11); lubridate 1.9.4(2024-12-08); magrittr 2.0.4(2025-09-12); memoise 2.0.1(2021-11-26); MetaProViz 3.99.51(2026-04-07); OmnipathR 3.19.12(2026-03-26); openxlsx 4.2.8.1(2025-10-31); otel 0.2.0(2025-08-29); patchwork 1.3.2(2025-08-25); pillar 1.11.1(2025-09-17); pkgconfig 2.0.3(2019-09-22); prettyunits 1.2.0(2023-09-24); processx 3.8.6(2025-02-21); progress 1.2.3(2023-12-06); promises 1.5.0(2025-11-01); ps 1.9.1(2025-04-12); purrr 1.1.0(2025-07-10); R.methodsS3 1.8.2(2022-06-13); R.oo 1.27.1(2025-05-02); R.utils 2.13.0(2025-02-24); R6 2.6.1(2025-02-15); rappdirs 0.3.3(2021-01-31); RColorBrewer 1.1-3(2022-04-03); Rcpp 1.1.0(2025-07-02); readr 2.1.5(2024-01-10); readxl 1.4.5(2025-03-07); rlang 1.2.0(2026-04-06); rmarkdown 2.31(2026-03-26); RSQLite 2.4.5(2025-11-30); rstudioapi 0.17.1(2024-10-22); rvest 1.0.5(2025-08-29); S7 0.2.1(2025-11-14); sass 0.4.10(2025-04-11); scales 1.4.0(2025-04-24); sessioninfo 1.2.3(2025-02-05); stringi 1.8.7(2025-03-27); stringr 1.5.2(2025-09-08); svglite 2.2.2(2025-10-21); systemfonts 1.3.1(2025-10-01); textshaping 1.0.4(2025-10-10); tibble 3.3.0(2025-06-08); tidyr 1.3.1(2024-01-24); tidyselect 1.2.1(2024-03-11); timechange 0.3.0(2024-01-18); tzdb 0.5.0(2025-03-15); vctrs 0.6.5(2023-12-01); websocket 1.4.4(2025-04-10); withr 3.0.2(2024-10-28); xfun 0.57(2026-03-20); XML 3.99-0.20(2025-11-08); xml2 1.5.1(2025-12-01); yaml 2.3.10(2024-07-26); yulab.utils 0.2.2(2025-12-01); zip 2.3.3(2025-05-13)
+[2026-04-10 11:38:52] [INFO]    [OmnipathR] CURL: version: 8.14.1; headers: 8.14.1; ssl_version: (OpenSSL/3.5.0) Schannel; libz_version: 1.3; libssh_version: libssh2/1.11.0; libidn_version: NA; host: x86_64-w64-mingw32; protocols: dict, file, ftp, ftps, gopher, gophers, http, https, imap, imaps, ldap, ldaps, mqtt, pop3, pop3s, rtsp, scp, sftp, smb, smbs, smtp, smtps, telnet, tftp, ws, wss; ipv6: TRUE; http2: TRUE; idn: TRUE; url_parser: TRUE
+[2026-04-10 11:38:52] [TRACE]   [OmnipathR] Reading JSON from `C:/Users/janni/AppData/Local/R/win-library/4.4/OmnipathR/db/db_def.json` (encoding: UTF-8).
+[2026-04-10 11:38:52] [TRACE]   [OmnipathR] JSON validation successful: TRUE
+[2026-04-10 11:38:52] [TRACE]   [OmnipathR] Reading JSON from `C:/Users/janni/AppData/Local/R/win-library/4.4/OmnipathR/internal/magic_bytes.json` (encoding: UTF-8).
+[2026-04-10 11:38:52] [TRACE]   [OmnipathR] JSON validation successful: TRUE
+[2026-04-10 11:38:52] [TRACE]   [OmnipathR] Reading JSON from `C:/Users/janni/AppData/Local/R/win-library/4.4/OmnipathR/internal/urls.json` (encoding: UTF-8).
+[2026-04-10 11:38:52] [TRACE]   [OmnipathR] JSON validation successful: TRUE
+[2026-04-10 11:38:52] [TRACE]   [OmnipathR] Reading JSON from `C:/Users/janni/AppData/Local/R/win-library/4.4/OmnipathR/internal/id_types.json` (encoding: UTF-8).
+[2026-04-10 11:38:52] [TRACE]   [OmnipathR] JSON validation successful: TRUE
+[2026-04-10 11:39:00] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-04-10 11:39:00] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/link/compound/pathway`.
+[2026-04-10 11:39:00] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/c6ff89c85308605f76b13b8b7eef2efc510fca11-1.rds`.
+[2026-04-10 11:39:00] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 19564 records from cache
+[2026-04-10 11:39:00] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-04-10 11:39:00] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/list/pathway`.
+[2026-04-10 11:39:00] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/0bd054860c052a2ac0d7a3849b304d085f377df0-1.rds`.
+[2026-04-10 11:39:00] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 585 records from cache
+[2026-04-10 11:39:00] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-04-10 11:39:00] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/list/compound`.
+[2026-04-10 11:39:00] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/855597ce84b494f3ef3ac5750c407848569a7f66-1.rds`.
+[2026-04-10 11:39:00] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 19571 records from cache
+[2026-04-10 11:39:00] [INFO]    [OmnipathR] Loading database `List of organisms in KEGG`.
+[2026-04-10 11:39:00] [TRACE]   [OmnipathR] Checking on-disk cache for database `kegg_organisms`.
+[2026-04-10 11:39:00] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/67846511e943f593aa512e9096b2b1e2964deb90-1.rds`.
+[2026-04-10 11:39:00] [INFO]    [OmnipathR] Loaded database `List of organisms in KEGG`.
+[2026-04-10 11:39:00] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-04-10 11:39:00] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/conv/compound/pubchem`.
+[2026-04-10 11:39:00] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/df48f267c99a2d8dd3cb7ed031941afbedc22d48-1.rds`.
+[2026-04-10 11:39:00] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 19442 records from cache
+[2026-04-10 11:39:00] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-04-10 11:39:00] [TRACE]   [OmnipathR] Looking up in cache: `https://reactome.org/download/current/ChEBI2Reactome_All_Levels.txt`.
+[2026-04-10 11:39:01] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/580052b27bcf74c765286f5c51efebcd2183c305-1.rds`.
+[2026-04-10 11:39:04] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-04-10 11:39:04] [TRACE]   [OmnipathR] Looking up in cache: `https://ngdc.cncb.ac.cn/macdb/api/get_download_file?file_type=metabolite`.
+[2026-04-10 11:39:04] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/913176fa62c684f07421e0a37868e26e61ae008e-1.rds`.
+[2026-04-10 11:39:04] [SUCCESS] [OmnipathR] MACdb (metabolite) (ngdc.cncb.ac.cn): loaded 40710 records from cache
+[2026-04-10 11:39:04] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-04-10 11:39:04] [TRACE]   [OmnipathR] Looking up in cache: `https://ngdc.cncb.ac.cn/macdb/api/get_download_file?file_type=study`.
+[2026-04-10 11:39:04] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/dd9ad369ce07cc43cbffd3dcb5cff2ec845b8785-1.rds`.
+[2026-04-10 11:39:04] [SUCCESS] [OmnipathR] MACdb (study) (ngdc.cncb.ac.cn): loaded 1127 records from cache
+[2026-04-10 11:39:13] [INFO]    [OmnipathR] Looking up in cache `metalinksdb.sqlite`: key=e2682a205032a8eff5e0533edafd2730b9eb450c, latest version=1.
+[2026-04-10 11:39:13] [TRACE]   [OmnipathR] Cache file path: C:\Users\janni\AppData\Local\cache\OmnipathR/e2682a205032a8eff5e0533edafd2730b9eb450c-1
+[2026-04-10 11:39:18] [INFO]    [OmnipathR] Loading database `Ensembl and OMA organism names`.
+[2026-04-10 11:39:18] [TRACE]   [OmnipathR] Checking on-disk cache for database `organisms`.
+[2026-04-10 11:39:18] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/2279cf45097ad11a757767cb09e3eb8d227f0445-1.rds`.
+[2026-04-10 11:39:18] [INFO]    [OmnipathR] Loaded database `Ensembl and OMA organism names`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `hmdb`, using RaMP
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/5756e91af26f87a0fc48ae8647096be76594d9c0-1.rds`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 31 `hmdb` IDs in column `hmdb`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `chebi`, using RaMP
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/54509d2e3538592347b655d1c233504ec2020500-1.rds`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 34 `chebi` IDs in column `chebi`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `pubchem`, using RaMP
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/452c5b1c3e86108438d3627c12ef37ae54e30dc6-1.rds`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 32 `pubchem` IDs in column `pubchem`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] ID translation table: from `chebi` to `hmdb`, using RaMP
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/f146d4b534dee110286529915961eeee2c69843a-1.rds`.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:19] [TRACE]   [OmnipathR] 467 rows before translation, 467 chebi IDs in column `seed_id`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/link/compound/pathway`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/c6ff89c85308605f76b13b8b7eef2efc510fca11-1.rds`.
+[2026-04-10 11:39:20] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 19564 records from cache
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/list/pathway`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/0bd054860c052a2ac0d7a3849b304d085f377df0-1.rds`.
+[2026-04-10 11:39:20] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 585 records from cache
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/list/compound`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/855597ce84b494f3ef3ac5750c407848569a7f66-1.rds`.
+[2026-04-10 11:39:20] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 19571 records from cache
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Looking up in cache: `https://rest.kegg.jp/conv/compound/pubchem`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/df48f267c99a2d8dd3cb7ed031941afbedc22d48-1.rds`.
+[2026-04-10 11:39:20] [SUCCESS] [OmnipathR] KEGG (rest.kegg.jp): loaded 19442 records from cache
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `hmdb`, using RaMP
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/5756e91af26f87a0fc48ae8647096be76594d9c0-1.rds`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 31 `hmdb` IDs in column `hmdb`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `chebi`, using RaMP
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/54509d2e3538592347b655d1c233504ec2020500-1.rds`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:20] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 34 `chebi` IDs in column `chebi`.
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `pubchem`, using RaMP
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/452c5b1c3e86108438d3627c12ef37ae54e30dc6-1.rds`.
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 32 `pubchem` IDs in column `pubchem`.
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] ID translation table: from `chebi` to `hmdb`, using RaMP
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/f146d4b534dee110286529915961eeee2c69843a-1.rds`.
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] 467 rows before translation, 467 chebi IDs in column `seed_id`.
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-04-10 11:39:21] [TRACE]   [OmnipathR] Looking up in cache: `https://reactome.org/download/current/ChEBI2Reactome_All_Levels.txt`.
+[2026-04-10 11:39:22] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/580052b27bcf74c765286f5c51efebcd2183c305-1.rds`.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `hmdb`, using RaMP
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/5756e91af26f87a0fc48ae8647096be76594d9c0-1.rds`.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 31 `hmdb` IDs in column `hmdb`.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `chebi`, using RaMP
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/54509d2e3538592347b655d1c233504ec2020500-1.rds`.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 34 `chebi` IDs in column `chebi`.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `pubchem`, using RaMP
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/452c5b1c3e86108438d3627c12ef37ae54e30dc6-1.rds`.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:24] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:25] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:25] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 32 `pubchem` IDs in column `pubchem`.
+[2026-04-10 11:39:25] [TRACE]   [OmnipathR] ID translation table: from `chebi` to `hmdb`, using RaMP
+[2026-04-10 11:39:25] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:25] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:25] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/f146d4b534dee110286529915961eeee2c69843a-1.rds`.
+[2026-04-10 11:39:25] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:25] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:25] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:25] [TRACE]   [OmnipathR] 467 rows before translation, 467 chebi IDs in column `seed_id`.
+[2026-04-10 11:39:25] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-04-10 11:39:25] [TRACE]   [OmnipathR] Looking up in cache: `https://ngdc.cncb.ac.cn/macdb/api/get_download_file?file_type=metabolite`.
+[2026-04-10 11:39:25] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/913176fa62c684f07421e0a37868e26e61ae008e-1.rds`.
+[2026-04-10 11:39:25] [SUCCESS] [OmnipathR] MACdb (metabolite) (ngdc.cncb.ac.cn): loaded 40710 records from cache
+[2026-04-10 11:39:25] [TRACE]   [OmnipathR] Downloading by `generic_downloader`.
+[2026-04-10 11:39:25] [TRACE]   [OmnipathR] Looking up in cache: `https://ngdc.cncb.ac.cn/macdb/api/get_download_file?file_type=study`.
+[2026-04-10 11:39:25] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/dd9ad369ce07cc43cbffd3dcb5cff2ec845b8785-1.rds`.
+[2026-04-10 11:39:26] [SUCCESS] [OmnipathR] MACdb (study) (ngdc.cncb.ac.cn): loaded 1127 records from cache
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `hmdb`, using RaMP
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/5756e91af26f87a0fc48ae8647096be76594d9c0-1.rds`.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 31 `hmdb` IDs in column `hmdb`.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `chebi`, using RaMP
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/54509d2e3538592347b655d1c233504ec2020500-1.rds`.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 34 `chebi` IDs in column `chebi`.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `pubchem`, using RaMP
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/452c5b1c3e86108438d3627c12ef37ae54e30dc6-1.rds`.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 32 `pubchem` IDs in column `pubchem`.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] ID translation table: from `chebi` to `hmdb`, using RaMP
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:26] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/f146d4b534dee110286529915961eeee2c69843a-1.rds`.
+[2026-04-10 11:39:27] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:27] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:27] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:27] [TRACE]   [OmnipathR] 467 rows before translation, 467 chebi IDs in column `seed_id`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `hmdb`, using RaMP
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/5756e91af26f87a0fc48ae8647096be76594d9c0-1.rds`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 31 `hmdb` IDs in column `hmdb`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `chebi`, using RaMP
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/54509d2e3538592347b655d1c233504ec2020500-1.rds`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 34 `chebi` IDs in column `chebi`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `pubchem`, using RaMP
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/452c5b1c3e86108438d3627c12ef37ae54e30dc6-1.rds`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 32 `pubchem` IDs in column `pubchem`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] ID translation table: from `chebi` to `hmdb`, using RaMP
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/f146d4b534dee110286529915961eeee2c69843a-1.rds`.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:36] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:37] [TRACE]   [OmnipathR] 467 rows before translation, 467 chebi IDs in column `seed_id`.
+[2026-04-10 11:39:37] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `hmdb`, using RaMP
+[2026-04-10 11:39:37] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:37] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:37] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/5756e91af26f87a0fc48ae8647096be76594d9c0-1.rds`.
+[2026-04-10 11:39:37] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:37] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 31 `hmdb` IDs in column `hmdb`.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `chebi`, using RaMP
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/54509d2e3538592347b655d1c233504ec2020500-1.rds`.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 34 `chebi` IDs in column `chebi`.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `pubchem`, using RaMP
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/452c5b1c3e86108438d3627c12ef37ae54e30dc6-1.rds`.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 32 `pubchem` IDs in column `pubchem`.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] ID translation table: from `chebi` to `hmdb`, using RaMP
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/f146d4b534dee110286529915961eeee2c69843a-1.rds`.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] 467 rows before translation, 467 chebi IDs in column `seed_id`.
+[2026-04-10 11:39:38] [INFO]    [OmnipathR] Looking up in cache `metalinksdb.sqlite`: key=e2682a205032a8eff5e0533edafd2730b9eb450c, latest version=1.
+[2026-04-10 11:39:38] [TRACE]   [OmnipathR] Cache file path: C:\Users\janni\AppData\Local\cache\OmnipathR/e2682a205032a8eff5e0533edafd2730b9eb450c-1
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `hmdb`, using RaMP
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/5756e91af26f87a0fc48ae8647096be76594d9c0-1.rds`.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 31 `hmdb` IDs in column `hmdb`.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `chebi`, using RaMP
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/54509d2e3538592347b655d1c233504ec2020500-1.rds`.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 34 `chebi` IDs in column `chebi`.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] ID translation table: from `kegg` to `pubchem`, using RaMP
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\Cache\OmnipathR/452c5b1c3e86108438d3627c12ef37ae54e30dc6-1.rds`.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] 30 rows before translation, 27 kegg IDs in column `seed_id`.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] 30 rows after translation; translated 27 `kegg` IDs in column `seed_id` to 32 `pubchem` IDs in column `pubchem`.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] ID translation table: from `chebi` to `hmdb`, using RaMP
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Looking up in cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Loading from cache: `ramp_id_mapping_table`.
+[2026-04-10 11:39:40] [TRACE]   [OmnipathR] Loaded data from RDS `C:\Users\janni\AppData\Local\cache\OmnipathR/f146d4b534dee110286529915961eeee2c69843a-1.rds`.
+[2026-04-10 11:39:41] [TRACE]   [OmnipathR] Translating complexes: 0 complexes in data.
+[2026-04-10 11:39:41] [TRACE]   [OmnipathR] 0 complexes after removing the ones mapping to more than 1 items in target identifier space.
+[2026-04-10 11:39:41] [TRACE]   [OmnipathR] Translated 0 complexes to 0.
+[2026-04-10 11:39:41] [TRACE]   [OmnipathR] 467 rows before translation, 467 chebi IDs in column `seed_id`.

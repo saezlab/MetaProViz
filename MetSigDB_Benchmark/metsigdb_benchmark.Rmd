@@ -46,7 +46,6 @@ suppressPackageStartupMessages({
   library(openxlsx)
   library(svglite)
   library(ggbreak)
-  library(ggpattern)
 })
 
 if (!exists("metsigdb_kegg", mode = "function")) {
@@ -64,9 +63,6 @@ if (!requireNamespace("ggbreak", quietly = TRUE)) {
   stop("Package `ggbreak` is required for the split y-axis footprint plot. Please install it first.")
 }
 
-if (!requireNamespace("ggpattern", quietly = TRUE)) {
-  stop("Package `ggpattern` is required for the patterned stacked footprint plot. Please install it first.")
-}
 ```
 
 # Benchmark implementation (v4)
@@ -229,7 +225,7 @@ standardise_metsigdb <- function(df, resource, groups_tbl) {
       term_id = as.character(ClassyFire_class),
       term_name = as.character(ClassyFire_class),
       target_id = as.character(class_source_id),
-      target_type = "metabolite",
+      target_type = "metabolite-annotation",
       metabolite_id = as.character(class_source_id),
       chebi_id = NA_character_,
       pubchem = NA_character_,
@@ -501,7 +497,7 @@ interaction_type_colors <- c(
   "metabolite-protein" = "#E66101",
   "pathway-metabolic_enzyme" = "#33A02C",
   "metabolite-cancer" = "#E31A1C",
-  "metabolite" = "#7570B3"
+  "metabolite-annotation" = "#7570B3"
 )
 ```
 
@@ -570,15 +566,42 @@ tbl_degree_buckets <- format_degree_buckets(res$degree_buckets) %>%
 ```
 
 ```{r generate-plots}
+interaction_type_order <- c(
+  "pathway-metabolite",
+  "pathway-metabolic_enzyme",
+  "metabolite-protein",
+  "metabolite-cancer",
+  "metabolite-annotation")
+
+metric_colors <- c(
+  `Distinct Terms` = "blue",
+  `Distinct Targets` = "red",
+  `Distinct Interactions` = "purple"
+)
+
+resource_order_tbl <- tbl_resource_level %>%
+  mutate(
+    `Interaction Type` = factor(`Interaction Type`, levels = interaction_type_order),
+    ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource)
+  ) %>%
+  distinct(ResourcePlot, `Interaction Type`) %>%
+  arrange(`Interaction Type`)
+
+resource_plot_levels <- as.character(resource_order_tbl$ResourcePlot)
+resource_label_colors <- unname(interaction_type_colors[as.character(resource_order_tbl$`Interaction Type`)])
+interaction_type_legend_df <- tibble::tibble(`Interaction Type` = factor(interaction_type_order, levels = interaction_type_order))
+
 # Grouped bar: exclusion deltas for targets.
 delta_targets_plot_data <- tbl_exclusion_compare %>%
   filter(!is.na(`% Delta Targets`)) %>%
   mutate(
+    `Interaction Type` = factor(`Interaction Type`, levels = interaction_type_order),
     value = `% Delta Targets`,
     label = scales::percent(value, accuracy = 0.1),
     label_y = value + if_else(value >= 0, 0.03, -0.03),
     line_y = value + if_else(value >= 0, 0.02, -0.02),
-    ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource)
+    ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource),
+    ResourcePlot = factor(ResourcePlot, levels = resource_plot_levels)
   )
 
 mpv_theme <- theme_classic(base_size = 11) +
@@ -624,11 +647,13 @@ p_delta_targets <- ggplot(delta_targets_plot_data, aes(x = ResourcePlot, y = val
 delta_interactions_plot_data <- tbl_exclusion_compare %>%
   filter(!is.na(`% Delta Interactions`)) %>%
   mutate(
+    `Interaction Type` = factor(`Interaction Type`, levels = interaction_type_order),
     value = `% Delta Interactions`,
     label = scales::percent(value, accuracy = 0.1),
     label_y = value + if_else(value >= 0, 0.03, -0.03),
     line_y = value + if_else(value >= 0, 0.02, -0.02),
-    ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource)
+    ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource),
+    ResourcePlot = factor(ResourcePlot, levels = resource_plot_levels)
   )
 
 p_delta_interactions <- ggplot(delta_interactions_plot_data, aes(x = ResourcePlot, y = value, fill = `Interaction Type`)) +
@@ -663,7 +688,11 @@ p_delta_interactions <- ggplot(delta_interactions_plot_data, aes(x = ResourcePlo
 
 # Grouped and faceted footprint plot.
 resource_footprint_plot_data <- tbl_resource_level %>%
-  mutate(ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource)) %>%
+  mutate(
+    `Interaction Type` = factor(`Interaction Type`, levels = interaction_type_order),
+    ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource),
+    ResourcePlot = factor(ResourcePlot, levels = resource_plot_levels)
+  ) %>%
   pivot_longer(
     cols = c(`Distinct Terms`, `Distinct Targets`, `Distinct Interactions`),
     names_to = "Metric",
@@ -700,20 +729,13 @@ p_resource_footprint_stacked <- ggplot(
   aes(
     x = ResourcePlot,
     y = Value,
-    fill = `Interaction Type`,
-    pattern = Metric
+    fill = Metric
   )
 ) +
-  ggpattern::geom_col_pattern(
+  geom_col(
     position = "stack",
     width = 0.8,
-    color = "grey35",
-    pattern_fill = "grey20",
-    pattern_colour = "grey20",
-    pattern_angle = 45,
-    pattern_density = 0.25,
-    pattern_spacing = 0.03,
-    pattern_key_scale_factor = 0.7
+    color = "grey35"
   ) +
   geom_text(
     aes(
@@ -725,24 +747,29 @@ p_resource_footprint_stacked <- ggplot(
     color = "black",
     na.rm = TRUE
   ) +
-  scale_fill_manual(values = interaction_type_colors, drop = FALSE) +
-  ggpattern::scale_pattern_manual(
-    values = c(
-      `Distinct Terms` = "none",
-      `Distinct Targets` = "stripe",
-      `Distinct Interactions` = "crosshatch"
-    ),
-    drop = FALSE
+  geom_point(
+    data = interaction_type_legend_df,
+    aes(x = resource_plot_levels[1], y = 0, color = `Interaction Type`),
+    inherit.aes = FALSE,
+    alpha = 0,
+    size = 0.1,
+    show.legend = TRUE
+  ) +
+  scale_fill_manual(values = metric_colors, drop = FALSE) +
+  scale_color_manual(values = interaction_type_colors, drop = FALSE) +
+  guides(
+    fill = guide_legend(order = 1),
+    color = guide_legend(order = 2, override.aes = list(alpha = 1, size = 3))
   ) +
   labs(
     title = "Stacked Resource Footprint Across Terms, Targets, and Interactions",
     x = "Resource",
     y = "Count",
-    fill = "Interaction Type",
-    pattern = "Metric"
+    fill = "Metric",
+    color = "Interaction Type (x-axis labels)"
   ) +
-  mpv_theme
-
+  mpv_theme +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, color = resource_label_colors))
 resource_footprint_stacked_totals <- resource_footprint_plot_data %>%
   dplyr::group_by(ResourcePlot) %>%
   dplyr::summarise(TotalValue = sum(Value), .groups = "drop")
@@ -814,9 +841,11 @@ p_resource_footprint_interactions_split <- make_resource_footprint_split_single(
 # Grouped bar: mean targets per term.
 set_level_plot_data <- tbl_set_level %>%
   mutate(
+    `Interaction Type` = factor(`Interaction Type`, levels = interaction_type_order),
     mean_label = round(`Mean Targets per Term`, 2),
     median_label = round(`Median Targets per Term`, 2),
-    ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource)
+    ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource),
+    ResourcePlot = factor(ResourcePlot, levels = resource_plot_levels)
   )
 
 p_set_level_mean <- ggplot(set_level_plot_data, aes(x = ResourcePlot, y = `Mean Targets per Term`, fill = `Interaction Type`)) +
@@ -856,13 +885,12 @@ p_set_level_median <- ggplot(set_level_plot_data, aes(x = ResourcePlot, y = `Med
 
 # Stacked bar: membership composition.
 degree_bucket_plot_data <- tbl_degree_buckets %>%
-  group_by(Resource) %>%
-  mutate(n_interaction_types = n_distinct(`Interaction Type`)) %>%
-  ungroup() %>%
   mutate(
+    `Interaction Type` = factor(`Interaction Type`, levels = interaction_type_order),
     `Membership Bucket` = factor(`Membership Bucket`, levels = c("in 1 term", "in 2 terms", "in >2 terms")),
     `Share Label` = scales::percent(`Share of Targets`, accuracy = 0.1),
-    ResourcePlot = if_else(n_interaction_types > 1, paste0(Resource, "\n", `Interaction Type`), Resource)
+    ResourcePlot = if_else(Resource %in% c("metsigdb_hallmarks", "metsigdb_gaude_pathways"), paste0(Resource, "\n", `Interaction Type`), Resource),
+    ResourcePlot = factor(ResourcePlot, levels = resource_plot_levels)
   )
 
 p_degree_bucket <- ggplot(degree_bucket_plot_data, aes(x = ResourcePlot, y = `Share of Targets`, fill = `Membership Bucket`)) +
@@ -873,14 +901,42 @@ p_degree_bucket <- ggplot(degree_bucket_plot_data, aes(x = ResourcePlot, y = `Sh
     size = 2.6,
     color = "black"
   ) +
+  geom_point(
+    data = interaction_type_legend_df,
+    aes(x = resource_plot_levels[1], y = 0, color = `Interaction Type`),
+    inherit.aes = FALSE,
+    alpha = 0,
+    size = 0.1,
+    show.legend = TRUE
+  ) +
   scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  scale_color_manual(values = interaction_type_colors, drop = FALSE) +
+  guides(
+    fill = guide_legend(order = 1),
+    color = guide_legend(order = 2, override.aes = list(alpha = 1, size = 3))
+  ) +
   labs(
     title = "Target Membership Composition per Resource",
     x = "Resource",
     y = "Share of Targets",
-    fill = "Membership Bucket"
+    fill = "Membership Bucket",
+    color = "Interaction Type (x-axis labels)"
   ) +
-  mpv_theme
+  mpv_theme +
+  theme(axis.text.x = element_text(angle = 90, hjust = 1, color = resource_label_colors))
+
+if (!requireNamespace("gridExtra", quietly = TRUE)) {
+  stop("Package `gridExtra` is required for the combined footprint-degree plot. Please install it first.")
+}
+
+stacked_split_grob <- grid::grid.grabExpr(print(p_resource_footprint_stacked_split))
+degree_bucket_grob <- grid::grid.grabExpr(print(p_degree_bucket))
+
+p_resource_degree_combined <- gridExtra::arrangeGrob(
+  stacked_split_grob,
+  degree_bucket_grob,
+  ncol = 2
+)
 
 plot_manifest <- tibble::tibble(
   Plot = c(
@@ -895,7 +951,8 @@ plot_manifest <- tibble::tibble(
     "Distinct Interactions by Resource (Y-axis split)",
     "Average Targets per Term",
     "Median Targets per Term",
-    "Membership Composition"
+    "Membership Composition",
+    "Combined Footprint and Membership"
   ),
   PlotObject = list(
     p_delta_targets,
@@ -909,7 +966,8 @@ plot_manifest <- tibble::tibble(
     p_resource_footprint_interactions_split,
     p_set_level_mean,
     p_set_level_median,
-    p_degree_bucket
+    p_degree_bucket,
+    p_resource_degree_combined
   ),
   SVG_File = c(
     "exclusion_pct_delta_targets.svg",
@@ -923,10 +981,11 @@ plot_manifest <- tibble::tibble(
     "resource_footprint_interactions_split.svg",
     "set_level_mean_targets.svg",
     "set_level_median_targets.svg",
-    "degree_bucket_composition.svg"
+    "degree_bucket_composition.svg",
+    "resource_degree_combined.svg"
   ),
-  Width = c(13, 13, 14, 14, 14, 14, 14, 14, 14, 13, 13, 13),
-  Height = c(6, 6, 8, 8, 8, 8, 8, 8, 8, 6, 6, 7)
+  Width = c(13, 13, 14, 14, 14, 14, 14, 14, 14, 13, 13, 13, 27),
+  Height = c(6, 6, 8, 8, 8, 8, 8, 8, 8, 6, 6, 7, 8)
 )
 
 plot_files <- purrr::pmap_chr(
@@ -1070,6 +1129,11 @@ knitr::kable(tbl_degree_buckets, digits = 3)
 
 ```{r test-3-degree-bucket-plot, fig.width=13, fig.height=7}
 p_degree_bucket
+```
+
+```{r test-3-combined-footprint-degree-plot, fig.width=27, fig.height=8}
+grid::grid.newpage()
+grid::grid.draw(p_resource_degree_combined)
 ```
 
 # Export summary
