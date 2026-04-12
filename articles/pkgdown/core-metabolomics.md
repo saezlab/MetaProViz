@@ -1848,34 +1848,34 @@ select_label = NULL)
     #> [1] stats     graphics  grDevices utils     datasets  methods   base     
     #> 
     #> other attached packages:
-    #> [1] stringr_1.6.0      ggfortify_0.4.19   ggplot2_4.0.2      rlang_1.1.7        tibble_3.3.1       dplyr_1.2.0       
-    #> [7] magrittr_2.0.4     MetaProViz_3.99.51 BiocStyle_2.38.0  
+    #> [1] stringr_1.6.0      ggfortify_0.4.19   ggplot2_4.0.2      rlang_1.2.0        tibble_3.3.1       dplyr_1.2.1       
+    #> [7] magrittr_2.0.5     MetaProViz_3.99.52 BiocStyle_2.38.0  
     #> 
     #> loaded via a namespace (and not attached):
     #>   [1] RColorBrewer_1.1-3          rstudioapi_0.18.0           jsonlite_2.0.0              ggbeeswarm_0.7.3           
     #>   [5] farver_2.1.2                rmarkdown_2.31              fs_2.0.1                    ragg_1.5.2                 
-    #>   [9] vctrs_0.7.2                 memoise_2.0.1               rstatix_0.7.3               htmltools_0.5.9            
+    #>   [9] vctrs_0.7.3                 memoise_2.0.1               rstatix_0.7.3               htmltools_0.5.9            
     #>  [13] S4Arrays_1.10.1             progress_1.2.3              curl_7.0.0                  ComplexUpset_1.3.3         
-    #>  [17] decoupleR_2.16.0            broom_1.0.12                cellranger_1.1.0            SparseArray_1.10.9         
+    #>  [17] decoupleR_2.16.0            broom_1.0.12                cellranger_1.1.0            SparseArray_1.10.10        
     #>  [21] Formula_1.2-5               sass_0.4.10                 parallelly_1.46.1           bslib_0.10.0               
     #>  [25] htmlwidgets_1.6.4           desc_1.4.3                  plyr_1.8.9                  httr2_1.2.2                
-    #>  [29] lubridate_1.9.5             cachem_1.1.0                igraph_2.2.2                lifecycle_1.0.5            
+    #>  [29] lubridate_1.9.5             cachem_1.1.0                igraph_2.2.3                lifecycle_1.0.5            
     #>  [33] pkgconfig_2.0.3             Matrix_1.7-4                R6_2.6.1                    fastmap_1.2.0              
     #>  [37] MatrixGenerics_1.22.0       digest_0.6.39               colorspace_2.1-2            patchwork_1.3.2            
-    #>  [41] S4Vectors_0.48.0            textshaping_1.0.5           GenomicRanges_1.62.1        RSQLite_2.4.6              
+    #>  [41] S4Vectors_0.48.1            textshaping_1.0.5           GenomicRanges_1.62.1        RSQLite_2.4.6              
     #>  [45] ggpubr_0.6.3                labeling_0.4.3              timechange_0.4.0            polyclip_1.10-7            
     #>  [49] httr_1.4.8                  abind_1.4-8                 compiler_4.5.2              bit64_4.6.0-1              
-    #>  [53] withr_3.0.2                 S7_0.2.1                    backports_1.5.0             BiocParallel_1.44.0        
+    #>  [53] withr_3.0.2                 S7_0.2.1                    backports_1.5.1             BiocParallel_1.44.0        
     #>  [57] viridis_0.6.5               carData_3.0-6               DBI_1.3.0                   logger_0.4.1               
     #>  [61] OmnipathR_3.19.12           ggforce_0.5.0               R.utils_2.13.0              ggsignif_0.6.4             
-    #>  [65] cosmosR_1.18.1              MASS_7.3-65                 rappdirs_0.3.4              DelayedArray_0.36.0        
+    #>  [65] cosmosR_1.18.1              MASS_7.3-65                 rappdirs_0.3.4              DelayedArray_0.36.1        
     #>  [69] sessioninfo_1.2.3           scatterplot3d_0.3-45        gtools_3.9.5                tools_4.5.2                
     #>  [73] vipor_0.4.7                 otel_0.2.0                  qcc_2.7                     beeswarm_0.4.0             
     #>  [77] zip_2.3.3                   R.oo_1.27.1                 glue_1.8.0                  grid_4.5.2                 
     #>  [81] checkmate_2.3.4             reshape2_1.4.5              generics_0.1.4              gtable_0.3.6               
     #>  [85] tzdb_0.5.0                  R.methodsS3_1.8.2           tidyr_1.3.2                 hms_1.1.4                  
     #>  [89] tidygraph_1.3.1             xml2_1.5.2                  car_3.1-5                   XVector_0.50.0             
-    #>  [93] BiocGenerics_0.56.0         ggrepel_0.9.8               pillar_1.11.1               vroom_1.7.0                
+    #>  [93] BiocGenerics_0.56.0         ggrepel_0.9.8               pillar_1.11.1               vroom_1.7.1                
     #>  [97] limma_3.66.0                later_1.4.8                 splines_4.5.2               tweenr_2.0.3               
     #> [101] lattice_0.22-7              bit_4.6.0                   tidyselect_1.2.1            knitr_1.51                 
     #> [105] gridExtra_2.3               bookdown_0.46               IRanges_2.44.0              Seqinfo_1.0.0              
@@ -1884,11 +1884,11 @@ select_label = NULL)
     #> [117] matrixStats_1.5.0           pheatmap_1.0.13             stringi_1.8.7               yaml_2.3.12                
     #> [121] kableExtra_1.4.0            evaluate_1.0.5              codetools_0.2-20            tcltk_4.5.2                
     #> [125] ggraph_2.2.2                qvalue_2.42.0               hash_2.2.6.4                BiocManager_1.30.27        
-    #> [129] Polychrome_1.5.4            cli_3.6.5                   systemfonts_1.3.2           jquerylib_0.1.4            
+    #> [129] Polychrome_1.5.4            cli_3.6.6                   systemfonts_1.3.2           jquerylib_0.1.4            
     #> [133] EnhancedVolcano_1.29.1      Rcpp_1.1.1                  readxl_1.4.5                XML_3.99-0.23              
     #> [137] parallel_4.5.2              pkgdown_2.2.0               readr_2.2.0                 blob_1.3.0                 
     #> [141] prettyunits_1.2.0           viridisLite_0.4.3           scales_1.4.0                writexl_1.5.4              
-    #> [145] inflection_1.3.7            purrr_1.2.1                 crayon_1.5.3                rvest_1.0.5
+    #> [145] inflection_1.3.7            purrr_1.2.2                 crayon_1.5.3                rvest_1.0.5
 
 Badia-I-Mompel, Pau, Jesús Vélez Santiago, Jana Braunger, Celina Geiss,
 Daniel Dimitrov, Sophia Müller-Dott, Petr Taus, et al. 2022. “decoupleR:
