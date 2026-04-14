@@ -60,7 +60,7 @@ sanitize_df <- function(df) {
   return(df)
 }
 
-#Make lists
+# Make lists
 convert_to_df <- function(path) {
   df <- as.data.frame(
     suppressMessages(
@@ -96,7 +96,7 @@ FeatureFilt <- read.csv(
 )
 
 # Extract the relevant information and compile a new sheet
-AffectedMetab <- c("N-acetylaspartylglutamate", "S-(2-succinyl)cysteine", "3-Dehydro-L-threonate" , "aconitate" ,"arginine"  ,"fumarate", "gluconate",  "malate", "methylarginine" , "ornithine","hypotaurine")
+AffectedMetab <- c("N-acetylaspartylglutamate", "S-(2-succinyl)cysteine", "3-Dehydro-L-threonate", "aconitate" ,"arginine"  ,"fumarate", "gluconate",  "malate", "methylarginine" , "ornithine", "hypotaurine")
 
 PoolCV <- data_list[["PoolEstimationCV"]]%>%
   dplyr::filter(CV >= 30 | Metabolite %in%  AffectedMetab)%>%
@@ -123,68 +123,13 @@ Merged <- PoolCV %>%
   mutate(`80%-filtering` = if_else(!is.na(`80%-filtering`), TRUE, FALSE)
          )%>%
   arrange(desc(removed))
-```
 
-
-# Export the updated Extended Data Table
-`Extended Data Table 3_Cells-Exometabolomics.xlsx`:\
-- Sheet 1: Raw data.\
-- Sheet 2: Pool estimation.\
-- Sheet 3: Media blank samples CV.\
-- Sheet 4: FilteredFeatures.\
-- Sheet 5: Processed data.\
-- Sheet 6: Differential Results 786-M1A versus HK2.\
-- Sheet 7: Differential Results 786-M2A versus HK2.\
-- Sheet 8: Differential Results 786-O versus HK2.\
-- Sheet 9: Differential Results OSLM1B versus HK2.\
-- Sheet 10: Differential Results OSRC2 versus HK2.\
-- Sheet 11: Differential Results RFX631 versus HK2.\
-- Sheet 12: Consumption-Release feature metadata.\
-
-*We need to add metalinks information here!
-```{r}
-#Overview sheets:
-df <- data.frame(
-  Sheet = paste("Sheet", 1:12),
-  Content = c(
-    "Raw data.",
-    "Pool estimation.",
-    "Media blank samples CV.",
-    "Filtered and Flanked Features.",
-    "Processed data.",
-    "Differential Results 786-M1A versus HK2.",
-    "Differential Results 786-M2A versus HK2.",
-    "Differential Results 786-O versus HK2.",
-    "Differential Results OSLM1B versus HK2.",
-    "Differential Results OSRC2 versus HK2.",
-    "Differential Results RFX631 versus HK2.",
-    "Consumption-Release feature metadata."
-  ),
-  stringsAsFactors = FALSE
+# save as csv
+write.csv2(
+    sanitize_df(Merged),
+    "Cells_CoRe/Merged_FilteredFeatures.csv",
+    row.names = FALSE
 )
-
-#Make lists
-Cells_CoRe <- list(
-  "SheetOverview" = df,
-  "RawData" = data_list[["RawData"]],
-  "PoolEstimationCV" = data_list[["PoolEstimationCV"]]%>%arrange(desc(CV)),
-  "MediaBlankCV" = data_list[["MediaBlankCV"]]%>%arrange(desc(CV)),
-  "FilteredFeatures" = Merged,
-  "ProcessedData" = data_list[["ProcessedData"]],
-  "DMA_786-M1A_vs_HK2" = data_list[["DMA_786-M1A_vs_HK2"]],
-  "DMA_786-M2A_vs_HK2" = data_list[["DMA_786-M2A_vs_HK2"]],
-  "DMA_786-O_vs_HK2" = data_list[["DMA_786-O_vs_HK2" ]],
-  "DMA_OSLM1B_vs_HK2" = data_list[["DMA_OSLM1B_vs_HK2"]],
-  "DMA_OSRC2_vs_HK2" = data_list[["DMA_OSRC2_vs_HK2"]],
-  "DMA_RFX631_vs_HK2" = data_list[[ "DMA_RFX631_vs_HK2"]],
-  "DMA_FeatureMetadata" = data_list[["DMA_FeatureMetadata"]]
-)
-
-# Convert All Text to UTF-8
-Cells_CoRe <- lapply(Cells_CoRe, sanitize_df)
-
-# Save:
-writexl::write_xlsx(Cells_CoRe, "Extended Data Table 3_Cells-Exometabolomics.xlsx" , col_names = TRUE)
 ```
 
 # Session information
