@@ -157,10 +157,11 @@ write.csv(MediaBlankCV,
           paste0(Fig3D ,"/Fig.3d.csv"), 
           row.names = FALSE)
 
-## Fig3E = PCA Pool QC
+## Fig3E = PCA Pool QC --> Raw data is used at this stage!
+#Open: Pool_Estimation_result[["DF"]][["data"]] from BioRxiv Branch and run: 
+PCA_RES <- prcomp(as.matrix(Pool_Estimation_result[["DF"]][["data"]]), scale. = as.logical(TRUE))
 
-#NOTE: We do not save the PC table as a .csv, but we can use it and do prcomp file? --> is this the exact same plot? 
-
+autoplot(PCA_RES)
 
 
 ## Fig3F = Before/After TIC
@@ -174,7 +175,25 @@ write.csv(ProcessedData%>%select(-(3:5)),
           paste0(Fig3F ,"/Fig.3f_RightPanel.csv"), 
           row.names = FALSE)
 
-## Fig3G = PCA outliers --> Sheet 5, processed data
+## Fig3G = PCA outliers --> Sheet 5, processed data is used with VizPCA!
+ProcessedData$Outliers <- relevel(as.factor(ProcessedData$Outliers), ref = "no")
+
+ProcessedData_Mat <- ProcessedData %>%
+  select( -Conditions, -Biological_Replicates, -GrowthFactor, -Outliers)%>%
+  column_to_rownames("Code")
+
+PCA_RES <- prcomp(as.matrix(ProcessedData_Mat), scale. = as.logical(TRUE))
+
+autoplot(PCA_RES)
+
+pca_QC <- invisible(viz_pca(data = as.data.frame(ProcessedData_Mat),
+                                    metadata_info = c(color = "Conditions", shape = "Outliers"),
+                                    metadata_sample = ProcessedData[,c(1:5)]%>%column_to_rownames("Code"),
+                                    plot_name = "Quality Control PCA Condition clustering and outlier check",
+                                    save_plot = NULL))
+
+# It is not the exact same --> What do I do here? 
+
 write.csv(ProcessedData , 
           paste0(Fig3G ,"/Fig.3g.csv"), 
           row.names = FALSE)
@@ -284,14 +303,40 @@ write.csv(MCA_core_Compressed,
           paste0(Fig4E ,"/Fig.4e.csv"), 
           row.names = FALSE)
 
-## Fig4F
+## Fig4F MCA_Summary Table
+MCA2Cond_Summary <- read_excel("Table_EV3.xlsx", sheet = "MCA2Cond_Summary")%>%
+  filter(`Regulation.Grouping`=="RG2_Significant")%>%
+  filter(!`SiRCle.cluster.Name`=="Background = FALSE")%>%
+  filter(!`SiRCle.cluster.Name`=="None")
 
+# this is not the exact same --> What happened? --> plot again!
 
 
 ## Fig4G
+MCA2Cond_786M1A_vs_HK2 <- read_excel("Table_EV3.xlsx", sheet = "MCA2Cond_786M1A_vs_HK2")%>%
+  filter(RG2_Significant =="Both_DOWN (Released/Consumed)")
+
+Heatmap_Meatbs <- MCA2Cond_786M1A_vs_HK2$Metabolite
+
+heatmap_plot_df <- ProcessedData %>%
+  pivot_longer(
+    cols = -all_of(sample_cols),
+    names_to = "Metabolite",
+    values_to = "Abundance"
+  ) %>%
+  left_join(
+    DMAFeatureMetadata %>%
+      select(all_of(c("Metabolite", "Pathway", "core_HK2", "core_786-O", "core_786-M1A"))),
+    by = "Metabolite"
+  )%>%
+  filter(Outliers != "Outlier_filtering_round_1") %>%
+  filter(!Metabolite %in% c("valine-d8", "hipppuric acid-d5"))  %>%
+  #filter(Pathway == "Amino acid metabolism") %>% #Select for metabolites from cluster!
+  select(-Biological_Replicates, -GrowthFactor, -Outliers)
 
 
 ## Fig4H
+#Needs to be compiled from both processed intra and processed core data. 
 
 
 ```
@@ -389,6 +434,25 @@ write.csv(ProcessedData ,
 
 
 
+
+## Screeplot uses PCA results:
+inflect_df <- as.data.frame(c(seq_along(PCA.res$sdev)))
+        colnames(inflect_df) <- "x"
+        inflect_df$y <- summary(PCA.res)$importance[2, ]
+        inflect_df$Cumulative <- summary(PCA.res)$importance[3, ]
+        screeplot_cumul <-
+            format(
+                round(inflect_df$Cumulative[seq_len(20)]*100, 1),
+                nsmall = 1
+            )  # make cumulative variation labels for plot
+        knee <-
+            uik(
+                inflect_df$x,
+                inflect_df$y
+            )  # Calculate the knee and select optimal number of components
+        # Note: we subtract 1 components from the knee cause the root of the
+        # knee is the PC that does not add something. npcs = 30
+        npcs <- knee -1
 ```
 
 
