@@ -158,10 +158,10 @@ write.csv(MediaBlankCV,
           row.names = FALSE)
 
 ## Fig3E = PCA Pool QC --> Raw data is used at this stage!
+#Open: Pool_Estimation_result[["DF"]][["data"]] from BioRxiv Branch and run: 
+PCA_RES <- prcomp(as.matrix(Pool_Estimation_result[["DF"]][["data"]]), scale. = as.logical(TRUE))
 
-
-#NOTE: We do not save the PC table as a .csv, but we can use it and do prcomp file? --> is this the exact same plot? 
-
+autoplot(PCA_RES)
 
 
 ## Fig3F = Before/After TIC
