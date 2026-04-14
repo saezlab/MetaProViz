@@ -40,12 +40,12 @@ install the required dependencies and load the libraries:
 ```{r, message=FALSE, warning=FALSE}
 #dependencies that need to be loaded:
 library(dplyr)
+library(tidyverse)
 library(readxl)
-
+library(MetaProViz)
 ```
 
 # Compile the source data tables for the figures
-
 ```{r}
 #Create output folder
 Output_folder <- file.path(getwd(), "SourceData")
@@ -53,7 +53,20 @@ if (!dir.exists(Output_folder)) {dir.create(Output_folder)} # Make Results folde
 ```
 
 ## Figure 1
-Not applicable as Schematics.
+Not applicable to Fig. 1a-b as Schematics.
+```{r}
+# Create needed output folders
+Fig1 <- file.path(Output_folder, "Figure 1")
+if (!dir.exists(Fig2)) {dir.create(Fig2)} 
+
+Fig1C <- file.path(Fig1 , "1C")
+if (!dir.exists(Fig1C)) {dir.create(Fig1C)}  
+
+#---------------------------------------------------------------------------------
+# Add Figure Source data and save as .csv files within the respective folders:
+
+
+```
 
 ## Figure 2
 Not applicable to Fig 2D-E as Schmatics
@@ -111,9 +124,10 @@ if (!dir.exists(Fig3G)) {dir.create(Fig3G)}
 #---------------------------------------------------------------------------------
 # Add Figure Source data and save as .csv files within the respective folders:
 
-## Fig3B = ExtendedDataTable 3, sheet  1 "Raw data." --> needs data wrangling
+## Fig3B = Table EV3, sheet  1 "Raw data." --> needs data wrangling
+data(intracell_raw)
+
 CellPlot_Intra <- intracell_raw%>%
-  column_to_rownames("Code")%>%
   filter(Conditions != "Pool")%>%
    mutate(Celltype = case_when(Conditions=="HK2" ~ 'Healthy',
                                Conditions=="786-O" ~ 'PrimaryTumour',
@@ -122,16 +136,47 @@ CellPlot_Intra <- intracell_raw%>%
 CellPlot_Intra$Count <- 1
 CellPlot_Intra$CelltypeFactor <- factor(CellPlot_Intra$Celltype, levels = c("Healthy","PrimaryTumour", "MetastaticTumour"))
 
-#--> Add those info to extended data table 3 as sheet 1 about sample infos! Do the same for the other sample data (intra), patients have this already
+CellPlot_Intra_select <- CellPlot_Intra %>%
+  select(Code, Conditions, Analytical_Replicates, Biological_Replicates, Celltype, Count)
+
+write.csv(CellPlot_Intra_select, 
+          paste0(Fig3B ,"/Fig.3b.csv"), 
+          row.names = FALSE)
+
+## Fig3C = Table EV3, sheet 2
+PoolEstimationCV <- read_excel("Table_EV3.xlsx", sheet = "PoolEstimationCV")
+
+write.csv(PoolEstimationCV, 
+          paste0(Fig3C ,"/Fig.3c.csv"), 
+          row.names = FALSE)
+
+## Fig3D = Table EV3, sheet 3
+MediaBlankCV <- read_excel("Table_EV3.xlsx", sheet = "MediaBlankCV")
+
+write.csv(MediaBlankCV, 
+          paste0(Fig3D ,"/Fig.3d.csv"), 
+          row.names = FALSE)
+
+## Fig3E = PCA Pool QC
 
 
-## Fig3C = ExtendedDataTable 3, sheet ""
 
-## Fig3D
 
-## Fig3E
+## Fig3F = Before/After TIC
+RawData <- read_excel("Table_EV3.xlsx", sheet = "RawData")
+write.csv(RawData , 
+          paste0(Fig3F ,"/Fig.3f_LeftPanel.csv"), 
+          row.names = FALSE)
 
-## Fig3F
+ProcessedData <- read_excel("Table_EV3.xlsx", sheet = "ProcessedData")
+write.csv(ProcessedData%>%select(-(3:5)),
+          paste0(Fig3F ,"/Fig.3f_RightPanel.csv"), 
+          row.names = FALSE)
+
+## Fig3G = PCA outliers --> Sheet 5, processed data
+write.csv(ProcessedData , 
+          paste0(Fig3G ,"/Fig.3g.csv"), 
+          row.names = FALSE)
 ```
 
 ## Figure 4
@@ -221,13 +266,59 @@ if (!dir.exists(Fig5F)) {dir.create(Fig5F)}
 ```
 
 
-
 ## EV Figure 1
 Not applicable as Schematics.
 
+
 ## EV Figure 2
 
-## EV Figure 3
+```{r}
+# Create needed output folders
+FigEV2 <- file.path(Output_folder, "Figure 2")
+if (!dir.exists(FigEV2)) {dir.create(FigEV2)} 
+
+FigEV2A <- file.path(FigEV2 , "2A")
+if (!dir.exists(FigEV2A)) {dir.create(FigEV2A)}
+
+FigEV2B <- file.path(FigEV2 , "2B")
+if (!dir.exists(FigEV2B)) {dir.create(FigEV2B)}  
+
+FigEV2C <- file.path(FigEV2 , "2C")
+if (!dir.exists(FigEV2C)) {dir.create(FigEV2C)}  
+
+FigEV2D <- file.path(FigEV2 , "2D")
+if (!dir.exists(FigEV2D)) {dir.create(FigEV2D)}
+
+FigEV2E <- file.path(FigEV2 , "2E")
+if (!dir.exists(FigEV2E)) {dir.create(FigEV2E)}
+
+#-----------------------------------------------------------------------------
+# Add Figure Source data and save as .csv files within the respective folders:
+
+## FigEV 2A = Table EV3, sheet 2
+PoolEstimationCV <- read_excel("Table_EV3.xlsx", sheet = "PoolEstimationCV")
+
+write.csv(PoolEstimationCV, 
+          paste0(FigEV2A ,"/Fig.EV2a.csv"), 
+          row.names = FALSE)
+
+## FigEV 2B = Table EV3, sheet 3
+MediaBlankCV <- read_excel("Table_EV3.xlsx", sheet = "MediaBlankCV")
+
+write.csv(MediaBlankCV, 
+          paste0(FigEV2B ,"/Fig.EV2b.csv"), 
+          row.names = FALSE)
+
+## FigEV 2C = PCA plot --> Sheet 5, processed data
+ProcessedData <- read_excel("Table_EV3.xlsx", sheet = "ProcessedData")
+
+write.csv(ProcessedData , 
+          paste0(FigEV2C ,"/Fig.EV2c.csv"), 
+          row.names = FALSE)
+
+
+
+```
 
 
 
