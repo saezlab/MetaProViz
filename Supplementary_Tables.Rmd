@@ -247,10 +247,12 @@ New sheet order:
 
 data("mca_core_rules")
 mca_results <- read.csv2(
-    "https://raw.githubusercontent.com/saezlab/MetaProViz/BioRxiv/Cells_CoRe/MetaProViz_Results/MCAcore/mca_2cond_MCA_core_Results_2025-08-01.csv"
+    "https://raw.githubusercontent.com/saezlab/MetaProViz/BioRxiv/Cells_CoRe/MetaProViz_Results/MCAcore/mca_2cond_MCA_core_Results_2025-08-01.csv",
+    sep=","
   )
 mca_summary <- read.csv2(
-    "https://raw.githubusercontent.com/saezlab/MetaProViz/BioRxiv/Cells_CoRe/MetaProViz_Results/MCAcore/mca_2cond_MCA_core_summary_2025-08-01.csv"
+    "https://raw.githubusercontent.com/saezlab/MetaProViz/BioRxiv/Cells_CoRe/MetaProViz_Results/MCAcore/mca_2cond_MCA_core_summary_2025-08-01.csv",
+    sep=","
   )
 
 data_list <- 
