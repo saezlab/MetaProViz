@@ -127,37 +127,49 @@ writexl::write_xlsx(MetSigDB_Benchmark, "Table_EV1.xlsx" , col_names = TRUE)
 - newly added sheets for the new workflow
 
 Previous sheets:
-- Sheet 1: ccRCC patients feature metadata.\
-- Sheet 2: Normalised data.\
-- Sheet 3: Metadata Analysis Anova.\
-- Sheet 4: Metadata Analysis Features.\
-- Sheet 5: Metadata Analysis Top/Bottom Features~PC.\
-- Sheet 6: Differential analysis TUMOR vs NORMAL.\
-- Sheet 7: Differential analysis TUMOR vs NORMAL of patient subset Old.\
-- Sheet 8: Differential analysis TUMOR vs NORMAL of patient subset Young.\
-- Sheet 9: MCA2Cond biological regulated clustering TvN_Young versus TvN_Old.\
-- Sheet 10: Summary of MCA2Cond biological regulated clustering.\
-- Sheet 11: Pathway enrichment analysis using KEGG on Old patient subset.\
-- Sheet 12: Pathway enrichment analysis using KEGG on Young patient subset.\
+- Sheet 1: ccRCC patients feature metadata.
+- Sheet 2: Normalised data.
+- Sheet 3: Metadata Analysis Anova.
+- Sheet 4: Metadata Analysis Features.
+- Sheet 5: Metadata Analysis Top/Bottom Features~PC.
+- Sheet 6: Differential analysis TUMOR vs NORMAL.
+- Sheet 7: Differential analysis TUMOR vs NORMAL of patient subset Old.
+- Sheet 8: Differential analysis TUMOR vs NORMAL of patient subset Young.
+- Sheet 9: MCA2Cond biological regulated clustering TvN_Young versus TvN_Old.
+- Sheet 10: Summary of MCA2Cond biological regulated clustering.
+- Sheet 11: Pathway enrichment analysis using KEGG on Old patient subset.
+- Sheet 12: Pathway enrichment analysis using KEGG on Young patient subset.
 
 
-New sheets:
-- Sheet x: 
-- Sheet x: 
-- Sheet x: 
-- Sheet x: 
-- Sheet x: 
-- Sheet x: 
-- Sheet x: 
-- Sheet x: 
-- Sheet x: 
-- Sheet x: 
-- Sheet x: 
-- Sheet x: 
-- Sheet x: 
-- Sheet x: 
-- Sheet x: 
+New sheet order:
 
+Figure 2 workflow tables
+- Sheet x: Raw ccRCC patients feature metadata (MetaboliteIDs_original).
+- Sheet x: ID QC id pair compatibility checks (ID_QC)
+- Sheet x: Feature metadata cleaned (MetaboliteIDs_cleaned)
+- Sheet x: Feature metadata translated (MetaboliteIDs_Translated)
+- Sheet x: Feature metadata traverse (MetaboliteIDs_traverse)
+- Sheet x: Feature metadata addEquivalent (MetaboliteIDs_addEquivalent)
+- Sheet x: Processed ccRCC patients feature metadata. (Tissue_MetaData_Extended_cleaned)
+- Sheet x: ID summary (id_summary)
+- Sheet x: ID summary deltas (id_summary_deltas)
+
+Keep these as before:
+- Sheet x: Normalised data.
+- Sheet x: Metadata Analysis Anova.
+- Sheet x: Metadata Analysis Features.
+- Sheet x: Metadata Analysis Top/Bottom Features~PC.
+- Sheet x: Differential analysis TUMOR vs NORMAL.
+- Sheet x: Differential analysis TUMOR vs NORMAL of patient subset Old.
+- Sheet x: Differential analysis TUMOR vs NORMAL of patient subset Young.
+- Sheet x: MCA2Cond biological regulated clustering TvN_Young versus TvN_Old.
+- Sheet x: Summary of MCA2Cond biological regulated clustering.
+
+Figure 5 workflow
+- Sheet x: Pathway enrichment analysis using KEGG on Old patient subset. (new analysis, DMA_ORA_res_OLD)
+- Sheet x: Pathway enrichment analysis using KEGG on Young patient subset. (new analysis, DMA_ORA_res_YOUNG)
+- Sheet x: Clustering results of ORA on Young patient subset, filtered for pathways with p.adj < 0.05. (data_with_clusters)
+- Sheet x: Cluster summary of ORA clustering results. (cluster_summary)
 
 ```{r}
 
@@ -167,51 +179,202 @@ data_list <-
     "https://raw.githubusercontent.com/saezlab/MetaProViz/BioRxiv/Extended%20Data%20Table%201_PatientsTissue_Metabolomics.xlsx"
   )
 
+## Fig2 workflow data
+
+# Original Feature Metadata
+MetaboliteIDs_original <- 
+  read.csv(
+    "MetaProViz_Results/PK/Original/Metabolite_IDs_original.csv",
+    sep=";"
+  ) %>%
+  select(-X)
+
+# ID QC
+ID_QC <- 
+  read.csv2(
+    "MetaProViz_Results/PK/ID_QC/joined_and_manually_cleaned_id_pair_tables.csv", # contains flags from where it was possibly manually curated
+    sep=";"
+  ) %>%
+  select(-X)
+
+# Cleaned Feature Metadata
+MetaboliteIDs_cleaned <- 
+  read.csv(
+    "MetaProViz_Results/PK/Cleaned/MetaboliteIDs_cleaned.csv",
+    sep=";"
+  ) %>%
+  select(-X)
+
+# Translated Feature Metadata
+MetaboliteIDs_Translated <- 
+  read.csv(
+    "MetaProViz_Results/PK/Translated/MetaboliteIDs_Translated.csv",
+    sep=";"
+  ) %>%
+  select(-X)
+
+# Traversed Feature Metadata
+MetaboliteIDs_traverse <- 
+  read.csv(
+    "MetaProViz_Results/PK/Traverse/MetaboliteIDs_traverse.csv",
+    sep=";"
+  ) %>%
+  select(-X)
+
+# addEquivalent Feature Metadata
+MetaboliteIDs_addEquivalent <- 
+  read.csv(
+    "MetaProViz_Results/PK/EquivalentID/MetaboliteIDs_addEquivalent.csv",
+    sep=";"
+  ) %>%
+  select(-X)
+ 
+# id summary tables
+id_summary <- 
+  read.csv(
+    "MetaProViz_Results/PK/id_summary/id_count_df.csv",
+    sep=";"
+  ) %>%
+  select(-X)
+
+id_summary_deltas <- 
+  read.csv(
+    "MetaProViz_Results/PK/id_summary/delta_df.csv",
+    sep=";"
+  ) %>%
+  select(-X)
+
+# Result of Fig2 workflow "Tissue_MetaData_Extended_cleaned" containing flag column of manual ID QC and manual curation during checkmatch
+Tissue_MetaData_Extended_cleaned <-
+  read.csv(
+    "MetaProViz_Results/PK/End_Result_Fig2/Tissue_MetaData_Extended_cleaned.csv",
+    sep=";"
+  ) %>%
+  select(-X)
 
 
 
+## Fig5 workflow data
+
+DMA_ORA_res_OLD <- 
+  read.csv(
+    "MetaProViz_Results/Enrichment/DM_ORA_res_OLD.csv",
+    sep=";"
+  ) %>%
+  select(-X)
+
+DMA_ORA_res_YOUNG <- 
+  read.csv(
+    "MetaProViz_Results/Enrichment/DM_ORA_res_OLD.csv",
+    sep=";"
+  ) %>%
+  select(-X)
+
+data_with_clusters <-
+  read.csv(
+    "MetaProViz_Results/Enrichment/data_with_clusters.csv",
+    sep=";"
+  ) %>%
+  select(-X)
+
+cluster_summary <-
+  read.csv(
+    "MetaProViz_Results/Enrichment/cluster_summary.csv",
+    sep=";"
+  ) %>%
+  select(-X)
 
 
-
-
-
-
-
-
-
-
-
-
+# Figure 2 workflow tables
+# - Sheet x: Raw ccRCC patients feature metadata (MetaboliteIDs_original).
+# - Sheet x: ID QC id pair compatibility checks (ID_QC)
+# - Sheet x: Feature metadata cleaned (MetaboliteIDs_cleaned)
+# - Sheet x: Feature metadata translated (MetaboliteIDs_Translated)
+# - Sheet x: Feature metadata traverse (MetaboliteIDs_traverse)
+# - Sheet x: Feature metadata addEquivalent (MetaboliteIDs_addEquivalent)
+# - Sheet x: Feature metadata filtered for KEGG and ambiguity-resolved. (Tissue_MetaData_Extended_cleaned)
+# - Sheet x: ID summary (id_summary)
+# - Sheet x: ID summary deltas (id_summary_deltas)
+# 
+# Keep these as before:
+# - Sheet x: Normalised data.
+# - Sheet x: Metadata Analysis Anova.
+# - Sheet x: Metadata Analysis Features.
+# - Sheet x: Metadata Analysis Top/Bottom Features~PC.
+# - Sheet x: Differential analysis TUMOR vs NORMAL.
+# - Sheet x: Differential analysis TUMOR vs NORMAL of patient subset Old.
+# - Sheet x: Differential analysis TUMOR vs NORMAL of patient subset Young.
+# - Sheet x: MCA2Cond biological regulated clustering TvN_Young versus TvN_Old.
+# - Sheet x: Summary of MCA2Cond biological regulated clustering.
+# 
+# Figure 5 workflow
+# - Sheet x: Pathway enrichment analysis using KEGG on Old patient subset. (new analysis, DMA_ORA_res_OLD)
+# - Sheet x: Pathway enrichment analysis using KEGG on Young patient subset. (new analysis, DMA_ORA_res_YOUNG)
+# - Sheet x: Clustering results of ORA on Young patient subset, filtered for pathways with p.adj < 0.05. (data_with_clusters)
+# - Sheet x: Cluster summary of ORA clustering results. (cluster_summary)
 
 # Overview sheets:
 df <- data.frame(
-  Sheet = paste("Sheet", 1:XXXXXXXXXXXX),
+  Sheet = paste("Sheet", 1:22),
   Content = c(
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
+    "Raw ccRCC patients feature metadata.",
+    "ID QC id pair compatibility checks.",
+    "Feature metadata cleaned.",
+    "Feature metadata translated.",
+    "Feature metadata traverse.",
+    "Feature metadata addEquivalent.",
+    "Feature metadata filtered for KEGG and ambiguity-resolved.",
+    "ID summary.",
+    "ID summary deltas.",
+    "Normalised data.",
+    "Metadata Analysis Anova.",
+    "Metadata Analysis Features.",
+    "Metadata Analysis Top/Bottom Features~PC.",
+    "Differential analysis TUMOR vs NORMAL.",
+    "Differential analysis TUMOR vs NORMAL of patient subset Old.",
+    "Differential analysis TUMOR vs NORMAL of patient subset Young.",
+    "MCA2Cond biological regulated clustering TvN_Young versus TvN_Old.",
+    "Summary of MCA2Cond biological regulated clustering.",
+    "Pathway enrichment analysis using KEGG on Old patient subset.",
+    "Pathway enrichment analysis using KEGG on Young patient subset.",
+    "Clustering results of ORA on Young patient subset, filtered for pathways with p.adj < 0.05.",
+    "Cluster summary of ORA clustering results."
   ),
   stringsAsFactors = FALSE
 )
 
 # Make lists
-MetSigDB_Benchmark <- list(
+Table_EV2 <- list(
   "SheetOverview" = df,
-  "" = object[[""]],
-  "" = object[[""]],
-  "" = object[[""]],
-  "" = object[[""]],
-  "" = object[[""]]
+  "Raw_Feature_Metadata" = MetaboliteIDs_original,
+  "ID_QC" = ID_QC,
+  "Feature_Metadata_Cleaned" = MetaboliteIDs_cleaned,
+  "Feature_Metadata_Translated" = MetaboliteIDs_Translated,
+  "Feature_Metadata_Traverse" = MetaboliteIDs_traverse,
+  "Feature_Metadata_EquivalentID" = MetaboliteIDs_addEquivalent,
+  "Feature_Metadata_KEGG_AmbiguityResolved" = Tissue_MetaData_Extended_cleaned,
+  "ID_Summary" = id_summary,
+  "ID_Summary_Deltas" = id_summary_deltas,
+  "NormalisedData" = data_list[["NormalisedData"]],
+  "MetaAnalysis_AOV" = data_list[["MetaAnalysis_AOV"]],
+  "MetaAnalysis_Features" = data_list[["MetaAnalysis_Features"]],
+  "MetaAnalysis_TopBottom" = data_list[["MetaAnalysis_TopBottom"]],
+  "DMA_TUMOR_vs_NORMAL" = data_list[["DMA_TUMOR_vs_NORMAL"]],
+  "DMA_TUMOR_vs_NORMAL_Old" = data_list[["DMA_TUMOR_vs_NORMAL_Old"]],
+  "DMA_TUMOR_vs_NORMAL_Young" = data_list[["DMA_TUMOR_vs_NORMAL_Young"]],
+  "MCA2Cond_Old-Young" = data_list[["MCA2Cond_Old-Young"]],
+  "MCA2Cond_Summary" = data_list[["MCA2Cond_Summary"]],
+  "KEGG_PathwayEnrichment_Old" = DMA_ORA_res_OLD,
+  "KEGG_PathwayEnrichment_Young" = DMA_ORA_res_YOUNG,
+  "ORA_Clustered_Data" = data_with_clusters,
+  "ORA_Cluster_Summary" = cluster_summary
 )
-# 
-# # Convert All Text to UTF-8
-# MetSigDB_Benchmark <- lapply(MetSigDB_Benchmark, sanitize_df)
-# 
-# # Save:
-# writexl::write_xlsx(MetSigDB_Benchmark, "Table_EV1.xlsx" , col_names = TRUE)
+
+# Convert All Text to UTF-8
+Table_EV2 <- lapply(Table_EV2, sanitize_df)
+
+# Save:
+writexl::write_xlsx(Table_EV2, "Table_EV2.xlsx" , col_names = TRUE)
 
 
 
@@ -246,11 +409,11 @@ New sheet order:
 ```{r}
 
 data("mca_core_rules")
-mca_results <- read.csv2(
+mca_results <- read.csv(
     "https://raw.githubusercontent.com/saezlab/MetaProViz/BioRxiv/Cells_CoRe/MetaProViz_Results/MCAcore/mca_2cond_MCA_core_Results_2025-08-01.csv",
     sep=","
   )
-mca_summary <- read.csv2(
+mca_summary <- read.csv(
     "https://raw.githubusercontent.com/saezlab/MetaProViz/BioRxiv/Cells_CoRe/MetaProViz_Results/MCAcore/mca_2cond_MCA_core_summary_2025-08-01.csv",
     sep=","
   )

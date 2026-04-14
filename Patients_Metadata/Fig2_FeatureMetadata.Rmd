@@ -1809,7 +1809,7 @@ write.csv2(
 
 ```{r}
 
-## summary counting table including all deltas as bargraph / lollipop graph
+## summary counting table including all deltas as bargraph
 
 ## save everything to:     MetaProViz_Results\PK\id_summary_plots
 if (!dir.exists("MetaProViz_Results/PK/id_summary_plots")) {
@@ -2580,8 +2580,8 @@ ccRCC_to_KEGGPathways <- MetaProViz::checkmatch_pk_to_data(data = Tissue_MetaDat
 # [2026-04-08 09:55:51] [WARN]    [MetaProViz] There are cases where multiple detected IDs match to multiple prior knowledge IDs of the same category
 
 # inspect results
-ccRCC_to_KEGGPathways_data_summary <- ccRCC_to_KEGGPathways$data_summary
-ccRCC_to_KEGGPathways_GroupingVariable_summary <- ccRCC_to_KEGGPathways$GroupingVariable_summary
+ccRCC_to_KEGGPathways_data_summary <- as.data.frame(ccRCC_to_KEGGPathways$data_summary)
+ccRCC_to_KEGGPathways_GroupingVariable_summary <- as.data.frame(ccRCC_to_KEGGPathways$GroupingVariable_summary)
 
 
 # There are some different features which share the same and ONLY KEGG ID.
@@ -2602,6 +2602,29 @@ ccRCC_to_KEGGPathways_data_summary <-
             ccRCC_to_KEGGPathways_data_summary,
             by = "KEGG"
         )
+
+
+if (!dir.exists("MetaProViz_Results/PK/CheckMatchID_Detected-to-PK")) {
+  dir.create("MetaProViz_Results/PK/CheckMatchID_Detected-to-PK", recursive = TRUE)
+}
+
+# convert lists inside ccRCC_to_KEGGPathways_data_summary to strings
+ccRCC_to_KEGGPathways_data_summary[] <- lapply(
+  ccRCC_to_KEGGPathways_data_summary,
+  function(x) {
+    if (is.list(x)) sapply(x, toString) else x
+  }
+)
+## save checkmatch results
+write.csv2(
+    ccRCC_to_KEGGPathways_data_summary,
+    "MetaProViz_Results/PK/CheckMatchID_Detected-to-PK/ccRCC_to_KEGGPathways_data_summary_manual_save.csv"
+)
+
+write.csv2(
+    ccRCC_to_KEGGPathways_GroupingVariable_summary,
+    "MetaProViz_Results/PK/CheckMatchID_Detected-to-PK/ccRCC_to_KEGGPathways_GroupingVariable_summary_manual_save.csv"
+)
 
 problems_terms <- ccRCC_to_KEGGPathways_GroupingVariable_summary %>%
   filter(!Group_Conflict_Notes== "None")

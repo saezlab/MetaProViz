@@ -95,7 +95,6 @@ read_xlsx_all <- function(url) {
 # Load results
 ## 1. Loading the Feature metadata
 Result from Fig2_FeatureMetadata, which include the feature metadata table with extended metabolite IDs and solved ambiguity issues for mapping KEGG IDs to KEGG pathways.
-@Jannik
 
 ```{r}
 # load Results from Fig2_FeatureMetadata
@@ -112,7 +111,7 @@ Tissue_MetaData_Extended_cleaned <-
 
 
 ## 2. Biological regulated clustering Results
-@Jannik: Load Extended Data Table 1 , Load Sheet 9 from BiorXiv
+Load Extended Data Table 1 , Load Sheet 9 from BiorXiv
 
 ```{r}
 Extended_Data_Table_1 <- read_xlsx_all(
@@ -317,7 +316,7 @@ for(comparison in c("Old", "Young")){
 cluster_pk_input <- 
     DM_ORA_res$Young$ClusterGosummary %>%
       filter(
-          p.adjust < 0.05   # same p..adjust cutoff as in the volcanos above
+          p.adjust < 0.05
       )
 
 cluster_pk_res <- 
