@@ -48,21 +48,171 @@ read_xlsx_all <- function(url) {
 
 ## Table EV1
 ### Content
-- this 
-- that
+- MetSigDB benchmark files
+
+Sheet order:
+- Sheet 1: Resource groups.\
+- Sheet 2: Metabolite exclusion comparison.\
+- Sheet 3: Resource-level benchmark of resources.\
+- Sheet 4: Resource-level summary.\
+- Sheet 5: Term-size distribution per resource.\
 
 ```{r}
+# get latest benchmark result folder
+latest_folder <- 
+  list.files(
+    path = "MetSigDB_Benchmark/benchmark_results",
+    full.names = TRUE,
+    recursive = FALSE
+  )
 
+# get latest benchmark file
+latest_file <-
+  list.files(
+    path = latest_folder,
+    full.names = TRUE,
+    recursive = FALSE,
+    include.dirs = FALSE,
+    pattern = "\\.xlsx$"
+  )
+
+sheets <- excel_sheets(latest_file)
+metsigdb_bechmark <-
+  lapply(sheets, function(s) read_excel(latest_file, sheet = s)) %>%
+    setNames(sheets)
+
+
+# Overview sheets:
+df <- data.frame(
+  Sheet = paste("Sheet", 1:5),
+  Content = c(
+    "Resource groups.",
+    "Metabolite exclusion comparison.",
+    "Resource-level benchmark of resources.",
+    "Set-level summary.",
+    "Term-size distribution per resource."
+  ),
+  Description = c(
+    "Resource-to-group mapping used in this benchmark run.",
+    "No exclusion vs default exclusion counts and deltas by resource and interaction type.",
+    "Distinct terms, targets, interactions, and average connectivity metrics.",
+    "Per-resource distribution summary of targets per term.",
+    "Target membership composition across 1 term, 2 terms, and >2 terms."
+  ),
+  stringsAsFactors = FALSE
+)
+
+# Make lists
+MetSigDB_Benchmark <- list(
+  "SheetOverview" = df,
+  "Resource_Groups" = metsigdb_bechmark[["Resource_Groups"]],
+  "Exclusion_Comparison" = metsigdb_bechmark[["Exclusion_Compare"]],
+  "Resource_Level" = metsigdb_bechmark[["Resource_Level"]],
+  "Set_Level" = metsigdb_bechmark[["Set_Level"]],
+  "Term_Size_Distribution" = metsigdb_bechmark[["Degree_Buckets"]]
+)
+
+# Convert All Text to UTF-8
+MetSigDB_Benchmark <- lapply(MetSigDB_Benchmark, sanitize_df)
+
+# Save:
+writexl::write_xlsx(MetSigDB_Benchmark, "Table_EV1.xlsx" , col_names = TRUE)
 
 ```
 
 
 ## Table EV2
 ### Content
-- this 
-- that
+- Previous Extended Data Table 1
+- newly added sheets for the new workflow
+
+Previous sheets:
+- Sheet 1: ccRCC patients feature metadata.\
+- Sheet 2: Normalised data.\
+- Sheet 3: Metadata Analysis Anova.\
+- Sheet 4: Metadata Analysis Features.\
+- Sheet 5: Metadata Analysis Top/Bottom Features~PC.\
+- Sheet 6: Differential analysis TUMOR vs NORMAL.\
+- Sheet 7: Differential analysis TUMOR vs NORMAL of patient subset Old.\
+- Sheet 8: Differential analysis TUMOR vs NORMAL of patient subset Young.\
+- Sheet 9: MCA2Cond biological regulated clustering TvN_Young versus TvN_Old.\
+- Sheet 10: Summary of MCA2Cond biological regulated clustering.\
+- Sheet 11: Pathway enrichment analysis using KEGG on Old patient subset.\
+- Sheet 12: Pathway enrichment analysis using KEGG on Young patient subset.\
+
+
+New sheets:
+- Sheet x: 
+- Sheet x: 
+- Sheet x: 
+- Sheet x: 
+- Sheet x: 
+- Sheet x: 
+- Sheet x: 
+- Sheet x: 
+- Sheet x: 
+- Sheet x: 
+- Sheet x: 
+- Sheet x: 
+- Sheet x: 
+- Sheet x: 
+- Sheet x: 
+
 
 ```{r}
+
+## load all data for Table EV2
+data_list <- 
+  read_xlsx_all(
+    "https://raw.githubusercontent.com/saezlab/MetaProViz/BioRxiv/Extended%20Data%20Table%201_PatientsTissue_Metabolomics.xlsx"
+  )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Overview sheets:
+df <- data.frame(
+  Sheet = paste("Sheet", 1:XXXXXXXXXXXX),
+  Content = c(
+    "",
+    "",
+    "",
+    "",
+    "",
+    "",
+  ),
+  stringsAsFactors = FALSE
+)
+
+# Make lists
+MetSigDB_Benchmark <- list(
+  "SheetOverview" = df,
+  "" = object[[""]],
+  "" = object[[""]],
+  "" = object[[""]],
+  "" = object[[""]],
+  "" = object[[""]]
+)
+# 
+# # Convert All Text to UTF-8
+# MetSigDB_Benchmark <- lapply(MetSigDB_Benchmark, sanitize_df)
+# 
+# # Save:
+# writexl::write_xlsx(MetSigDB_Benchmark, "Table_EV1.xlsx" , col_names = TRUE)
+
 
 
 ```
@@ -89,8 +239,19 @@ New sheet order:
 - Sheet 10: Differential Results OSRC2 versus HK2.\
 - Sheet 11: Differential Results RFX631 versus HK2.\
 - Sheet 12: Consumption-Release feature metadata.\
-- Sheet 13: MetalinksDB metabolite-transporter, -receptor and -enzyme links to the measured metabolites. -> new addition\
+- Sheet 13: MCA2Cond Clustering rules.\
+- Sheet 14: MCA2Cond biological regulated clustering 786M1A versus HK2.\
+- Sheet 15: Summary of MCA2Cond biological regulated clustering.\
+- Sheet 16: MetalinksDB metabolite-transporter, -receptor and -enzyme links to the measured metabolites. -> new addition\
 ```{r}
+
+data("mca_core_rules")
+mca_results <- read.csv2(
+    "https://raw.githubusercontent.com/saezlab/MetaProViz/BioRxiv/Cells_CoRe/MetaProViz_Results/MCAcore/mca_2cond_MCA_core_Results_2025-08-01.csv"
+  )
+mca_summary <- read.csv2(
+    "https://raw.githubusercontent.com/saezlab/MetaProViz/BioRxiv/Cells_CoRe/MetaProViz_Results/MCAcore/mca_2cond_MCA_core_summary_2025-08-01.csv"
+  )
 
 data_list <- 
   read_xlsx_all(
@@ -109,7 +270,7 @@ CoRe_MetalinksDB <-
 
 # Overview sheets:
 df <- data.frame(
-  Sheet = paste("Sheet", 1:13),
+  Sheet = paste("Sheet", 1:16),
   Content = c(
     "Raw data.",
     "Pool estimation.",
@@ -123,6 +284,9 @@ df <- data.frame(
     "Differential Results OSRC2 versus HK2.",
     "Differential Results RFX631 versus HK2.",
     "Consumption-Release feature metadata.",
+    "MCA2Cond Clustering rules.",
+    "MCA2Cond biological regulated clustering 786M1A versus HK2.",
+    "Summary of MCA2Cond biological regulated clustering.",
     "MetalinksDB metabolite-transporter, -receptor and -enzyme links to the measured metabolites."
   ),
   stringsAsFactors = FALSE
@@ -143,6 +307,9 @@ Cells_CoRe <- list(
   "DMA_OSRC2_vs_HK2" = data_list[["DMA_OSRC2_vs_HK2"]],
   "DMA_RFX631_vs_HK2" = data_list[[ "DMA_RFX631_vs_HK2"]],
   "DMA_FeatureMetadata" = data_list[["DMA_FeatureMetadata"]],
+  "Rules_MCA2Cond" = mca_core_rules,
+  "MCA2Cond_786M1A_vs_HK2" = mca_results,
+  "MCA2Cond_Summary" = mca_summary,
   "MetalinksDB_metabolite_links" = CoRe_MetalinksDB
 )
 
@@ -171,7 +338,7 @@ New sheet order:
 - Sheet 7:  Differential Results 786-M2A versus HK2.\
 - Sheet 8:  Differential Results 786-O versus HK2.\
 - Sheet 9:  MCA2Cond Clustering rules.\
-- Sheet 10: MCA2Cond biological regulated clustering 786-OvsHK2 versus versus 786-M1AvsHK2.\
+- Sheet 10: MCA2Cond biological regulated clustering 786-OvsHK2 versus 786-M1AvsHK2.\
 - Sheet 11: Summary of MCA2Cond biological regulated clustering.\
 ```{r}
 
@@ -198,7 +365,7 @@ df <- data.frame(
     "Differential Results 786-M2A versus HK2.",
     "Differential Results 786-O versus HK2.",
     "MCA2Cond Clustering rules.",
-    "MCA2Cond biological regulated clustering 786-OvsHK2 versus versus 786-M1AvsHK2",
+    "MCA2Cond biological regulated clustering 786-OvsHK2 versus 786-M1AvsHK2",
     "Summary of MCA2Cond biological regulated clustering."
   ),
   stringsAsFactors = FALSE

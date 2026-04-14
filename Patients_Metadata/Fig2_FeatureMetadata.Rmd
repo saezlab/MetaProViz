@@ -222,6 +222,12 @@ MetaboliteIDs <- tissue_meta %>%
 
 MetaboliteIDs <- MetaboliteIDs %>%
   mutate(across(where(is.character), ~ gsub(";", ",", .x)))
+
+## save as csv
+write.csv2(
+  MetaboliteIDs,
+  "MetaProViz_Results/PK/Original/Metabolite_IDs_original.csv"
+)
 ```
 
 # 2. MetaProViz Metabolite ID workflow
@@ -804,7 +810,7 @@ completely_incompatible_manual_no_cas %<>%
         correction_tbl = "completely_incompatible_manual_no_cas"
     )
 
-completely_incompatible_manual_with_cas %<>%v
+completely_incompatible_manual_with_cas %<>%
     mutate(
         across(
             c(PUBCHEM_Corrected),

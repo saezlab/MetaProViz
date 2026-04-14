@@ -137,7 +137,6 @@ write.csv2(
 - Sheet 10: MCA2Cond biological regulated clustering 786-OvsHK2 versus versus 786-M1AvsHK2.\
 - Sheet 11: Summary of MCA2Cond biological regulated clustering.\
 
-*We need to add metalinks information here!
 ```{r}
 #Overview sheets:
 df <- data.frame(
