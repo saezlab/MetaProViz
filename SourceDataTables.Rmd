@@ -159,6 +159,7 @@ write.csv(MediaBlankCV,
 
 ## Fig3E = PCA Pool QC
 
+#NOTE: We do not save the PC table as a .csv, but we can use it and do prcomp file? --> is this the exact same plot? 
 
 
 
@@ -212,17 +213,87 @@ if (!dir.exists(Fig4H)) {dir.create(Fig4H)}
 #---------------------------------------------------------------------------------
 # Add Figure Source data and save as .csv files within the respective folders:
 
-## Fig4A =
+## Fig4A = Table_EV3
+DMA_786O_vs_HK2<- read_excel("Table_EV3.xlsx", sheet = "DMA_786-O_vs_HK2")
 
-## Fig4B = ExtendedDataTable 4, sheet  1 "Raw data." --> needs data wrangling
+write.csv(DMA_786O_vs_HK2, 
+          paste0(Fig4A ,"/Fig.4a.csv"), 
+          row.names = FALSE)
 
-## Fig4C = ExtendedDataTable 4, sheet ""
+## Fig4B = Table_EV3
+DMAFeatureMetadata<- read_excel("Table_EV3.xlsx", sheet = "DMA_FeatureMetadata")%>%
+  select(-HMDB, -KEGG.ID, -KEGGCompound)%>%
+  drop_na()
+
+write.csv(DMAFeatureMetadata, 
+          paste0(Fig4B ,"/Fig.4b.csv"), 
+          row.names = FALSE)
+
+## Fig4C = Table_EV4, sheet ""
+ProcessedData <- read_excel("Table_EV3.xlsx", sheet = "ProcessedData")
+
+# 1) Columns in ProcessedData that are sample metadata (not metabolites)
+sample_cols <- c("Code", "Conditions", "Biological_Replicates", "GrowthFactor", "Outliers")
+
+# 2) Convert metabolite columns to long format (one row = one heatmap cell)
+heatmap_plot_df <- ProcessedData %>%
+  pivot_longer(
+    cols = -all_of(sample_cols),
+    names_to = "Metabolite",
+    values_to = "Abundance"
+  ) %>%
+  left_join(
+    DMAFeatureMetadata %>%
+      select(all_of(c("Metabolite", "Pathway", "core_HK2", "core_786-O", "core_786-M1A"))),
+    by = "Metabolite"
+  )%>%
+  filter(Outliers != "Outlier_filtering_round_1") %>%
+  filter(!Metabolite %in% c("valine-d8", "hipppuric acid-d5"))  %>%
+  filter(Pathway == "Amino acid metabolism") %>%
+  select(-Biological_Replicates, -GrowthFactor, -Outliers)
+
+write.csv(heatmap_plot_df, 
+          paste0(Fig4C ,"/Fig.4c.csv"), 
+          row.names = FALSE)
 
 ## Fig4D
+DMA_786O_vs_HK2_Intra <- read_excel("Table_EV4.xlsx", sheet = "DMA_786-O_vs_HK2")
 
-## Fig4E
+write.csv(DMA_786O_vs_HK2_Intra, 
+          paste0(Fig4D ,"/Fig.4d.csv"), 
+          row.names = FALSE)
+
+## Fig4E Alluvial plot
+data(mca_core_rules)
+
+MCA_core_Compressed <- mca_core_rules %>%
+  mutate(Intra = case_when(
+    Intra %in% c("UP", "DOWN") ~ Intra,  # Keep "UP" and "DOWN" as they are
+    Intra %in% c("Not Detected", "Significant Negative", "Significant Positive", "Not Significant") ~ "No Change",
+    TRUE ~ NA_character_  # Handle unexpected values
+  )) %>%
+  mutate(CoRe = case_when(
+    CoRe %in% c("UP", "DOWN") ~ CoRe,  # Keep "UP" and "DOWN" as they are
+    CoRe %in% c("Not Detected", "Significant Negative", "Significant Positive", "Not Significant") ~ "No Change",
+    TRUE ~ NA_character_  # Handle unexpected values
+  ))%>%
+  distinct(Intra, CoRe, Core_Direction, .keep_all = TRUE)%>%  # Keep only unique rows based on these columns
+  filter(!Core_Direction=="Not Detected")#remove the "Not Detected" as we are only interested in the released/consumed metabolites
+
+write.csv(MCA_core_Compressed, 
+          paste0(Fig4E ,"/Fig.4e.csv"), 
+          row.names = FALSE)
 
 ## Fig4F
+
+
+
+## Fig4G
+
+
+## Fig4H
+
+
 ```
 
 ## Figure 5
