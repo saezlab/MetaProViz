@@ -2000,6 +2000,7 @@ outlier_detection <- function(
     scree_plot_list <- list()
     outlier_plot_list <- list()
     metabolite_zero_var_total_list <- list()
+    DF_list <- list()  # Initialize DF_list for storing per-round data
     zero_var_metab_warning <- FALSE
 
 
@@ -2179,6 +2180,21 @@ outlier_detection <- function(
         outlier_plot_list[[paste("HotellingsPlot_round", loop, sep = "")]] <- HotellingT2plot
         dev.off()
 
+        # ---- Capture per-round data for export
+        # PCA scores, loadings, and variance explained
+        DF_list[[paste0("PCA_scores_Round", loop)]] <- as.data.frame(PCA.res$x) %>% rownames_to_column("Sample")
+        DF_list[[paste0("PCA_loadings_Round", loop)]] <- as.data.frame(PCA.res$rotation) %>% rownames_to_column("Metabolite")
+        DF_list[[paste0("PCA_variance_Round", loop)]] <- data.frame(
+            PC = paste0("PC", seq_along(PCA.res$sdev)),
+            VarianceExplained = (PCA.res$sdev^2) / sum(PCA.res$sdev^2),
+            CumulativeVarianceExplained = cumsum((PCA.res$sdev^2) / sum(PCA.res$sdev^2)),
+            SelectedForHotelling = seq_along(PCA.res$sdev) <= npcs,
+            HotellingNPCs = npcs
+        )
+        # Hotelling T2 input and results
+        DF_list[[paste0("Hotellings_input_Round", loop)]] <- as.data.frame(data_hot) %>% rownames_to_column("Sample")
+        DF_list[[paste0("Hotellings_results_Round", loop)]] <- HotellingT2plot_data
+
         a <- loop
         if (core) {
             a %<>% paste0("_core")
@@ -2293,10 +2309,10 @@ outlier_detection <- function(
         data_norm_filtered_full %>%
         relocate(Outliers) %>%  # Put Outlier columns in the front
         merge(       # add the design in the output df (merge by rownames/sample names
-            x = metadata_sample, 
-            y = . , 
+            x = metadata_sample,
+            y = . ,
             by = 0
-        )   
+        )
 
     rownames(data_norm_filtered_full) <- data_norm_filtered_full$Row.names
     data_norm_filtered_full$Row.names <- c()
@@ -2340,12 +2356,20 @@ outlier_detection <- function(
 
 
     # # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## #
+    # # --- Add final QC PCA data
+    # Compute PCA on original data with zero-variance metabolites removed (matches viz_pca plots)
+    qc_pca_final <- prcomp(as.data.frame(data) %>% dplyr::select(-zero_var_metab_export_df$Metabolite), center = TRUE, scale. = TRUE)
+    DF_list[["QC_PCA_scores_Final"]] <- as.data.frame(qc_pca_final$x) %>% rownames_to_column("Sample")
+    DF_list[["QC_PCA_loadings_Final"]] <- as.data.frame(qc_pca_final$rotation) %>% rownames_to_column("Metabolite")
+    DF_list[["QC_PCA_variance_Final"]] <- data.frame(
+        PC = paste0("PC", seq_along(qc_pca_final$sdev)),
+        VarianceExplained = (qc_pca_final$sdev^2) / sum(qc_pca_final$sdev^2)
+    )
+
     # # --- Save and Return plots and DFs
-    DF_list <-
-        list(
-            "Zero_variance_metabolites_core" = zero_var_metab_export_df,
-            "data_outliers" = data_norm_filtered_full
-        )
+    # Add zero variance metabolites and final outlier data
+    DF_list[["Zero_variance_metabolites_core"]] <- zero_var_metab_export_df
+    DF_list[["data_outliers"]] <- data_norm_filtered_full
 
     # Return
     Output_list <- list("DF" = DF_list, "Plot" = outlier_plot_list)
