@@ -148,7 +148,7 @@ Previous sheets:
 
 New sheet order:
 
-Figure 2 workflow tables
+Figure 2 workflow tables and EV Figure 1
 - Sheet x: Raw ccRCC patients feature metadata (MetaboliteIDs_original).
 - Sheet x: ID QC id pair compatibility checks (ID_QC)
 - Sheet x: Feature metadata cleaned (MetaboliteIDs_cleaned)
@@ -175,6 +175,11 @@ Figure 5 workflow
 - Sheet x: Pathway enrichment analysis using KEGG on Young patient subset. (new analysis, DMA_ORA_res_YOUNG)
 - Sheet x: Clustering results of ORA on Young patient subset, filtered for pathways with p.adj < 0.05. (data_with_clusters)
 - Sheet x: Cluster summary of ORA clustering results. (cluster_summary)
+
+AlanineMetaboliteIDs from previous Extended Data Table 2
+- Sheet x: Alanine IDs mapped to pathways from wiki, KEGG and Reactome.
+- Sheet x: Mapping ambiguities for `KEGG Glycolysis/Gluconeogenesis` translating from KEGG to HMDB IDs.
+
 
 ```{r}
 
@@ -290,6 +295,15 @@ cluster_summary <-
   select(-X)
 
 
+# AlanineMetaboliteIDs from previous Extended Data Table 2
+AlanineMetaboliteIDs <- 
+  read_xlsx_all(
+    "https://raw.githubusercontent.com/saezlab/MetaProViz/BioRxiv/Extended%20Data%20Table%202_AlanineMetaboliteIDs.xlsx"
+  )
+
+AlanineIDs <- AlanineMetaboliteIDs$AlanineIDs
+MappingAmbiguities <- AlanineMetaboliteIDs$MappingAmbiguities
+
 # Figure 2 workflow tables
 # - Sheet x: Raw ccRCC patients feature metadata (MetaboliteIDs_original).
 # - Sheet x: ID QC id pair compatibility checks (ID_QC)
@@ -317,10 +331,15 @@ cluster_summary <-
 # - Sheet x: Pathway enrichment analysis using KEGG on Young patient subset. (new analysis, DMA_ORA_res_YOUNG)
 # - Sheet x: Clustering results of ORA on Young patient subset, filtered for pathways with p.adj < 0.05. (data_with_clusters)
 # - Sheet x: Cluster summary of ORA clustering results. (cluster_summary)
+#
+# AlanineMetaboliteIDs from previous Extended Data Table 2
+# - Sheet x: Alanine IDs mapped to pathways from wiki, KEGG and Reactome.
+# - Sheet x: Mapping ambiguities for `KEGG Glycolysis/Gluconeogenesis` translating from KEGG to HMDB IDs.
+
 
 # Overview sheets:
 df <- data.frame(
-  Sheet = paste("Sheet", 1:22),
+  Sheet = paste("Sheet", 1:24),
   Content = c(
     "Raw ccRCC patients feature metadata.",
     "ID QC id pair compatibility checks.",
@@ -343,7 +362,9 @@ df <- data.frame(
     "Pathway enrichment analysis using KEGG on Old patient subset.",
     "Pathway enrichment analysis using KEGG on Young patient subset.",
     "Clustering results of ORA on Young patient subset, filtered for pathways with p.adj < 0.05.",
-    "Cluster summary of ORA clustering results."
+    "Cluster summary of ORA clustering results.",
+    "Alanine IDs mapped to pathways from wiki, KEGG and Reactome.",
+    "Mapping ambiguities for `KEGG Glycolysis/Gluconeogenesis` translating from KEGG to HMDB IDs."
   ),
   stringsAsFactors = FALSE
 )
@@ -372,7 +393,9 @@ Table_EV2 <- list(
   "KEGG_PathwayEnrichment_Old" = DMA_ORA_res_OLD,
   "KEGG_PathwayEnrichment_Young" = DMA_ORA_res_YOUNG,
   "ORA_Clustered_Data" = data_with_clusters,
-  "ORA_Cluster_Summary" = cluster_summary
+  "ORA_Cluster_Summary" = cluster_summary,
+  "AlanineMetaboliteIDs" = AlanineIDs,
+  "Alanine_MappingAmbiguities" = MappingAmbiguities
 )
 
 # Convert All Text to UTF-8

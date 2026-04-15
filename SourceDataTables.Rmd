@@ -491,15 +491,9 @@ if (!dir.exists(FigEV1C)) {dir.create(FigEV1C)}
 
 
 # Fig EV1a
-# BioRxiv ExtendedDataTable 2, sheet 2 "AlanineIDs"
-data_list <- 
-  read_xlsx_all(
-    "https://raw.githubusercontent.com/saezlab/MetaProViz/BioRxiv/Extended%20Data%20Table%202_AlanineMetaboliteIDs.xlsx"
-  )
+Table_EV2_AlanineMetaboliteIDs <- read_excel("Table_EV2.xlsx", sheet = "AlanineMetaboliteIDs")
 
-AlanineIDs <- data_list$AlanineIDs
-
-write.csv(AlanineIDs, 
+write.csv(Table_EV2_AlanineMetaboliteIDs, 
           paste0(FigEV1A ,"/Fig.EV1a.csv"), 
           row.names = FALSE)
 
@@ -514,10 +508,9 @@ write.csv(combined ,
 
 
 # Fig EV1c
-# BioRxiv ExtendedDataTable 2, sheet 3 "Mapping ambiguities"
-MappingAmbiguities <- data_list$MappingAmbiguities
+Table_EV2_Alanine_MappingAmbiguities <- read_excel("Table_EV2.xlsx", sheet = "Alanine_MappingAmbiguities")
 
-write.csv(MappingAmbiguities, 
+write.csv(Table_EV2_Alanine_MappingAmbiguities, 
           paste0(FigEV1C ,"/Fig.EV1c.csv"), 
           row.names = FALSE)
 ```
