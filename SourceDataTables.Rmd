@@ -40,6 +40,7 @@ install the required dependencies and load the libraries:
 ```{r, message=FALSE, warning=FALSE}
 #dependencies that need to be loaded:
 library(dplyr)
+library(magrittr)
 library(tidyverse)
 library(readxl)
 library(MetaProViz)
@@ -111,7 +112,6 @@ if (!dir.exists(Fig2C)) {dir.create(Fig2C)}
 # Add Figure Source data and save as .csv files within the respective folders:
 
 # Fig 2B
-
 Table_EV2_Raw_Feature_Metadata <- read_excel("Table_EV2.xlsx", sheet = "Raw_Feature_Metadata")
 Table_EV2_Feature_Metadata_EquivalentID <- read_excel("Table_EV2.xlsx", sheet = "Feature_Metadata_EquivalentID")
 
@@ -249,44 +249,172 @@ write.csv(MediaBlankCV,
           paste0(Fig3D ,"/Fig.3d.csv"), 
           row.names = FALSE)
 
-## Fig3E = PCA Pool QC --> Raw data is used at this stage!
-#Open: Pool_Estimation_result[["DF"]][["data"]] from BioRxiv Branch and run: 
-PCA_RES <- prcomp(as.matrix(Pool_Estimation_result[["DF"]][["data"]]), scale. = as.logical(TRUE))
-
-autoplot(PCA_RES)
-
-
-## Fig3F = Before/After TIC
-RawData <- read_excel("Table_EV3.xlsx", sheet = "RawData")
-write.csv(RawData , 
-          paste0(Fig3F ,"/Fig.3f_LeftPanel.csv"), 
-          row.names = FALSE)
-
-ProcessedData <- read_excel("Table_EV3.xlsx", sheet = "ProcessedData")
-write.csv(ProcessedData%>%select(-(3:5)),
-          paste0(Fig3F ,"/Fig.3f_RightPanel.csv"), 
-          row.names = FALSE)
-
-## Fig3G = PCA outliers --> Sheet 5, processed data is used with VizPCA!
-ProcessedData$Outliers <- relevel(as.factor(ProcessedData$Outliers), ref = "no")
-
-ProcessedData_Mat <- ProcessedData %>%
-  select( -Conditions, -Biological_Replicates, -GrowthFactor, -Outliers)%>%
+## Fig3E = PCA Pool QC
+# Load from BoRxiv branch:
+Pool_Estimation_result <- read.csv(
+    "https://raw.githubusercontent.com/saezlab/MetaProViz/BioRxiv/Cells_CoRe/MetaProViz_Results/Processing/pool_estimation/pool_estimation_data_2025-08-01.csv",
+    sep=","
+  )%>%
   column_to_rownames("Code")
 
-PCA_RES <- prcomp(as.matrix(ProcessedData_Mat), scale. = as.logical(TRUE))
-
+#Run prcomp to generate PCA results and check plot
+PCA_RES <- prcomp(as.matrix(Pool_Estimation_result), scale. = as.logical(TRUE))
 autoplot(PCA_RES)
 
-pca_QC <- invisible(viz_pca(data = as.data.frame(ProcessedData_Mat),
-                                    metadata_info = c(color = "Conditions", shape = "Outliers"),
-                                    metadata_sample = ProcessedData[,c(1:5)]%>%column_to_rownames("Code"),
-                                    plot_name = "Quality Control PCA Condition clustering and outlier check",
-                                    save_plot = NULL))
+#extract PCA loading:
+pca_var <- (PCA_RES$sdev^2) / sum(PCA_RES$sdev^2)
 
-# It is not the exact same --> What do I do here? 
+pca_pc1_pc2_df <- as.data.frame(PCA_RES$x) %>%
+  rownames_to_column("Code") %>%
+  transmute(
+    Code,
+    PC1,
+    PC2,
+    PC1_variance_pct = round(pca_var[1] * 100, 2),
+    PC2_variance_pct = round(pca_var[2] * 100, 2)
+  )
 
-write.csv(ProcessedData , 
+ggplot(pca_pc1_pc2_df, aes(x = PC1, y = PC2)) +
+  geom_point(size = 3, alpha = 0.8, color = "#2C7FB8") +
+  labs(x = paste0("PC1 (", sprintf("%.2f", unique(pca_pc1_pc2_df$PC1_variance_pct)[1]), "%)"),
+       y = paste0("PC2 (", sprintf("%.2f", unique(pca_pc1_pc2_df$PC2_variance_pct)[1]), "%)"))
+
+#sAVE:
+write.csv(pca_pc1_pc2_df , 
+          paste0(Fig3E ,"/Fig.3e.csv"), 
+          row.names = FALSE)
+
+## Fig3F = Before/After TIC
+RawData <- read_excel("Table_EV3.xlsx", sheet = "RawData")%>%
+  mutate(Panel = "LEFT", .before = 1)
+
+ProcessedData <- read_excel("Table_EV3.xlsx", sheet = "ProcessedData")%>%
+  mutate(Panel = "RIGHT", .before = 1)
+
+CombinedData <- bind_rows(RawData, ProcessedData)
+
+write.csv(CombinedData,
+          paste0(Fig3F ,"/Fig.3f.csv"), 
+          row.names = FALSE)
+
+## Fig3G = PCA outliers
+# The figures have been generated within MetaProViz functions and the data tables have not been saved. 
+#Hence, we will extract the data now:
+
+###-----------------------------
+# Prepare the input:
+data(medium_raw)
+
+Media <- medium_raw%>%
+column_to_rownames("Code")
+
+Media_input <- Media%>%
+subset(!Conditions=="Pool", select = -c(1:3))#remove pool samples and remove the information columns
+
+Media_Metadata <- Media%>%
+subset(!Conditions=="Pool", select = c(1:3))#remove pool samples and keep the information columns only
+
+# data files:
+input_data <- Media_input
+data <- Media_input
+data %<>% as.data.frame()
+data %<>% mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
+data <- as.data.frame(mutate_all(as.data.frame(data), function(x) as.numeric(as.character(x))))
+
+metadata_sample <- Media_Metadata
+
+# parameter info
+metadata_info = c(Conditions = "Conditions",
+                  Biological_Replicates = "Biological_Replicates",
+                  core_norm_factor = "GrowthFactor",
+                  core_media = "blank")
+                                                
+featurefilt = "Modified"
+                            
+cutoff_featurefilt = 0.8
+                                                
+mvi_percentage=50
+                                                
+hotellins_confidence = 0.99# We perform outlier testing using 0.99 confidence interval
+                                                
+core = TRUE
+
+tic = TRUE
+
+#1 Feature filtering:
+data_Filtered <- MetaProViz:::feature_filtering(
+            data = data,
+            featurefilt = featurefilt,
+            cutoff_featurefilt = cutoff_featurefilt,
+            metadata_sample = metadata_sample,
+            metadata_info = metadata_info,
+            core = core)
+
+data_Filt <- data_Filtered[["DF"]]
+
+#MVI
+mviRes <- MetaProViz:::mvi_imputation(
+            data = data_Filt,
+            metadata_sample = metadata_sample,
+            metadata_info = metadata_info,
+            core = core,
+            mvi_percentage = mvi_percentage)
+
+# Perform tic
+ticRes_List <- MetaProViz:::tic_norm(
+            data = mviRes,
+            metadata_sample = metadata_sample,
+            metadata_info = metadata_info,
+            tic = tic)
+ticRes <- ticRes_List[["DF"]][["data_tic"]]
+
+#Core
+data_coreNorm <- MetaProViz:::core_norm(
+            data = ticRes,
+            metadata_sample = metadata_sample,
+            metadata_info = metadata_info)
+
+ticRes <- data_coreNorm[["DF"]][["core_Norm"]]
+data_norm <- ticRes %>% as.data.frame()
+
+#Outlier Analysis
+OutlierRes <- MetaProViz:::outlier_detection(
+        data = data_norm,
+        metadata_sample = metadata_sample,
+        metadata_info = metadata_info,
+        core = core,
+        hotellins_confidence = hotellins_confidence)
+##----------------------------------------------------------------------------------
+
+#Get the PCA scores and variance explained for the QC PCA plot:
+qc_scores <- OutlierRes$DF$QC_PCA_scores_Final
+qc_variance <- OutlierRes$DF$QC_PCA_variance_Final
+
+qc_scores_meta <- qc_scores %>%
+  left_join(
+    metadata_sample %>%
+      rownames_to_column("Sample") %>%
+      select(Sample, Conditions, Biological_Replicates),
+    by = "Sample"
+  ) %>%
+  left_join(
+    OutlierRes$DF$data_outliers %>%
+      rownames_to_column("Sample") %>%
+      select(Sample, Outliers),
+    by = "Sample"
+  )
+
+ggplot(qc_scores_meta, aes(x = PC1, y = PC2, color = Conditions, shape = Outliers)) +
+  geom_point(size = 3) +
+  labs(
+    title = "QC PCA (Final - Colored by Condition)",
+    x = paste0("PC1 (", round(qc_variance$VarianceExplained[1]*100, 2), "%)"),
+    y = paste0("PC2 (", round(qc_variance$VarianceExplained[2]*100, 2), "%)")
+  ) +
+  theme_classic()
+
+#Save
+write.csv(qc_scores_meta , 
           paste0(Fig3G ,"/Fig.3g.csv"), 
           row.names = FALSE)
 ```
@@ -401,8 +529,9 @@ MCA2Cond_Summary <- read_excel("Table_EV3.xlsx", sheet = "MCA2Cond_Summary")%>%
   filter(!`SiRCle.cluster.Name`=="Background = FALSE")%>%
   filter(!`SiRCle.cluster.Name`=="None")
 
-# this is not the exact same --> What happened? --> plot again!
-
+write.csv(MCA2Cond_Summary, 
+          paste0(Fig4F ,"/Fig.4f.csv"), 
+          row.names = FALSE)
 
 ## Fig4G
 MCA2Cond_786M1A_vs_HK2 <- read_excel("Table_EV3.xlsx", sheet = "MCA2Cond_786M1A_vs_HK2")%>%
@@ -426,10 +555,26 @@ heatmap_plot_df <- ProcessedData %>%
   #filter(Pathway == "Amino acid metabolism") %>% #Select for metabolites from cluster!
   select(-Biological_Replicates, -GrowthFactor, -Outliers)
 
+write.csv(heatmap_plot_df, 
+          paste0(Fig4G ,"/Fig.4g.csv"), 
+          row.names = FALSE)
 
 ## Fig4H
 #Needs to be compiled from both processed intra and processed core data. 
+ProcessedData_Core <- read_excel("Table_EV3.xlsx", sheet = "ProcessedData")%>%
+  select(Code, Conditions, Biological_Replicates, methionine)%>%
+  mutate(Panel = "CoRe", .before = 1)
 
+
+ProcessedData_Intra <- read_excel("Table_EV4.xlsx", sheet = "ProcessedData")%>%
+  select(Code, Conditions, Biological_Replicates, methionine)%>%
+  mutate(Panel = "Intra", .before = 1)
+
+Processed_CombinedData <- bind_rows(ProcessedData_Core, ProcessedData_Intra)
+
+write.csv(Processed_CombinedData,
+          paste0(Fig4H ,"/Fig.4h.csv"), 
+          row.names = FALSE)
 
 ```
 
@@ -460,11 +605,12 @@ if (!dir.exists(Fig5F)) {dir.create(Fig5F)}
 #-----------------------------------------------------------------------------
 # Add Figure Source data and save as .csv files within the respective folders:
 
-## Fig5A =
+## Fig5A
 
-## Fig5B = ExtendedDataTable 5, sheet  1 "Raw data." --> needs data wrangling
 
-## Fig5C = ExtendedDataTable 5, sheet ""
+## Fig5B
+
+## Fig5C
 
 ## Fig5D 
 
@@ -555,34 +701,62 @@ write.csv(MediaBlankCV,
           paste0(FigEV2B ,"/Fig.EV2b.csv"), 
           row.names = FALSE)
 
-## FigEV 2C = PCA plot --> Sheet 5, processed data
-ProcessedData <- read_excel("Table_EV3.xlsx", sheet = "ProcessedData")
+## FigEV 2C = PCA plot
+# We use the data we created for Fig 3g (see above)
+qc_scores_meta$Biological_Replicates <- as.factor(qc_scores_meta$Biological_Replicates)
 
-write.csv(ProcessedData , 
-          paste0(FigEV2C ,"/Fig.EV2c.csv"), 
+#Save
+write.csv(qc_scores_meta , 
+          paste0(FigEV2B ,"/Fig.EV2c.csv"), 
+          row.names = FALSE)
+
+## FigEV 2D: Filtering round 1 Hotellins plot
+round_num <- 1
+hotellings_df <- OutlierRes$DF[[paste0("Hotellings_results_Round", round_num)]]# generated for Fig. 3G (see above)
+
+ggplot(hotellings_df, aes(x = Samples, y = `Group summary statistics`)) +
+  geom_point(color = "blue", size = 2)
+
+write.csv(hotellings_df , 
+          paste0(FigEV2B ,"/Fig.EV2d.csv"), 
           row.names = FALSE)
 
 
+## FigEV 2E Screeplot uses PCA results from Filtering round 1:
+variance_round1 <- OutlierRes$DF$PCA_variance_Round1 %>%# generated for Fig. 3G (see above)
+  mutate(
+    PC_num = seq_len(n()),
+    VariancePercent = VarianceExplained * 100
+  ) %>%
+  slice(1:min(20, n()))
 
+ggplot(variance_round1, aes(x = PC_num, y = VariancePercent)) +
+  geom_col(width = 1, fill = "grey70", color = "grey40") +
+  geom_line(aes(group = 1), color = "black", linewidth = 0.5) +
+  geom_point(color = "black", size = 1.5) +
+  geom_text(
+    aes(label = sprintf("%.2f", round(VariancePercent, 1))),
+    vjust = -0.3,
+    size = 3
+  ) +
+  scale_x_continuous(
+    breaks = variance_round1$PC_num,
+    expand = c(0, 0)
+  ) +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.08))
+  ) +
+  labs(
+    title = "PCA Explained Variance Plot Filtering Round 1",
+    x = "Principal Component",
+    y = "Explained variance (%)"
+  ) +
+  theme_classic()
 
-## Screeplot uses PCA results:
-inflect_df <- as.data.frame(c(seq_along(PCA.res$sdev)))
-        colnames(inflect_df) <- "x"
-        inflect_df$y <- summary(PCA.res)$importance[2, ]
-        inflect_df$Cumulative <- summary(PCA.res)$importance[3, ]
-        screeplot_cumul <-
-            format(
-                round(inflect_df$Cumulative[seq_len(20)]*100, 1),
-                nsmall = 1
-            )  # make cumulative variation labels for plot
-        knee <-
-            uik(
-                inflect_df$x,
-                inflect_df$y
-            )  # Calculate the knee and select optimal number of components
-        # Note: we subtract 1 components from the knee cause the root of the
-        # knee is the PC that does not add something. npcs = 30
-        npcs <- knee -1
+write.csv(variance_round1 , 
+          paste0(FigEV2E ,"/Fig.EV2e.csv"), 
+          row.names = FALSE)
+
 ```
 
 
