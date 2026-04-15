@@ -56,6 +56,7 @@ Sheet order:
 - Sheet 3: Resource-level benchmark of resources.\
 - Sheet 4: Resource-level summary.\
 - Sheet 5: Term-size distribution per resource.\
+- Sheet 6: MetaProViz comparison to other tools.\
 
 ```{r}
 # get latest benchmark result folder
@@ -81,23 +82,26 @@ metsigdb_bechmark <-
   lapply(sheets, function(s) read_excel(latest_file, sheet = s)) %>%
     setNames(sheets)
 
+comparison <- read_excel("ComparisonOtherTools/Comparison.xlsx")
 
 # Overview sheets:
 df <- data.frame(
-  Sheet = paste("Sheet", 1:5),
+  Sheet = paste("Sheet", 1:6),
   Content = c(
     "Resource groups.",
     "Metabolite exclusion comparison.",
     "Resource-level benchmark of resources.",
     "Set-level summary.",
-    "Term-size distribution per resource."
+    "Term-size distribution per resource.",
+    "MetaProViz comparison to other tools."
   ),
   Description = c(
     "Resource-to-group mapping used in this benchmark run.",
     "No exclusion vs default exclusion counts and deltas by resource and interaction type.",
     "Distinct terms, targets, interactions, and average connectivity metrics.",
     "Per-resource distribution summary of targets per term.",
-    "Target membership composition across 1 term, 2 terms, and >2 terms."
+    "Target membership composition across 1 term, 2 terms, and >2 terms.",
+    "Comparison to MetaboAnalyst R 4.0."
   ),
   stringsAsFactors = FALSE
 )
@@ -109,7 +113,8 @@ MetSigDB_Benchmark <- list(
   "Exclusion_Comparison" = metsigdb_bechmark[["Exclusion_Compare"]],
   "Resource_Level" = metsigdb_bechmark[["Resource_Level"]],
   "Set_Level" = metsigdb_bechmark[["Set_Level"]],
-  "Term_Size_Distribution" = metsigdb_bechmark[["Degree_Buckets"]]
+  "Term_Size_Distribution" = metsigdb_bechmark[["Degree_Buckets"]],
+  "Comparison_to_other_tools" = comparison
 )
 
 # Convert All Text to UTF-8
