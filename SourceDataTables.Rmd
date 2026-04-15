@@ -606,17 +606,117 @@ if (!dir.exists(Fig5F)) {dir.create(Fig5F)}
 # Add Figure Source data and save as .csv files within the respective folders:
 
 ## Fig5A
+data(tissue_norm)
 
+TissuePlot <- tissue_norm%>%
+  column_to_rownames("Code")%>%
+  filter(TISSUE_TYPE != "NORMAL")%>%
+  separate(`TYPE-STAGE`, into=c("Type", "Stage"), sep="-", remove=FALSE)
+TissuePlot$Count <- 1
+
+TissuePlot$AGEFactor <- factor(TissuePlot$AGE, levels = c("Young","Middle", "Old"))
+
+ggplot2::ggplot(TissuePlot, ggplot2::aes(fill=Stage, y=Count, x=AGEFactor)) + 
+        ggplot2::geom_bar(position="stack", stat="identity")+
+        ggplot2::scale_fill_manual(values = c("STAGE I" = "#006384"  , "STAGE II" = "#9F0162", "STAGE III" = "#00735C" , "STAGE IV" = "grey" ))+
+        ggplot2::theme_classic()+
+        ggplot2::ggtitle("ccRCC patients metadata")+
+        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
+        ggplot2::labs(subtitle="Age at surgery <42 = Young,  >58 = Old, else = Middle", x = "Age", y = "Number of Patients")
+
+write.csv(TissuePlot , 
+          paste0(Fig5A ,"/Fig.5a.csv"), 
+          row.names = FALSE)
 
 ## Fig5B
+Stat_results <- read_excel("Table_EV2.xlsx", sheet = "MetaAnalysis_AOV")
 
-## Fig5C
+data_Heat <-
+        Stat_results %>%
+        filter(tukeyHSD_p.adjusted < 0.05) %>%
+        # Filter for significant results
+        # Exclude Residuals row
+        filter(Explained_Variance > 1) %>%
+        distinct(
+            term,
+            PC,
+            .keep_all = TRUE
+        ) %>%  # only keep unique term~PC combinations AND STATS
+        select(term, PC, Explained_Variance) %>%
+        pivot_wider(names_from = PC, values_from = Explained_Variance) %>%
+        column_to_rownames("term") %>%
+        mutate_all(~ replace(., is.na(.), 0L))
+
+write.csv(data_Heat , 
+          paste0(Fig5B ,"/Fig.5b.csv"), 
+          row.names = TRUE)
+
+## Fig5C alluvial plot
+data("mca_twocond_rules")
+
+MCA_twocond_Compressed <- mca_twocond_rules %>%
+  mutate(Cond1 = case_when(
+    Cond1 %in% c("UP", "DOWN") ~ Cond1,  # Keep "UP" and "DOWN" as they are
+    Cond1 %in% c("Not Detected", "Significant Negative", "Significant Positive", "Not Significant") ~ "No Change",
+    TRUE ~ NA_character_  # Handle unexpected values
+  )) %>%
+  mutate(Cond2 = case_when(
+    Cond2 %in% c("UP", "DOWN") ~ Cond2,  # Keep "UP" and "DOWN" as they are
+    Cond2 %in% c("Not Detected", "Significant Negative", "Significant Positive", "Not Significant") ~ "No Change",
+    TRUE ~ NA_character_  # Handle unexpected values
+  ))%>%
+  distinct(Cond1, Cond2, .keep_all = TRUE)
+
+write.csv(MCA_twocond_Compressed, 
+          paste0(Fig5C ,"/Fig.5c.csv"), 
+          row.names = FALSE)
 
 ## Fig5D 
+#Select Dipeptides
+Dipeptides <- read_excel("Table_EV2.xlsx", sheet = "Raw_Feature_Metadata")%>%
+  filter(SUB_PATHWAY == "Dipeptide")%>%
+  select(Metabolite)
+
+#Tumour versus Normal Young --> Selection Dipeptides
+DMA_Young <- read_excel("Table_EV2.xlsx", sheet = "DMA_TUMOR_vs_NORMAL_Young")%>%
+  select(Metabolite, Log2FC, p.adj)%>%
+  filter(Metabolite %in% Dipeptides$Metabolite)%>%
+  mutate(Panel = "Young", .before = 1)
+
+#Tumour versus Normal Old --> Selection Dipeptides
+DMA_Old <- read_excel("Table_EV2.xlsx", sheet = "DMA_TUMOR_vs_NORMAL_Old")%>%
+  select(Metabolite, Log2FC, p.adj)%>%
+  filter(Metabolite %in% Dipeptides$Metabolite)%>%
+  mutate(Panel = "Old", .before = 1)
+
+# Addition biological clusters
+MCA_2Cond <- read_excel("Table_EV2.xlsx", sheet = "MCA2Cond_Old-Young")%>%
+  select(Metabolite, RG2_Significant)
+
+DMA_Young <- merge(DMA_Young, MCA_2Cond, by = "Metabolite", all.x = TRUE)
+DMA_Old <- merge(DMA_Old, MCA_2Cond, by = "Metabolite", all.x = TRUE)
+
+#Cobine and save
+CombinedData_YO <- bind_rows(DMA_Young, DMA_Old)
+
+write.csv(CombinedData_YO,
+          paste0(Fig5D ,"/Fig.5d.csv"), 
+          row.names = FALSE)
+
 
 ## Fig5E
+# Select pathway metabolites
+Enrich_Young <- read_excel("Table_EV2.xlsx", sheet = "KEGG_PathwayEnrichment_Young")
+
+MineralAbsorption <- Enrich_Young%>%
+  select(ID == "")
+  
+ProteinDigestion <- 
 
 ## Fig5F
+#Check with jannik
+
+
 ```
 
 
