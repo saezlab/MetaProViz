@@ -647,8 +647,8 @@ data_Heat <-
         column_to_rownames("term") %>%
         mutate_all(~ replace(., is.na(.), 0L))
 
-write.csv(data_Heat , 
-          paste0(Fig5B ,"/Fig.5b.csv"), 
+write.csv(data_Heat,
+          paste0(Fig5B ,"/Fig.5b.csv"),
           row.names = TRUE)
 
 ## Fig5C alluvial plot
@@ -690,7 +690,7 @@ DMA_Old <- read_excel("Table_EV2.xlsx", sheet = "DMA_TUMOR_vs_NORMAL_Old")%>%
   mutate(Panel = "Old", .before = 1)
 
 # Addition biological clusters
-MCA_2Cond <- read_excel("Table_EV2.xlsx", sheet = "MCA2Cond_Old-Young")%>%
+MCA_2Cond <- read_excel("Table_EV2.xlsx", sheet = "MCA2Cond_Old-Young") %>%
   select(Metabolite, RG2_Significant)
 
 DMA_Young <- merge(DMA_Young, MCA_2Cond, by = "Metabolite", all.x = TRUE)
@@ -706,16 +706,30 @@ write.csv(CombinedData_YO,
 
 ## Fig5E
 # Select pathway metabolites
-Enrich_Young <- read_excel("Table_EV2.xlsx", sheet = "KEGG_PathwayEnrichment_Young")
 
-MineralAbsorption <- Enrich_Young%>%
-  select(ID == "")
-  
-ProteinDigestion <- 
+volcano_plot_source_data_Young <- 
+  read.csv2("Patients_Metadata/MetaProViz_Results/Enrichment/volcano_plot_source_data_Young.csv") %>%
+  select(-X) %>%
+  filter(
+      term == "Mineral absorption" | term == "Protein digestion and absorption"
+    ) 
+
+write.csv(volcano_plot_source_data_Young, 
+          paste0(Fig5E ,"/Fig.5e.csv"), 
+          row.names = FALSE)
 
 ## Fig5F
-#Check with jannik
+# read in cluster_summary and similarity_matrix from Table EV2
 
+clustered_data <- read_excel("Table_EV2.xlsx", sheet = "ORA_Clustered_Data")
+cluster_similarity_matrix <- read_excel("Table_EV2.xlsx", sheet = "ORA_Cluster_Similarity_Matrix")
+
+write.csv(clustered_data, 
+          paste0(Fig5F ,"/Fig.5f_1.csv"), 
+          row.names = FALSE)
+write.csv(cluster_similarity_matrix, 
+          paste0(Fig5F ,"/Fig.5f_2.csv"), 
+          row.names = FALSE)
 
 ```
 

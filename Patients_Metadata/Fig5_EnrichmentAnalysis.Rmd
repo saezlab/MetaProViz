@@ -89,7 +89,54 @@ read_xlsx_all <- function(url) {
     setNames(sheets)
 }
 
-
+decoupleRAddInfo <- function(mat, net, res, .source, .target, complete=FALSE){
+  
+  # add number of Genes_targeted_by_TF_num
+  net$Count <- 1
+  net_Mean <- aggregate(net$Count, by=list(source=net[[.source]]), FUN=sum)%>%
+    dplyr::rename("targets_num" = 2)
+  
+  if(complete==TRUE){
+    res_Add<- merge(x= res, y=net_Mean, by="source", all=TRUE)
+  }else{
+    res_Add<- merge(x= res, y=net_Mean, by="source", all.x =TRUE)
+  }
+  
+  # add list of Genes_targeted_by_TF_chr
+  net_List <- aggregate(net[[.target]]~net[[.source]], FUN=toString)%>%
+    dplyr::rename("source" = 1,
+                  "targets_chr"=2)
+  res_Add<- merge(x= res_Add, y=net_List, by="source", all.x=TRUE)
+  
+  # add number of Genes_targeted_by_TF_detected_num
+  mat <- as.data.frame(mat)%>% #Are these the normalised counts?
+    tibble::rownames_to_column("Symbol")
+  
+  Detected <- merge(x= mat , y=net[,c(.source, .target)], by.x="Symbol", by.y=.target, all.x=TRUE)%>%
+    filter(!is.na(across(all_of(.source))))
+  Detected$Count <-1
+  Detected_Mean <- aggregate(Detected$Count, by=list(source=Detected[[.source]]), FUN=sum)%>%
+    dplyr::rename("targets_detected_num" = 2)
+  
+  res_Add<- merge(x= res_Add, y=Detected_Mean, by="source", all.x=TRUE)%>%
+    dplyr::mutate(targets_detected_num = tidyr::replace_na(targets_detected_num, 0))
+  
+  # add list of Genes_targeted_by_TF_detected_chr
+  Detected_List <- aggregate(Detected$Symbol~Detected[[.source]], FUN=toString)%>%
+    dplyr::rename("source"=1,
+           "targets_detected_chr" = 2)
+  
+  res_Add<- merge(x= res_Add, y=Detected_List, by="source", all.x=TRUE)
+  
+  #add percentage of Percentage_of_Genes_detected
+  res_Add$targets_detected_percentage <-round(((res_Add$targets_detected_num/res_Add$targets_num)*100),digits=2)
+  
+  #sort by score
+  # res_Add<-res_Add%>%
+  #   arrange(desc(as.numeric(as.character(score))))
+  
+  Output<-res_Add
+}
 ```
 
 # Load results
@@ -164,6 +211,7 @@ KEGG_Pathways_clean <-
 
 
 
+ora_input <- list()
 
 # continue
 # comparison = "Young"
@@ -178,12 +226,12 @@ for(comparison in c("Old", "Young")){
         stop("Invalid comparison value")
     }
   
-  dma_res <- merge(
+  dma_res <- merge( # kegg.y is from old DMA
       x = Tissue_MetaData_Extended_cleaned,
       y = df_selected,
       by = "Metabolite",
       all = TRUE
-  )
+  ) 
   
   
   #@Jannik:
@@ -220,7 +268,6 @@ for(comparison in c("Old", "Young")){
               KEGG,
               sep = ",\\s*"
           ) %>%
-          
           group_by( # create index per original row
               .row_id
           ) %>%
@@ -262,6 +309,7 @@ for(comparison in c("Old", "Young")){
               - ".n"
           )
   
+  ora_input[[comparison]] <- dma_res_clean
   
   #Perform ORA
   set.seed(100)
@@ -283,9 +331,9 @@ for(comparison in c("Old", "Young")){
 
   DM_ORA_res[[comparison]] <- Res
 
-  #Select to plot:
+  # Select to plot:
   Res_Select <- Res[["ClusterGosummary"]] %>%
-    filter(p.adjust < 0.1)%>%
+    filter(p.adjust < 0.1) %>%
     #filter(pvalue<0.05)%>%
     filter(percentage_of_Pathway_detected > 10)
 
@@ -300,7 +348,7 @@ for(comparison in c("Old", "Young")){
               PEA_score = "GeneRatio",#Column data2
               PEA_Feature = "MetaboliteID"
           ), # Column metadata_feature (needs to be the same as row names in data)
-          metadata_feature = KEGG_Pathways,#Must be the pathways used for pathway analysis
+          metadata_feature = KEGG_Pathways_clean, #Must be the pathways used for pathway analysis
           plot_name = paste("KEGG_", comparison, sep = ""),
           select_label = NULL,
           subtitle = "PEA" 
@@ -308,6 +356,54 @@ for(comparison in c("Old", "Young")){
   }
 }
 ```
+
+
+```{r}
+# remove last few columns from DMA result
+
+Old_ClusterGosummary <- DM_ORA_res$Old$ClusterGosummary
+
+Young_ClusterGosummary <- DM_ORA_res$Young$ClusterGosummary
+
+Young_ClusterGosummary %<>% 
+  select(
+    "source"=ID, GeneRatio, BgRatio, RichFactor, FoldEnrichment, zScore, pvalue, p.adjust, qvalue
+  )
+
+Old_ClusterGosummary %<>% 
+  select(
+    "source"=ID, GeneRatio, BgRatio, RichFactor, FoldEnrichment, zScore, pvalue, p.adjust, qvalue
+  )
+
+```
+
+```{r}
+res_Young <- decoupleRAddInfo(
+  mat = dma_res_clean %>% select(t.val), # ORA input     dma_res_clean
+  net = KEGG_Pathways_clean %>% select("source" = term, "target" = MetaboliteID, Description), # ORA network   KEGG_Pathways_clean
+  res = Young_ClusterGosummary, # Result ClusterGosummary
+  .source= "source",
+  .target = "target",
+  complete = TRUE
+) %>%
+  dplyr::rename(
+    "ID" = "source"
+  )
+
+
+res_Old <- decoupleRAddInfo(
+  mat = dma_res_clean %>% select(t.val), # ORA input     dma_res_clean
+  net = KEGG_Pathways_clean %>% select("source" = term, "target" = MetaboliteID, Description), # ORA network   KEGG_Pathways_clean
+  res = Old_ClusterGosummary, # Result ClusterGosummary
+  .source= "source",
+  .target = "target",
+  complete = TRUE
+) %>%
+  dplyr::rename(
+    "ID" = "source"
+  )
+```
+
 
 ## Use the results to showcase networks
 
@@ -392,16 +488,20 @@ viz_graph(
 #     f.  $node_sizes             -> long formal node_size to term mapping
 #     g.  $graph_plot             -> S3 igraph object
 
+
+# DMA
 write.csv2(
-    DM_ORA_res$Old$ClusterGosummary,
+    res_Old,
     "MetaProViz_Results/Enrichment/DM_ORA_res_OLD.csv"
 )
 
 write.csv2(
-    DM_ORA_res$Young$ClusterGosummary,
+    res_Young,
     "MetaProViz_Results/Enrichment/DM_ORA_res_YOUNG.csv"
 )
 
+
+# cluster_pk
 write.csv2(
     cluster_pk_res$data,
     "MetaProViz_Results/Enrichment/data_with_clusters.csv"
@@ -418,10 +518,43 @@ write.csv2(
 )
 
 
+# source data table for main volcanos
+
+ora_input_Young <- ora_input$Young %>% rownames_to_column("MetaboliteID")
+ora_input_Old <- ora_input$Old %>% rownames_to_column("MetaboliteID")
+
+
+KEGG_Pathways_merged_Young <- merge(
+  KEGG_Pathways_clean,
+  ora_input_Young,
+  by = "MetaboliteID",
+  all.x = TRUE
+) %>%
+  select(-compound_names)
+
+
+KEGG_Pathways_merged_Old <- merge(
+  KEGG_Pathways_clean,
+  ora_input_Old,
+  by = "MetaboliteID",
+  all.x = TRUE
+)%>%
+  select(-compound_names)
+
+
+
+write.csv2(
+    KEGG_Pathways_merged_Young,
+    "MetaProViz_Results/Enrichment/volcano_plot_source_data_Young.csv",
+    
+)
+
+write.csv2(
+    KEGG_Pathways_merged_Old,
+    "MetaProViz_Results/Enrichment/volcano_plot_source_data_Old.csv"
+)
+
 ```
-
-
-
 
 
 # Session information

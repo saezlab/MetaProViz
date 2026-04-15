@@ -299,7 +299,6 @@ similarity_matrix <-
   as.matrix(
     read.csv2(
       "MetaProViz_Results/Enrichment/similarity_matrix.csv", 
-      row.names = 1,
       check.names = FALSE
     )
   )
@@ -391,7 +390,7 @@ Table_EV2 <- list(
   "Feature_Metadata_Translated" = MetaboliteIDs_Translated,
   "Feature_Metadata_Traverse" = MetaboliteIDs_traverse,
   "Feature_Metadata_EquivalentID" = MetaboliteIDs_addEquivalent,
-  "Feature_Metadata_KEGG_AmbiguityResolved" = Tissue_MetaData_Extended_cleaned,
+  "Feature_Metadata_KEGG" = Tissue_MetaData_Extended_cleaned,
   "ID_Summary" = id_summary,
   "ID_Summary_Deltas" = id_summary_deltas,
   "NormalisedData" = data_list[["NormalisedData"]],
