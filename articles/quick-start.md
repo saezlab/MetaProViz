@@ -1057,7 +1057,7 @@ data](https://saezlab.github.io/MetaProViz/articles/standard-metabolomics.html#r
     #> 
     #> other attached packages:
     #> [1] tibble_3.3.1       ggfortify_0.4.19   ggplot2_4.0.2      rlang_1.2.0        dplyr_1.2.1        magrittr_2.0.5    
-    #> [7] MetaProViz_3.99.52 BiocStyle_2.38.0  
+    #> [7] MetaProViz_3.99.53 BiocStyle_2.38.0  
     #> 
     #> loaded via a namespace (and not attached):
     #>   [1] RColorBrewer_1.1-3          rstudioapi_0.18.0           jsonlite_2.0.0              ggbeeswarm_0.7.3           

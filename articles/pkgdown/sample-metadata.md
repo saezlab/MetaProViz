@@ -985,7 +985,7 @@ for(comparison in names(ResList)){
     #> 
     #> other attached packages:
     #> [1] stringr_1.6.0      tibble_3.3.1       tidyr_1.3.2        rlang_1.2.0        dplyr_1.2.1        magrittr_2.0.5    
-    #> [7] MetaProViz_3.99.52 BiocStyle_2.38.0  
+    #> [7] MetaProViz_3.99.53 BiocStyle_2.38.0  
     #> 
     #> loaded via a namespace (and not attached):
     #>   [1] RColorBrewer_1.1-3          rstudioapi_0.18.0           jsonlite_2.0.0              ggbeeswarm_0.7.3           

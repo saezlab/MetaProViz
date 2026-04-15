@@ -1159,7 +1159,7 @@ Tissue_TvsN_Young <- tissue_dma_young
     #> 
     #> other attached packages:
     #> [1] tibble_3.3.1       stringr_1.6.0      dplyr_1.2.1        purrr_1.2.2        rlang_1.2.0        magrittr_2.0.5    
-    #> [7] MetaProViz_3.99.52 BiocStyle_2.38.0  
+    #> [7] MetaProViz_3.99.53 BiocStyle_2.38.0  
     #> 
     #> loaded via a namespace (and not attached):
     #>   [1] splines_4.5.2               later_1.4.8                 R.oo_1.27.1                 cellranger_1.1.0           
