@@ -103,8 +103,8 @@ if (!dir.exists(Fig2)) {dir.create(Fig2)}
 Fig2B <- file.path(Fig2 , "2B")
 if (!dir.exists(Fig2B)) {dir.create(Fig2B)}  
 
-Fig2D <- file.path(Fig2 , "2D")
-if (!dir.exists(Fig2D)) {dir.create(Fig2D)}  
+Fig2C <- file.path(Fig2 , "2C")
+if (!dir.exists(Fig2C)) {dir.create(Fig2C)}  
 
 
 #---------------------------------------------------------------------------------
@@ -175,7 +175,7 @@ write.csv(combined,
           row.names = FALSE)
 
 
-# Fig 2D
+# Fig 2C
 
 Table_EV2_ID_Summary <- read_excel("Table_EV2.xlsx", sheet = "ID_Summary")
 Table_EV2_ID_Summary_Deltas <- read_excel("Table_EV2.xlsx", sheet = "ID_Summary_Deltas")
@@ -183,7 +183,7 @@ combined <- rbind(Table_EV2_ID_Summary, Table_EV2_ID_Summary_Deltas)
 combined <- combined %>% select(row_name, Total_IDs)
 
 write.csv(combined, 
-          paste0(Fig2D ,"/Fig.2d.csv"), 
+          paste0(Fig2C ,"/Fig.2c.csv"), 
           row.names = FALSE)
 
 ```
