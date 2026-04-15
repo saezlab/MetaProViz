@@ -14,7 +14,7 @@ output:
 vignette: >
   %\VignetteIndexEntry{Standard Metabolomics}
   %\VignetteEncoding{UTF-8}
-  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEngine{knitr::rmdarkdown}
 bibliography: bibliography.bib
 editor_options:
   chunk_output_type: console
@@ -57,19 +57,33 @@ Not applicable to Fig. 1a-b as Schematics.
 ```{r}
 # Create needed output folders
 Fig1 <- file.path(Output_folder, "Figure 1")
-if (!dir.exists(Fig2)) {dir.create(Fig2)} 
+if (!dir.exists(Fig1)) {dir.create(Fig1)} 
 
 Fig1C <- file.path(Fig1 , "1C")
-if (!dir.exists(Fig1C)) {dir.create(Fig1C)}  
+if (!dir.exists(Fig1C)) {dir.create(Fig1C)}
+
+Fig1D <- file.path(Fig1 , "1D")
+if (!dir.exists(Fig1D)) {dir.create(Fig1D)}
 
 #---------------------------------------------------------------------------------
 # Add Figure Source data and save as .csv files within the respective folders:
 
+# Fig1C
+Table_EV1_Resource_Level <- read_excel("Table_EV1.xlsx", sheet = "Resource_Level")
+write.csv(Table_EV1_Resource_Level , 
+          paste0(Fig1C ,"/Fig.1c.csv"), 
+          row.names = FALSE)
+
+# Fig1D
+Table_EV1_Term_Size_Distribution <- read_excel("Table_EV1.xlsx", sheet = "Term_Size_Distribution")
+write.csv(Table_EV1_Term_Size_Distribution , 
+          paste0(Fig1D ,"/Fig.1d.csv"), 
+          row.names = FALSE)
 
 ```
 
 ## Figure 2
-Not applicable to Fig 2D-E as Schmatics
+Not applicable to Fig 2D-E as Schematics.
 ```{r}
 # Create needed output folders
 Fig2 <- file.path(Output_folder, "Figure 2")
@@ -383,14 +397,55 @@ if (!dir.exists(Fig5F)) {dir.create(Fig5F)}
 
 
 ## EV Figure 1
-Not applicable as Schematics.
+```{r}
+# Create needed output folders
+FigEV1 <- file.path(Output_folder, "Figure EV1")
+if (!dir.exists(FigEV1)) {dir.create(FigEV1)} 
+
+FigEV1A <- file.path(FigEV1, "Figure EV1A")
+if (!dir.exists(FigEV1A)) {dir.create(FigEV1A)} 
+
+FigEV1B <- file.path(FigEV1, "Figure EV1B")
+if (!dir.exists(FigEV1B)) {dir.create(FigEV1B)} 
+
+FigEV1C <- file.path(FigEV1, "Figure EV1C")
+if (!dir.exists(FigEV1C)) {dir.create(FigEV1C)} 
+
+
+# Fig EV1a
+
+
+
+# Fig EV1b
+Table_EV2_ID_Summary <- read_excel("Table_EV2.xlsx", sheet = "ID_Summary")
+Table_EV2_ID_Summary_Deltas <- read_excel("Table_EV2.xlsx", sheet = "ID_Summary_Deltas")
+combined <- rbind(Table_EV2_ID_Summary, Table_EV2_ID_Summary_Deltas)
+
+write.csv(combined , 
+          paste0(FigEV1B ,"/Fig.EV1b.csv"), 
+          row.names = FALSE)
+
+
+
+# Fig EV1c
+
+
+
+
+
+
+
+
+
+
+```
 
 
 ## EV Figure 2
 
 ```{r}
 # Create needed output folders
-FigEV2 <- file.path(Output_folder, "Figure 2")
+FigEV2 <- file.path(Output_folder, "Figure EV2")
 if (!dir.exists(FigEV2)) {dir.create(FigEV2)} 
 
 FigEV2A <- file.path(FigEV2 , "2A")
