@@ -375,7 +375,7 @@ df <- data.frame(
     "Clustering results of ORA on Young patient subset, filtered for pathways with p.adj < 0.05.",
     "Cluster summary of ORA clustering results.",
     "Clustering similarity matrix.",
-    "Alanine IDs mapped to pathways from wiki,, KEGG and Reactome.",
+    "Alanine IDs mapped to pathways from wiki, KEGG and Reactome.",
     "Mapping ambiguities for `KEGG Glycolysis/Gluconeogenesis` translating from KEGG to HMDB IDs."
   ),
   stringsAsFactors = FALSE
