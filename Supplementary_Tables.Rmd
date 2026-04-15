@@ -486,7 +486,6 @@ writexl::write_xlsx(Cells_CoRe, "Table_EV3.xlsx" , col_names = TRUE)
 ```
 
 
-
 ## Table EV4
 ### Content
 - Previous Extended Data Table 4
@@ -558,19 +557,6 @@ Cells_Intra <- lapply(Cells_Intra, sanitize_df)
 # Save:
 writexl::write_xlsx(Cells_Intra, "Table_EV4.xlsx" , col_names = TRUE)
 ```
-
-
-
-## Table EV5
-### Content
-- this 
-- that
-
-```{r}
-
-
-```
-
 
 
 # Session information
