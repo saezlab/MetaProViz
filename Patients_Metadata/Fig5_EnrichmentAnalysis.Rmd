@@ -412,6 +412,12 @@ write.csv2(
     "MetaProViz_Results/Enrichment/cluster_summary.csv"
 )
 
+write.csv2(
+    cluster_pk_res$similarity_matrix,
+    "MetaProViz_Results/Enrichment/similarity_matrix.csv"
+)
+
+
 ```
 
 

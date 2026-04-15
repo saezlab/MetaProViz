@@ -1450,7 +1450,7 @@ Input_CHEBI <- MetaboliteIDs_traverse %>%
 
 ```
 
-````{r}
+```{r}
 # before adding equivalent IDs, it is important to note, that the function
 # equivalent_id internally drops duplicated IDs from the metadata_info["Input_ID"]
 
