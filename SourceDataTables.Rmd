@@ -45,6 +45,17 @@ library(readxl)
 library(MetaProViz)
 ```
 
+```{r}
+read_xlsx_all <- function(url) {
+  tmp <- tempfile(fileext = ".xlsx")
+  download.file(url, tmp, mode = "wb")
+  
+  sheets <- excel_sheets(tmp)
+  lapply(sheets, function(s) read_excel(tmp, sheet = s)) |>
+    setNames(sheets)
+}
+```
+
 # Compile the source data tables for the figures
 ```{r}
 #Create output folder
@@ -83,35 +94,102 @@ write.csv(Table_EV1_Term_Size_Distribution ,
 ```
 
 ## Figure 2
-Not applicable to Fig 2D-E as Schematics.
+Not applicable to Fig 2A and D as Schematics.
 ```{r}
 # Create needed output folders
 Fig2 <- file.path(Output_folder, "Figure 2")
 if (!dir.exists(Fig2)) {dir.create(Fig2)} 
 
-Fig2A <- file.path(Fig2 , "2A")
-if (!dir.exists(Fig2A)) {dir.create(Fig2A)}  
-
 Fig2B <- file.path(Fig2 , "2B")
 if (!dir.exists(Fig2B)) {dir.create(Fig2B)}  
 
-Fig2C <- file.path(Fig2 , "2C")
-if (!dir.exists(Fig2C)) {dir.create(Fig2C)}  
+Fig2D <- file.path(Fig2 , "2D")
+if (!dir.exists(Fig2D)) {dir.create(Fig2D)}  
 
 
 #---------------------------------------------------------------------------------
 # Add Figure Source data and save as .csv files within the respective folders:
 
-## Fig2A = ExtendedDataTable 1, sheet 2 "Feature metadata"
+# Fig 2B
 
-## Fig2B = ExtendedDataTable 2, sheet 2 "Alanine IDs"
+Table_EV2_Raw_Feature_Metadata <- read_excel("Table_EV2.xlsx", sheet = "Raw_Feature_Metadata")
+Table_EV2_Feature_Metadata_EquivalentID <- read_excel("Table_EV2.xlsx", sheet = "Feature_Metadata_EquivalentID")
 
-## Fig2C = ExtendedDataTable 2, sheet 3 "Mapping ambiguities"
+# These two tables were used to generate both upsetplots
+# append them using rbind, making same column order and adding a "Version" column, 
+# indicating whether it is the "Original" (left) or "Adapted" (right) plot
+
+Table_EV2_Raw_Feature_Metadata <- 
+  Table_EV2_Raw_Feature_Metadata %>%
+    mutate(
+      CHEBI = NA_character_,
+      manual_correction = NA_character_,
+      correction_tbl = NA_character_,
+      Plot = "Original"
+    ) %>%
+    select(
+        Plot,
+        Metabolite,
+        CAS,
+        SUPER_PATHWAY,
+        SUB_PATHWAY,
+        COMP_ID,
+        PLATFORM,
+        RI,
+        MASS,
+        HMDB,
+        KEGG,
+        PUBCHEM,
+        CHEBI,
+        manual_correction,
+        correction_tbl
+    )
+
+Table_EV2_Feature_Metadata_EquivalentID <- 
+  Table_EV2_Feature_Metadata_EquivalentID %>%
+    mutate(
+      Plot = "Adapted"
+    ) %>%
+    select(
+        Plot,
+        Metabolite,
+        CAS,
+        SUPER_PATHWAY,
+        SUB_PATHWAY,
+        COMP_ID,
+        PLATFORM,
+        RI,
+        MASS,
+        HMDB,
+        KEGG,
+        PUBCHEM,
+        CHEBI,
+        manual_correction,
+        correction_tbl
+    )
+
+combined <- rbind(Table_EV2_Raw_Feature_Metadata, Table_EV2_Feature_Metadata_EquivalentID)
+
+write.csv(combined, 
+          paste0(Fig2B ,"/Fig.2b.csv"), 
+          row.names = FALSE)
+
+
+# Fig 2D
+
+Table_EV2_ID_Summary <- read_excel("Table_EV2.xlsx", sheet = "ID_Summary")
+Table_EV2_ID_Summary_Deltas <- read_excel("Table_EV2.xlsx", sheet = "ID_Summary_Deltas")
+combined <- rbind(Table_EV2_ID_Summary, Table_EV2_ID_Summary_Deltas)
+combined <- combined %>% select(row_name, Total_IDs)
+
+write.csv(combined, 
+          paste0(Fig2D ,"/Fig.2d.csv"), 
+          row.names = FALSE)
 
 ```
 
 ## Figure 3
-Not applicable to Fig 3A as Schmatics
+Not applicable to Fig 3A as Schematics
 ```{r}
 # Create needed output folders
 Fig3 <- file.path(Output_folder, "Figure 3")
@@ -413,8 +491,17 @@ if (!dir.exists(FigEV1C)) {dir.create(FigEV1C)}
 
 
 # Fig EV1a
+# BioRxiv ExtendedDataTable 2, sheet 2 "AlanineIDs"
+data_list <- 
+  read_xlsx_all(
+    "https://raw.githubusercontent.com/saezlab/MetaProViz/BioRxiv/Extended%20Data%20Table%202_AlanineMetaboliteIDs.xlsx"
+  )
 
+AlanineIDs <- data_list$AlanineIDs
 
+write.csv(AlanineIDs, 
+          paste0(FigEV1A ,"/Fig.EV1a.csv"), 
+          row.names = FALSE)
 
 # Fig EV1b
 Table_EV2_ID_Summary <- read_excel("Table_EV2.xlsx", sheet = "ID_Summary")
@@ -426,18 +513,13 @@ write.csv(combined ,
           row.names = FALSE)
 
 
-
 # Fig EV1c
+# BioRxiv ExtendedDataTable 2, sheet 3 "Mapping ambiguities"
+MappingAmbiguities <- data_list$MappingAmbiguities
 
-
-
-
-
-
-
-
-
-
+write.csv(MappingAmbiguities, 
+          paste0(FigEV1C ,"/Fig.EV1c.csv"), 
+          row.names = FALSE)
 ```
 
 
