@@ -2,7 +2,7 @@
 title: "Supplementary_Tables"
 author: 
   - name: Jannik Franken
-      affiliation:
+    affiliation:
       - Heidelberg University
 date: "14 4 2026"
 output: html_document
