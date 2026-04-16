@@ -99,6 +99,6 @@ Rscript -e "renv::load(); renv::settings\$bioconductor.version('3.20'); if (!req
 
 # Step 5: Snapshot the package environment
 echo "📸 Saving package versions to renv.lock..."
-Rscript -e "renv::snapshot(confirm = FALSE)"
+Rscript -e "renv::load(); renv::settings\$bioconductor.version('3.20'); options(repos = BiocManager::repositories(version = '3.20')); renv::snapshot(confirm = FALSE)"
 
 echo "✅ Pipeline complete!"
