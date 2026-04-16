@@ -362,8 +362,15 @@ for(comparison in c("Old", "Young")){
 # remove last few columns from DMA result
 
 Old_ClusterGosummary <- DM_ORA_res$Old$ClusterGosummary
-
 Young_ClusterGosummary <- DM_ORA_res$Young$ClusterGosummary
+
+# save ORA columns
+Young_ClusterGosummary_ORA <- Young_ClusterGosummary %>% select(
+  ID,
+  "ORA_Metabolites_in_pathway" = Metabolites_in_pathway,
+  "ORA_metabolites_count" = Count,
+  "ORA_percentage_of_Pathway_detected" = percentage_of_Pathway_detected,
+)
 
 Young_ClusterGosummary %<>% 
   select(
@@ -388,7 +395,31 @@ res_Young <- decoupleRAddInfo(
 ) %>%
   dplyr::rename(
     "ID" = "source"
+  ) %>%
+  select(
+    ID,
+    GeneRatio,
+    BgRatio,
+    RichFactor,
+    FoldEnrichment,
+    zScore,
+    pvalue,
+    p.adjust,
+    qvalue,
+    "n_Metabolites_in_pathway" = targets_num,
+    "all_metabolites_in_pathway" = targets_chr,
+    "n_detected_metabolites_in_pathway" = targets_detected_num,
+    "detected_metabolites_in_pathway" = targets_detected_chr,
+    "percentage_detected_metabolites_of_pathway" = targets_detected_percentage
   )
+
+res_Young <- merge(
+  res_Young,
+  Young_ClusterGosummary_ORA,
+  by.x = "ID",
+  by.y = "ID",
+  all.x = TRUE
+)
 
 
 res_Old <- decoupleRAddInfo(
