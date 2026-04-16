@@ -101,7 +101,7 @@ df <- data.frame(
     "Distinct terms, targets, interactions, and average connectivity metrics.",
     "Per-resource distribution summary of targets per term.",
     "Target membership composition across 1 term, 2 terms, and >2 terms.",
-    "Comparison to MetaboAnalyst R 4.0."
+    "Comparison to MetaboAnalyst R 4.0 with unique conceptual contributions of MetaProViz: Comparison based on publicly available documentation and publications of MetaboAnalyst R 4.0. The table highlights selected features relevant to the methodological contributions of MetaProViz and is not intended to provide an exhaustive benchmark. MetaboAnalyst has many complementary features that are described elsewhere and are not part of MetaProiViz."
   ),
   stringsAsFactors = FALSE
 )
