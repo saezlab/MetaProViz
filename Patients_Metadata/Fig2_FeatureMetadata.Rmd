@@ -727,10 +727,10 @@ write.csv2(
 # the ones which were lost due to compeltely incompatible seed ids
 
 # lost_id_pair_rows_with_cas.csv
-completely_incompatible_manual_with_cas <- read.csv("Patients_Metadata/lost_id_pair_rows_with_cas_manualcuration.csv")
+completely_incompatible_manual_with_cas <- read.csv("lost_id_pair_rows_with_cas_manualcuration.csv")
 
 # lost_id_pair_rows_no_cas.csv
-completely_incompatible_manual_no_cas <- read.csv("Patients_Metadata/lost_id_pair_rows_no_cas_manualcuration.csv")
+completely_incompatible_manual_no_cas <- read.csv("lost_id_pair_rows_no_cas_manualcuration.csv")
 
 
 
