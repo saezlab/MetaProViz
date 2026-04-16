@@ -35,7 +35,7 @@ if (!requireNamespace("renv", quietly = TRUE)) {
 packages <- c(
     "magrittr", "dplyr", "tibble", "rlang",
     "stringr", "tidyverse", "tidyr", "purrr", "rmarkdown",
-    "remotes"
+    "remotes", "R.utils", "R.oo", "R.methodsS3", "lazyeval"
 )
 
 # Check if lockfile exists
@@ -62,6 +62,13 @@ if (!file.exists("renv.lock")) {
         message("⚠️ Restoring from lockfile...")
         renv::restore(prompt = FALSE)
     }
+}
+
+# Ensure runtime packages needed by MetaProViz are available
+runtime_packages <- c("R.utils", "R.oo", "R.methodsS3", "lazyeval")
+missing_runtime <- runtime_packages[!vapply(runtime_packages, requireNamespace, logical(1), quietly = TRUE)]
+if (length(missing_runtime) > 0) {
+    install.packages(missing_runtime, dependencies = NA)
 }
 EOF
 
