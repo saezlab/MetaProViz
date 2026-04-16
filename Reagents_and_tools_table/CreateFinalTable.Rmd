@@ -1,0 +1,161 @@
+---
+title: "Reagents and tools table"
+author:
+  - name: Christina Schmidt
+    affiliation:
+    - Heidelberg University
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_float: true
+    toc_depth: 5
+    code_folding: show
+vignette: >
+  %\VignetteIndexEntry{Standard Metabolomics}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options:
+  chunk_output_type: console
+---
+
+
+
+# Session information
+
+```{r session_info, echo=FALSE}
+options(width = 120)
+sessionInfo()
+```
+
+# Load and merge tables
+
+```{r merge_tables}
+library(dplyr)
+
+# ── Load ──────────────────────────────────────────────────────────────────────
+biorxiv  <- read.csv("BioRxiv/renv_resource_table.csv",  check.names = FALSE, stringsAsFactors = FALSE)
+revision <- read.csv("Revision/renv_resource_table.csv", check.names = FALSE, stringsAsFactors = FALSE)
+
+names(biorxiv)[1]  <- "Package"
+names(revision)[1] <- "Package"
+
+# ── Merge ─────────────────────────────────────────────────────────────────────
+merged <- full_join(biorxiv, revision, by = "Package", suffix = c("_BioRxiv", "_Revision"))
+merged <- merged %>% select(Package, everything())
+
+# ── Resolve: Reference or Source ─────────────────────────────────────────────
+# Helper: extract version number from an Identifier string like "CRAN; dplyr 1.1.4"
+extract_version <- function(x) {
+  vapply(x, function(xi) {
+    m <- regmatches(xi, regexpr("[0-9]+(?:\\.[0-9]+)+(?:-[0-9]+)?", xi, perl = TRUE))
+    if (length(m) == 0 || is.na(m)) NA_character_ else m
+  }, character(1))
+}
+
+merged <- merged %>%
+  mutate(
+    ref_b = `Reference or Source_BioRxiv`,
+    ref_r = `Reference or Source_Revision`,
+    `Reference_or_Source_same` = case_when(
+      is.na(ref_b) | is.na(ref_r) ~ TRUE,
+      ref_b == ref_r               ~ TRUE,
+      TRUE                         ~ FALSE
+    ),
+    `Reference or Source` = mapply(function(rb, rr, ib, ir) {
+      if (is.na(rb) && is.na(rr)) return(NA_character_)
+      if (is.na(rb)) return(rr)
+      if (is.na(rr)) return(rb)
+      if (rb == rr)  return(rb)
+      vb <- extract_version(ib); vr <- extract_version(ir)
+      tryCatch(
+        if (!is.na(vr) && !is.na(vb) && package_version(vr) >= package_version(vb)) rr else rb,
+        error = function(e) rb
+      )
+    }, ref_b, ref_r,
+       `Identifier or Catalog Number_BioRxiv`,
+       `Identifier or Catalog Number_Revision`,
+       USE.NAMES = FALSE)
+  ) %>%
+  select(-ref_b, -ref_r) %>%
+  mutate(
+    id_b = `Identifier or Catalog Number_BioRxiv`,
+    id_r = `Identifier or Catalog Number_Revision`,
+    `Identifier_or_Catalog_Number_same` = case_when(
+      is.na(id_b) | is.na(id_r) ~ TRUE,
+      id_b == id_r               ~ TRUE,
+      TRUE                       ~ FALSE
+    ),
+    `Identifier or Catalog Number` = mapply(function(ib, ir) {
+      if (is.na(ib) && is.na(ir)) return(NA_character_)
+      if (is.na(ib)) return(ir)
+      if (is.na(ir)) return(ib)
+      if (ib == ir)  return(ib)
+      vb <- extract_version(ib); vr <- extract_version(ir)
+      tryCatch(
+        if (!is.na(vr) && !is.na(vb) && package_version(vr) >= package_version(vb)) ir else ib,
+        error = function(e) ib
+      )
+    }, id_b, id_r, USE.NAMES = FALSE)
+  ) %>%
+  select(-id_b, -id_r)%>%
+  mutate(
+    mpv_b = MetaProViz_Dependency_BioRxiv,
+    mpv_r = MetaProViz_Dependency_Revision,
+    `MetaProViz_Dependency_same` = case_when(
+      is.na(mpv_b) | is.na(mpv_r) ~ TRUE,
+      mpv_b == mpv_r              ~ TRUE,
+      TRUE                        ~ FALSE
+    ),
+    `MetaProViz_Dependency` = mapply(function(mb, mr, ib, ir) {
+      if (is.na(mb) && is.na(mr)) return(NA_character_)
+      if (is.na(mb)) return(mr)
+      if (is.na(mr)) return(mb)
+      if (mb == mr)  return(mb)
+      vb <- extract_version(ib); vr <- extract_version(ir)
+      tryCatch(
+        if (!is.na(vr) && !is.na(vb) && package_version(vr) >= package_version(vb)) mr else mb,
+        error = function(e) mb
+      )
+    }, mpv_b, mpv_r,
+       `Identifier or Catalog Number_BioRxiv`,
+       `Identifier or Catalog Number_Revision`,
+       USE.NAMES = FALSE)
+  ) %>%
+  select(-mpv_b, -mpv_r) %>%
+  mutate(
+    load_b = `LoadedBy_run_pipeline.sh_BioRxiv`,
+    load_r = `LoadedBy_run_pipeline.sh_Revision`,
+    `LoadedBy_run_pipeline.sh_same` = case_when(
+      is.na(load_b) | is.na(load_r) ~ TRUE,
+      load_b == load_r              ~ TRUE,
+      TRUE                          ~ FALSE
+    ),
+    `LoadedBy_run_pipeline.sh` = mapply(function(lb, lr, ib, ir) {
+      if (is.na(lb) && is.na(lr)) return(NA)
+      if (is.na(lb)) return(lr)
+      if (is.na(lr)) return(lb)
+      if (lb == lr)  return(lb)
+      vb <- extract_version(ib); vr <- extract_version(ir)
+      tryCatch(
+        if (!is.na(vr) && !is.na(vb) && package_version(vr) >= package_version(vb)) lr else lb,
+        error = function(e) lb
+      )
+    }, load_b, load_r,
+       `Identifier or Catalog Number_BioRxiv`,
+       `Identifier or Catalog Number_Revision`,
+       USE.NAMES = FALSE)
+  ) %>%
+  select(-load_b, -load_r)
+
+# ── Select ────────────────────────────────────────────────────────────────────
+merged_select <- merged %>%
+  filter(MetaProViz_Dependency == TRUE | LoadedBy_run_pipeline.sh == TRUE)%>%
+  select(Package, `Reference or Source`, `Identifier or Catalog Number`, MetaProViz_Dependency, LoadedBy_run_pipeline.sh)
+
+
+# ── Export ────────────────────────────────────────────────────────────────────
+write.csv(merged, "renv_resource_table_merged_full.csv", row.names = FALSE)
+write.csv(merged_select, "renv_resource_table_merged_select.csv", row.names = FALSE)
+
+```

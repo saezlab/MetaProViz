@@ -1,0 +1,52 @@
+"Package","Reference or Source","Identifier or Catalog Number","MetaProViz_Dependency","LoadedBy_run_pipeline.sh"
+"MetaProViz","https://github.com/saezlab/MetaProViz","GitHub; saezlab/MetaProViz 3.99.53",FALSE,TRUE
+"dplyr","https://dplyr.tidyverse.org","CRAN; dplyr 1.2.1",TRUE,TRUE
+"easyalluvial","https://github.com/erblast/easyalluvial/","CRAN; easyalluvial 0.3.2",FALSE,TRUE
+"ggfortify","https://github.com/sinhrks/ggfortify","CRAN; ggfortify 0.4.19",TRUE,FALSE
+"magrittr","https://magrittr.tidyverse.org","CRAN; magrittr 2.0.5",TRUE,TRUE
+"purrr","https://purrr.tidyverse.org/","CRAN; purrr 1.2.2",TRUE,TRUE
+"rlang","https://rlang.r-lib.org","CRAN; rlang 1.2.0",TRUE,TRUE
+"rmarkdown","https://github.com/rstudio/rmarkdown","CRAN; rmarkdown 2.31",FALSE,TRUE
+"stringr","https://stringr.tidyverse.org","CRAN; stringr 1.6.0",TRUE,TRUE
+"tibble","https://tibble.tidyverse.org/","CRAN; tibble 3.3.1",TRUE,TRUE
+"tidyr","https://tidyr.tidyverse.org","CRAN; tidyr 1.3.2",TRUE,TRUE
+"tidyverse","https://tidyverse.tidyverse.org","CRAN; tidyverse 2.0.0",FALSE,TRUE
+"ComplexUpset","https://github.com/krassowski/complex-upset","CRAN; ComplexUpset 1.3.3",TRUE,FALSE
+"DBI","https://dbi.r-dbi.org","CRAN; DBI 1.2.3",TRUE,FALSE
+"EnhancedVolcano","https://github.com/kevinblighe/EnhancedVolcano","Bioconductor 3.20; EnhancedVolcano 1.24.0",TRUE,FALSE
+"OmnipathR","https://github.com/saezlab/OmnipathR","GitHub; saezlab/OmnipathR 3.19.12",TRUE,FALSE
+"Polychrome","http://oompa.r-forge.r-project.org/","CRAN; Polychrome 1.5.4",TRUE,FALSE
+"R.methodsS3","https://github.com/HenrikBengtsson/R.methodsS3","CRAN; R.methodsS3 1.8.2",FALSE,TRUE
+"R.oo","https://henrikbengtsson.github.io/R.oo/","CRAN; R.oo 1.27.1",FALSE,TRUE
+"R.utils","https://henrikbengtsson.github.io/R.utils/","CRAN; R.utils 2.13.0",FALSE,TRUE
+"S4Vectors","https://bioconductor.org/packages/S4Vectors","Bioconductor 3.20; S4Vectors 0.44.0",TRUE,FALSE
+"broom","https://broom.tidymodels.org/","CRAN; broom 1.0.10",TRUE,FALSE
+"cosmosR","https://github.com/saezlab/COSMOSR","Bioconductor 3.20; cosmosR 1.14.0",TRUE,FALSE
+"factoextra","http://www.sthda.com/english/rpkgs/factoextra","CRAN; factoextra 1.0.7",TRUE,FALSE
+"ggVennDiagram","https://github.com/gaospecial/ggVennDiagram","CRAN; ggVennDiagram 1.5.2",TRUE,FALSE
+"ggbeeswarm","https://github.com/eclarke/ggbeeswarm","CRAN; ggbeeswarm 0.7.2",TRUE,FALSE
+"ggplot2","https://ggplot2.tidyverse.org","CRAN; ggplot2 4.0.2",TRUE,FALSE
+"ggpubr","https://rpkgs.datanovia.com/ggpubr/","CRAN; ggpubr 0.6.1",TRUE,FALSE
+"ggrepel","https://ggrepel.slowkow.com/","CRAN; ggrepel 0.9.6",TRUE,FALSE
+"gridExtra","https://cran.r-project.org/package=gridExtra","CRAN; gridExtra 2.3",TRUE,FALSE
+"gtools","https://github.com/r-gregmisc/gtools","CRAN; gtools 3.9.5",TRUE,FALSE
+"hash","http://www.johnhughes.org","CRAN; hash 2.2.6.3",TRUE,FALSE
+"igraph","https://r.igraph.org/","CRAN; igraph 2.2.1",TRUE,FALSE
+"inflection","https://CRAN.R-project.org/package=inflection","CRAN; inflection 1.3.7",TRUE,FALSE
+"kableExtra","http://haozhu233.github.io/kableExtra/","CRAN; kableExtra 1.4.0",TRUE,FALSE
+"knitr","https://yihui.org/knitr/","CRAN; knitr 1.50",TRUE,FALSE
+"lazyeval","https://cran.r-project.org/package=lazyeval","CRAN; lazyeval 0.2.3",FALSE,TRUE
+"limma","https://bioinf.wehi.edu.au/limma/","Git; limma 3.65.5",TRUE,FALSE
+"logger","https://daroczig.github.io/logger/","CRAN; logger 0.4.1",TRUE,FALSE
+"patchwork","https://patchwork.data-imaginist.com","CRAN; patchwork 1.3.2",TRUE,FALSE
+"pheatmap","https://cran.r-project.org/package=pheatmap","CRAN; pheatmap 1.0.13",TRUE,FALSE
+"qcc","https://github.com/luca-scr/qcc","CRAN; qcc 2.7",TRUE,FALSE
+"qvalue","http://github.com/jdstorey/qvalue","Bioconductor 3.20; qvalue 2.38.0",TRUE,FALSE
+"rappdirs","https://rappdirs.r-lib.org","CRAN; rappdirs 0.3.3",TRUE,FALSE
+"readr","https://readr.tidyverse.org","CRAN; readr 2.1.6",TRUE,FALSE
+"rstatix","https://rpkgs.datanovia.com/rstatix/","CRAN; rstatix 0.7.2",TRUE,FALSE
+"svglite","https://svglite.r-lib.org","CRAN; svglite 2.2.1",TRUE,FALSE
+"tidyselect","https://tidyselect.r-lib.org","CRAN; tidyselect 1.2.1",TRUE,FALSE
+"writexl","https://ropensci.r-universe.dev/writexl https://docs.ropensci.org/writexl/","CRAN; writexl 1.5.4",TRUE,FALSE
+"SummarizedExperiment","https://bioconductor.org/packages/SummarizedExperiment","Bioconductor 3.20; SummarizedExperiment 1.36.0",TRUE,FALSE
+"ggraph","https://ggraph.data-imaginist.com","CRAN; ggraph 2.2.2",TRUE,FALSE
