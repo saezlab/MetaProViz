@@ -9,6 +9,13 @@ echo "📦 Checking and initializing renv..."
 # Define R installation path
 R_PATH="/c/Program Files/R/R-4.x.x/bin/Rscript.exe"
 
+# Minimal fallback for Git Bash when Rscript is not on PATH
+if ! command -v Rscript >/dev/null 2>&1; then
+    R_PATH=$(ls -1d /c/Program\ Files/R/R-*/bin/Rscript.exe 2>/dev/null | sort -V | tail -n 1)
+    [ -x "$R_PATH" ] || { echo "❌ Rscript not found. Set R_PATH in run_pipeline.sh"; exit 1; }
+    Rscript() { "$R_PATH" "$@"; }
+fi
+
 
 # Step 1: Install or load renv in R
 # Initialize renv and install packages
