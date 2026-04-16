@@ -92,13 +92,8 @@ Rscript -e "renv::load(); rmarkdown::render('SourceDataTables.Rmd')"
 echo "🧹 Cleaning stale package folders..."
 Rscript -e "renv::load(); lib <- renv::paths\$library(); pkgs <- list.dirs(lib, full.names = TRUE, recursive = FALSE); stale <- pkgs[!file.exists(file.path(pkgs, 'DESCRIPTION'))]; if (length(stale) > 0) { unlink(stale, recursive = TRUE, force = TRUE); message('Removed stale folders: ', paste(basename(stale), collapse = ', ')) } else { message('No stale folders found.') }"
 
-# Step 4.6: Align Bioconductor release for strict snapshot validation
-echo "🧬 Aligning Bioconductor packages..."
-Rscript -e "renv::load(); renv::settings\$bioconductor.version('3.20'); if (!requireNamespace('BiocManager', quietly = TRUE)) install.packages('BiocManager'); options(repos = BiocManager::repositories(version = '3.20')); cur <- tryCatch(as.character(utils::packageVersion('S4Vectors')), error = function(e) ''); if (cur != '0.44.0') BiocManager::install('S4Vectors', ask = FALSE, update = FALSE, force = TRUE)"
-
-
 # Step 5: Snapshot the package environment
 echo "📸 Saving package versions to renv.lock..."
-Rscript -e "renv::load(); renv::settings\$bioconductor.version('3.20'); bioc_repos <- BiocManager::repositories(version = '3.20'); options(repos = bioc_repos, renv.config.repos.override = bioc_repos); cache_path <- file.path(renv::paths\$root(), 'cache'); if (dir.exists(cache_path)) unlink(list.files(cache_path, pattern = 'PACKAGES', full.names = TRUE, recursive = TRUE)); renv::snapshot(confirm = FALSE)"
+Rscript -e "renv::snapshot(confirm = FALSE, force = TRUE)"
 
 echo "✅ Pipeline complete!"
