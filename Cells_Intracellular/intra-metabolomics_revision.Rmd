@@ -117,7 +117,7 @@ Merged_intra <- PoolCV_intra %>%
 # save as csv
 write.csv2(
     sanitize_df(Merged_intra),
-    "Cells_Intracellular/Merged_FilteredFeatures.csv",
+    "Merged_FilteredFeatures.csv",
     row.names = FALSE
 )
 ```
