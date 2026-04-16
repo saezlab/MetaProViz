@@ -35,7 +35,7 @@ if (!requireNamespace("renv", quietly = TRUE)) {
 packages <- c(
     "magrittr", "dplyr", "tibble", "rlang",
     "stringr", "tidyverse", "tidyr", "purrr", "rmarkdown",
-    "devtools"
+    "remotes"
 )
 
 # Check if lockfile exists
@@ -45,11 +45,11 @@ if (!file.exists("renv.lock")) {
 
     # Install all CRAN packages at once
     message("📥 Installing required packages...")
-    install.packages(packages)
+    install.packages(packages, dependencies = NA)
 
     # Install GitHub packages
     message("📥 Installing MetaProViz from GitHub...")
-    devtools::install_github("saezlab/MetaProViz")
+    remotes::install_github("saezlab/MetaProViz")
 
     # Create initial snapshot
     message("📸 Creating initial snapshot...")
@@ -67,15 +67,15 @@ EOF
 
 # Step 2: Render Rmd files in order
 echo "📝 Rendering RMarkdown files..."
-Rscript -e "renv::load(); rmarkdown::render('Cells_CoRe/core-metabolomics_revision.Rmd')"
-Rscript -e "renv::load(); rmarkdown::render('Cells_Intracellular/standard-metabolomics_revision.Rmd')"
+Rscript -e "renv::load(); rmarkdown::render('Cells_CoRe/core-metabolomics_revison.Rmd')"
+Rscript -e "renv::load(); rmarkdown::render('Cells_Intracellular/intra-metabolomics_revision.Rmd')"
 Rscript -e "renv::load(); rmarkdown::render('MetSigDB_Benchmark/metsigdb_benchmark.Rmd')"
 Rscript -e "renv::load(); rmarkdown::render('Patients_Metadata/Fig2_FeatureMetadata.Rmd')"
 Rscript -e "renv::load(); rmarkdown::render('Patients_Metadata/Fig5_EnrichmentAnalysis.Rmd')"
 
 # Step 3: Run Source data tables
 echo "📊 Creating source data tables..."
-Rscript -e "renv::load(); rmarkdown::render('SupplementaryTables.Rmd')"
+Rscript -e "renv::load(); rmarkdown::render('Supplementary_Tables.Rmd')"
 
 # Step 4: Run supplementary tables last
 echo "📊 Creating supplementary tables..."
