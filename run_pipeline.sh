@@ -88,6 +88,10 @@ Rscript -e "renv::load(); rmarkdown::render('Supplementary_Tables.Rmd')"
 echo "📊 Creating supplementary tables..."
 Rscript -e "renv::load(); rmarkdown::render('SourceDataTables.Rmd')"
 
+# Step 4.5: Remove stale package directories missing DESCRIPTION
+echo "🧹 Cleaning stale package folders..."
+Rscript -e "renv::load(); lib <- renv::paths\$library(); pkgs <- list.dirs(lib, full.names = TRUE, recursive = FALSE); stale <- pkgs[!file.exists(file.path(pkgs, 'DESCRIPTION'))]; if (length(stale) > 0) { unlink(stale, recursive = TRUE, force = TRUE); message('Removed stale folders: ', paste(basename(stale), collapse = ', ')) } else { message('No stale folders found.') }"
+
 
 # Step 5: Snapshot the package environment
 echo "📸 Saving package versions to renv.lock..."
