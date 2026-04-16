@@ -1,0 +1,15 @@
+"Resource","Resource Group","Interaction Type","Distinct Terms","Distinct Targets","Distinct Interactions","Avg Targets per Term","Avg Terms per Target"
+"metsigdb_chemicalclass","Annotation resources","metabolite-annotation",410,145820,145820,355.658536585366,1
+"metsigdb_macdb","Cancer association resources","metabolite-cancer",212,5404,17939,84.6179245283019,3.31957809030348
+"metsigdb_gaude_pathways","Derived pathway resources","pathway-metabolic_enzyme",96,1453,1932,20.125,1.32966276668961
+"metsigdb_gaude_pathways","Derived pathway resources","pathway-metabolite",90,822,3822,42.4666666666667,4.64963503649635
+"metsigdb_hallmarks","Derived pathway resources","pathway-metabolic_enzyme",50,4384,7322,146.44,1.67016423357664
+"metsigdb_hallmarks","Derived pathway resources","pathway-metabolite",48,753,4536,94.5,6.02390438247012
+"metsigdb_metalinks","Interaction resources","metabolite-protein",3585,1116,24500,6.83403068340307,21.9534050179211
+"metsigdb_metalinks__enzyme_metabolite","Interaction resources","metabolite-protein",825,584,3654,4.42909090909091,6.25684931506849
+"metsigdb_metalinks__other_protein_metabolite","Interaction resources","metabolite-protein",1691,777,8282,4.89769367238321,10.6589446589447
+"metsigdb_metalinks__receptor_metabolite","Interaction resources","metabolite-protein",671,373,9558,14.2444113263785,25.6246648793566
+"metsigdb_metalinks__transporter_metabolite","Interaction resources","metabolite-protein",481,385,3067,6.37629937629938,7.96623376623377
+"metsigdb_kegg","Pathway resources","pathway-metabolite",450,6525,18731,41.6244444444444,2.87065134099617
+"metsigdb_reactome","Pathway resources","pathway-metabolite",19827,3129,277313,13.9866343874515,88.6267178012144
+"metsigdb_wikipathways","Pathway resources","pathway-metabolite",1288,6896,15573,12.0908385093168,2.2582656612529

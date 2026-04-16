@@ -1,0 +1,11 @@
+"";"row_name";"No_database_ID"
+"1";"delta_Original_Cleaned";0
+"2";"delta_Original_Translated";-18
+"3";"delta_Cleaned_Translated";-18
+"4";"delta_Original_Traverse";-18
+"5";"delta_Cleaned_Traverse";-18
+"6";"delta_Translated_Traverse";0
+"7";"delta_Original_addEquivalent";-18
+"8";"delta_Cleaned_addEquivalent";-18
+"9";"delta_Translated_addEquivalent";0
+"10";"delta_Traverse_addEquivalent";0

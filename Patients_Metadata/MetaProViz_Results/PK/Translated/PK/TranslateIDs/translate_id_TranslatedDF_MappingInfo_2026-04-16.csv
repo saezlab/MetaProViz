@@ -1,0 +1,37 @@
+Metabolite,CAS,SUPER_PATHWAY,SUB_PATHWAY,COMP_ID,PLATFORM,RI,MASS,PUBCHEM,KEGG,HMDB,CHEBI,manual_correction,correction_tbl,hmdb,CAS_hmdb_from_ambiguity_bygroup,CAS_hmdb_to_ambiguity_bygroup,CAS_hmdb_ambiguity_bygroup,kegg,CAS_kegg_from_ambiguity_bygroup,CAS_kegg_to_ambiguity_bygroup,CAS_kegg_ambiguity_bygroup,pubchem,CAS_pubchem_from_ambiguity_bygroup,CAS_pubchem_to_ambiguity_bygroup,CAS_pubchem_ambiguity_bygroup
+N6-carbamoylthreonyladenosine,24719-82-2,Nucleotide,"Purine metabolism, guanine containing",35157,LC/MS Pos,2656,413,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+S-adenosylmethionine (SAM),24346-00-7,Amino acid,"Cysteine, methionine, SAM, taurine metabolism",15915,LC/MS Pos,676,399.1,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+arginyltyrosine,74863-12-0,Peptide,Dipeptide,41376,LC/MS Pos,1376.6,338.2,NA,NA,NA,NA,FALSE,NA,HMDB0028721,1,1,one-to-one,,1,0,one-to-none,7021456,1,1,one-to-one
+chiro-inositol,643-12-9,Lipid,Inositol metabolism,37112,GC/MS,1857,318.10000000000002,NA,NA,NA,NA,FALSE,NA,HMDB0240209,1,1,one-to-one,C19891,1,1,one-to-one,,1,0,one-to-none
+cytidine 5'-diphosphocholine,33818-15-4,Lipid,Glycerolipid metabolism,34418,LC/MS Pos,777,489.1,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+glycylisoleucine,19461-38-2,Peptide,Dipeptide,36659,LC/MS Pos,2080,189.1,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+heme,14875-96-8,Cofactors and vitamins,Hemoglobin and porphyrin metabolism,41754,LC/MS Pos,5057,616.20000000000005,NA,NA,NA,NA,FALSE,NA,HMDB0003178,1,1,one-to-one,C00032,1,1,one-to-one,444098,1,1,one-to-one
+histidylmethionine,2488-11-1,None,None,41965,LC/MS Pos,1025,287.2,NA,NA,NA,NA,FALSE,NA,HMDB0028891,1,1,one-to-one,,1,0,one-to-none,7408103,1,1,one-to-one
+1-stearoylglycerophosphoinositol,796963-93-4,Lipid,Lysolipid,19324,LC/MS Neg,5800,599.4,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+inosine,58-63-9,Nucleotide,"Purine metabolism, (hypo)xanthine/inosine containing",1123,LC/MS Neg,1600,267.2,NA,NA,NA,NA,FALSE,NA,HMDB0000195,1,1,one-to-one,C00294,1,1,one-to-one,6021,1,1,one-to-one
+isobutyrylcarnitine,25518-49-4,Amino acid,"Valine, leucine and isoleucine metabolism",33441,LC/MS Pos,1941,232.2,NA,NA,NA,NA,FALSE,NA,HMDB0000736; HMDB0002083; HMDB0062556; HMDB0062606,1,4,one-to-many,,1,0,one-to-none,10177002; 168379,1,2,one-to-many
+isoleucylglutamate,42516-53-0,Peptide,Dipeptide,40057,LC/MS Pos,1650,261.2,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+isoleucylisoleucine,42537-99-5,Peptide,Dipeptide,36761,LC/MS Pos,2678,245.1,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+isoleucylmethionine,42384-14-5,Peptide,Dipeptide,40058,LC/MS Pos,2392,263.2,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+isoleucylserine,6403-14-1,Peptide,Dipeptide,40012,LC/MS Pos,1472.5,219.2,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+lysylmethionine,97729-52-7,Peptide,Dipeptide,41943,LC/MS Pos,1013.1,278.2,NA,NA,NA,NA,FALSE,NA,HMDB0028957,1,1,one-to-one,,1,0,one-to-none,7016114,1,1,one-to-one
+lysyltyrosine,35978-98-4,Peptide,Dipeptide,42089,LC/MS Pos,1310,310.3,NA,NA,NA,NA,FALSE,NA,HMDB0028963,1,1,one-to-one,,1,0,one-to-none,7021820,1,1,one-to-one
+methionylalanine,3061-96-9,Peptide,Dipeptide,40685,LC/MS Pos,1500,221.1,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+methionylaspartate,14595-65-4,None,None,40687,LC/MS Pos,1275.3,265.10000000000002,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+methionylglutamate,14517-44-3,Peptide,Dipeptide,40693,LC/MS Pos,1503,279.10000000000002,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+nicotinamide riboside*,1341-23-7,Cofactors and vitamins,Nicotinate and nicotinamide metabolism,33013,LC/MS Pos,955,255.1,NA,NA,NA,NA,FALSE,NA,HMDB0000855,1,1,one-to-one,C03150,1,1,one-to-one,439924,1,1,one-to-one
+nicotinate adenine dinucleotide (NAAD+),"6450-77-7, 104809-30-5",Cofactors and vitamins,Nicotinate and nicotinamide metabolism,15725,LC/MS Neg,1236,662.9,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+phenylalanylmethionine,15080-84-9,Peptide,Dipeptide,41436,LC/MS Pos,2772,297.2,NA,NA,NA,NA,FALSE,NA,HMDB0029001,1,1,one-to-one,,1,0,one-to-none,7010505,1,1,one-to-one
+phenylalanyltryptophan,24587-41-5,Peptide,Dipeptide,41377,LC/MS Pos,3349,352.2,NA,NA,NA,NA,FALSE,NA,HMDB0029006,1,1,one-to-one,,1,0,one-to-none,134906,1,1,one-to-one
+phenylalanyltyrosine,17355-18-9,Peptide,Dipeptide,41527,LC/MS Pos,2630,329.2,NA,NA,NA,NA,FALSE,NA,HMDB0029007,1,1,one-to-one,,1,0,one-to-none,13341191,1,1,one-to-one
+quebrachitol,642-38-6,Xenobiotics,Food component/Plant,37088,GC/MS,1797,217,NA,NA,NA,NA,FALSE,NA,HMDB0034221,1,1,one-to-one,C08257,1,1,one-to-one,,1,0,one-to-none
+serylleucine,6665-16-3,Peptide,Dipeptide,40066,LC/MS Pos,2106,219.2,NA,NA,NA,NA,FALSE,NA,HMDB0029043; HMDB0094712,1,2,one-to-many,,1,0,one-to-none,7015694,1,1,one-to-one
+serylvaline,51782-06-0,Peptide,Dipeptide,42058,LC/MS Pos,1501,205.1,NA,NA,NA,NA,FALSE,NA,HMDB0029052; HMDB0094706,1,2,one-to-many,,1,0,one-to-none,7020158,1,1,one-to-one
+threonylglutamate,54532-73-9,Peptide,Dipeptide,42067,LC/MS Pos,819,249.2,NA,NA,NA,NA,FALSE,NA,HMDB0029060,1,1,one-to-one,,1,0,one-to-none,7020163,1,1,one-to-one
+threonylmethionine,90729-28-5,Peptide,Dipeptide,42068,LC/MS Pos,1641,251.1,NA,NA,NA,NA,FALSE,NA,HMDB0029067,1,1,one-to-one,,1,0,one-to-none,7020164,1,1,one-to-one
+triethyleneglycol,112-27-6,Xenobiotics,Chemical,27743,LC/MS Pos,1824,168.1,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+tryptophylasparagine,175027-11-9,Peptide,Dipeptide,40661,LC/MS Pos,1963,319.2,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+tyrosylglutamine,28252-40-6,Peptide,Dipeptide,41459,LC/MS Pos,1437,310.2,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+tyrosylhistidine,3788-44-1,Peptide,Dipeptide,41464,LC/MS Pos,903,319.2,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+tyrosyllysine,54925-88-1,Peptide,Dipeptide,40656,LC/MS Pos,949.1,310.2,NA,NA,NA,NA,FALSE,NA,,1,0,one-to-none,,1,0,one-to-none,,1,0,one-to-none
+valylhistidine,13589-07-6,Peptide,Dipeptide,40680,LC/MS Neg,1629.1,253.2,NA,NA,NA,NA,FALSE,NA,HMDB0029129,1,1,one-to-one,,1,0,one-to-none,7408624,1,1,one-to-one

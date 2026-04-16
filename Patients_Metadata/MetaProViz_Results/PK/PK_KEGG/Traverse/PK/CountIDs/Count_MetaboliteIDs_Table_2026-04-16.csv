@@ -1,0 +1,578 @@
+Metabolite,CAS,SUPER_PATHWAY,SUB_PATHWAY,COMP_ID,PLATFORM,RI,MASS,PUBCHEM,KEGG,HMDB,CHEBI,manual_correction,correction_tbl,was_na,entry_count,id_label
+"1,2-propanediol",57-55-6,Lipid,Ketone bodies,38002,GC/MS,1041,117,259994,"C00583, C02912",HMDB0001881,CHEBI:28972,TRUE,completely_incompatible_manual_with_cas,FALSE,2,Multiple IDs
+1-heptadecanoylglycerophosphoethanolamine*,NA,Lipid,Lysolipid,37419,LC/MS Neg,6029,466.3,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+4-hydroxyhippurate,2482-25-9,Xenobiotics,Benzoate metabolism,35527,LC/MS Neg,1439,194,151012,NA,HMDB0013678,CHEBI:71018,FALSE,NA,TRUE,0,No ID
+4-hydroxyphenylacetate,156-38-7,Amino acid,Phenylalanine & tyrosine metabolism,541,GC/MS,1630.6,179,127,C00642,HMDB0000020,"CHEBI:18101, CHEBI:48999",FALSE,NA,FALSE,1,Single ID
+4-methyl-2-oxopentanoate,816-66-0,Amino acid,"Valine, leucine and isoleucine metabolism",22116,LC/MS Neg,2200,129.19999999999999,"3527278, 70",C00233,"HMDB0000695, HMDB0000762","CHEBI:17865, CHEBI:48430",FALSE,NA,FALSE,1,Single ID
+"5,6-dihydrouracil",504-07-4,Nucleotide,"Pyrimidine metabolism, uracil containing",1559,GC/MS,1505.2,243,649,C00429,HMDB0000076,CHEBI:15901,FALSE,NA,FALSE,1,Single ID
+5-HETE,73307-52-5,Lipid,Eicosanoid,37372,LC/MS Neg,5372,319.2,"5280733, 5283153, 5283165, 70678647, 9862886",C04805,"HMDB0002218, HMDB0011134","CHEBI:28209, CHEBI:60943, CHEBI:65341, CHEBI:90632",FALSE,NA,FALSE,1,Single ID
+5-aminovalerate,660-88-8,Amino acid,"Urea cycle, arginine-, proline-, metabolism",18319,LC/MS Pos,860,118.1,138,C00431,HMDB0003355,"CHEBI:15887, CHEBI:356010",FALSE,NA,FALSE,1,Single ID
+5-methyltetrahydrofolate (5MeTHF),"68703-91-3, 68792-52-9",Cofactors and vitamins,Folate metabolism,18330,LC/MS Neg,1838,458.2,"135398561, 439234, 9825434",C00440,HMDB0001396,CHEBI:15641,FALSE,NA,FALSE,1,Single ID
+5-methylthioadenosine (MTA),2457-80-9,Amino acid,Polyamine metabolism,1419,LC/MS Pos,2427,298.10000000000002,439176,C00170,HMDB0001173,CHEBI:17509,FALSE,NA,FALSE,1,Single ID
+5-methyluridine (ribothymidine),1463-10-1,Nucleotide,"Pyrimidine metabolism, uracil containing",35136,LC/MS Neg,1774,257.10000000000002,445408,NA,HMDB0000884,CHEBI:45996,FALSE,NA,TRUE,0,No ID
+5-oxoETE,106154-18-1,Lipid,Eicosanoid,38400,LC/MS Neg,5373,317.3,"16061124, 1831, 5283159",C14732,"HMDB0010217, HMDB0246835","CHEBI:52449, CHEBI:65342",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+1-linoleoylglycerol (1-monolinolein),2277-28-3,Lipid,Monoacylglycerol,27447,GC/MS,2181,395.3,5283469,NA,HMDB0242115,"CHEBI:75565, CHEBI:75568",FALSE,NA,TRUE,0,No ID
+5-oxoproline,98-79-3,Amino acid,Glutathione metabolism,1494,LC/MS Neg,744,128.19999999999999,"439685, 7405",C01879,"HMDB0000267, HMDB0000805, HMDB0060262","CHEBI:16924, CHEBI:18183, CHEBI:57948",FALSE,NA,FALSE,1,Single ID
+6'-sialyllactose,35890-39-2,Carbohydrate,"Fructose, mannose, galactose, starch, and sucrose metabolism",39795,GC/MS,2071.5,285.10000000000002,643987,NA,HMDB0006569,NA,FALSE,NA,TRUE,0,No ID
+6-keto prostaglandin F1alpha,"58961-34-8, 58962-34-8",Lipid,Eicosanoid,20476,LC/MS Neg,4180,369.3,"5280888, 5283044",C05961,HMDB0002886,CHEBI:28158,FALSE,NA,FALSE,1,Single ID
+6-phosphogluconate,"921-62-0, 53411-70-4",Carbohydrate,"Nucleotide sugars, pentose metabolism",15442,LC/MS Neg,588,275.10000000000002,"5459869, 91493",C00345,HMDB0001316,"CHEBI:16863, CHEBI:48928, CHEBI:58759",FALSE,NA,FALSE,1,Single ID
+7-alpha-hydroxy-3-oxo-4-cholestenoate (7-Hoca),115538-85-7,Lipid,Sterol/Steroid,36776,LC/MS Neg,5268,429.4,3081085,C17337,"HMDB0012458, HMDB0062430",CHEBI:83036,FALSE,NA,FALSE,1,Single ID
+7-alpha-hydroxycholesterol,566-27-8,Lipid,Sterol/Steroid,35692,GC/MS,2300,456.2,107722,C03594,HMDB0001496,CHEBI:17500,FALSE,NA,FALSE,1,Single ID
+7-beta-hydroxycholesterol,566-27-8,Lipid,Sterol/Steroid,35092,GC/MS,2340,456.4,"107722, 3247057, 473141",C03594,"HMDB0001496, HMDB0006119","CHEBI:17500, CHEBI:42989",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+Ac-Ser-Asp-Lys-Pro-OH,127103-11-1,Peptide,Polypeptide,40707,LC/MS Pos,1767,488.2,4409396,NA,HMDB0247929,NA,FALSE,NA,TRUE,0,No ID
+C-glycosyltryptophan*,NA,Amino acid,Tryptophan metabolism,32675,LC/MS Pos,1912,367.1,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+"Isobar: fructose 1,6-diphosphate, glucose 1,6-diphosphate, myo-inositol 1,4 or 1,3-diphosphate",NA,Carbohydrate,"Glycolysis, gluconeogenesis, pyruvate metabolism",36984,LC/MS Neg,572,339,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+1-linoleoylglycerophosphocholine,NA,Lipid,Lysolipid,34419,LC/MS Pos,5574,520.4,5280646,C04100,NA,NA,TRUE,completely_incompatible_manual_no_cas,FALSE,1,Single ID
+"Isobar: ribulose 5-phosphate, xylulose 5-phosphate",NA,Carbohydrate,"Nucleotide sugars, pentose metabolism",37288,GC/MS,1935,357.2,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+L-urobilin,34217-90-8,Cofactors and vitamins,Hemoglobin and porphyrin metabolism,40173,LC/MS Pos,4091,595.4,"440785, 6433298","C05793, C05794","HMDB0004159, HMDB0004160, HMDB0004161",CHEBI:36378,TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,2,Multiple IDs
+N-6-trimethyllysine,23284-33-5,Amino acid,Lysine metabolism,1498,LC/MS Pos,650,189.2,"159659, 440120, 440121",C03793,"HMDB0001325, HMDB0304556","CHEBI:17311, CHEBI:58100",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+N-acetyl-aspartyl-glutamate (NAAG),3106-85-2,Amino acid,Glutamate metabolism,35665,LC/MS Pos,1563,305,"188803, 5255, 6992083",C12270,"HMDB0001067, HMDB0255414","CHEBI:73688, CHEBI:76931, CHEBI:95120",FALSE,NA,FALSE,1,Single ID
+N-acetylalanine,97-69-8,Amino acid,Alanine and aspartate metabolism,1585,LC/MS Neg,882,130.1,88064,C02847,HMDB0000766,CHEBI:40992,TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+N-acetylarginine,155-84-0,Amino acid,"Urea cycle, arginine-, proline-, metabolism",33953,LC/MS Neg,1149,215.2,67427,C02562,HMDB0004620,CHEBI:40521,TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+N-acetylasparagine,4033-40-3,Amino acid,Alanine and aspartate metabolism,33942,LC/MS Pos,974,175.1,99715,NA,HMDB0006028,NA,FALSE,NA,TRUE,0,No ID
+N-acetylaspartate (NAA),"997-55-7, 997-55-7",Amino acid,Alanine and aspartate metabolism,22185,LC/MS Pos,1222,176.1,"2042020, 65065",C01042,HMDB0000812,"CHEBI:16953, CHEBI:21547",FALSE,NA,FALSE,1,Single ID
+N-acetylglucosamine,7512-17-6,Carbohydrate,Aminosugars metabolism,15095,GC/MS,1903.3,245,"24139, 439174","C00140, C03878","HMDB0000215, HMDB0000533, HMDB0000803, HMDB0014288","CHEBI:28009, CHEBI:506227",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,2,Multiple IDs
+N-acetylglucosamine 6-phosphate,102029-88-9,Carbohydrate,Aminosugars metabolism,15107,LC/MS Neg,628,300.10000000000002,"25243963, 439219, 440996",C00357,"HMDB0001062, HMDB0002817","CHEBI:15784, CHEBI:57513",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+1-linoleoylglycerophosphoethanolamine*,NA,Lipid,Lysolipid,32635,LC/MS Neg,5725,476.3,52925130,NA,HMDB0011507,"CHEBI:133732, CHEBI:83058",FALSE,NA,TRUE,0,No ID
+N-acetylglutamine,2490-97-3,Amino acid,Glutamate metabolism,33943,LC/MS Pos,1204,189.1,182230,C02716,HMDB0006029,"CHEBI:143879, CHEBI:21553",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+N-acetylglycine,543-24-8,Amino acid,"Glycine, serine and threonine metabolism",27710,GC/MS,1396.4,143.9,10972,NA,HMDB0000532,CHEBI:40410,FALSE,NA,TRUE,0,No ID
+N-acetylisoleucine,NA,Amino acid,"Valine, leucine and isoleucine metabolism",33967,LC/MS Pos,3370,174.1,7036275,NA,HMDB0061684,CHEBI:21555,FALSE,NA,TRUE,0,No ID
+N-acetylleucine,1188-21-2,Amino acid,"Valine, leucine and isoleucine metabolism",1587,LC/MS Pos,3444,174.1,70912,C02710,HMDB0011756,"CHEBI:17786, CHEBI:58270",FALSE,NA,FALSE,1,Single ID
+N-acetylmethionine,65-82-7,Amino acid,"Cysteine, methionine, SAM, taurine metabolism",1589,LC/MS Pos,2588,192.1,448580,C02712,HMDB0011745,"CHEBI:21557, CHEBI:71670",FALSE,NA,FALSE,1,Single ID
+N-acetylneuraminate,131-48-6,Carbohydrate,Aminosugars metabolism,32377,LC/MS Neg,695,308.1,445063,"C00270, C19910","HMDB0000230, HMDB0000800","CHEBI:45744, CHEBI:58705",TRUE,completely_incompatible_manual_with_cas,FALSE,2,Multiple IDs
+N-acetylornithine,6205-08-9,Amino acid,"Urea cycle, arginine-, proline-, metabolism",15630,LC/MS Pos,875,175.2,439232,C00437,"HMDB0003357, HMDB0006489","CHEBI:16543, CHEBI:181895, CHEBI:57805",FALSE,NA,FALSE,1,Single ID
+N-acetylphenylalanine,2018-61-3,Amino acid,Phenylalanine & tyrosine metabolism,33950,LC/MS Neg,2590,206.2,74839,C03519,HMDB0000512,"CHEBI:16259, CHEBI:57702",FALSE,NA,FALSE,1,Single ID
+N-acetylserine,97-14-3,Amino acid,"Glycine, serine and threonine metabolism",37076,GC/MS,1526,218,65249,NA,HMDB0002931,CHEBI:45441,FALSE,NA,TRUE,0,No ID
+N-acetylthreonine,NA,Amino acid,"Glycine, serine and threonine metabolism",33939,LC/MS Neg,846,160.1,152204,NA,HMDB0062557,CHEBI:45826,TRUE,completely_incompatible_manual_no_cas,TRUE,0,No ID
+1-methylimidazoleacetate,2625-49-2,Amino acid,Histidine metabolism,32350,LC/MS Pos,845,141.1,75810,C05828,HMDB0002820,CHEBI:1606,FALSE,NA,FALSE,1,Single ID
+N-acetyltryptophan,1218-34-4,Amino acid,Tryptophan metabolism,33959,LC/MS Neg,2650,245.2,700653,C03137,HMDB0013713,"CHEBI:143877, CHEBI:74640",TRUE,completely_incompatible_manual_with_cas,FALSE,1,Single ID
+N-acetyltyrosine,537-55-3,Amino acid,Phenylalanine & tyrosine metabolism,32390,LC/MS Neg,1677,222.2,68310,NA,HMDB0000866,CHEBI:21563,FALSE,NA,TRUE,0,No ID
+N-acetylvaline,96-81-1,Amino acid,"Valine, leucine and isoleucine metabolism",1591,LC/MS Pos,2654,160.1,66789,NA,HMDB0011757,CHEBI:21565,FALSE,NA,TRUE,0,No ID
+N-methylglutamate,35989-16-3,Amino acid,Glutamate metabolism,31532,GC/MS,1665,260.2,439377,C01046,HMDB0062660,"CHEBI:16440, CHEBI:29083",FALSE,NA,FALSE,1,Single ID
+N1-Methyl-2-pyridone-5-carboxamide,701-44-0,Cofactors and vitamins,Nicotinate and nicotinamide metabolism,40469,LC/MS Pos,1707.3,153.19999999999999,69698,C05842,HMDB0004193,CHEBI:27410,FALSE,NA,FALSE,1,Single ID
+N1-methyladenosine,15763-06-1,Nucleotide,"Purine metabolism, adenine containing",15650,LC/MS Pos,1356,282.10000000000002,27476,C02494,HMDB0003331,CHEBI:16020,FALSE,NA,FALSE,1,Single ID
+N1-methylguanosine,2140-65-0,Nucleotide,"Purine metabolism, guanine containing",31609,LC/MS Pos,1850,298.10000000000002,96373,C04545,HMDB0001563,CHEBI:19062,FALSE,NA,FALSE,1,Single ID
+"N2,N2-dimethylguanosine",2140-67-2,Nucleotide,"Purine metabolism, guanine containing",35137,LC/MS Pos,2157,312.10000000000002,"135501639, 92919",NA,HMDB0004824,CHEBI:19289,FALSE,NA,TRUE,0,No ID
+N2-acetyllysine,1946-82-3,Amino acid,Lysine metabolism,36751,LC/MS Pos,853,189.1,92907,C12989,HMDB0000446,"CHEBI:35704, CHEBI:61512",FALSE,NA,FALSE,1,Single ID
+N2-methylguanosine,2140-77-4,Nucleotide,"Purine metabolism, guanine containing",35133,LC/MS Pos,1950,298.10000000000002,3035422,NA,HMDB0005862,CHEBI:19702,FALSE,NA,TRUE,0,No ID
+1-myristoylglycerophosphocholine,20559-16-4,Lipid,Lysolipid,35626,LC/MS Pos,5481,468.3,460604,NA,HMDB0010379,CHEBI:64489,FALSE,NA,TRUE,0,No ID
+N6-acetyllysine,692-04-6,Amino acid,Lysine metabolism,36752,LC/MS Pos,1134,189.1,92832,C02727,HMDB0000206,"CHEBI:17752, CHEBI:58260",FALSE,NA,FALSE,1,Single ID
+N6-carbamoylthreonyladenosine,24719-82-2,Nucleotide,"Purine metabolism, guanine containing",35157,LC/MS Pos,2656,413,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+S-adenosylhomocysteine (SAH),979-92-0,Amino acid,"Cysteine, methionine, SAM, taurine metabolism",15948,LC/MS Neg,1821,383.1,439155,C00021,HMDB0000939,"CHEBI:16680, CHEBI:181457, CHEBI:57856",FALSE,NA,FALSE,1,Single ID
+S-adenosylmethionine (SAM),24346-00-7,Amino acid,"Cysteine, methionine, SAM, taurine metabolism",15915,LC/MS Pos,676,399.1,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+S-methylcysteine,1187-84-4,Amino acid,"Cysteine, methionine, SAM, taurine metabolism",40262,GC/MS,1447.8,162.1,24417,NA,"HMDB0002108, HMDB0302211","CHEBI:133545, CHEBI:45658",FALSE,NA,TRUE,0,No ID
+VGAHAGEYGAEALER*,NA,Peptide,Polypeptide,35211,LC/MS Pos,2542,765.8,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+acetylcarnitine,5080-50-2,Lipid,Carnitine metabolism,32198,LC/MS Pos,1203,204.2,"1, 439756, 7045767",C02571,"HMDB0000201, HMDB0000456, HMDB0000515, HMDB0240773","CHEBI:15960, CHEBI:57589, CHEBI:73024",FALSE,NA,FALSE,1,Single ID
+adenine,73-24-5,Nucleotide,"Purine metabolism, adenine containing",554,GC/MS,1804.2,264,190,C00147,HMDB0000034,CHEBI:16708,FALSE,NA,FALSE,1,Single ID
+adenosine,58-61-7,Nucleotide,"Purine metabolism, adenine containing",555,LC/MS Pos,1650,268.10000000000002,60961,C00212,"HMDB0000050, HMDB0004401, HMDB0004402, HMDB0004421",CHEBI:16335,FALSE,NA,FALSE,1,Single ID
+adenosine 2'-monophosphate (2'-AMP),130-49-4,Nucleotide,"Purine metabolism, adenine containing",36815,LC/MS Pos,1625,348.1,53481006,C00946,HMDB0011617,"CHEBI:28223, CHEBI:77740",FALSE,NA,FALSE,1,Single ID
+1-myristoylglycerophosphoethanolamine,NA,Lipid,Lysolipid,35627,LC/MS Pos,5481,426.1,9547070,NA,HMDB0011500,CHEBI:84299,FALSE,NA,TRUE,0,No ID
+adenosine 3'-monophosphate (3'-AMP),84-21-9,Nucleotide,"Purine metabolism, adenine containing",35142,LC/MS Pos,1451,348.1,41211,C01367,"HMDB0003540, HMDB0006550","CHEBI:28931, CHEBI:60880",FALSE,NA,FALSE,1,Single ID
+adenosine 5'-monophosphate (AMP),149022-20-8,Nucleotide,"Purine metabolism, adenine containing",32342,LC/MS Pos,1210,348.1,"15938965, 6083",C00020,HMDB0000045,"CHEBI:16027, CHEBI:456215",FALSE,NA,FALSE,1,Single ID
+adenylosuccinate,19046-78-7,Nucleotide,"Purine metabolism, adenine containing",18360,LC/MS Neg,569,462.1,"195, 440122, 447145, 46878398, 74413789",C03794,"HMDB0000536, HMDB0001332, HMDB0011633, HMDB0059653, HMDB0248010, HMDB0304257","CHEBI:15919, CHEBI:57567",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+adipate,124-04-9,Lipid,"Fatty acid, dicarboxylate",21134,GC/MS,1520,110.9,196,C06104,"HMDB0000448, HMDB0004862","CHEBI:17128, CHEBI:30832",FALSE,NA,FALSE,1,Single ID
+adrenate (22:4n6),2091-25-0,Lipid,Long chain fatty acid,32980,LC/MS Neg,5684,331.3,"5282844, 5497181",C16527,"HMDB0002226, HMDB0062580","CHEBI:53487, CHEBI:77225",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+agmatine,2482-00-0,Amino acid,Polyamine metabolism,15496,GC/MS,1526,174,199,C00179,"HMDB0001432, HMDB0060259","CHEBI:17431, CHEBI:58145",FALSE,NA,FALSE,1,Single ID
+alanine,56-41-7,Amino acid,Alanine and aspartate metabolism,1126,GC/MS,1147.5999999999999,115.9,5950,C00041,HMDB0000161,"CHEBI:16977, CHEBI:57972",FALSE,NA,FALSE,1,Single ID
+alanylalanine,1948-31-8,Peptide,Dipeptide,15129,LC/MS Pos,757,161.1,5460362,C00993,HMDB0003459,"CHEBI:16576, CHEBI:57822",FALSE,NA,FALSE,1,Single ID
+alanylglutamate,NA,Peptide,Dipeptide,37064,LC/MS Pos,766,219,656476,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+alanylglycine,NA,Peptide,Dipeptide,37075,GC/MS,1412,272.10000000000002,6998028,NA,"HMDB0006899, HMDB0028687","CHEBI:73757, CHEBI:73786",FALSE,NA,TRUE,0,No ID
+1-oleoylglycerol (1-monoolein),111-03-5,Lipid,Monoacylglycerol,21184,GC/MS,2181.1999999999998,397.4,"12178130, 5283468",NA,"HMDB0011567, HMDB0062009, HMDB0094684","CHEBI:75342, CHEBI:75757",FALSE,NA,TRUE,0,No ID
+alanylisoleucine,NA,Peptide,Dipeptide,37118,LC/MS Pos,2011,203.1,7408079,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+alanylleucine,NA,Peptide,Dipeptide,37093,LC/MS Pos,2150,203,259583,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+alanylmethionine,NA,Peptide,Dipeptide,37065,LC/MS Pos,1596,221,"5242543, 98509",NA,NA,NA,TRUE,completely_incompatible_manual_no_cas,TRUE,0,No ID
+alanylphenylalanine,3061-90-3,Peptide,Dipeptide,38679,LC/MS Pos,2422,237.2,96814,NA,HMDB0028694,CHEBI:73807,FALSE,NA,TRUE,0,No ID
+alanylthreonine,NA,Peptide,Dipeptide,37085,LC/MS Pos,708,191,426318,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+alanyltryptophan,16305-75-2,Peptide,Dipeptide,42073,LC/MS Pos,2630,276.2,85362,NA,"HMDB0013209, HMDB0028698",CHEBI:73808,FALSE,NA,TRUE,0,No ID
+alanyltyrosine,NA,Peptide,Dipeptide,37098,LC/MS Pos,1713,253,572319,NA,HMDB0304776,NA,FALSE,NA,TRUE,0,No ID
+alanylvaline,NA,Peptide,Dipeptide,37084,LC/MS Pos,1513,189,137276,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+allo-threonine,28954-12-3,Amino acid,"Glycine, serine and threonine metabolism",15142,GC/MS,1417.8,219,99289,C05519,HMDB0004041,"CHEBI:28718, CHEBI:58585",FALSE,NA,FALSE,1,Single ID
+alpha-glutamylglutamate,3929-61-1,Peptide,Dipeptide,22166,LC/MS Pos,857,277.10000000000002,439500,C01425,HMDB0028818,CHEBI:5390,FALSE,NA,FALSE,1,Single ID
+1-oleoylglycerophosphocholine,19420-56-5,Lipid,Lysolipid,33960,LC/MS Pos,5700,522.4,16081932,NA,HMDB0002815,CHEBI:28610,FALSE,NA,TRUE,0,No ID
+alpha-glutamyltryptophan,38101-59-6,Peptide,Dipeptide,40664,LC/MS Pos,2660,334.1,100094,NA,"HMDB0028830, HMDB0094678",CHEBI:73512,FALSE,NA,TRUE,0,No ID
+alpha-glutamyltyrosine,NA,Peptide,Dipeptide,40033,LC/MS Pos,1810,311.10000000000002,351830,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+alpha-hydroxyisovalerate,600-37-3,Amino acid,"Valine, leucine and isoleucine metabolism",33937,LC/MS Neg,1142,117.1,"21933914, 853180, 99823",NA,"HMDB0000407, HMDB0062584","CHEBI:60631, CHEBI:60645, CHEBI:64669",FALSE,NA,TRUE,0,No ID
+alpha-tocopherol,"59-02-9, 10191-41-0",Cofactors and vitamins,Tocopherol metabolism,1561,GC/MS,2305.4,502.5,14985,C02477,HMDB0001893,CHEBI:18145,FALSE,NA,FALSE,1,Single ID
+androsterone sulfate,2479-86-9,Lipid,Sterol/Steroid,31591,LC/MS Neg,5011,369.2,"12594, 159663",C04555,"HMDB0001032, HMDB0002759","CHEBI:16814, CHEBI:57905, CHEBI:83037",TRUE,completely_incompatible_manual_with_cas,FALSE,1,Single ID
+anserine,10030-52-1,Peptide,Dipeptide derivative,15747,LC/MS Neg,1126,239.2,112072,C01262,HMDB0000194,"CHEBI:18323, CHEBI:58445",FALSE,NA,FALSE,1,Single ID
+arabitol,488-82-4,Carbohydrate,"Nucleotide sugars, pentose metabolism",38075,GC/MS,1687.5,307.1,"439255, 94154","C00474, C00532, C01904","HMDB0000199, HMDB0000508, HMDB0000568, HMDB0001851","CHEBI:15963, CHEBI:18333, CHEBI:18403",TRUE,completely_incompatible_manual_with_cas,FALSE,3,Multiple IDs
+arabonate,7643-75-7,Cofactors and vitamins,Ascorbate and aldarate metabolism,37516,GC/MS,1736,292.10000000000002,122045,C00878,HMDB0000539,"CHEBI:16157, CHEBI:20912",FALSE,NA,FALSE,1,Single ID
+arachidate (20:0),506-30-9,Lipid,Long chain fatty acid,1118,GC/MS,2071.1999999999998,369.3,10467,C06425,HMDB0002212,"CHEBI:28822, CHEBI:32360",FALSE,NA,FALSE,1,Single ID
+arachidonate (20:4n6),506-32-1,Lipid,Long chain fatty acid,1110,LC/MS Neg,5525,303.39999999999998,"3246804, 444899",C00219,"HMDB0001043, HMDB0060102","CHEBI:15843, CHEBI:32395",FALSE,NA,FALSE,1,Single ID
+1-oleoylglycerophosphoethanolamine,89576-29-4,Lipid,Lysolipid,35628,LC/MS Neg,5928,478.3,9547071,NA,HMDB0011506,CHEBI:74971,FALSE,NA,TRUE,0,No ID
+arginine,1119-34-2,Amino acid,"Urea cycle, arginine-, proline-, metabolism",1638,LC/MS Neg,728,173.2,"1549073, 6322",C00062,"HMDB0000517, HMDB0062762","CHEBI:16467, CHEBI:32682",FALSE,NA,FALSE,1,Single ID
+argininosuccinate,156637-58-0,Amino acid,"Urea cycle, arginine-, proline-, metabolism",15497,GC/MS,2157,446.3,"16950, 439998, 46878376, 828",C03406,"HMDB0000052, HMDB0001006, HMDB0248585","CHEBI:15682, CHEBI:184023, CHEBI:57472",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+arginylleucine,1188-24-5,Peptide,Dipeptide,39995,LC/MS Pos,1620,288.3,6992563,NA,HMDB0028713,CHEBI:73815,FALSE,NA,TRUE,0,No ID
+arginylmethionine,NA,Peptide,Dipeptide,41458,LC/MS Pos,1151,306.2,9815009,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+arginylphenylalanine,2047-13-4,Peptide,Dipeptide,41485,LC/MS Pos,1795,322.2,150964,NA,HMDB0028716,"CHEBI:189870, CHEBI:73818",FALSE,NA,TRUE,0,No ID
+arginyltyrosine,74863-12-0,Peptide,Dipeptide,41376,LC/MS Pos,1376.6,338.2,7021456,NA,HMDB0028721,CHEBI:73822,FALSE,NA,TRUE,0,No ID
+arginylvaline,2896-20-0,Peptide,Dipeptide,41395,LC/MS Pos,944.9,274.2,6992654,NA,HMDB0028722,CHEBI:73823,FALSE,NA,TRUE,0,No ID
+ascorbate (Vitamin C),134-03-2,Cofactors and vitamins,Ascorbate and aldarate metabolism,1640,GC/MS,1850.1,332.1,"54670067, 54679076","C00072, C01041","HMDB0000044, HMDB0014273, HMDB0029945","CHEBI:29073, CHEBI:38290",TRUE,completely_incompatible_manual_with_cas,FALSE,2,Multiple IDs
+asparagine,70-47-3,Amino acid,Alanine and aspartate metabolism,11398,GC/MS,1651.2,231,6267,C00152,HMDB0000168,"CHEBI:17196, CHEBI:58048",FALSE,NA,FALSE,1,Single ID
+aspartate,56-84-8,Amino acid,Alanine and aspartate metabolism,15996,GC/MS,1529.7,232,"15939608, 5960",C00049,HMDB0000191,"CHEBI:17053, CHEBI:29991",FALSE,NA,FALSE,1,Single ID
+"1,3-dihydroxyacetone",62147-49-3,Carbohydrate,"Glycolysis, gluconeogenesis, pyruvate metabolism",35963,GC/MS,1263,103,670,C00184,HMDB0001882,CHEBI:16016,FALSE,NA,FALSE,1,Single ID
+1-oleoylglycerophosphoinositol*,NA,Lipid,Lysolipid,36602,LC/MS Neg,5577,597.4,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+aspartate-glutamate,6157-06-8,Peptide,Dipeptide,37461,LC/MS Pos,819,263.2,4130574,NA,HMDB0028752,NA,FALSE,NA,TRUE,0,No ID
+aspartylleucine,3062-14-4,Peptide,Dipeptide,40068,LC/MS Pos,2310,247.2,332962,NA,HMDB0028757,NA,FALSE,NA,TRUE,0,No ID
+aspartylphenylalanine,13433-09-5,Peptide,Dipeptide,22175,LC/MS Pos,2538,281.10000000000002,93078,NA,"HMDB0000706, HMDB0006113, HMDB0028760",CHEBI:73830,FALSE,NA,TRUE,0,No ID
+aspartyltryptophan,71835-79-5,Peptide,Dipeptide,41481,LC/MS Pos,2717,320.2,9948926,NA,HMDB0028764,NA,FALSE,NA,TRUE,0,No ID
+aspartylvaline,13433-04-0,Peptide,Dipeptide,41373,LC/MS Neg,749.4,231.1,4991131,NA,HMDB0028766,NA,FALSE,NA,TRUE,0,No ID
+atenolol,29122-68-7,Xenobiotics,Drug,38658,LC/MS Pos,1988,267.2,2249,NA,HMDB0001924,CHEBI:2904,FALSE,NA,TRUE,0,No ID
+azelate (nonanedioate),123-99-9,Lipid,"Fatty acid, dicarboxylate",18362,LC/MS Neg,1322,187.2,2266,C08261,HMDB0000784,"CHEBI:48131, CHEBI:78208",FALSE,NA,FALSE,1,Single ID
+benzoate,65-85-0,Xenobiotics,Benzoate metabolism,15778,GC/MS,1291.5,179,"242, 243","C00180, C00539","HMDB0001870, HMDB0304270","CHEBI:16150, CHEBI:30746",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,2,Multiple IDs
+beta-alanine,"56-41-7, 107-95-9",Amino acid,Alanine and aspartate metabolism,55,GC/MS,1451.8,174,239,C00099,HMDB0000056,"CHEBI:16958, CHEBI:57966",FALSE,NA,FALSE,1,Single ID
+beta-hydroxypyruvate,3369-79-7,Amino acid,"Glycine, serine and threonine metabolism",15686,GC/MS,1425.1,221,"4186339, 964",C00168,HMDB0001352,"CHEBI:17180, CHEBI:30841",FALSE,NA,FALSE,1,Single ID
+1-oleoylglycerophosphoserine,NA,Lipid,Lysolipid,19260,LC/MS Neg,5690,522.29999999999995,"85036846, 9547099",NA,"HMDB0061694, HMDB0240603",CHEBI:52649,FALSE,NA,TRUE,0,No ID
+beta-tocopherol,NA,Cofactors and vitamins,Tocopherol metabolism,35702,GC/MS,2260,488.3,6857447,C14152,HMDB0006335,CHEBI:47771,FALSE,NA,FALSE,1,Single ID
+betaine,107-43-7,Amino acid,"Glycine, serine and threonine metabolism",34426,LC/MS Neg,725,178.1,"247, 248",C00719,"HMDB0000043, HMDB0059606","CHEBI:17750, CHEBI:41139",FALSE,NA,FALSE,1,Single ID
+"bilirubin (E,E)*",NA,Cofactors and vitamins,Hemoglobin and porphyrin metabolism,32586,LC/MS Neg,4242,583.20000000000005,"21252250, 5280352, 5315454",C00486,"HMDB0000054, HMDB0000488, HMDB0240584","CHEBI:132996, CHEBI:16990, CHEBI:72719",FALSE,NA,FALSE,1,Single ID
+"bilirubin (Z,Z)",635-65-4,Cofactors and vitamins,Hemoglobin and porphyrin metabolism,27716,LC/MS Neg,4812,583.20000000000005,"21252250, 5280352, 5315454",C00486,"HMDB0000054, HMDB0000488, HMDB0240584","CHEBI:132996, CHEBI:16990, CHEBI:72719",FALSE,NA,FALSE,1,Single ID
+butyrylcarnitine,25576-40-3,Lipid,Fatty acid metabolism (also BCAA metabolism),32412,LC/MS Pos,2007,232.2,"213144, 439829",C02862,"HMDB0002013, HMDB0062510","CHEBI:21949, CHEBI:7676",FALSE,NA,FALSE,1,Single ID
+caprate (10:0),112-37-8,Lipid,Medium chain fatty acid,1642,LC/MS Neg,5092,171.2,2969,C01571,HMDB0000511,"CHEBI:27689, CHEBI:30813",FALSE,NA,FALSE,1,Single ID
+caproate (6:0),142-62-1,Lipid,Medium chain fatty acid,32489,LC/MS Neg,2766,115.2,"4398339, 8892",C01585,"HMDB0000535, HMDB0061883","CHEBI:17120, CHEBI:30776",FALSE,NA,FALSE,1,Single ID
+caprylate (8:0),124-07-2,Lipid,Medium chain fatty acid,32492,LC/MS Neg,4367,143.19999999999999,"119389, 379",C06423,"HMDB0000482, HMDB0062511, HMDB0304443","CHEBI:25646, CHEBI:28837",FALSE,NA,FALSE,1,Single ID
+carnitine,461-05-2,Lipid,Carnitine metabolism,15500,LC/MS Pos,702,162.19999999999999,"10917, 288, 85",C00318,"HMDB0000062, HMDB0001467","CHEBI:16347, CHEBI:17126, CHEBI:3424",FALSE,NA,FALSE,1,Single ID
+catechol sulfate,NA,Xenobiotics,Benzoate metabolism,35320,LC/MS Neg,1928,188.9,3083879,NA,"HMDB0059724, HMDB0061713",CHEBI:68505,TRUE,completely_incompatible_manual_no_cas,TRUE,0,No ID
+1-palmitoleoylglycerophosphocholine*,NA,Lipid,Lysolipid,33230,LC/MS Pos,5524,494.3,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+celecoxib,169590-42-5,Xenobiotics,Drug,38599,LC/MS Neg,5257.9,380.2,2662,C07589,HMDB0005014,CHEBI:41423,FALSE,NA,FALSE,1,Single ID
+chiro-inositol,643-12-9,Lipid,Inositol metabolism,37112,GC/MS,1857,318.10000000000002,NA,C19891,HMDB0240209,CHEBI:27372,FALSE,NA,FALSE,1,Single ID
+cholate,81-25-4,Lipid,Bile acid metabolism,22842,LC/MS Neg,5148,407.4,"160636, 221493, 5283874, 5460314","C00695, C17737","HMDB0000505, HMDB0000619","CHEBI:16359, CHEBI:29747, CHEBI:81308",FALSE,NA,FALSE,2,Multiple IDs
+cholesterol,57-88-5,Lipid,Sterol/Steroid,63,GC/MS,2316.9,329.3,"5314029, 5997",C00187,"HMDB0000067, HMDB0000507, HMDB0062453",CHEBI:16113,FALSE,NA,FALSE,1,Single ID
+choline,67-48-1,Lipid,Glycerolipid metabolism,15506,LC/MS Pos,674,104.2,6209,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+choline phosphate,72556-74-2,Lipid,Glycerolipid metabolism,34396,LC/MS Pos,695,184.1,135437,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+cinnamoylglycine,NA,Xenobiotics,Food component/Plant,38637,LC/MS Neg,3139,204.1,709625,NA,HMDB0011621,CHEBI:68616,FALSE,NA,TRUE,0,No ID
+cis-aconitate,585-84-2,Energy,Krebs cycle,12025,LC/MS Neg,603,173.1,643757,C00417,"HMDB0000072, HMDB0000461","CHEBI:16383, CHEBI:32805",FALSE,NA,FALSE,1,Single ID
+cis-vaccenate (18:1n7),693-72-1,Lipid,Long chain fatty acid,33970,GC/MS,1987,339.3,"5281127, 5282761",C08367,"HMDB0003231, HMDB0010377, HMDB0240219","CHEBI:28727, CHEBI:30827, CHEBI:50464",FALSE,NA,FALSE,1,Single ID
+citalopram,21986-53-7,Xenobiotics,Drug,38651,LC/MS Pos,3771.8,325.2,2771,C07572,HMDB0005038,"CHEBI:3723, CHEBI:77397",FALSE,NA,FALSE,1,Single ID
+1-palmitoleoylglycerophosphoethanolamine*,NA,Lipid,Lysolipid,34565,LC/MS Pos,5521.4,452.3,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+citramalate,6236-10-8,Amino acid,"Valine, leucine and isoleucine metabolism",22158,GC/MS,1490.7,247,1081,C00815,HMDB0000426,"CHEBI:13997, CHEBI:15584",FALSE,NA,FALSE,1,Single ID
+citrate,77-92-9,Energy,Krebs cycle,1564,GC/MS,1763.4,273.10000000000002,"311, 31348",C00158,HMDB0000094,"CHEBI:16947, CHEBI:30769",FALSE,NA,FALSE,1,Single ID
+citrulline,372-75-8,Amino acid,"Urea cycle, arginine-, proline-, metabolism",2132,LC/MS Pos,715,176.1,"833, 9750",C00327,"HMDB0000904, HMDB0250742","CHEBI:16349, CHEBI:18211, CHEBI:57743",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+codeine,76-57-3,Xenobiotics,Drug,39610,LC/MS Pos,2201.1,300.2,5284371,C06174,"HMDB0004995, HMDB0014463","CHEBI:16714, CHEBI:57871",FALSE,NA,FALSE,1,Single ID
+cortisol,50-23-7,Lipid,Sterol/Steroid,1712,LC/MS Pos,4573,363.2,5754,C00735,"HMDB0000063, HMDB0014879","CHEBI:17650, CHEBI:180955",FALSE,NA,FALSE,1,Single ID
+cortisone,53-06-5,Lipid,Sterol/Steroid,1769,LC/MS Pos,4420,361.2,222786,C00762,HMDB0002802,CHEBI:16962,FALSE,NA,FALSE,1,Single ID
+creatine,57-00-1,Amino acid,Creatine metabolism,27718,LC/MS Pos,758,132.1,586,C00300,HMDB0000064,"CHEBI:16919, CHEBI:57947",FALSE,NA,FALSE,1,Single ID
+creatinine,60-27-5,Amino acid,Creatine metabolism,513,LC/MS Pos,730,114.1,"26009888, 588",C00791,HMDB0000562,CHEBI:16737,FALSE,NA,FALSE,1,Single ID
+cysteine,"52-90-4, 56-89-3",Amino acid,"Cysteine, methionine, SAM, taurine metabolism",31453,GC/MS,1560.1,218,5862,C00097,HMDB0000574,"CHEBI:17561, CHEBI:35235",FALSE,NA,FALSE,1,Single ID
+cysteine-glutathione disulfide,13081-14-6,Amino acid,Glutathione metabolism,35159,LC/MS Pos,821,427.1,"11215652, 11767258, 53477713, 65359",C00127,"HMDB0000656, HMDB0003337","CHEBI:143243, CHEBI:167606, CHEBI:17858",FALSE,NA,FALSE,1,Single ID
+1-palmitoylglycerol (1-monopalmitin),542-44-9,Lipid,Monoacylglycerol,21127,GC/MS,2119.5,371.3,14900,NA,HMDB0245964,CHEBI:69081,FALSE,NA,TRUE,0,No ID
+cysteinylglycine,19246-18-5,Peptide,Dipeptide,35637,LC/MS Neg,881,177,439498,C01419,"HMDB0000078, HMDB0028775","CHEBI:4047, CHEBI:61694",FALSE,NA,FALSE,1,Single ID
+cystine,56-89-3,Amino acid,"Cysteine, methionine, SAM, taurine metabolism",39512,GC/MS,2015.3,145.9,"595, 67678","C00491, C01420","HMDB0000192, HMDB0250712","CHEBI:16283, CHEBI:17376, CHEBI:35491, CHEBI:35492",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,2,Multiple IDs
+cytidine,65-46-3,Nucleotide,"Pyrimidine metabolism, cytidine containing",514,LC/MS Pos,1065,244,6175,C00475,HMDB0000089,CHEBI:17562,FALSE,NA,FALSE,1,Single ID
+cytidine 5'-diphosphocholine,33818-15-4,Lipid,Glycerolipid metabolism,34418,LC/MS Pos,777,489.1,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+cytidine 5'-monophosphate (5'-CMP),63-37-6,Nucleotide,"Pyrimidine metabolism, cytidine containing",2372,LC/MS Pos,887,324,"6131, 7058165",C00055,HMDB0000095,"CHEBI:17361, CHEBI:60377",FALSE,NA,FALSE,1,Single ID
+cytidine-3'-monophosphate (3'-CMP),84-52-6,Nucleotide,"Pyrimidine metabolism, cytidine containing",2959,LC/MS Pos,1181,323.89999999999998,66535,C05822,HMDB0240312,"CHEBI:53013, CHEBI:60875",FALSE,NA,FALSE,1,Single ID
+"cytosine-2',3'-cyclic monophosphate",15718-51-1,Nucleotide,"Pyrimidine metabolism, cytidine containing",37465,LC/MS Pos,912,306.2,417654,C02354,"HMDB0011691, HMDB0250240",NA,TRUE,completely_incompatible_manual_with_cas,FALSE,1,Single ID
+deoxycarnitine,6249-56-5,Lipid,Carnitine metabolism,36747,LC/MS Pos,759,146.1,725,C01181,"HMDB0001161, HMDB0006831",CHEBI:16244,FALSE,NA,FALSE,1,Single ID
+dihomo-linoleate (20:2n6),2091-39-6,Lipid,Long chain fatty acid,17805,LC/MS Neg,5722,307.3,6439848,C16525,HMDB0005060,"CHEBI:73731, CHEBI:77220",FALSE,NA,FALSE,1,Single ID
+dihomo-linolenate (20:3n3 or n6),NA,Lipid,Essential fatty acid,35718,LC/MS Neg,5600,305.39999999999998,"5280581, 5312529","C03242, C16522","HMDB0002925, HMDB0006735, HMDB0060039","CHEBI:53460, CHEBI:53486, CHEBI:71589, CHEBI:77223",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,2,Multiple IDs
+1-palmitoylglycerophosphocholine,17364-16-8,Lipid,Lysolipid,33955,LC/MS Pos,5671,496.4,86554,NA,HMDB0256091,NA,FALSE,NA,TRUE,0,No ID
+dihydrocholesterol,80-97-7,Lipid,Sterol/Steroid,21131,GC/MS,2320.8000000000002,215.2,6665,NA,HMDB0000908,CHEBI:86570,FALSE,NA,TRUE,0,No ID
+dimethylarginine (SDMA + ADMA),NA,Amino acid,"Urea cycle, arginine-, proline-, metabolism",36808,LC/MS Pos,812,203.2,"123831, 169148",C03626,"HMDB0001539, HMDB0003334","CHEBI:17929, CHEBI:25682, CHEBI:58326",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+dimethylglycine,1118-68-9,Amino acid,"Glycine, serine and threonine metabolism",5086,GC/MS,1030,57.9,"673, 6971056",C01026,HMDB0000092,"CHEBI:17724, CHEBI:58251",FALSE,NA,FALSE,1,Single ID
+docosadienoate (22:2n6),7370-49-2,Lipid,Long chain fatty acid,32415,LC/MS Neg,6017,335.4,"5282807, 5312554",C16533,"HMDB0061714, HMDB0062219","CHEBI:145970, CHEBI:75117",TRUE,completely_incompatible_manual_with_cas,FALSE,1,Single ID
+"docosahexaenoate (DHA, 22:6n3)",6217-54-5,Lipid,Essential fatty acid,19323,LC/MS Neg,5518,327.3,"24778483, 445580",C06429,"HMDB0002183, HMDB0062579","CHEBI:28125, CHEBI:77016",FALSE,NA,FALSE,1,Single ID
+docosapentaenoate (n3 DPA 22:5n3),2234-74-4,Lipid,Essential fatty acid,32504,LC/MS Neg,5574,329.4,"5497182, 6438348, 6441454",C16513,"HMDB0001976, HMDB0006528, HMDB0013123, HMDB0060113","CHEBI:53488, CHEBI:65136, CHEBI:77224, CHEBI:77226",TRUE,completely_incompatible_manual_with_cas,FALSE,1,Single ID
+"docosapentaenoate (n6 DPA, 22:5n6)",25182-74-5,Lipid,Essential fatty acid,37478,LC/MS Neg,5625,329.4,"24778483, 445580, 6438348, 6441454",C06429,"HMDB0001976, HMDB0002183, HMDB0013123, HMDB0060113, HMDB0062579","CHEBI:28125, CHEBI:65136, CHEBI:77016, CHEBI:77226",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+docosatrienoate (22:3n3),59708-86-0,Lipid,Long chain fatty acid,32417,LC/MS Neg,5825,333.4,"5312556, 5312557",C16534,HMDB0002823,"CHEBI:77807, CHEBI:80549",FALSE,NA,FALSE,1,Single ID
+dodecanedioate,693-23-2,Lipid,"Fatty acid, dicarboxylate",32388,LC/MS Neg,2990,229.2,"12736, 6991984",C02678,HMDB0000623,"CHEBI:4676, CHEBI:76273",FALSE,NA,FALSE,1,Single ID
+"eicosapentaenoate (EPA, 20:5n3)","10-2005-9, 10417-94-4",Lipid,Essential fatty acid,18467,LC/MS Neg,5442,301.3,"24778482, 446284",C06428,HMDB0001999,"CHEBI:28364, CHEBI:58562",FALSE,NA,FALSE,1,Single ID
+1-palmitoylglycerophosphoethanolamine,NA,Lipid,Lysolipid,35631,LC/MS Neg,5940,452.3,9547069,NA,HMDB0011503,CHEBI:73004,FALSE,NA,TRUE,0,No ID
+eicosenoate (20:1n9 or 11),NA,Lipid,Long chain fatty acid,33587,LC/MS Neg,5955,309.39999999999998,5282768,C16526,HMDB0002231,"CHEBI:32425, CHEBI:32426",FALSE,NA,FALSE,1,Single ID
+epinephrine,51-43-4,Amino acid,Phenylalanine & tyrosine metabolism,1578,LC/MS Pos,891,184,5816,C00788,"HMDB0000068, HMDB0000615","CHEBI:28918, CHEBI:71406",FALSE,NA,FALSE,1,Single ID
+ergothioneine,58511-63-0,Xenobiotics,Food component/Plant,37459,LC/MS Pos,847,230.2,5351619,C05570,HMDB0003045,"CHEBI:134344, CHEBI:4828",FALSE,NA,FALSE,1,Single ID
+erucate (22:1n9),112-86-7,Lipid,Long chain fatty acid,1552,GC/MS,2134,395.4,"5281116, 5282772, 8216",C08316,"HMDB0002068, HMDB0249369","CHEBI:28792, CHEBI:32393",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+erythritol,149-32-6,Xenobiotics,"Sugar, sugar substitute, starch",20699,GC/MS,1517.5,217,222285,C00503,"HMDB0002994, HMDB0094689",CHEBI:17113,FALSE,NA,FALSE,1,Single ID
+erythronate*,88759-55-1,Carbohydrate,Aminosugars metabolism,33477,GC/MS,1546.9,292.10000000000002,2781043,NA,HMDB0000613,"CHEBI:136591, CHEBI:37655",FALSE,NA,TRUE,0,No ID
+ethanolamine,141-43-5,Lipid,Glycerolipid metabolism,1497,GC/MS,1304,174.1,700,C00189,"HMDB0000149, HMDB0060149, HMDB0062693","CHEBI:16000, CHEBI:57603",FALSE,NA,FALSE,1,Single ID
+flavin adenine dinucleotide (FAD),"146-14-5, 84366-81-4",Cofactors and vitamins,Riboflavin metabolism,2134,LC/MS Neg,2413,784.1,"643975, 703",C00016,"HMDB0001248, HMDB0252293",CHEBI:16238,FALSE,NA,FALSE,1,Single ID
+fructose,57-48-7,Carbohydrate,"Fructose, mannose, galactose, starch, and sucrose metabolism",577,GC/MS,1758,217,439709,"C00095, C02336",HMDB0000660,CHEBI:28645,TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,2,Multiple IDs
+fructose 1-phosphate,53823-70-4,Carbohydrate,"Glycolysis, gluconeogenesis, pyruvate metabolism",15907,GC/MS,1996.5,445.2,"10400369, 25244216, 65246",C01094,"HMDB0001076, HMDB0060467, HMDB0062538","CHEBI:138881, CHEBI:139419, CHEBI:18105",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+1-palmitoylglycerophosphoinositol*,NA,Lipid,Lysolipid,35305,LC/MS Neg,5573,571.29999999999995,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+fructose-6-phosphate,103213-47-4,Carbohydrate,"Glycolysis, gluconeogenesis, pyruvate metabolism",12021,GC/MS,1994.9,315.1,"21604863, 440641",C05345,HMDB0003971,"CHEBI:16084, CHEBI:57634",TRUE,completely_incompatible_manual_with_cas,FALSE,1,Single ID
+fucose,2438-80-4,Carbohydrate,Aminosugars metabolism,15821,GC/MS,1682.2,204,"17106, 439554",C01019,"HMDB0000174, HMDB0059624","CHEBI:2181, CHEBI:42548",FALSE,NA,FALSE,1,Single ID
+fumarate,100-17-8,Energy,Krebs cycle,1643,GC/MS,1382.1,245,"444972, 5460307, 6183479",C00122,HMDB0000134,"CHEBI:18012, CHEBI:29806, CHEBI:37154",FALSE,NA,FALSE,1,Single ID
+gabapentin,60142-96-3,Xenobiotics,Drug,38686,LC/MS Pos,2482,172.2,3446,NA,HMDB0005015,CHEBI:42797,FALSE,NA,TRUE,0,No ID
+galactose,59-23-4,Carbohydrate,"Fructose, mannose, galactose, starch, and sucrose metabolism",12055,GC/MS,1793.8,203.9,3037556,C01582,NA,CHEBI:17118,TRUE,completely_incompatible_manual_with_cas,FALSE,1,Single ID
+gamma-aminobutyrate (GABA),56-12-2,Amino acid,Glutamate metabolism,1416,GC/MS,1539.7,304.10000000000002,"119, 5460232",C00334,HMDB0000112,"CHEBI:16865, CHEBI:30566, CHEBI:59888",FALSE,NA,FALSE,1,Single ID
+gamma-glutamylcysteine,636-58-8,Peptide,gamma-glutamyl,1778,LC/MS Pos,1274,251.1,"123938, 7059430, 842",C00669,"HMDB0001049, HMDB0029146, HMDB0303807","CHEBI:17515, CHEBI:58173",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+gamma-glutamylglutamate,1116-22-9,Peptide,gamma-glutamyl,36738,LC/MS Pos,1036,277.10000000000002,92865,C05282,"HMDB0011737, HMDB0029148",CHEBI:73705,FALSE,NA,FALSE,1,Single ID
+gamma-glutamylglutamine,10148-81-9,Peptide,gamma-glutamyl,2730,LC/MS Pos,806,276.10000000000002,150914,C05283,HMDB0011738,CHEBI:73707,FALSE,NA,FALSE,1,Single ID
+gamma-glutamylisoleucine*,NA,Peptide,gamma-glutamyl,34456,LC/MS Pos,2644,261.2,22885096,NA,"HMDB0011170, HMDB0029152",CHEBI:68434,FALSE,NA,TRUE,0,No ID
+1-palmitoylplasmenylethanolamine*,NA,Lipid,Lysolipid,39270,LC/MS Neg,6153,436.4,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+gamma-glutamylleucine,2566-39-4,Peptide,gamma-glutamyl,18369,LC/MS Pos,2744,261.2,151023,NA,"HMDB0011171, HMDB0029153",CHEBI:68433,FALSE,NA,TRUE,0,No ID
+gamma-glutamylphenylalanine,7432-24-8,Peptide,gamma-glutamyl,33422,LC/MS Pos,2846,295.10000000000002,111299,NA,"HMDB0000594, HMDB0029562",CHEBI:89582,FALSE,NA,TRUE,0,No ID
+gamma-glutamylvaline,2746-34-1,Peptide,gamma-glutamyl,32393,LC/MS Pos,2040,247.2,7015683,NA,"HMDB0011172, HMDB0029162",CHEBI:68848,FALSE,NA,TRUE,0,No ID
+gamma-tocopherol,54-28-4,Cofactors and vitamins,Tocopherol metabolism,33420,GC/MS,2264,488.4,92729,C02483,"HMDB0001492, HMDB0002634",CHEBI:18185,FALSE,NA,FALSE,1,Single ID
+glucarate (saccharate),5793-88-4,Cofactors and vitamins,Ascorbate and aldarate metabolism,1476,GC/MS,1885.8,333.1,33037,C00818,"HMDB0000663, HMDB0029881","CHEBI:16002, CHEBI:30612",FALSE,NA,FALSE,1,Single ID
+gluconate,527-07-1,Carbohydrate,"Nucleotide sugars, pentose metabolism",587,GC/MS,1879.4,333,10690,C00257,"HMDB0000625, HMDB0003373","CHEBI:18391, CHEBI:33198",FALSE,NA,FALSE,1,Single ID
+glucose,50-99-7,Carbohydrate,"Glycolysis, gluconeogenesis, pyruvate metabolism",20488,GC/MS,1866.8,217.1,"107526, 5793, 64689, 79025","C00031, C00221, C00267","HMDB0000122, HMDB0000516, HMDB0003340, HMDB0003345, HMDB0006564, HMDB0061922, HMDB0062170, HMDB0304632","CHEBI:15903, CHEBI:17925, CHEBI:4167, CHEBI:42758",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,3,Multiple IDs
+glucose 1-phosphate,56401-20-8,Carbohydrate,"Glycolysis, gluconeogenesis, pyruvate metabolism",15561,GC/MS,2017,299.10000000000002,"439165, 65533",C00103,"HMDB0001306, HMDB0001586","CHEBI:16077, CHEBI:29042, CHEBI:58601",FALSE,NA,FALSE,1,Single ID
+glucose-6-phosphate (G6P),103192-55-8,Carbohydrate,"Glycolysis, gluconeogenesis, pyruvate metabolism",31260,GC/MS,2042.7,387.2,"21604864, 23616120, 439284, 439958, 5958","C00092, C00668","HMDB0001401, HMDB0001549, HMDB0006793","CHEBI:15954, CHEBI:17665, CHEBI:4170, CHEBI:57584, CHEBI:58225, CHEBI:61548",TRUE,completely_incompatible_manual_with_cas,FALSE,2,Multiple IDs
+glucuronate,207300-70-7,Carbohydrate,"Glycolysis, gluconeogenesis, pyruvate metabolism",15443,GC/MS,1886.5,217,444791,C00191,HMDB0000127,CHEBI:42717,FALSE,NA,FALSE,1,Single ID
+1-pentadecanoylglycerophosphocholine*,NA,Lipid,Lysolipid,37418,LC/MS Pos,5563,482.3,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+glutamate,56-86-0,Amino acid,Glutamate metabolism,57,LC/MS Pos,700,148.1,"14598502, 23327, 33032, 4179667, 5128032, 611","C00025, C00217, C00302","HMDB0000148, HMDB0003339, HMDB0060475","CHEBI:14321, CHEBI:15966, CHEBI:16015, CHEBI:18237, CHEBI:29985, CHEBI:29986, CHEBI:29987",TRUE,completely_incompatible_manual_with_cas,FALSE,3,Multiple IDs
+"glutamate, gamma-methyl ester",1499-55-4,Amino acid,Glutamate metabolism,33487,LC/MS Pos,1062,162.1,68662,NA,HMDB0061715,NA,FALSE,NA,TRUE,0,No ID
+glutamine,56-85-9,Amino acid,Glutamate metabolism,53,LC/MS Pos,684,147.19999999999999,"5961, 6992086",C00064,HMDB0000641,"CHEBI:18050, CHEBI:58359",FALSE,NA,FALSE,1,Single ID
+glutarate (pentanedioate),110-94-1,Amino acid,Lysine metabolism,396,GC/MS,1433.6,261,743,C00489,HMDB0000661,"CHEBI:17859, CHEBI:30921",FALSE,NA,FALSE,1,Single ID
+glutaroyl carnitine,102636-82-8,Amino acid,Lysine metabolism,35439,LC/MS Pos,1565,276.10000000000002,53481622,NA,"HMDB0013130, HMDB0062587","CHEBI:165628, CHEBI:82952",FALSE,NA,TRUE,0,No ID
+"glutathione, oxidized (GSSG)",103239-24-3,Amino acid,Glutathione metabolism,27727,LC/MS Pos,1535,613.1,"11215652, 11767258, 53477713, 65359",C00127,"HMDB0000656, HMDB0003337","CHEBI:143243, CHEBI:167606, CHEBI:17858",FALSE,NA,FALSE,1,Single ID
+"glutathione, reduced (GSH)",70-18-8,Amino acid,Glutathione metabolism,2127,LC/MS Pos,1274,308.10000000000002,"124886, 448106",C00051,"HMDB0000125, HMDB0001463, HMDB0006960","CHEBI:16856, CHEBI:57925",FALSE,NA,FALSE,1,Single ID
+glycerate,600-19-1,Carbohydrate,"Glycolysis, gluconeogenesis, pyruvate metabolism",1572,GC/MS,1360.7,189,"10140, 439194, 5460316, 5460358","C00258, C01921","HMDB0000138, HMDB0000139, HMDB0031818, HMDB0032596","CHEBI:16659, CHEBI:17687, CHEBI:29746, CHEBI:32398",FALSE,NA,FALSE,2,Multiple IDs
+glycerol,56-81-5,Lipid,Glycerolipid metabolism,15122,GC/MS,1311,205,753,C00116,HMDB0000131,CHEBI:17754,FALSE,NA,FALSE,1,Single ID
+glycerol 2-phosphate,819-83-0,Xenobiotics,Chemical,27728,GC/MS,1691.8,243,2526,C02979,HMDB0002520,"CHEBI:17270, CHEBI:58083",FALSE,NA,FALSE,1,Single ID
+"1,5-anhydroglucitol (1,5-AG)",154-58-5,Carbohydrate,"Glycolysis, gluconeogenesis, pyruvate metabolism",20675,GC/MS,1788.7,217,64960,C07326,"HMDB0002712, HMDB0011726, HMDB0011736",CHEBI:16070,FALSE,NA,FALSE,1,Single ID
+1-stearoylglycerol (1-monostearin),123-94-4,Lipid,Monoacylglycerol,21188,GC/MS,2186.6,399.4,24699,NA,NA,CHEBI:75555,FALSE,NA,TRUE,0,No ID
+glycerol 3-phosphate (G3P),29849-82-9,Lipid,Glycerolipid metabolism,15365,GC/MS,1719.7,357.1,"439162, 7048686, 754","C00093, C03189","HMDB0000126, HMDB0002722, HMDB0252849","CHEBI:14336, CHEBI:15978, CHEBI:231935, CHEBI:57597",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,2,Multiple IDs
+glycerophosphoethanolamine,33049-08-0,Lipid,Glycerolipid metabolism,37455,GC/MS,1906,357.1,123874,C01233,HMDB0000114,CHEBI:52330,FALSE,NA,FALSE,1,Single ID
+glycerophosphorylcholine (GPC),28319-77-9,Lipid,Glycerolipid metabolism,15990,LC/MS Pos,694,258.10000000000002,657272,C00670,"HMDB0000049, HMDB0000086",CHEBI:16870,FALSE,NA,FALSE,1,Single ID
+glycine,56-40-6,Amino acid,"Glycine, serine and threonine metabolism",11777,GC/MS,1166,101.9,750,C00037,HMDB0000123,"CHEBI:15428, CHEBI:57305",FALSE,NA,FALSE,1,Single ID
+glycocholenate sulfate*,NA,Lipid,Bile acid metabolism,32599,LC/MS Neg,4763,254.8,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+glycolate (hydroxyacetate),79-14-1,Xenobiotics,Chemical,15737,GC/MS,1119,177,"5460308, 757","C00160, C03547","HMDB0000115, HMDB0003035","CHEBI:17497, CHEBI:29805",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,2,Multiple IDs
+glycolithocholate sulfate*,NA,Lipid,Bile acid metabolism,32620,LC/MS Neg,5015,512.29999999999995,"3623888, 443113, 72222",C11301,"HMDB0002639, HMDB0062801",CHEBI:9347,FALSE,NA,FALSE,1,Single ID
+glycylglycine,556-50-3,Peptide,Dipeptide,21029,GC/MS,1757.9,174,11163,C02037,HMDB0011733,"CHEBI:17201, CHEBI:356445",FALSE,NA,FALSE,1,Single ID
+glycylisoleucine,19461-38-2,Peptide,Dipeptide,36659,LC/MS Pos,2080,189.1,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+glycylleucine,869-19-2,Peptide,Dipeptide,34398,LC/MS Pos,2236,189.1,92843,C02155,HMDB0000759,"CHEBI:143163, CHEBI:73514",FALSE,NA,FALSE,1,Single ID
+1-stearoylglycerophosphocholine,19420-57-6,Lipid,Lysolipid,33961,LC/MS Pos,5844,524.4,"10415542, 11757087, 24779456, 24779458, 24779461, 24779463, 24779473, 24779476, 24779479, 24779481, 24779513, 24779527, 460602, 497299, 52924039, 52924045, 52924051, 52924053, 52924059, 53480465, 53480467, 53480469, 53480471, 53480473, 53480475, 53480477",C04230,"HMDB0010380, HMDB0010381, HMDB0010382, HMDB0010383, HMDB0010384, HMDB0010385, HMDB0010387, HMDB0010390, HMDB0010391, HMDB0010392, HMDB0010393, HMDB0010395, HMDB0010396, HMDB0010397, HMDB0010398, HMDB0010399, HMDB0010400, HMDB0010401, HMDB0010402, HMDB0010403, HMDB0010404, HMDB0010405, HMDB0010406, HMDB0010408, HMDB0012108, HMDB0013122, HMDB0062541, HMDB0094688, HMDB0258493","CHEBI:131924, CHEBI:133657, CHEBI:133662, CHEBI:133734, CHEBI:183975, CHEBI:72998, CHEBI:73794, CHEBI:73851, CHEBI:73858, CHEBI:73873, CHEBI:74340, CHEBI:74343, CHEBI:74344, CHEBI:74348, CHEBI:74968, CHEBI:83055, CHEBI:84753, CHEBI:86255, CHEBI:86259, CHEBI:86260, CHEBI:88684, CHEBI:88685, CHEBI:88686, CHEBI:88698, CHEBI:88948, CHEBI:88952",FALSE,NA,FALSE,1,Single ID
+glycyllysine,31461-63-9,Peptide,Dipeptide,41529,GC/MS,2088.3000000000002,174.1,306144,NA,HMDB0028846,NA,FALSE,NA,TRUE,0,No ID
+glycylmethionine,554-94-9,Peptide,Dipeptide,42012,LC/MS Pos,1593,207.1,96757,NA,HMDB0028847,NA,FALSE,NA,TRUE,0,No ID
+glycylphenylalanine,51-907-7,Peptide,Dipeptide,33954,LC/MS Neg,2193,221.2,"1549344, 92953",NA,NA,NA,TRUE,completely_incompatible_manual_with_cas,TRUE,0,No ID
+glycylproline,704-15-4,Peptide,Dipeptide,22171,LC/MS Pos,1115,173.1,3013625,NA,HMDB0000721,"CHEBI:70744, CHEBI:73779",FALSE,NA,TRUE,0,No ID
+glycylthreonine,7093-70-1,Peptide,Dipeptide,42050,GC/MS,1911.1,174.1,351980,NA,HMDB0028851,NA,FALSE,NA,TRUE,0,No ID
+glycyltryptophan,NA,Peptide,Dipeptide,38151,LC/MS Pos,2542,262.4,"1551340, 92181",NA,NA,NA,TRUE,completely_incompatible_manual_no_cas,TRUE,0,No ID
+glycyltyrosine,658-79-7,Peptide,Dipeptide,33958,LC/MS Pos,1728,239.1,92829,NA,HMDB0028853,CHEBI:73517,FALSE,NA,TRUE,0,No ID
+glycylvaline,1963-21-9,Peptide,Dipeptide,18357,LC/MS Pos,1572,175.1,2724807,NA,HMDB0028854,CHEBI:73922,FALSE,NA,TRUE,0,No ID
+guanidinoacetate,352-97-6,Amino acid,Guanidino and acetamido metabolism,12359,GC/MS,1696.6,172,763,C00581,HMDB0000128,"CHEBI:16344, CHEBI:57742",FALSE,NA,FALSE,1,Single ID
+guanine,73-40-5,Nucleotide,"Purine metabolism, guanine containing",418,GC/MS,1942.3,352.1,764,C00242,HMDB0000132,CHEBI:16235,FALSE,NA,FALSE,1,Single ID
+1-stearoylglycerophosphoethanolamine,69747-55-3,Lipid,Lysolipid,34416,LC/MS Pos,5842,482.3,9547068,NA,HMDB0011130,CHEBI:75036,FALSE,NA,TRUE,0,No ID
+guanosine,118-00-3,Nucleotide,"Purine metabolism, guanine containing",1573,LC/MS Neg,1675,282.10000000000002,6802,C00387,HMDB0000133,CHEBI:16750,FALSE,NA,FALSE,1,Single ID
+guanosine 5'- monophosphate (5'-GMP),5550-12-9,Nucleotide,"Purine metabolism, guanine containing",2849,LC/MS Pos,1300,364,135414246,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+"gulono-1,4-lactone",1128-23-0,Cofactors and vitamins,Ascorbate and aldarate metabolism,33454,GC/MS,1862,333.1,"439373, 608","C01040, C05410","HMDB0003466, HMDB0243497","CHEBI:17587, CHEBI:5571",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,2,Multiple IDs
+heme,14875-96-8,Cofactors and vitamins,Hemoglobin and porphyrin metabolism,41754,LC/MS Pos,5057,616.20000000000005,444098,C00032,HMDB0003178,"CHEBI:17627, CHEBI:26355, CHEBI:30413, CHEBI:60344",FALSE,NA,FALSE,1,Single ID
+hexanoylcarnitine,6920-35-0,Lipid,Carnitine metabolism,32328,LC/MS Pos,3174,260.2,"3246938, 4398339, 6426853, 8892",C01585,"HMDB0000535, HMDB0000705, HMDB0000756, HMDB0061883","CHEBI:17120, CHEBI:30776, CHEBI:70749, CHEBI:84834",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+hippurate,495-69-2,Xenobiotics,Benzoate metabolism,15753,LC/MS Neg,2136,178.1,"464, 91637",C01586,"HMDB0000714, HMDB0011723, HMDB0062583","CHEBI:18089, CHEBI:606565, CHEBI:68455",FALSE,NA,FALSE,1,Single ID
+histamine,51-45-6,Amino acid,Histidine metabolism,1574,GC/MS,1808,174.1,"25201573, 774",C00388,"HMDB0000870, HMDB0060263","CHEBI:18295, CHEBI:58432",FALSE,NA,FALSE,1,Single ID
+histidine,5934-29-2,Amino acid,Histidine metabolism,59,LC/MS Neg,757,154.1,"6274, 86580368",C00135,"HMDB0000177, HMDB0003412","CHEBI:15971, CHEBI:32513, CHEBI:57595",FALSE,NA,FALSE,1,Single ID
+histidylleucine,7763-65-7,Peptide,Dipeptide,40061,LC/MS Pos,1482,269.2,"189008, 440549",C05010,"HMDB0028889, HMDB0253179","CHEBI:147392, CHEBI:5729",FALSE,NA,FALSE,1,Single ID
+histidylmethionine,2488-11-1,None,None,41965,LC/MS Pos,1025,287.2,7408103,NA,HMDB0028891,CHEBI:74053,FALSE,NA,TRUE,0,No ID
+1-stearoylglycerophosphoinositol,796963-93-4,Lipid,Lysolipid,19324,LC/MS Neg,5800,599.4,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+histidylphenylalanine,16874-81-0,Peptide,Dipeptide,42084,LC/MS Pos,1730,303.2,152198,NA,HMDB0028892,CHEBI:141438,FALSE,NA,TRUE,0,No ID
+histidyltryptophan,23403-90-9,Peptide,Dipeptide,41912,LC/MS Pos,1961,342.2,6539217,NA,HMDB0304782,NA,FALSE,NA,TRUE,0,No ID
+histidyltyrosine,35979-00-1,Peptide,Dipeptide,41899,LC/MS Pos,1253,319.2,515713,NA,HMDB0028897,CHEBI:74059,FALSE,NA,TRUE,0,No ID
+homocysteine,454-29-5,Amino acid,"Cysteine, methionine, SAM, taurine metabolism",40266,GC/MS,1648.2,234,"6971015, 778, 91552","C00155, C05330","HMDB0000165, HMDB0000742","CHEBI:17230, CHEBI:17588, CHEBI:58065, CHEBI:58199",FALSE,NA,FALSE,2,Multiple IDs
+homoserine,672-15-1,Amino acid,"Glycine, serine and threonine metabolism",23642,GC/MS,1471,218.1,12647,C00263,HMDB0000719,"CHEBI:15699, CHEBI:57476",FALSE,NA,FALSE,1,Single ID
+homostachydrine*,1195-94-4,Xenobiotics,Food component/Plant,33009,LC/MS Pos,1199,158.19999999999999,"441447, 4479243",C08283,"HMDB0033433, HMDB0304552",CHEBI:5757,FALSE,NA,FALSE,1,Single ID
+hydantoin-5-propionic acid,5624-26-0,Amino acid,Histidine metabolism,40473,LC/MS Neg,762,171.3,782,C05565,HMDB0001212,CHEBI:28297,FALSE,NA,FALSE,1,Single ID
+hydrochlorothiazide,58-93-5,Xenobiotics,Drug,39625,LC/MS Neg,2041.6,296.10000000000002,3639,C07041,HMDB0001928,CHEBI:5778,FALSE,NA,FALSE,1,Single ID
+hypotaurine,300-84-5,Amino acid,"Cysteine, methionine, SAM, taurine metabolism",590,GC/MS,1598.5,188,107812,C00519,HMDB0000965,"CHEBI:16668, CHEBI:57853",FALSE,NA,FALSE,1,Single ID
+hypoxanthine,68-94-0,Nucleotide,"Purine metabolism, (hypo)xanthine/inosine containing",3127,LC/MS Neg,1313,135.1,790,C00262,HMDB0000157,CHEBI:17368,FALSE,NA,FALSE,1,Single ID
+10-heptadecenoate (17:1n7),29743-97-3,Lipid,Long chain fatty acid,33971,LC/MS Neg,5558,267.3,5312435,NA,"HMDB0060038, HMDB0062542",CHEBI:75094,FALSE,NA,TRUE,0,No ID
+imidazole propionate,1074-59-5,Amino acid,Histidine metabolism,40730,LC/MS Pos,1011.7,141.1,70630,C20522,HMDB0002271,"CHEBI:72991, CHEBI:73087",FALSE,NA,FALSE,1,Single ID
+indoleacetate,6505-45-9,Amino acid,Tryptophan metabolism,27513,GC/MS,1862,202,"801, 802",C00954,"HMDB0000197, HMDB0302181","CHEBI:16411, CHEBI:30854",FALSE,NA,FALSE,1,Single ID
+indolelactate,832-97-3,Amino acid,Tryptophan metabolism,18349,GC/MS,1964.9,202,676157,C02043,HMDB0000671,NA,FALSE,NA,FALSE,1,Single ID
+inosine,58-63-9,Nucleotide,"Purine metabolism, (hypo)xanthine/inosine containing",1123,LC/MS Neg,1600,267.2,6021,C00294,HMDB0000195,CHEBI:17596,FALSE,NA,FALSE,1,Single ID
+inositol 1-phosphate (I1P),106032-59-1,Lipid,Inositol metabolism,1481,GC/MS,2057.8000000000002,318.10000000000002,NA,C01177,HMDB0000213,"CHEBI:18297, CHEBI:58433",FALSE,NA,FALSE,1,Single ID
+isobutyrylcarnitine,25518-49-4,Amino acid,"Valine, leucine and isoleucine metabolism",33441,LC/MS Pos,1941,232.2,"10177002, 168379",NA,"HMDB0000736, HMDB0002083, HMDB0062556, HMDB0062606","CHEBI:73017, CHEBI:84838",FALSE,NA,TRUE,0,No ID
+isoleucine,73-32-5,Amino acid,"Valine, leucine and isoleucine metabolism",1125,LC/MS Pos,1614,132.1,6306,C00407,HMDB0000172,"CHEBI:17191, CHEBI:58045",FALSE,NA,FALSE,1,Single ID
+isoleucylalanine,24787-73-3,Peptide,Dipeptide,40046,LC/MS Pos,1686,203.2,7009577,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+isoleucylarginine,55715-01-0,Peptide,Dipeptide,40071,LC/MS Pos,1245,288.2,9900561,NA,HMDB0028901,NA,FALSE,NA,TRUE,0,No ID
+isoleucylglutamate,42516-53-0,Peptide,Dipeptide,40057,LC/MS Pos,1650,261.2,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+10-nonadecenoate (19:1n9),73033-09-7,Lipid,Long chain fatty acid,33972,LC/MS Neg,5775,295.39999999999998,5312513,NA,"HMDB0013622, HMDB0062543, HMDB0062658",CHEBI:83051,FALSE,NA,TRUE,0,No ID
+isoleucylglycine,868-28-0,Peptide,Dipeptide,40008,LC/MS Pos,1732,189.2,342532,NA,HMDB0028907,NA,FALSE,NA,TRUE,0,No ID
+isoleucylhistidine,NA,Peptide,Dipeptide,40085,LC/MS Pos,1021,269.2,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+isoleucylisoleucine,42537-99-5,Peptide,Dipeptide,36761,LC/MS Pos,2678,245.1,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+isoleucylmethionine,42384-14-5,Peptide,Dipeptide,40058,LC/MS Pos,2392,263.2,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+isoleucylphenylalanine,22951-98-0,Peptide,Dipeptide,40067,LC/MS Pos,3155,279.2,435728,NA,HMDB0028914,NA,FALSE,NA,TRUE,0,No ID
+isoleucylserine,6403-14-1,Peptide,Dipeptide,40012,LC/MS Pos,1472.5,219.2,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+isoleucyltryptophan,13589-06-5,Peptide,Dipeptide,40079,LC/MS Pos,3080,318.2,9797038,NA,HMDB0028918,NA,FALSE,NA,TRUE,0,No ID
+isoleucyltyrosine,38579-21-4,Peptide,Dipeptide,40073,LC/MS Pos,2300,295.2,342468,NA,HMDB0028919,NA,FALSE,NA,TRUE,0,No ID
+isoleucylvaline,41017-96-3,Peptide,Dipeptide,40049,LC/MS Pos,2202,231.2,449407,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+isovalerylcarnitine,NA,Amino acid,"Valine, leucine and isoleucine metabolism",34407,LC/MS Pos,2533,246.2,6426851,NA,HMDB0000688,CHEBI:73025,FALSE,NA,TRUE,0,No ID
+13-HODE + 9-HODE,NA,Lipid,"Fatty acid, monohydroxy",37752,LC/MS Neg,5247,295.2,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+kynurenine,2922-83-0,Amino acid,Tryptophan metabolism,15140,LC/MS Pos,1902,209.1,161166,C00328,"HMDB0000183, HMDB0000684","CHEBI:16946, CHEBI:57959",FALSE,NA,FALSE,1,Single ID
+lactate,79-33-4,Carbohydrate,"Glycolysis, gluconeogenesis, pyruvate metabolism",527,GC/MS,1102.8,116.9,"107689, 5460161",C00186,"HMDB0000190, HMDB0003328, HMDB0062492","CHEBI:16651, CHEBI:422",FALSE,NA,FALSE,1,Single ID
+laurate (12:0),143-07-7,Lipid,Medium chain fatty acid,1645,LC/MS Neg,5288,199.3,3893,C02679,HMDB0000638,"CHEBI:18262, CHEBI:30805",FALSE,NA,FALSE,1,Single ID
+laurylcarnitine,NA,Lipid,Carnitine metabolism,34534,LC/MS Pos,5066,344.3,"10427569, 168381",NA,"HMDB0002250, HMDB0062713","CHEBI:73054, CHEBI:77086",TRUE,completely_incompatible_manual_no_cas,TRUE,0,No ID
+leucine,61-90-5,Amino acid,"Valine, leucine and isoleucine metabolism",60,LC/MS Pos,1674,132.19999999999999,6106,C00123,HMDB0000687,"CHEBI:15603, CHEBI:57427",FALSE,NA,FALSE,1,Single ID
+leucylalanine,7298-84-2,Peptide,Dipeptide,40010,LC/MS Pos,1760,203.2,81721,NA,HMDB0028922,CHEBI:73527,FALSE,NA,TRUE,0,No ID
+leucylarginine,26607-15-8,Peptide,Dipeptide,40028,LC/MS Pos,1300,288.2,3800205,NA,HMDB0028923,NA,FALSE,NA,TRUE,0,No ID
+leucylasparagine,14608-81-2,Peptide,Dipeptide,40052,LC/MS Pos,1418,246.2,4128305,NA,HMDB0028924,NA,FALSE,NA,TRUE,0,No ID
+leucylglutamate,NA,Peptide,Dipeptide,40021,LC/MS Pos,1716,261.2,"5259589, 5259590",NA,HMDB0028928,NA,TRUE,completely_incompatible_manual_no_cas,TRUE,0,No ID
+leucylglycine,686-50-0,Peptide,Dipeptide,40045,LC/MS Pos,1800,189.2,79070,NA,HMDB0028929,NA,FALSE,NA,TRUE,0,No ID
+15-methylpalmitate (isobar with 2-methylpalmitate),NA,Lipid,"Fatty acid, branched",38768,LC/MS Neg,5698,269.39999999999998,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+leucylhistidine,38062-72-5,Peptide,Dipeptide,40077,LC/MS Pos,1056,269.2,341684,NA,HMDB0028931,NA,FALSE,NA,TRUE,0,No ID
+leucylleucine,3303-31-9,Peptide,Dipeptide,36756,LC/MS Pos,3012,245.1,94244,C11332,"HMDB0028933, HMDB0254039","CHEBI:191208, CHEBI:6418, CHEBI:73531",FALSE,NA,FALSE,1,Single ID
+leucylmethionine,36077-39-1,Peptide,Dipeptide,40022,LC/MS Pos,2504,263.2,118276,NA,HMDB0028935,NA,FALSE,NA,TRUE,0,No ID
+leucylphenylalanine,3063-05-6,Peptide,Dipeptide,40026,LC/MS Pos,3308,279.2,259325,NA,HMDB0302841,NA,FALSE,NA,TRUE,0,No ID
+leucylserine,6209-12-7,Peptide,Dipeptide,40048,LC/MS Pos,1519.7,219.2,3621685,NA,HMDB0028938,NA,FALSE,NA,TRUE,0,No ID
+leucyltryptophan,5156-22-9,Peptide,Dipeptide,40034,LC/MS Pos,3216,318.2,329275,NA,HMDB0028940,CHEBI:174310,FALSE,NA,TRUE,0,No ID
+leucyltyrosine,968-21-8,Peptide,Dipeptide,40030,LC/MS Pos,2413,295.2,273262,NA,HMDB0028941,NA,FALSE,NA,TRUE,0,No ID
+lidocaine,137-58-6,Xenobiotics,Drug,35661,LC/MS Pos,2761,235.2,3676,C07073,HMDB0014426,CHEBI:6456,FALSE,NA,FALSE,1,Single ID
+linoleate (18:2n6),60-33-3,Lipid,Essential fatty acid,1105,LC/MS Neg,5533,279.3,5280450,C01595,HMDB0000673,"CHEBI:17351, CHEBI:30245",FALSE,NA,FALSE,1,Single ID
+"linolenate [alpha or gamma, (18:3n3 or 6)]",NA,Lipid,Essential fatty acid,34035,LC/MS Neg,5450,277.3,"5280934, 5282822",C06427,HMDB0001388,"CHEBI:27432, CHEBI:32387",FALSE,NA,FALSE,1,Single ID
+16-hydroxypalmitate,506-13-8,Lipid,"Fatty acid, monohydroxy",39609,LC/MS Neg,5232,271.3,10466,C18218,"HMDB0006294, HMDB0155887","CHEBI:55328, CHEBI:55329",FALSE,NA,FALSE,1,Single ID
+lipitor,134523-03-8,Xenobiotics,Drug,38619,LC/MS Neg,5091.5,557.29999999999995,60823,C06834,HMDB0005006,CHEBI:39548,FALSE,NA,FALSE,1,Single ID
+lysine,56-87-1,Amino acid,Lysine metabolism,1301,LC/MS Pos,603,147.19999999999999,"5962, 641599",C00047,"HMDB0000182, HMDB0062809","CHEBI:18019, CHEBI:32551",FALSE,NA,FALSE,1,Single ID
+lysylleucine,7369-79-1,Peptide,Dipeptide,40020,LC/MS Pos,1546,260.2,7016103,NA,HMDB0028955,CHEBI:74561,FALSE,NA,TRUE,0,No ID
+lysyllysine,13184-13-9,None,None,42090,LC/MS Pos,533,138.19999999999999,4293571,NA,HMDB0304785,NA,FALSE,NA,TRUE,0,No ID
+lysylmethionine,97729-52-7,Peptide,Dipeptide,41943,LC/MS Pos,1013.1,278.2,7016114,NA,HMDB0028957,CHEBI:74566,FALSE,NA,TRUE,0,No ID
+lysyltyrosine,35978-98-4,Peptide,Dipeptide,42089,LC/MS Pos,1310,310.3,7021820,NA,HMDB0028963,CHEBI:73608,FALSE,NA,TRUE,0,No ID
+malate,6915-15-7,Energy,Krebs cycle,1303,GC/MS,1502,233,"160434, 222656, 525, 5459792",C00149,"HMDB0000156, HMDB0000744","CHEBI:15589, CHEBI:15595, CHEBI:30797, CHEBI:6650",FALSE,NA,FALSE,1,Single ID
+malonylcarnitine,NA,Lipid,Fatty acid synthesis,37059,LC/MS Pos,980,248.1,"22833583, 91825606",NA,"HMDB0002095, HMDB0062496, HMDB0062592","CHEBI:85470, CHEBI:86047",FALSE,NA,TRUE,0,No ID
+maltohexaose,34620-77-4,Carbohydrate,"Fructose, mannose, galactose, starch, and sucrose metabolism",35170,LC/MS Neg,1224,989.1,5288409,C01936,HMDB0012253,CHEBI:61953,FALSE,NA,FALSE,1,Single ID
+maltopentaose,34620-76-3,Carbohydrate,"Fructose, mannose, galactose, starch, and sucrose metabolism",35163,LC/MS Neg,1100,827.1,"13489094, 3710145",C06218,"HMDB0012254, HMDB0249794",CHEBI:61952,TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+2'-deoxyadenosine 3'-monophosphate,102832-10-0,Nucleotide,"Purine metabolism, adenine containing",40663,LC/MS Pos,1383.5,332.1,1467,NA,HMDB0245534,NA,FALSE,NA,TRUE,0,No ID
+maltose,6363-53-7,Carbohydrate,"Fructose, mannose, galactose, starch, and sucrose metabolism",15804,GC/MS,2176.1999999999998,204.1,"10991489, 439341","C00208, C00897","HMDB0000163, HMDB0037138","CHEBI:18167, CHEBI:47937",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,2,Multiple IDs
+maltotetraose,34612-38-9,Carbohydrate,Oligosaccharide,15910,LC/MS Neg,965,665.1,"25147451, 439639, 870","C00464, C02052","HMDB0001296, HMDB0029931, HMDB0252767","CHEBI:143180, CHEBI:28808",FALSE,NA,FALSE,2,Multiple IDs
+maltotriose,1109-28-0,Carbohydrate,"Fructose, mannose, galactose, starch, and sucrose metabolism",15877,GC/MS,2419,204,"192826, 439586, 62698","C00420, C00721, C01835","HMDB0001262, HMDB0006857, HMDB0038852","CHEBI:140999, CHEBI:27931",FALSE,NA,FALSE,3,Multiple IDs
+mannitol,69-65-8,Carbohydrate,"Fructose, mannose, galactose, starch, and sucrose metabolism",15335,GC/MS,1839,319.10000000000002,6251,C00392,"HMDB0000765, HMDB0001363",CHEBI:16899,FALSE,NA,FALSE,1,Single ID
+mannose,3458-28-4,Carbohydrate,"Fructose, mannose, galactose, starch, and sucrose metabolism",584,GC/MS,1753.5,203.9,"185698, 18950","C00159, C00936",HMDB0000169,"CHEBI:28729, CHEBI:4208",TRUE,completely_incompatible_manual_with_cas,FALSE,2,Multiple IDs
+mannose-6-phosphate,"70442-25-0, 104872-94-8",Carbohydrate,"Fructose, mannose, galactose, starch, and sucrose metabolism",1469,GC/MS,2004.6,387.1,"23421200, 439198, 65127",C00275,"HMDB0001078, HMDB0304312","CHEBI:48066, CHEBI:49728, CHEBI:58735",FALSE,NA,FALSE,1,Single ID
+margarate (17:0),506-12-7,Lipid,Long chain fatty acid,1121,LC/MS Neg,5733,269.3,10465,NA,HMDB0002259,"CHEBI:32365, CHEBI:32366",FALSE,NA,TRUE,0,No ID
+metformin,1115-70-4,Xenobiotics,Drug,39972,GC/MS,1746.4,284.10000000000002,4091,C07151,HMDB0001921,CHEBI:6801,FALSE,NA,FALSE,1,Single ID
+methionine,63-68-3,Amino acid,"Cysteine, methionine, SAM, taurine metabolism",1302,LC/MS Pos,1252,150.1,6137,C00073,HMDB0000696,"CHEBI:16643, CHEBI:57844",FALSE,NA,FALSE,1,Single ID
+methionylalanine,3061-96-9,Peptide,Dipeptide,40685,LC/MS Pos,1500,221.1,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+1-arachidonoylglycerophosphocholine*,NA,Lipid,Lysolipid,33228,LC/MS Pos,5554,544.29999999999995,NA,C05208,NA,NA,FALSE,NA,FALSE,1,Single ID
+2'-deoxycytidine 3'-monophosphate,6220-63-9,Nucleotide,"Pyrimidine metabolism, cytidine containing",40453,LC/MS Pos,1048,308,3274948,NA,HMDB0062545,NA,FALSE,NA,TRUE,0,No ID
+methionylasparagine,36261-61-7,Peptide,Dipeptide,40686,LC/MS Pos,1060.3,264.10000000000002,333467,NA,HMDB0028968,NA,FALSE,NA,TRUE,0,No ID
+methionylaspartate,14595-65-4,None,None,40687,LC/MS Pos,1275.3,265.10000000000002,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+methionylglutamate,14517-44-3,Peptide,Dipeptide,40693,LC/MS Pos,1503,279.10000000000002,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+methionylglycine,14486-03-4,Peptide,Dipeptide,40717,LC/MS Pos,1478,207.1,259185,NA,HMDB0028973,CHEBI:174028,FALSE,NA,TRUE,0,No ID
+methionylleucine,14486-16-9,Peptide,Dipeptide,40023,LC/MS Pos,2698,263.2,3425788,NA,HMDB0028977,NA,FALSE,NA,TRUE,0,No ID
+methionylphenylalanine,14492-14-9,Peptide,Dipeptide,41441,LC/MS Pos,3042,297.2,100048,NA,HMDB0028980,NA,FALSE,NA,TRUE,0,No ID
+methyl-alpha-glucopyranoside,97-30-3,Xenobiotics,Chemical,20714,LC/MS Pos,1087,212.1,64947,C02603,NA,NA,TRUE,completely_incompatible_manual_with_cas,FALSE,1,Single ID
+methylglutaroylcarnitine,NA,Amino acid,"Valine, leucine and isoleucine metabolism",37060,LC/MS Pos,1900,290.10000000000002,128145,NA,HMDB0000552,CHEBI:70857,FALSE,NA,TRUE,0,No ID
+methylphosphate,7023-27-0,Nucleotide,Purine and pyrimidine metabolism,37070,GC/MS,1221,240.9,13130,NA,HMDB0061711,CHEBI:340824,FALSE,NA,TRUE,0,No ID
+metoprolol,56392-17-7,Xenobiotics,Drug,18037,LC/MS Pos,3205,268.2,4171,C07202,HMDB0001932,CHEBI:6904,FALSE,NA,FALSE,1,Single ID
+2'-deoxyguanosine,961-07-9,Nucleotide,"Purine metabolism, guanine containing",1411,LC/MS Pos,1728,268,"135398592, 187790",C00330,HMDB0000085,CHEBI:17172,FALSE,NA,FALSE,1,Single ID
+metoprolol acid metabolite*,NA,Xenobiotics,Drug,34109,LC/MS Pos,2535,268.2,62936,NA,HMDB0254682,CHEBI:83478,FALSE,NA,TRUE,0,No ID
+myo-inositol,87-89-8,Lipid,Inositol metabolism,19934,GC/MS,1924.9,217,NA,C00137,"HMDB0000211, HMDB0002256",CHEBI:17268,FALSE,NA,FALSE,1,Single ID
+myristate (14:0),544-63-8,Lipid,Long chain fatty acid,1365,LC/MS Neg,5439,227.3,11005,C06424,HMDB0000806,"CHEBI:28875, CHEBI:30807",FALSE,NA,FALSE,1,Single ID
+myristoleate (14:1n5),544-64-9,Lipid,Long chain fatty acid,32418,LC/MS Neg,5338,225.3,5281119,C08322,HMDB0002000,"CHEBI:27781, CHEBI:32370",FALSE,NA,FALSE,1,Single ID
+myristoylcarnitine,18822-89-4,Lipid,Carnitine metabolism,33952,LC/MS Pos,5113,372.4,6426854,NA,HMDB0254979,CHEBI:73061,FALSE,NA,TRUE,0,No ID
+naproxen,22204-53-1,Xenobiotics,Drug,12122,LC/MS Neg,4168,228.9,156391,C01517,HMDB0001923,CHEBI:7476,FALSE,NA,FALSE,1,Single ID
+nervonate (24:1n9),506-37-6,Lipid,Long chain fatty acid,41820,GC/MS,2201,423.4,5281120,C08323,"HMDB0002368, HMDB0303950","CHEBI:32392, CHEBI:44247",FALSE,NA,FALSE,1,Single ID
+nicotinamide,98-92-0,Cofactors and vitamins,Nicotinate and nicotinamide metabolism,594,LC/MS Pos,1267,123.1,936,C00153,HMDB0001406,CHEBI:17154,FALSE,NA,FALSE,1,Single ID
+nicotinamide adenine dinucleotide (NAD+),53-84-9,Cofactors and vitamins,Nicotinate and nicotinamide metabolism,5278,LC/MS Pos,1370,664,"5892, 5893, 925",C00003,"HMDB0000902, HMDB0249146","CHEBI:13389, CHEBI:15846, CHEBI:44215",FALSE,NA,FALSE,1,Single ID
+nicotinamide adenine dinucleotide reduced (NADH),"58-68-4, 606-68-8",Cofactors and vitamins,Nicotinate and nicotinamide metabolism,31475,LC/MS Neg,1554,664.1,439153,C00004,HMDB0001487,CHEBI:16908,FALSE,NA,FALSE,1,Single ID
+2'-deoxyinosine,890-38-0,Nucleotide,"Purine metabolism, (hypo)xanthine/inosine containing",15076,LC/MS Neg,1700,251.1,65058,C05512,HMDB0000071,CHEBI:28997,FALSE,NA,FALSE,1,Single ID
+nicotinamide ribonucleotide (NMN),1094-61-7,Cofactors and vitamins,Nicotinate and nicotinamide metabolism,22152,LC/MS Pos,886,335.1,"14180, 14181, 23617374",C00455,"HMDB0000229, HMDB0059645","CHEBI:14648, CHEBI:14649, CHEBI:16171",FALSE,NA,FALSE,1,Single ID
+nicotinamide riboside*,1341-23-7,Cofactors and vitamins,Nicotinate and nicotinamide metabolism,33013,LC/MS Pos,955,255.1,439924,C03150,HMDB0000855,CHEBI:15927,FALSE,NA,FALSE,1,Single ID
+nicotinate,59-67-6,Cofactors and vitamins,Nicotinate and nicotinamide metabolism,1504,LC/MS Neg,1221,122.1,"937, 938",C00253,HMDB0001488,"CHEBI:15940, CHEBI:32544",FALSE,NA,FALSE,1,Single ID
+nicotinate adenine dinucleotide (NAAD+),"6450-77-7, 104809-30-5",Cofactors and vitamins,Nicotinate and nicotinamide metabolism,15725,LC/MS Neg,1236,662.9,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+octanoylcarnitine,3671-77-0,Lipid,Carnitine metabolism,33936,LC/MS Pos,4100,288.3,123701,NA,NA,CHEBI:73039,FALSE,NA,TRUE,0,No ID
+oleate (18:1n9),112-80-1,Lipid,Long chain fatty acid,1359,GC/MS,1984.4,339.2,"42607286, 445639, 5460221",C00712,"HMDB0000207, HMDB0002066","CHEBI:16196, CHEBI:30823",FALSE,NA,FALSE,1,Single ID
+oleoylcarnitine,NA,Lipid,Carnitine metabolism,35160,LC/MS Pos,5202,426.4,46907933,NA,"HMDB0005065, HMDB0062772",CHEBI:84651,FALSE,NA,TRUE,0,No ID
+ophthalmate,495-27-2,Amino acid,Glutathione metabolism,34592,LC/MS Neg,920,288.10000000000002,7018721,NA,HMDB0005765,CHEBI:84058,FALSE,NA,TRUE,0,No ID
+ornithine,3184-13-2,Amino acid,"Urea cycle, arginine-, proline-, metabolism",1493,GC/MS,1763.8,141.9,"59565831, 6262, 6992088, 71082","C00077, C00515","HMDB0000214, HMDB0000818, HMDB0003374, HMDB0004984","CHEBI:15729, CHEBI:16176, CHEBI:46911, CHEBI:57668",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,2,Multiple IDs
+p-acetamidophenylglucuronide,120595-80-4,Xenobiotics,Drug,33423,LC/MS Neg,1377,326.1,"4022661, 83944",NA,"HMDB0010316, HMDB0247905","CHEBI:132962, CHEBI:32636",TRUE,completely_incompatible_manual_with_cas,TRUE,0,No ID
+2-aminoadipate,"542-32-5, 1118-90-7",Amino acid,Lysine metabolism,6146,GC/MS,1686.5,260.10000000000002,"469, 5460399, 92136",C00956,"HMDB0000510, HMDB0302754","CHEBI:17082, CHEBI:37023, CHEBI:37024, CHEBI:58672",FALSE,NA,FALSE,1,Single ID
+p-cresol sulfate,3233-57-7,Amino acid,Phenylalanine & tyrosine metabolism,36103,LC/MS Neg,2896,187.1,2879,C01468,"HMDB0001858, HMDB0013762",CHEBI:17847,FALSE,NA,FALSE,1,Single ID
+palmitate (16:0),57-10-3,Lipid,Long chain fatty acid,1336,LC/MS Neg,5619,255.3,"504166, 985",C00249,"HMDB0000220, HMDB0060083","CHEBI:15756, CHEBI:7896",FALSE,NA,FALSE,1,Single ID
+palmitoleate (16:1n7),373-49-9,Lipid,Long chain fatty acid,33447,LC/MS Neg,5477,253.3,"445638, 5282745",C08362,"HMDB0003229, HMDB0012328, HMDB0060082","CHEBI:28716, CHEBI:32372, CHEBI:59265",FALSE,NA,FALSE,1,Single ID
+palmitoyl sphingomyelin,NA,Lipid,Sphingolipid,37506,GC/MS,2524,311.3,9939941,NA,"HMDB0010169, HMDB0012098, HMDB0061712",CHEBI:78646,FALSE,NA,TRUE,0,No ID
+palmitoylcarnitine,6865-14-1,Lipid,Carnitine metabolism,22189,LC/MS Pos,5179,400.4,461,NA,HMDB0240783,CHEBI:73067,FALSE,NA,TRUE,0,No ID
+pantothenate,137-08-6,Cofactors and vitamins,Pantothenate and CoA metabolism,1508,LC/MS Pos,2218,220.1,"167945, 6613, 988",C00864,"HMDB0000210, HMDB0062717, HMDB0250782","CHEBI:29032, CHEBI:46905, CHEBI:7916",FALSE,NA,FALSE,1,Single ID
+paroxetine,110429-49-8,Xenobiotics,Drug,40461,LC/MS Pos,4222,330.2,43815,C07415,HMDB0014853,CHEBI:7936,FALSE,NA,FALSE,1,Single ID
+pelargonate (9:0),112-05-0,Lipid,Medium chain fatty acid,12035,LC/MS Neg,4847,157.19999999999999,8158,C01601,HMDB0000847,"CHEBI:29019, CHEBI:32361",FALSE,NA,FALSE,1,Single ID
+penicillin G,69-57-8,Xenobiotics,Drug,37468,LC/MS Pos,3314,335.2,5904,C05551,HMDB0015186,"CHEBI:18208, CHEBI:51354",FALSE,NA,FALSE,1,Single ID
+pentadecanoate (15:0),1002-84-2,Lipid,Long chain fatty acid,1361,GC/MS,1853.5,299.2,13849,C16537,HMDB0000826,"CHEBI:42504, CHEBI:78795",FALSE,NA,FALSE,1,Single ID
+2-aminobutyrate,1492-24-6,Amino acid,Butanoate metabolism,1577,GC/MS,1215.7,130,439691,C02261,HMDB0000650,CHEBI:28797,FALSE,NA,FALSE,1,Single ID
+phenol red,143-74-8,Xenobiotics,Chemical,36817,LC/MS Neg,3650,353.1,4766,C12600,NA,CHEBI:31991,TRUE,completely_incompatible_manual_with_cas,FALSE,1,Single ID
+phenol sulfate,937-34-8,Amino acid,Phenylalanine & tyrosine metabolism,32553,LC/MS Neg,2150,173.1,74426,C02180,HMDB0060015,CHEBI:27905,FALSE,NA,FALSE,1,Single ID
+phenylacetylglutamine,28047-15-6,Amino acid,Phenylalanine & tyrosine metabolism,35126,LC/MS Pos,2868,265.2,"306137, 92258","C04148, C05597","HMDB0006344, HMDB0062645","CHEBI:17884, CHEBI:58310, CHEBI:8087",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,2,Multiple IDs
+phenylalanine,63-91-2,Amino acid,Phenylalanine & tyrosine metabolism,64,LC/MS Pos,2056,166.1,6140,C00079,"HMDB0000159, HMDB0000612","CHEBI:17295, CHEBI:58095",FALSE,NA,FALSE,1,Single ID
+phenylalanylalanine,3918-87-4,Peptide,Dipeptide,41374,LC/MS Pos,2047.6,237.1,5488196,NA,HMDB0028988,CHEBI:73630,FALSE,NA,TRUE,0,No ID
+phenylalanylarginine,1238-09-1,Peptide,Dipeptide,41487,LC/MS Pos,1553,322.2,10268029,NA,HMDB0028989,"CHEBI:133147, CHEBI:73632",FALSE,NA,TRUE,0,No ID
+phenylalanylaspartate,22828-05-3,Peptide,Dipeptide,41419,LC/MS Pos,1901,281.10000000000002,6992643,NA,HMDB0028991,CHEBI:73631,FALSE,NA,TRUE,0,No ID
+phenylalanylglutamate,3617-45-6,Peptide,Dipeptide,41432,LC/MS Pos,2005,295.2,151134,NA,HMDB0028994,CHEBI:74712,FALSE,NA,TRUE,0,No ID
+phenylalanylglycine,721-90-4,Peptide,Dipeptide,41370,LC/MS Neg,2460.8000000000002,221.1,98207,NA,HMDB0304788,NA,FALSE,NA,TRUE,0,No ID
+phenylalanylleucine,3303-55-7,Peptide,Dipeptide,40192,LC/MS Pos,3252,279.2,4078229,NA,HMDB0253025,NA,FALSE,NA,TRUE,0,No ID
+2-arachidonoylglycerophosphocholine*,NA,Lipid,Lysolipid,35256,LC/MS Pos,5524,544.29999999999995,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+phenylalanylmethionine,15080-84-9,Peptide,Dipeptide,41436,LC/MS Pos,2772,297.2,7010505,NA,HMDB0029001,"CHEBI:190709, CHEBI:74719",FALSE,NA,TRUE,0,No ID
+phenylalanylphenylalanine,2577-40-4,Peptide,Dipeptide,38150,LC/MS Pos,3317,313.2,6993089,NA,HMDB0013302,"CHEBI:191205, CHEBI:72723",FALSE,NA,TRUE,0,No ID
+phenylalanylproline,7669-65-0,Peptide,Dipeptide,41392,LC/MS Neg,3170,261.2,7020641,NA,HMDB0011177,CHEBI:74750,FALSE,NA,TRUE,0,No ID
+phenylalanylserine,16053-39-7,Peptide,Dipeptide,40016,LC/MS Pos,1808,253.1,193508,NA,HMDB0029004,CHEBI:71032,FALSE,NA,TRUE,0,No ID
+phenylalanyltryptophan,24587-41-5,Peptide,Dipeptide,41377,LC/MS Pos,3349,352.2,134906,NA,HMDB0029006,CHEBI:74751,FALSE,NA,TRUE,0,No ID
+phenylalanyltyrosine,17355-18-9,Peptide,Dipeptide,41527,LC/MS Pos,2630,329.2,13341191,NA,HMDB0029007,CHEBI:73637,FALSE,NA,TRUE,0,No ID
+phenylalanylvaline,3918-90-9,Peptide,Dipeptide,41393,LC/MS Pos,2570,265.10000000000002,7359121,NA,HMDB0029008,CHEBI:73638,FALSE,NA,TRUE,0,No ID
+phosphate,7664-38-2,Energy,Oxidative phosphorylation,11438,GC/MS,1307.7,298.89999999999998,"1003, 1004, 1061, 3681305",C00009,"HMDB0000973, HMDB0001429, HMDB0002105, HMDB0002142, HMDB0005947","CHEBI:18367, CHEBI:26078, CHEBI:39745, CHEBI:43474",FALSE,NA,FALSE,1,Single ID
+phosphoenolpyruvate (PEP),10526-80-4,Carbohydrate,"Glycolysis, gluconeogenesis, pyruvate metabolism",597,GC/MS,1595.4,369,"1005, 3674425, 638308",C00074,HMDB0000263,"CHEBI:18021, CHEBI:44897, CHEBI:58702",FALSE,NA,FALSE,1,Single ID
+phosphoethanolamine,1071-23-4,Lipid,Glycerolipid metabolism,1600,LC/MS Neg,644,140.1,1015,C00346,"HMDB0000224, HMDB0012279, HMDB0060151, HMDB0060152","CHEBI:17553, CHEBI:58190",FALSE,NA,FALSE,1,Single ID
+2-arachidonoylglycerophosphoethanolamine*,NA,Lipid,Lysolipid,32815,LC/MS Neg,5674,500.3,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+phytosphingosine,554-62-1,Lipid,Sphingolipid,1510,LC/MS Pos,5189,318.39999999999998,122121,C12144,HMDB0004610,"CHEBI:46961, CHEBI:64124",FALSE,NA,FALSE,1,Single ID
+pipecolate,4043-87-2,Amino acid,Lysine metabolism,1444,LC/MS Pos,1120,130.1,"439227, 849",C00408,"HMDB0000070, HMDB0000716","CHEBI:17964, CHEBI:30913, CHEBI:61185",FALSE,NA,FALSE,1,Single ID
+piperine,94-62-2,Xenobiotics,Food component/Plant,33935,LC/MS Pos,5136,286.2,638024,C03882,HMDB0029377,CHEBI:28821,FALSE,NA,FALSE,1,Single ID
+pivaloylcarnitine,NA,Xenobiotics,Drug,35432,LC/MS Pos,2370,246.2,126894,NA,HMDB0041993,CHEBI:165622,FALSE,NA,TRUE,0,No ID
+pregnanediol-3-glucuronide,1852-49-9,Lipid,Sterol/Steroid,40708,LC/MS Neg,5136.8999999999996,495.4,"123796, 44263371",NA,HMDB0010318,CHEBI:88765,FALSE,NA,TRUE,0,No ID
+pregnen-diol disulfate*,NA,Lipid,Sterol/Steroid,32562,LC/MS Neg,3886,238.3,"101541, 219833",C05484,"HMDB0004025, HMDB0005943",CHEBI:8387,FALSE,NA,FALSE,1,Single ID
+pro-hydroxy-pro,18684-24-7,Peptide,Dipeptide,35127,LC/MS Pos,960,229.2,11902892,NA,"HMDB0006695, HMDB0029018",CHEBI:74767,FALSE,NA,TRUE,0,No ID
+proline,147-85-3,Amino acid,"Urea cycle, arginine-, proline-, metabolism",1898,LC/MS Pos,796,116.1,145742,C00148,HMDB0000162,"CHEBI:17203, CHEBI:60039",FALSE,NA,FALSE,1,Single ID
+prolylglycine,2578-57-6,Peptide,Dipeptide,40703,LC/MS Pos,875,173.1,6426709,NA,HMDB0011178,"CHEBI:61695, CHEBI:61696",FALSE,NA,TRUE,0,No ID
+prolylmethionine,52899-08-8,None,None,41386,LC/MS Pos,1736.8,247.1,"5233577, 5250073",NA,HMDB0029023,NA,TRUE,completely_incompatible_manual_with_cas,TRUE,0,No ID
+2-docosahexaenoylglycerophosphocholine*,NA,Lipid,Lysolipid,35883,LC/MS Pos,5507,568.29999999999995,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+propionylcarnitine,17298-37-2,Lipid,Fatty acid metabolism (also BCAA metabolism),32452,LC/MS Pos,1589,218.2,"107738, 188824",C03017,"HMDB0000824, HMDB0062514","CHEBI:28867, CHEBI:53210",FALSE,NA,FALSE,1,Single ID
+prostaglandin A2,13345-50-1,Lipid,Eicosanoid,19761,LC/MS Neg,4875,333.3,"40488287, 5280880, 5283092",C05953,"HMDB0002752, HMDB0062524","CHEBI:133370, CHEBI:184988, CHEBI:27820",FALSE,NA,FALSE,1,Single ID
+prostaglandin E2,363-24-6,Lipid,Eicosanoid,7746,LC/MS Neg,4562,351.3,"11865423, 5280360, 5283031",C00584,HMDB0001220,"CHEBI:15551, CHEBI:606564",FALSE,NA,FALSE,1,Single ID
+pseudouridine,1445-07-4,Nucleotide,"Pyrimidine metabolism, uracil containing",33442,LC/MS Neg,1104,243.1,15047,C02067,"HMDB0000767, HMDB0006075",CHEBI:17802,FALSE,NA,FALSE,1,Single ID
+putrescine,110-60-1,Amino acid,Polyamine metabolism,1408,GC/MS,1705.8,174,1045,C00134,"HMDB0001414, HMDB0060243","CHEBI:17148, CHEBI:326268",FALSE,NA,FALSE,1,Single ID
+pyridoxal,65-22-5,Cofactors and vitamins,Pyridoxal metabolism,1651,LC/MS Pos,1210,168.1,1050,C00250,HMDB0001545,CHEBI:17310,FALSE,NA,FALSE,1,Single ID
+pyridoxate,82-82-6,Cofactors and vitamins,Vitamin B6 metabolism,31555,LC/MS Neg,2210,182.1,6723,C00847,HMDB0000017,"CHEBI:17405, CHEBI:30959",FALSE,NA,FALSE,1,Single ID
+pyroglutamine*,NA,Amino acid,Glutamate metabolism,32672,LC/MS Pos,764,129.19999999999999,134508,NA,HMDB0242134,CHEBI:133469,FALSE,NA,TRUE,0,No ID
+pyrophosphate (PPi),1466-09-3,Energy,Oxidative phosphorylation,2078,GC/MS,1642.3,451,"1023, 4097574, 4995, 644102",C00013,"HMDB0000250, HMDB0304340","CHEBI:18361, CHEBI:29888, CHEBI:33019, CHEBI:45212",FALSE,NA,FALSE,1,Single ID
+quebrachitol,642-38-6,Xenobiotics,Food component/Plant,37088,GC/MS,1797,217,NA,C08257,HMDB0034221,CHEBI:111,FALSE,NA,FALSE,1,Single ID
+2-docosahexaenoylglycerophosphoethanolamine*,NA,Lipid,Lysolipid,34258,LC/MS Pos,5512,526.20000000000005,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+quinate,77-95-2,Xenobiotics,Food component/Plant,18335,GC/MS,1793,345.1,6508,C00296,HMDB0003072,"CHEBI:17521, CHEBI:29751",FALSE,NA,FALSE,1,Single ID
+quinidine,56-54-2,Xenobiotics,Drug,39766,LC/MS Pos,2712.6,325.3,441074,C06527,HMDB0015044,CHEBI:28593,FALSE,NA,FALSE,1,Single ID
+quinolinate,89-00-9,Cofactors and vitamins,Nicotinate and nicotinamide metabolism,1899,GC/MS,1697.7,296.10000000000002,"1066, 165390","C03460, C03722","HMDB0000232, HMDB0001011","CHEBI:16675, CHEBI:27754",FALSE,NA,FALSE,2,Multiple IDs
+ranitidine,66357-59-3,Xenobiotics,Drug,38595,LC/MS Pos,1967,315.10000000000002,3001055,NA,"HMDB0001930, HMDB0005003",CHEBI:8776,FALSE,NA,TRUE,0,No ID
+ribitol,488-81-3,Carbohydrate,"Nucleotide sugars, pentose metabolism",15772,GC/MS,1692.4,217,NA,C00474,HMDB0000508,CHEBI:15963,FALSE,NA,FALSE,1,Single ID
+riboflavin (Vitamin B2),83-88-5,Cofactors and vitamins,Riboflavin metabolism,1827,LC/MS Pos,3111,377.2,493570,C00255,HMDB0000244,"CHEBI:17015, CHEBI:57986",FALSE,NA,FALSE,1,Single ID
+ribose,50-69-1,Carbohydrate,"Nucleotide sugars, pentose metabolism",12080,GC/MS,1639.2,204,5779,C00121,"HMDB0000283, HMDB0012194",CHEBI:47013,FALSE,NA,FALSE,1,Single ID
+ribulose,488-84-6,Carbohydrate,"Nucleotide sugars, pentose metabolism",35855,GC/MS,1662,306.10000000000002,"12358756, 9920423","C00309, C00508","HMDB0000621, HMDB0003371","CHEBI:16880, CHEBI:17173",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,2,Multiple IDs
+saccharopine,997-68-2,Amino acid,Lysine metabolism,1495,GC/MS,2082.1,357.2,160556,C00449,"HMDB0000279, HMDB0062698","CHEBI:16927, CHEBI:57951",FALSE,NA,FALSE,1,Single ID
+salicylate,69-72-7,Xenobiotics,Drug,1515,LC/MS Neg,2226,137.1,338,C00805,"HMDB0001895, HMDB0015470, HMDB0302214","CHEBI:16914, CHEBI:30762",FALSE,NA,FALSE,1,Single ID
+2-docosapentaenoylglycerophosphocholine*,NA,Lipid,Lysolipid,37366,LC/MS Pos,5532,570.29999999999995,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+sarcosine (N-Methylglycine),107-97-1,Amino acid,"Glycine, serine and threonine metabolism",1516,GC/MS,1182.9000000000001,116,1088,C00213,HMDB0000271,"CHEBI:15611, CHEBI:57433",FALSE,NA,FALSE,1,Single ID
+scyllo-inositol,488-59-5,Lipid,Inositol metabolism,32379,GC/MS,1893.8,318.2,NA,C06153,"HMDB0000160, HMDB0006088",CHEBI:10642,FALSE,NA,FALSE,1,Single ID
+sedoheptulose-7-phosphate,2646-35-7,Carbohydrate,"Nucleotide sugars, pentose metabolism",35649,GC/MS,2070,691.35,"165007, 616, 92042786",C05382,"HMDB0001068, HMDB0062754, HMDB0258206","CHEBI:133983, CHEBI:15721, CHEBI:57483",FALSE,NA,FALSE,1,Single ID
+serine,56-45-1,Amino acid,"Glycine, serine and threonine metabolism",1648,GC/MS,1389.1,204,"5951, 617, 71077","C00065, C00716, C00740","HMDB0000187, HMDB0000589, HMDB0003406, HMDB0062263","CHEBI:16523, CHEBI:17115, CHEBI:17822, CHEBI:33384, CHEBI:35247",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,3,Multiple IDs
+serylisoleucine*,NA,Peptide,Dipeptide,40193,LC/MS Pos,2021,219.2,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+serylleucine,6665-16-3,Peptide,Dipeptide,40066,LC/MS Pos,2106,219.2,7015694,NA,"HMDB0029043, HMDB0094712",CHEBI:74815,FALSE,NA,TRUE,0,No ID
+serylphenyalanine,NA,Peptide,Dipeptide,40054,LC/MS Pos,2348,253.2,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+serylvaline,51782-06-0,Peptide,Dipeptide,42058,LC/MS Pos,1501,205.1,7020158,NA,"HMDB0029052, HMDB0094706",CHEBI:74823,FALSE,NA,TRUE,0,No ID
+sorbitol,6706-59-8,Carbohydrate,"Fructose, mannose, galactose, starch, and sucrose metabolism",15053,GC/MS,1843,319.10000000000002,5780,C00794,HMDB0000247,CHEBI:17924,FALSE,NA,FALSE,1,Single ID
+sorbitol 6-phosphate,108392-12-7,Carbohydrate,"Fructose, mannose, galactose, starch, and sucrose metabolism",15699,LC/MS Neg,613,261.1,"152306, 618","C01096, C02810",HMDB0005831,"CHEBI:17044, CHEBI:60084, CHEBI:743019",TRUE,completely_incompatible_manual_with_cas,FALSE,2,Multiple IDs
+1-arachidonoylglycerophosphoethanolamine*,NA,Lipid,Lysolipid,35186,LC/MS Neg,5731,500.3,42607465,NA,HMDB0011517,CHEBI:64395,FALSE,NA,TRUE,0,No ID
+2-docosapentaenoylglycerophosphoethanolamine*,NA,Lipid,Lysolipid,34875,LC/MS Pos,5548,528.20000000000005,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+spermidine,124-20-9,Amino acid,Polyamine metabolism,485,LC/MS Pos,533,146.19999999999999,1102,C00315,HMDB0001257,"CHEBI:16610, CHEBI:57834",FALSE,NA,FALSE,1,Single ID
+spermine,71-44-3,Amino acid,Polyamine metabolism,603,LC/MS Pos,506,203.2,1103,C00750,HMDB0001256,"CHEBI:15746, CHEBI:45725",FALSE,NA,FALSE,1,Single ID
+sphinganine,3102-56-5,Lipid,Sphingolipid,17769,LC/MS Pos,5175,302.3,"46878428, 91486",C00836,HMDB0000269,"CHEBI:16566, CHEBI:57817",FALSE,NA,FALSE,1,Single ID
+sphingosine,123-78-4,Lipid,Sphingolipid,17747,LC/MS Pos,5197,300.2,"46878424, 5280335",C00319,"HMDB0000252, HMDB0062807","CHEBI:16393, CHEBI:57756",FALSE,NA,FALSE,1,Single ID
+squalene,111-02-4,Lipid,Sterol/Steroid,1518,GC/MS,2205,69,"5280370, 638072",C00751,HMDB0000256,CHEBI:15440,FALSE,NA,FALSE,1,Single ID
+stachydrine,4136-37-2,Xenobiotics,Food component/Plant,34384,LC/MS Pos,860,144.1,115244,C10172,HMDB0004827,CHEBI:35280,FALSE,NA,FALSE,1,Single ID
+stearate (18:0),57-11-4,Lipid,Long chain fatty acid,1358,LC/MS Neg,5886,283.39999999999998,5281,C01530,HMDB0000827,"CHEBI:25629, CHEBI:28842",FALSE,NA,FALSE,1,Single ID
+stearidonate (18:4n3),111174-40-4,Lipid,Long chain fatty acid,33969,LC/MS Neg,5381,275.3,"5282837, 5312508",C16300,HMDB0006547,"CHEBI:32389, CHEBI:77222",FALSE,NA,FALSE,1,Single ID
+stearoylcarnitine,18822-91-8,Lipid,Carnitine metabolism,34409,LC/MS Pos,5300,428.4,"52922056, 6426855",NA,"HMDB0000848, HMDB0062532","CHEBI:73074, CHEBI:84644",FALSE,NA,TRUE,0,No ID
+streptomycin,3810-74-0,Xenobiotics,Drug,39872,LC/MS Pos,543.29999999999995,300.8,19648,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+2-eicosatrienoylglycerophosphocholine*,NA,Lipid,Lysolipid,35884,LC/MS Pos,5565,546.29999999999995,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+succinate,110-15-6,Energy,Krebs cycle,1437,GC/MS,1348,247,"1110, 160419",C00042,HMDB0000254,"CHEBI:15741, CHEBI:30031",FALSE,NA,FALSE,1,Single ID
+succinylcarnitine,NA,Energy,Krebs cycle,37058,LC/MS Pos,1401,262.10000000000002,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+tartarate,"87-69-4, 6106-24-7",Xenobiotics,Food component/Plant,15336,GC/MS,1626.1,292.10000000000002,"444305, 875",C00898,"HMDB0000956, HMDB0059916, HMDB0062642","CHEBI:15671, CHEBI:15674, CHEBI:30924, CHEBI:30929",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+taurine,107-35-7,Amino acid,"Cysteine, methionine, SAM, taurine metabolism",2125,GC/MS,1616.4,254.1,1123,C00245,HMDB0000251,"CHEBI:15891, CHEBI:507393",FALSE,NA,FALSE,1,Single ID
+testosterone,NA,Lipid,Sterol/Steroid,19464,LC/MS Pos,5119,289.2,"10204, 6013",C00535,"HMDB0000234, HMDB0000628","CHEBI:17347, CHEBI:42534",FALSE,NA,FALSE,1,Single ID
+theobromine,83-67-0,Xenobiotics,Xanthine metabolism,18392,LC/MS Pos,2136,181.1,5429,C07480,HMDB0002825,CHEBI:28946,FALSE,NA,FALSE,1,Single ID
+threitol,2418-52-2,Carbohydrate,"Nucleotide sugars, pentose metabolism",35854,GC/MS,1513,217.1,169019,C16884,HMDB0004136,CHEBI:48300,FALSE,NA,FALSE,1,Single ID
+threonate,70753-61-6,Cofactors and vitamins,Ascorbate and aldarate metabolism,27738,GC/MS,1560.7,292.10000000000002,"21145021, 439535, 5460407",C01620,"HMDB0000943, HMDB0062620, HMDB0245425","CHEBI:15908, CHEBI:49060, CHEBI:57561",FALSE,NA,FALSE,1,Single ID
+threonine,72-19-5,Amino acid,"Glycine, serine and threonine metabolism",1284,GC/MS,1412.3,218.1,6288,C00188,HMDB0000167,"CHEBI:16857, CHEBI:57926",FALSE,NA,FALSE,1,Single ID
+threonylglutamate,54532-73-9,Peptide,Dipeptide,42067,LC/MS Pos,819,249.2,7020163,NA,HMDB0029060,CHEBI:74857,FALSE,NA,TRUE,0,No ID
+2-ethylhexanoate,149-57-5,Xenobiotics,Chemical,1554,GC/MS,1210.5,201.2,8697,NA,"HMDB0031230, HMDB0062546",CHEBI:89058,FALSE,NA,TRUE,0,No ID
+threonylleucine,50299-12-2,Peptide,Dipeptide,40051,LC/MS Pos,2204,233.2,7021827,NA,HMDB0029065,CHEBI:74860,FALSE,NA,TRUE,0,No ID
+threonylmethionine,90729-28-5,Peptide,Dipeptide,42068,LC/MS Pos,1641,251.1,7020164,NA,HMDB0029067,CHEBI:74861,FALSE,NA,TRUE,0,No ID
+threonylphenylalanine,NA,Peptide,Dipeptide,31530,LC/MS Pos,2500,267.2,"4099798, 4099799",NA,NA,NA,TRUE,completely_incompatible_manual_no_cas,TRUE,0,No ID
+threonylvaline,99032-17-4,Peptide,Dipeptide,42011,LC/MS Pos,1574.5,219.2,7020901,NA,HMDB0029074,CHEBI:90328,FALSE,NA,TRUE,0,No ID
+thymidine,50-89-5,Nucleotide,"Pyrimidine metabolism, thymine containing",39539,LC/MS Neg,1935,284.8,5789,C00214,HMDB0000273,CHEBI:17748,FALSE,NA,FALSE,1,Single ID
+thymine,65-71-4,Nucleotide,"Pyrimidine metabolism, thymine containing",604,GC/MS,1429.1,255,1135,C00178,HMDB0000262,CHEBI:17821,FALSE,NA,FALSE,1,Single ID
+trans-4-hydroxyproline,51-35-4,Amino acid,"Urea cycle, arginine-, proline-, metabolism",1366,GC/MS,1537,140,"5810, 69248",C01157,"HMDB0000725, HMDB0006055, HMDB0036576","CHEBI:18095, CHEBI:18240, CHEBI:58375, CHEBI:58419",FALSE,NA,FALSE,1,Single ID
+trans-urocanate,104-98-3,Amino acid,Histidine metabolism,607,LC/MS Pos,1119,139.1,736715,C00785,"HMDB0000301, HMDB0002280, HMDB0034174","CHEBI:17771, CHEBI:30817",FALSE,NA,FALSE,1,Single ID
+triethyleneglycol,112-27-6,Xenobiotics,Chemical,27743,LC/MS Pos,1824,168.1,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+trigonelline (N'-methylnicotinate),6138-41-6,Cofactors and vitamins,Nicotinate and nicotinamide metabolism,32401,LC/MS Pos,757,138.1,5570,C01004,HMDB0000875,CHEBI:18123,FALSE,NA,FALSE,1,Single ID
+2-hydroxyacetaminophen sulfate*,NA,Xenobiotics,Drug,33173,LC/MS Neg,1703,246.1,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+tryptophan,73-22-3,Amino acid,Tryptophan metabolism,54,LC/MS Pos,2445,205.1,6305,C00078,HMDB0000929,"CHEBI:16828, CHEBI:57912",FALSE,NA,FALSE,1,Single ID
+tryptophan betaine,20671-76-5,Amino acid,Tryptophan metabolism,37097,LC/MS Pos,2464,247.1,442106,C09213,HMDB0061115,CHEBI:5832,FALSE,NA,FALSE,1,Single ID
+tryptophylasparagine,175027-11-9,Peptide,Dipeptide,40661,LC/MS Pos,1963,319.2,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+tryptophylglutamate,36099-95-3,Peptide,Dipeptide,41401,LC/MS Pos,2246,334.2,3634442,NA,HMDB0029082,NA,FALSE,NA,TRUE,0,No ID
+tryptophylleucine,13123-35-8,Peptide,Dipeptide,40080,LC/MS Pos,3369,318.2,323786,NA,HMDB0029087,NA,FALSE,NA,TRUE,0,No ID
+tyrosine,60-18-4,Amino acid,Phenylalanine & tyrosine metabolism,1299,LC/MS Pos,1516,182.1,6057,C00082,"HMDB0000158, HMDB0000647","CHEBI:17895, CHEBI:58315",FALSE,NA,FALSE,1,Single ID
+tyrosylalanine,730-08-5,Peptide,Dipeptide,40018,LC/MS Pos,1589.5,253.2,7020632,NA,NA,NA,TRUE,completely_incompatible_manual_with_cas,TRUE,0,No ID
+tyrosylglutamine,28252-40-6,Peptide,Dipeptide,41459,LC/MS Pos,1437,310.2,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+tyrosylglycine,673-05-5,Peptide,Dipeptide,41375,LC/MS Pos,1596.8,239.1,259323,NA,HMDB0259337,NA,FALSE,NA,TRUE,0,No ID
+tyrosylhistidine,3788-44-1,Peptide,Dipeptide,41464,LC/MS Pos,903,319.2,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+2-hydroxybutyrate (AHB),3347-90-8,Amino acid,"Cysteine, methionine, SAM, taurine metabolism",21044,GC/MS,1169.4000000000001,130.9,"11266, 440864",C05984,HMDB0000008,"CHEBI:1148, CHEBI:50613, CHEBI:64552, CHEBI:73709",FALSE,NA,FALSE,1,Single ID
+tyrosylleucine,17355-10-1,Peptide,Dipeptide,40031,LC/MS Pos,2656,295.2,"7009561, 87071",NA,NA,NA,TRUE,completely_incompatible_manual_with_cas,TRUE,0,No ID
+tyrosyllysine,54925-88-1,Peptide,Dipeptide,40656,LC/MS Pos,949.1,310.2,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+tyrosylphenylalanine,17355-11-2,Peptide,Dipeptide,41492,LC/MS Pos,2890,329.2,3421919,NA,HMDB0029112,NA,FALSE,NA,TRUE,0,No ID
+tyrosyltyrosine,1050-28-8,Peptide,Dipeptide,40667,LC/MS Pos,2177,345.2,"5057430, 70590",NA,NA,NA,TRUE,completely_incompatible_manual_with_cas,TRUE,0,No ID
+tyrosylvaline,17355-09-8,Peptide,Dipeptide,41424,LC/MS Pos,2041,281.2,"7009559, 7009560",NA,NA,NA,TRUE,completely_incompatible_manual_with_cas,TRUE,0,No ID
+undecanedioate,1852-04-6,Lipid,"Fatty acid, dicarboxylate",35671,LC/MS Neg,2376,215.1,15816,NA,HMDB0000888,CHEBI:73713,FALSE,NA,TRUE,0,No ID
+uracil,66-22-8,Nucleotide,"Pyrimidine metabolism, uracil containing",605,GC/MS,1370.4,241,1174,C00106,HMDB0000300,CHEBI:17568,FALSE,NA,FALSE,1,Single ID
+urate,"69-93-2, 120K5305",Nucleotide,"Purine metabolism, urate metabolism",1604,LC/MS Neg,769,167.1,1175,C00366,HMDB0000289,CHEBI:17775,FALSE,NA,FALSE,1,Single ID
+urea,57-13-6,Amino acid,"Urea cycle, arginine-, proline-, metabolism",1670,GC/MS,1223.9000000000001,171,1176,C00086,HMDB0000294,CHEBI:16199,FALSE,NA,FALSE,1,Single ID
+uridine,58-96-8,Nucleotide,"Pyrimidine metabolism, uracil containing",606,LC/MS Neg,1430,243.1,6029,C00299,HMDB0000296,CHEBI:16704,FALSE,NA,FALSE,1,Single ID
+2-hydroxyglutarate,40951-21-1,Lipid,"Fatty acid, dicarboxylate",37253,GC/MS,1576,247,"43, 439391, 4609868, 5460200","C01087, C02630","HMDB0000606, HMDB0002323, HMDB0059655","CHEBI:11596, CHEBI:15801, CHEBI:17084, CHEBI:32796",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,2,Multiple IDs
+uridine monophosphate (5' or 3'),NA,Nucleotide,"Pyrimidine metabolism, uracil containing",39879,LC/MS Pos,1079,325,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+valerylcarnitine,NA,Lipid,Fatty acid metabolism,34406,LC/MS Pos,2584,246.2,"16226475, 53481619",NA,HMDB0013128,"CHEBI:165624, CHEBI:85095",FALSE,NA,TRUE,0,No ID
+valine,72-18-4,Amino acid,"Valine, leucine and isoleucine metabolism",1649,LC/MS Pos,1040,118.1,6287,C00183,"HMDB0000883, HMDB0034366","CHEBI:16414, CHEBI:57762",FALSE,NA,FALSE,1,Single ID
+valylalanine,27493-61-4,Peptide,Dipeptide,41518,LC/MS Pos,1278.5999999999999,189.1,6992637,NA,HMDB0029120,CHEBI:75008,FALSE,NA,TRUE,0,No ID
+valylarginine,37682-75-0,Peptide,Dipeptide,42072,LC/MS Pos,794.2,274.2,4266827,NA,HMDB0304792,NA,FALSE,NA,TRUE,0,No ID
+valylasparagine,66170-00-1,Peptide,Dipeptide,40727,LC/MS Neg,1334,230.2,"10357, 439193",C00252,HMDB0002923,CHEBI:28189,TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+valylaspartate,20556-16-5,Peptide,Dipeptide,40650,LC/MS Pos,1073.3,233.1,7009608,NA,HMDB0029123,CHEBI:75009,FALSE,NA,TRUE,0,No ID
+valylglutamate,3062-07-5,Peptide,Dipeptide,32454,LC/MS Pos,1346,247.1,7009623,NA,HMDB0029126,CHEBI:75011,FALSE,NA,TRUE,0,No ID
+valylglutamine,42854-54-6,Peptide,Dipeptide,42079,LC/MS Pos,1102,246.2,7016044,NA,HMDB0029125,CHEBI:75010,FALSE,NA,TRUE,0,No ID
+valylglycine,686-43-1,Peptide,Dipeptide,40475,LC/MS Pos,1330,175.1,136487,NA,HMDB0259740,NA,FALSE,NA,TRUE,0,No ID
+2-hydroxyhippurate (salicylurate),487-54-7,Xenobiotics,Benzoate metabolism,18281,LC/MS Neg,2252,194.1,10253,C07588,HMDB0000840,CHEBI:9008,FALSE,NA,FALSE,1,Single ID
+valylhistidine,13589-07-6,Peptide,Dipeptide,40680,LC/MS Neg,1629.1,253.2,7408624,NA,HMDB0029129,CHEBI:73700,FALSE,NA,TRUE,0,No ID
+valylisoleucine,20556-14-3,Peptide,Dipeptide,40050,LC/MS Pos,2365,231.2,7010531,NA,HMDB0029130,CHEBI:75012,FALSE,NA,TRUE,0,No ID
+valylleucine,NA,Peptide,Dipeptide,39994,LC/MS Pos,2503.3000000000002,231.2,352039,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+valyllysine,22677-62-9,Peptide,Dipeptide,41384,LC/MS Neg,1601.8,244.2,168058,NA,HMDB0029132,CHEBI:75014,FALSE,NA,TRUE,0,No ID
+valylmethionine,14486-09-0,Peptide,Dipeptide,40674,LC/MS Pos,2000,249.1,6993038,NA,HMDB0029133,CHEBI:75015,FALSE,NA,TRUE,0,No ID
+valylphenylalanine,3918-92-1,Peptide,Dipeptide,40688,LC/MS Pos,2790,265.2,6993119,NA,HMDB0029134,CHEBI:75016,FALSE,NA,TRUE,0,No ID
+valylserine,15388-94-8,Peptide,Dipeptide,40716,LC/MS Neg,1332,203.2,139506,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+valyltryptophan,24587-37-9,Peptide,Dipeptide,40649,LC/MS Pos,2830,304.2,168182,NA,HMDB0029138,NA,FALSE,NA,TRUE,0,No ID
+valyltyrosine,3061-91-4,Peptide,Dipeptide,40697,LC/MS Pos,2000,281.2,7009554,NA,HMDB0029139,CHEBI:73703,FALSE,NA,TRUE,0,No ID
+valylvaline,3918-94-3,Peptide,Dipeptide,40728,LC/MS Pos,1842,217.2,107475,NA,HMDB0029140,CHEBI:73704,FALSE,NA,TRUE,0,No ID
+2-hydroxyisobutyrate,594-61-6,Xenobiotics,Chemical,22030,GC/MS,1107.5,130.9,"11671, 4277439",NA,"HMDB0000729, HMDB0242161","CHEBI:19641, CHEBI:50129",FALSE,NA,TRUE,0,No ID
+vanillylmandelate (VMA),55-10-7,Amino acid,Phenylalanine & tyrosine metabolism,1567,GC/MS,1806.8,297.10000000000002,"1245, 23615482, 736172",C05584,"HMDB0000291, HMDB0133489, HMDB0304531","CHEBI:1127735, CHEBI:20106, CHEBI:27622",FALSE,NA,FALSE,1,Single ID
+venlafaxine,93413-69-5,Xenobiotics,Drug,38623,LC/MS Pos,3700,278.2,5656,C07187,HMDB0005016,CHEBI:9943,TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+xanthine,69-89-6,Nucleotide,"Purine metabolism, (hypo)xanthine/inosine containing",3147,LC/MS Pos,1430,153.1,1188,C00385,HMDB0000292,CHEBI:17712,FALSE,NA,FALSE,1,Single ID
+xanthosine,146-80-5,Nucleotide,"Purine metabolism, (hypo)xanthine/inosine containing",15136,LC/MS Pos,1785,285,64959,C01762,HMDB0000299,CHEBI:18107,FALSE,NA,FALSE,1,Single ID
+xylitol,87-99-0,Carbohydrate,"Nucleotide sugars, pentose metabolism",41319,GC/MS,1677.6,217,"6912, 94154","C00379, C01904","HMDB0000568, HMDB0002917, HMDB0242149","CHEBI:1305691, CHEBI:17151, CHEBI:18333",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,2,Multiple IDs
+xylonate,73686-31-7,Carbohydrate,"Nucleotide sugars, pentose metabolism",35638,GC/MS,1722,292,"5460056, 6602431, 6971042, 6971043","C00502, C05411","HMDB0059750, HMDB0060256, HMDB0242170, HMDB0242183","CHEBI:17746, CHEBI:28146, CHEBI:48092, CHEBI:48093",TRUE,completely_incompatible_manual_with_cas,FALSE,2,Multiple IDs
+xylose,609-06-3,Carbohydrate,"Nucleotide sugars, pentose metabolism",15835,GC/MS,1723.9,204,135191,C00181,"HMDB0000098, HMDB0003763, HMDB0060254",CHEBI:53455,FALSE,NA,FALSE,1,Single ID
+xylulose,551-84-8,Carbohydrate,"Nucleotide sugars, pentose metabolism",18344,GC/MS,1668,306.10000000000002,"12358757, 5289590",C00310,"HMDB0000654, HMDB0001644",CHEBI:17140,FALSE,NA,FALSE,1,Single ID
+2-hydroxypalmitate,764-67-0,Lipid,"Fatty acid, monohydroxy",35675,LC/MS Neg,5508,271.3,92836,NA,NA,"CHEBI:65097, CHEBI:65101",FALSE,NA,TRUE,0,No ID
+2-isopropylmalate,3237-44-3,Carbohydrate,"Glycolysis, gluconeogenesis, pyruvate metabolism",15667,LC/MS Neg,732,175.2,5280523,C02504,HMDB0000402,"CHEBI:1178, CHEBI:35128",FALSE,NA,FALSE,1,Single ID
+1-arachidonoylglycerophosphoinositol*,NA,Lipid,Lysolipid,34214,LC/MS Neg,5479,619.4,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+2-linoleoylglycerol (2-monolinolein),3443-82-1,Lipid,Monoacylglycerol,32536,GC/MS,2169,408.3,5365676,NA,HMDB0011538,CHEBI:75457,FALSE,NA,TRUE,0,No ID
+2-linoleoylglycerophosphocholine*,NA,Lipid,Lysolipid,35257,LC/MS Pos,5544,520.4,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+2-linoleoylglycerophosphoethanolamine*,NA,Lipid,Lysolipid,36593,LC/MS Neg,5650,476.4,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+2-methoxyacetaminophen sulfate*,NA,Xenobiotics,Drug,33178,LC/MS Neg,1977,260.10000000000002,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+2-methylbutyroylcarnitine,31023-25-3,Amino acid,"Valine, leucine and isoleucine metabolism",35431,LC/MS Pos,2439,246.1,6426901,NA,"HMDB0000378, HMDB0001963",CHEBI:73026,FALSE,NA,TRUE,0,No ID
+2-myristoylglycerophosphocholine*,NA,Lipid,Lysolipid,35681,LC/MS Pos,5450,468.3,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+2-oleoylglycerol (2-monoolein),3443-84-3,Lipid,Monoacylglycerol,35848,GC/MS,2170,410.1,5319879,NA,HMDB0011537,CHEBI:73990,FALSE,NA,TRUE,0,No ID
+2-oleoylglycerophosphocholine*,NA,Lipid,Lysolipid,35254,LC/MS Pos,5640,522.4,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+2-oleoylglycerophosphoethanolamine*,NA,Lipid,Lysolipid,35687,LC/MS Neg,5848,478.3,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+2-oleoylglycerophosphoserine*,NA,Lipid,Lysolipid,37948,LC/MS Neg,5577,522.29999999999995,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+1-arachidonylglycerol,NA,Lipid,Monoacylglycerol,34397,GC/MS,2226,203.1,53480981,C13857,HMDB0011572,NA,TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+2-palmitoleoylglycerophosphocholine*,NA,Lipid,Lysolipid,35819,LC/MS Pos,5482,494.3,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+2-palmitoylglycerol (2-monopalmitin),23470-00-0,Lipid,Monoacylglycerol,33419,GC/MS,2108,129,123409,NA,HMDB0011533,CHEBI:75455,FALSE,NA,TRUE,0,No ID
+2-palmitoylglycerophosphocholine*,NA,Lipid,Lysolipid,35253,LC/MS Pos,5604,496.3,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+2-palmitoylglycerophosphoethanolamine*,NA,Lipid,Lysolipid,35688,LC/MS Neg,5790,452.3,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+2-phosphoglycerate,70195-25-4,Carbohydrate,"Glycolysis, gluconeogenesis, pyruvate metabolism",35629,GC/MS,1734,459.1,"40467846, 439278, 59, 60038355",C00631,"HMDB0000362, HMDB0003391, HMDB0062707, HMDB0304085","CHEBI:17835, CHEBI:24344, CHEBI:58289, CHEBI:88350",FALSE,NA,FALSE,1,Single ID
+2-stearoylglycerophosphocholine*,NA,Lipid,Lysolipid,35255,LC/MS Pos,5780,524.4,10208382,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+2-stearoylglycerophosphoethanolamine*,NA,Lipid,Lysolipid,41220,LC/MS Pos,5779.6,482.2,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+3'-dephosphocoenzyme A,3633-59-8,Cofactors and vitamins,Pantothenate and CoA metabolism,18289,LC/MS Neg,2010,686.2,444485,C00882,HMDB0001373,CHEBI:15468,FALSE,NA,FALSE,1,Single ID
+"3,4-dihydroxyphenethyleneglycol",28822-73-3,Amino acid,Phenylalanine & tyrosine metabolism,1555,GC/MS,1807.7,355.2,91528,C05576,"HMDB0000318, HMDB0005870",CHEBI:1387,FALSE,NA,FALSE,1,Single ID
+3-(4-hydroxyphenyl)lactate,6482-98-0,Amino acid,Phenylalanine & tyrosine metabolism,32197,LC/MS Neg,1395,181.1,"9378, 9548580",C03672,HMDB0000755,"CHEBI:17385, CHEBI:36659",FALSE,NA,FALSE,1,Single ID
+1-docosahexaenoylglycerophosphocholine*,NA,Lipid,Lysolipid,33822,LC/MS Pos,5518,568.4,NA,NA,NA,NA,FALSE,NA,TRUE,0,No ID
+3-(N-acetyl-L-cystein-S-yl) acetaminophen*,52372-86-8,Xenobiotics,Drug,18299,LC/MS Pos,2622,313.10000000000002,83967,NA,HMDB0242140,"CHEBI:133435, CHEBI:133438",FALSE,NA,TRUE,0,No ID
+3-(cystein-S-yl)acetaminophen*,NA,Xenobiotics,Drug,34365,LC/MS Pos,1960,271.2,5233914,NA,HMDB0242116,"CHEBI:133066, CHEBI:133067",FALSE,NA,TRUE,0,No ID
+3-aminoisobutyrate,"10569-72-9, 214139-20-5",Nucleotide,"Pyrimidine metabolism, thymine containing, Valine, leucine and isoleucine metabolism/",1566,GC/MS,1252.2,101.9,64956,C05145,"HMDB0000485, HMDB0003911","CHEBI:142590, CHEBI:27389",FALSE,NA,FALSE,1,Single ID
+3-carboxy-4-methyl-5-propyl-2-furanpropanoate (CMPF),86879-39-2,Lipid,"Fatty acid, dicarboxylate",31787,LC/MS Neg,2815,239.1,123979,NA,"HMDB0061112, HMDB0062776",CHEBI:41254,FALSE,NA,TRUE,0,No ID
+3-dehydrocarnitine*,10457-99-5,Lipid,Carnitine metabolism,32654,LC/MS Pos,1020,160.19999999999999,6991982,C02636,HMDB0012154,CHEBI:57885,FALSE,NA,FALSE,1,Single ID
+3-hydroxybutyrate (BHBA),625-72-9,Lipid,Ketone bodies,542,GC/MS,1203.5,116.9,"3541112, 441, 6971058, 92135",C01089,"HMDB0000011, HMDB0000357","CHEBI:10983, CHEBI:17066, CHEBI:20067, CHEBI:37054",FALSE,NA,FALSE,1,Single ID
+3-hydroxydecanoate,5561-87-5,Lipid,"Fatty acid, monohydroxy",22053,LC/MS Neg,4681,187.2,"26612, 5312798, 5312799",NA,"HMDB0002203, HMDB0010725","CHEBI:132983, CHEBI:171760, CHEBI:37371",FALSE,NA,TRUE,0,No ID
+3-hydroxyhippurate,NA,Xenobiotics,Benzoate metabolism,39600,LC/MS Neg,1670,194.1,450268,NA,HMDB0006116,CHEBI:70824,FALSE,NA,TRUE,0,No ID
+3-hydroxyoctanoate,88930-08-9,Lipid,"Fatty acid, monohydroxy",22001,LC/MS Neg,3463,159.19999999999999,"11367166, 26613",NA,HMDB0001954,"CHEBI:37098, CHEBI:37100",FALSE,NA,TRUE,0,No ID
+3-indoxyl sulfate,2642-37-7,Amino acid,Tryptophan metabolism,27672,LC/MS Neg,2258,212,10258,NA,"HMDB0000682, HMDB0003309","CHEBI:144643, CHEBI:43355",FALSE,NA,TRUE,0,No ID
+1-heptadecanoylglycerophosphocholine,50930-23-9,Lipid,Lysolipid,33957,LC/MS Pos,5750,510.4,"10415542, 11757087, 24779456, 24779458, 24779461, 24779463, 24779473, 24779476, 24779479, 24779481, 24779513, 24779527, 460602, 497299, 52924039, 52924045, 52924051, 52924053, 52924059, 53480465, 53480467, 53480469, 53480471, 53480473, 53480475, 53480477",C04230,"HMDB0010380, HMDB0010381, HMDB0010382, HMDB0010383, HMDB0010384, HMDB0010385, HMDB0010387, HMDB0010390, HMDB0010391, HMDB0010392, HMDB0010393, HMDB0010395, HMDB0010396, HMDB0010397, HMDB0010398, HMDB0010399, HMDB0010400, HMDB0010401, HMDB0010402, HMDB0010403, HMDB0010404, HMDB0010405, HMDB0010406, HMDB0010408, HMDB0012108, HMDB0013122, HMDB0062541, HMDB0094688, HMDB0258493","CHEBI:131924, CHEBI:133657, CHEBI:133662, CHEBI:133734, CHEBI:183975, CHEBI:72998, CHEBI:73794, CHEBI:73851, CHEBI:73858, CHEBI:73873, CHEBI:74340, CHEBI:74343, CHEBI:74344, CHEBI:74348, CHEBI:74968, CHEBI:83055, CHEBI:84753, CHEBI:86255, CHEBI:86259, CHEBI:86260, CHEBI:88684, CHEBI:88685, CHEBI:88686, CHEBI:88698, CHEBI:88948, CHEBI:88952",FALSE,NA,FALSE,1,Single ID
+3-methyl-2-oxovalerate,51829-07-3,Amino acid,"Valine, leucine and isoleucine metabolism",15676,LC/MS Neg,2106,129.19999999999999,"439286, 440877, 6857401","C00671, C06008","HMDB0000491, HMDB0001962, HMDB0002254, HMDB0003736, HMDB0004750","CHEBI:15614, CHEBI:28379, CHEBI:35146",FALSE,NA,FALSE,2,Multiple IDs
+3-methylhistidine,368-16-1,Amino acid,Histidine metabolism,15677,LC/MS Neg,911,168.1,"64969, 92105",C01152,"HMDB0000001, HMDB0000479, HMDB0004935, HMDB0006703, HMDB0006704","CHEBI:27596, CHEBI:50599",FALSE,NA,FALSE,1,Single ID
+3-phosphoglycerate,80731-10-8,Carbohydrate,"Glycolysis, gluconeogenesis, pyruvate metabolism",40264,GC/MS,1754,357.1,724,C00597,HMDB0000807,CHEBI:17050,FALSE,NA,FALSE,1,Single ID
+3-ureidopropionate,462-88-4,Amino acid,Alanine and aspartate metabolism,3155,LC/MS Pos,1062,133.1,"111, 6971254",C02642,"HMDB0000026, HMDB0062812","CHEBI:11892, CHEBI:18261",FALSE,NA,FALSE,1,Single ID
+4-acetamidophenol,103-90-2,Xenobiotics,Drug,12032,LC/MS Pos,2238,152.1,1983,C06804,HMDB0001859,CHEBI:46195,FALSE,NA,FALSE,1,Single ID
+4-acetaminophen sulfate,"10066-90-7, 32113-41-0",Xenobiotics,Drug,37475,LC/MS Neg,1779,230.1,"1983, 83939",C06804,"HMDB0001859, HMDB0059911","CHEBI:32635, CHEBI:46195",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,1,Single ID
+"4-androsten-3beta,17beta-diol disulfate 1*",NA,Lipid,Sterol/Steroid,37202,LC/MS Neg,3735,224.3,10634,C04295,HMDB0003818,CHEBI:2710,FALSE,NA,FALSE,1,Single ID
+4-guanidinobutanoate,"463-003, 463-00-3",Amino acid,Guanidino and acetamido metabolism,15681,LC/MS Pos,1085,146.1,500,C01035,"HMDB0003464, HMDB0005991","CHEBI:15728, CHEBI:57486",FALSE,NA,FALSE,1,Single ID
+4-hydroxybutyrate (GHB),502-85-2,Lipid,"Fatty acid, monohydroxy",34585,GC/MS,1277,233.1,"10413, 3037032","C00989, C01991","HMDB0000710, HMDB0015507","CHEBI:16724, CHEBI:30830",FALSE,NA,FALSE,2,Multiple IDs
+4-hydroxyglutamate,2485-33-8,Amino acid,Glutamate metabolism,40499,GC/MS,1644.2,244.1,"440854, 5460078, 5460800, 6971086","C03079, C05947","HMDB0001344, HMDB0002273, HMDB0062752","CHEBI:16338, CHEBI:21285, CHEBI:32812, CHEBI:6331",TRUE,keeping_only_compatible_for_partially_compatible_features,FALSE,2,Multiple IDs

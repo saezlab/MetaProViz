@@ -1,0 +1,28 @@
+"Intra","CoRe","Core_Direction","RG1_All","R2_Significant","RG3_Change","RG3_ChangeNum"
+"DOWN","DOWN","Released","Intra DOWN+ CoRe DOWN_Released","Both_DOWN (Released)","Both_DOWN (Released)",1
+"DOWN","No Change","Released","Intra DOWN+ CoRe Not Significant_Released","None","None",2
+"DOWN","UP","Released","Intra DOWN+ CoRe UP_Released","Opposite (Released UP)","Opposite (Released UP)",3
+"UP","DOWN","Released","Intra UP+ CoRe DOWN_Released","Opposite (Released DOWN)","Opposite (Released DOWN)",4
+"UP","No Change","Released","Intra UP+ CoRe Not Significant_Released","None","None",5
+"UP","UP","Released","Intra UP+ CoRe UP_Released","Both_UP (Released)","Both_UP (Released)",6
+"No Change","DOWN","Released","Intra Not Detected+ CoRe DOWN_Released","CoRe_DOWN (Released)","CoRe_DOWN (Released)",7
+"No Change","No Change","Released","Intra Not Detected+ CoRe Not Significant_Released","None","None",8
+"No Change","UP","Released","Intra Not Detected+ CoRe UP_Released","CoRe_UP (Released)","CoRe_UP (Released)",9
+"DOWN","DOWN","Consumed","Intra DOWN+ CoRe DOWN_Consumed","Both_DOWN (Consumed)","Both_DOWN (Consumed)",10
+"DOWN","No Change","Consumed","Intra DOWN+ CoRe Not Significant_Consumed","None","None",2
+"DOWN","UP","Consumed","Intra DOWN+ CoRe UP_Consumed","Opposite (Consumed UP)","Opposite (Consumed UP)",11
+"UP","DOWN","Consumed","Intra UP+ CoRe DOWN_Consumed","Opposite (Consumed DOWN)","Opposite (Consumed DOWN)",12
+"UP","No Change","Consumed","Intra UP+ CoRe Not Significant_Consumed","None","None",5
+"UP","UP","Consumed","Intra UP+ CoRe UP_Consumed","Both_UP (Consumed)","Both_UP (Consumed)",13
+"No Change","DOWN","Consumed","Intra Not Detected+ CoRe DOWN_Consumed","CoRe_DOWN (Consumed)","CoRe_DOWN (Consumed)",14
+"No Change","No Change","Consumed","Intra Not Detected+ CoRe Not Significant_Consumed","None","None",8
+"No Change","UP","Consumed","Intra Not Detected+ CoRe UP_Consumed","CoRe_UP (Consumed)","CoRe_UP (Consumed)",15
+"DOWN","DOWN","Released/Consumed","Intra DOWN + CoRe DOWN_Released/Consumed","Both_DOWN (Released/Consumed)","Both_DOWN (Released/Consumed)",16
+"DOWN","No Change","Released/Consumed","Intra DOWN + CoRe Not Significant_Released/Consumed","None","None",2
+"DOWN","UP","Released/Consumed","Intra DOWN + CoRe UP_Released/Consumed","Opposite (Released/Consumed UP)","Opposite (Released/Consumed UP)",17
+"UP","DOWN","Released/Consumed","Intra UP + CoRe DOWN_Released/Consumed","Opposite (Released/Consumed DOWN)","Opposite (Released/Consumed DOWN)",18
+"UP","No Change","Released/Consumed","Intra UP + CoRe Not Significant_Released/Consumed","None","None",5
+"UP","UP","Released/Consumed","Intra UP + CoRe UP_Released/Consumed","Both_UP (Released/Consumed)","Both_UP (Released/Consumed)",19
+"No Change","DOWN","Released/Consumed","Intra Not Detected + CoRe DOWN_Released/Consumed","CoRe_DOWN (Released/Consumed)","CoRe_DOWN (Released/Consumed)",20
+"No Change","No Change","Released/Consumed","Intra Not Detected + CoRe Not Significant_Released/Consumed","None","None",8
+"No Change","UP","Released/Consumed","Intra Not Detected + CoRe UP_Released/Consumed","CoRe_UP (Released/Consumed)","CoRe_UP (Released/Consumed)",21
