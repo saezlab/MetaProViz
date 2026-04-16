@@ -15,7 +15,6 @@ vignette: >
   %\VignetteIndexEntry{Standard Metabolomics}
   %\VignetteEncoding{UTF-8}
   %\VignetteEngine{knitr::rmarkdown}
-bibliography: bibliography.bib
 editor_options:
   chunk_output_type: console
 ---
