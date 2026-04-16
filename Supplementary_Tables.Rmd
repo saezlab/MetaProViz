@@ -195,7 +195,7 @@ data_list <-
 # Original Feature Metadata
 MetaboliteIDs_original <- 
   read.csv(
-    "MetaProViz_Results/PK/Original/Metabolite_IDs_original.csv",
+    "Patients_Metadata/MetaProViz_Results/PK/Original/Metabolite_IDs_original.csv",
     sep=";"
   ) %>%
   select(-X)
@@ -203,7 +203,7 @@ MetaboliteIDs_original <-
 # ID QC
 ID_QC <- 
   read.csv2(
-    "MetaProViz_Results/PK/ID_QC/joined_and_manually_cleaned_id_pair_tables.csv", # contains flags from where it was possibly manually curated
+    "Patients_Metadata/MetaProViz_Results/PK/ID_QC/joined_and_manually_cleaned_id_pair_tables.csv", # contains flags from where it was possibly manually curated
     sep=";"
   ) %>%
   select(-X)
@@ -211,7 +211,7 @@ ID_QC <-
 # Cleaned Feature Metadata
 MetaboliteIDs_cleaned <- 
   read.csv(
-    "MetaProViz_Results/PK/Cleaned/MetaboliteIDs_cleaned.csv",
+    "Patients_Metadata/MetaProViz_Results/PK/Cleaned/MetaboliteIDs_cleaned.csv",
     sep=";"
   ) %>%
   select(-X)
@@ -219,7 +219,7 @@ MetaboliteIDs_cleaned <-
 # Translated Feature Metadata
 MetaboliteIDs_Translated <- 
   read.csv(
-    "MetaProViz_Results/PK/Translated/MetaboliteIDs_Translated.csv",
+    "Patients_Metadata/MetaProViz_Results/PK/Translated/MetaboliteIDs_Translated.csv",
     sep=";"
   ) %>%
   select(-X)
@@ -227,7 +227,7 @@ MetaboliteIDs_Translated <-
 # Traversed Feature Metadata
 MetaboliteIDs_traverse <- 
   read.csv(
-    "MetaProViz_Results/PK/Traverse/MetaboliteIDs_traverse.csv",
+    "Patients_Metadata/MetaProViz_Results/PK/Traverse/MetaboliteIDs_traverse.csv",
     sep=";"
   ) %>%
   select(-X)
@@ -235,7 +235,7 @@ MetaboliteIDs_traverse <-
 # addEquivalent Feature Metadata
 MetaboliteIDs_addEquivalent <- 
   read.csv(
-    "MetaProViz_Results/PK/EquivalentID/MetaboliteIDs_addEquivalent.csv",
+    "Patients_Metadata/MetaProViz_Results/PK/EquivalentID/MetaboliteIDs_addEquivalent.csv",
     sep=";"
   ) %>%
   select(-X)
@@ -243,14 +243,14 @@ MetaboliteIDs_addEquivalent <-
 # id summary tables
 id_summary <- 
   read.csv(
-    "MetaProViz_Results/PK/id_summary/id_count_df.csv",
+    "Patients_Metadata/MetaProViz_Results/PK/id_summary/id_count_df.csv",
     sep=";"
   ) %>%
   select(-X)
 
 id_summary_deltas <- 
   read.csv(
-    "MetaProViz_Results/PK/id_summary/delta_df.csv",
+    "Patients_Metadata/MetaProViz_Results/PK/id_summary/delta_df.csv",
     sep=";"
   ) %>%
   select(-X)
@@ -258,7 +258,7 @@ id_summary_deltas <-
 # Result of Fig2 workflow "Tissue_MetaData_Extended_cleaned" containing flag column of manual ID QC and manual curation during checkmatch
 Tissue_MetaData_Extended_cleaned <-
   read.csv(
-    "MetaProViz_Results/PK/End_Result_Fig2/Tissue_MetaData_Extended_cleaned.csv",
+    "Patients_Metadata/MetaProViz_Results/PK/End_Result_Fig2/Tissue_MetaData_Extended_cleaned.csv",
     sep=";"
   ) %>%
   select(-X)
@@ -269,28 +269,28 @@ Tissue_MetaData_Extended_cleaned <-
 
 DMA_ORA_res_OLD <- 
   read.csv(
-    "MetaProViz_Results/Enrichment/DM_ORA_res_OLD.csv",
+    "Patients_Metadata/MetaProViz_Results/Enrichment/DM_ORA_res_OLD.csv",
     sep=";"
   ) %>%
   select(-X)
 
 DMA_ORA_res_YOUNG <- 
   read.csv(
-    "MetaProViz_Results/Enrichment/DM_ORA_res_YOUNG.csv",
+    "Patients_Metadata/MetaProViz_Results/Enrichment/DM_ORA_res_YOUNG.csv",
     sep=";"
   ) %>%
   select(-X)
 
 data_with_clusters <-
   read.csv(
-    "MetaProViz_Results/Enrichment/data_with_clusters.csv",
+    "Patients_Metadata/MetaProViz_Results/Enrichment/data_with_clusters.csv",
     sep=";"
   ) %>%
   select(-X)
 
 cluster_summary <-
   read.csv(
-    "MetaProViz_Results/Enrichment/cluster_summary.csv",
+    "Patients_Metadata/MetaProViz_Results/Enrichment/cluster_summary.csv",
     sep=";"
   ) %>%
   select(-X)
@@ -298,7 +298,7 @@ cluster_summary <-
 similarity_matrix <- 
   as.matrix(
     read.csv2(
-      "MetaProViz_Results/Enrichment/similarity_matrix.csv", 
+      "Patients_Metadata/MetaProViz_Results/Enrichment/similarity_matrix.csv", 
       check.names = FALSE
     )
   )
