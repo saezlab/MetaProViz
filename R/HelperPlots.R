@@ -73,6 +73,7 @@ cm <- function(
 #' @importFrom logger log_warn log_trace
 #' @importFrom purrr partial
 #' @importFrom stringr str_sub
+#' @importFrom grid is.unit convertUnit unit
 #' @noRd
 set_size <- function(
     gtbl,
@@ -131,6 +132,23 @@ set_size <- function(
     } else if (!ifempty || !(idx %in% gtbl$layout[[col]])) {
         original <- gtbl[[dim]][idx]
         size %<>% callback(original)
+
+        # Defensive: clamp the resolved size to non-negative. The gtable
+        # algebra in adjust_layout can produce negative residuals (e.g.
+        # `max(3.1cm, -1.95cm, 1cm) - max(-1.95cm, 1cm)` going via
+        # subtraction), and `grid::viewport()` then rejects them with
+        # "non-finite location and/or size for viewport". Clamping is a
+        # cheap workaround until the layout adjustment is reworked.
+        if (is.unit(size)) {
+            size_cm <- tryCatch(
+                convertUnit(size, "cm", valueOnly = TRUE),
+                error = function(e) NA_real_
+            )
+            if (!is.na(size_cm) && is.finite(size_cm) && size_cm < 0) {
+                log_trace("Clamping negative %s to 0cm (was %s)", dim, size)
+                size <- unit(0, "cm")
+            }
+        }
 
         if (grow && tdim %in% names(gtbl)) {
             grow %<>% {

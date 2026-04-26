@@ -123,6 +123,8 @@ results_dir <- function(
 #' @importFrom tidyselect where
 #' @importFrom grDevices svg png pdf
 #' @importFrom graphics plot.new text
+#' @importFrom grid convertUnit unit grid.draw
+#' @importFrom logger log_warn
 #' @noRd
 save_res <- function(
     inputlist_df = NULL,
@@ -259,28 +261,39 @@ save_res <- function(
                 plot_unit <- "cm"
             }
 
-            # Check if this is a ComplexUpset plot (has S7 class from ComplexUpset package)
-            # ComplexUpset plots have theme conflicts with ggsave, so use device-based saving
+            # Plots that don't go through ggsave cleanly:
+            #   - ComplexUpset has theme conflicts with ggsave.
+            #   - Plots wrapped with `with_canvas_size` (heatmap, PCA,
+            #     volcano, superplot, …) carry their own canvas
+            #     dimensions and must be drawn on a device that matches.
+            #     Otherwise grid's viewport math goes non-finite and
+            #     dies with "non-finite location and/or size for
+            #     viewport".
             plot_obj <- inputlist_plot[[Plot]]
             is_upset_plot <- inherits(plot_obj, "upset_plot") ||
                 (
                     "package:ComplexUpset" %in% search() &&
                     inherits(plot_obj, "ggplot")
                 )
+            is_canvas_sized <- inherits(plot_obj, "with_canvas_size")
 
-            if (is_upset_plot || grepl("upset", Plot, ignore.case = TRUE)) {
-                # Use device-based saving for upset plots
-                file_name_full <-
-                    paste0(
-                        file_name_Save,
-                        ".",
-                        save_plot,
-                        sep = ""
-                    )
+            if (is_upset_plot || grepl("upset", Plot, ignore.case = TRUE) ||
+                is_canvas_sized) {
 
-                # Convert to inches for device functions
-                width_in <- grid::convertUnit(grid::unit(plot_width, plot_unit), "inches", valueOnly = TRUE)
-                height_in <- grid::convertUnit(grid::unit(plot_height, plot_unit), "inches", valueOnly = TRUE)
+                file_name_full <- paste0(file_name_Save, ".", save_plot, sep = "")
+
+                # If the plot carries a canvas size, prefer that over
+                # the caller-passed plot_width/plot_height — using the
+                # wrong dimensions is exactly what trips grid's viewport
+                # check.
+                if (is_canvas_sized && !is.null(plot_obj$width) &&
+                        !is.null(plot_obj$height)) {
+                    width_in <- convertUnit(plot_obj$width, "inches", valueOnly = TRUE)
+                    height_in <- convertUnit(plot_obj$height, "inches", valueOnly = TRUE)
+                } else {
+                    width_in <- convertUnit(unit(plot_width, plot_unit), "inches", valueOnly = TRUE)
+                    height_in <- convertUnit(unit(plot_height, plot_unit), "inches", valueOnly = TRUE)
+                }
 
                 # Open device based on save_plot type
                 if (save_plot == "svg") {
@@ -297,42 +310,60 @@ save_res <- function(
                     )
                 }
 
-                # Plot and close device
-                # ComplexUpset plots may have theme issues with some ggplot2 versions
-                # Use gridExtra to render the plot which handles patchwork objects better
                 tryCatch(
                     {
-                        grid::grid.draw(patchwork::patchworkGrob(plot_obj))
+                        if (is_upset_plot) {
+                            grid.draw(patchwork::patchworkGrob(plot_obj))
+                        } else {
+                            # with_canvas_size gtables and other grobs
+                            # render directly with grid.draw.
+                            grid.draw(plot_obj)
+                        }
                     },
                     error = function(e) {
-                        # Fallback: try direct print which sometimes works
-                        tryCatch(
-                            {
-                                log_info(plot_obj)
-                            },
-                            error = function(e2) {
-                                # Last resort: save a blank plot with error message
-                                plot.new()
-                                text(
-                                    0.5,
-                                    0.5,
-                                    paste("Error rendering ComplexUpset plot:\n", e2$message
-                                ),
-                                    cex = 0.8, col = "red"
-                                )
-                            }
+                        log_warn(
+                            "Could not render plot %s to %s: %s",
+                            Plot, save_plot, conditionMessage(e)
+                        )
+                        # Last resort: blank page with error label so
+                        # the file exists and the loop continues.
+                        plot.new()
+                        text(
+                            0.5, 0.5,
+                            paste("Error rendering plot:\n", conditionMessage(e)),
+                            cex = 0.8, col = "red"
                         )
                     }
                 )
                 dev.off()
             } else {
-                # Use ggsave for regular ggplot2 plots
-                ggsave(
-                    filename = paste0(file_name_Save, ".", save_plot, sep = ""),
-                    plot = plot_obj,
-                    width = plot_width,
-                    height = plot_height,
-                    units = plot_unit
+                # Use ggsave for regular ggplot2 plots. Wrap in
+                # tryCatch: heatmaps wrapped via ggplot()+annotation_custom
+                # over a pheatmap-derived gtable can fail viewport math
+                # in batch contexts ("non-finite location and/or size for
+                # viewport"). Emit a clear warning rather than halting
+                # the entire enclosing analysis.
+                tryCatch(
+                    ggsave(
+                        filename = paste0(file_name_Save, ".", save_plot, sep = ""),
+                        plot = plot_obj,
+                        width = plot_width,
+                        height = plot_height,
+                        units = plot_unit
+                    ),
+                    error = function(e) {
+                        log_warn(
+                            "ggsave failed for plot %s: %s",
+                            Plot, conditionMessage(e)
+                        )
+                        warning(
+                            "MetaProViz could not save plot ", Plot, " (",
+                            save_plot, "): ", conditionMessage(e),
+                            "\nThe analysis result is still returned in memory; ",
+                            "you can save it manually with `ggsave()`.",
+                            call. = FALSE
+                        )
+                    }
                 )
             }
 
@@ -341,7 +372,7 @@ save_res <- function(
                 if (is_upset_plot || grepl("upset", Plot, ignore.case = TRUE)) {
                     tryCatch(
                         {
-                            grid::grid.draw(patchwork::patchworkGrob(plot_obj))
+                            grid.draw(patchwork::patchworkGrob(plot_obj))
                         },
                         error = function(e) {
                             msg <- paste0(
