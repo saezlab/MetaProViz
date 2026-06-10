@@ -1,0 +1,61 @@
+"MetaboliteID","Description","term","Metabolite","pubchem","Metabolite_Name","Log2FC","t.val","p.val","p.adj"
+"C00009","map04978","Mineral absorption","Orthophosphate",3311,"phosphate",-1.01779581047948,-3.32371654831962,0.00468027032581089,0.0228013169718992
+"C00025","map04974","Protein digestion and absorption","L-Glutamate",3327,"glutamate",-0.125203289051176,-0.653002378733869,0.52373230715739,0.718795170895016
+"C00031","map04978","Mineral absorption","D-Glucose",3333,"glucose",1.08763167888417,1.94740737971632,0.0706410987018438,0.175831555720746
+"C00032","map04978","Mineral absorption","Heme",3334,"heme",4.40329267865001,2.96749381362454,0.00966667634416437,0.0405147464424536
+"C00033","map04974","Protein digestion and absorption","Acetate",3335,NA,NA,NA,NA,NA
+"C00037","map04978","Mineral absorption","Glycine",3339,"glycine",-1.24093405803635,-2.73722775734102,0.0153766673210099,0.0580443733309645
+"C00037","map04974","Protein digestion and absorption","Glycine",3339,"glycine",-1.24093405803635,-2.73722775734102,0.0153766673210099,0.0580443733309645
+"C00041","map04974","Protein digestion and absorption","L-Alanine",3343,"alanine",-1.4813198032603,-3.84858882599683,0.00160393843664303,0.0108838679629349
+"C00041","map04978","Mineral absorption","L-Alanine",3343,"alanine",-1.4813198032603,-3.84858882599683,0.00160393843664303,0.0108838679629349
+"C00047","map04974","Protein digestion and absorption","L-Lysine",3349,"lysine",-1.03827331424337,-3.44066191738874,0.00368560517725208,0.0198188202927707
+"C00049","map04974","Protein digestion and absorption","L-Aspartate",3351,"aspartate",-1.40140105854515,-3.40213069680029,0.00398749954082237,0.0204763489934122
+"C00062","map04974","Protein digestion and absorption","L-Arginine",3362,"arginine",-0.783041010880113,-2.35512406283065,0.0326979663288522,0.100203445201321
+"C00064","map04974","Protein digestion and absorption","L-Glutamine",3364,"glutamine",0.489162582925664,2.6416806522265,0.0186096987909581,0.0665349285640718
+"C00064","map04978","Mineral absorption","L-Glutamine",3364,"glutamine",0.489162582925664,2.6416806522265,0.0186096987909581,0.0665349285640718
+"C00065","map04974","Protein digestion and absorption","L-Serine",3365,"serine",-2.26018775069451,-4.35172780495935,0.000581652655279628,0.00571624161223082
+"C00065","map04978","Mineral absorption","L-Serine",3365,"serine",-2.26018775069451,-4.35172780495935,0.000581652655279628,0.00571624161223082
+"C00073","map04974","Protein digestion and absorption","L-Methionine",3373,"methionine",-1.57705746674587,-5.26710531284351,9.78546084517836e-05,0.00199204024348273
+"C00073","map04978","Mineral absorption","L-Methionine",3373,"methionine",-1.57705746674587,-5.26710531284351,9.78546084517836e-05,0.00199204024348273
+"C00078","map04974","Protein digestion and absorption","L-Tryptophan",3378,"tryptophan",-2.28894648874326,-3.82783809363338,0.00167304774115569,0.0112192613230441
+"C00078","map04978","Mineral absorption","L-Tryptophan",3378,"tryptophan",-2.28894648874326,-3.82783809363338,0.00167304774115569,0.0112192613230441
+"C00079","map04974","Protein digestion and absorption","L-Phenylalanine",3379,"phenylalanine",-1.41086528949251,-4.96422253110864,0.00017459661906401,0.00255179674016629
+"C00079","map04978","Mineral absorption","L-Phenylalanine",3379,"phenylalanine",-1.41086528949251,-4.96422253110864,0.00017459661906401,0.00255179674016629
+"C00082","map04974","Protein digestion and absorption","L-Tyrosine",3382,"tyrosine",-1.49855073730837,-5.55033964996305,5.7553199231592e-05,0.00149115107100033
+"C00097","map04974","Protein digestion and absorption","L-Cysteine",3397,"cysteine",-1.98835526775679,-3.51927140196609,0.00313875769214864,0.0177137810348983
+"C00099","map04974","Protein digestion and absorption","beta-Alanine",3399,"beta-alanine",1.28390148577065,1.76607465710919,0.0979182061621204,0.223253510049635
+"C00123","map04974","Protein digestion and absorption","L-Leucine",3423,"leucine",-1.30945106781109,-5.10822083922505,0.00013239358005633,0.00233820600803912
+"C00123","map04978","Mineral absorption","L-Leucine",3423,"leucine",-1.30945106781109,-5.10822083922505,0.00013239358005633,0.00233820600803912
+"C00124","map04978","Mineral absorption","D-Galactose",3424,NA,NA,NA,NA,NA
+"C00134","map04974","Protein digestion and absorption","Putrescine",3434,"putrescine",1.10352666696784,1.52548068639634,0.148143491485983,0.301577821953609
+"C00135","map04974","Protein digestion and absorption","L-Histidine",3435,"histidine",-1.16397504531629,-4.24138622429901,0.000725364853463358,0.00634937256640125
+"C00146","map04974","Protein digestion and absorption","Phenol",3446,NA,NA,NA,NA,NA
+"C00148","map04978","Mineral absorption","L-Proline",3448,"proline",-1.41877006956476,-5.2390989665256,0.000103186156186209,0.00202814169055653
+"C00148","map04974","Protein digestion and absorption","L-Proline",3448,"proline",-1.41877006956476,-5.2390989665256,0.000103186156186209,0.00202814169055653
+"C00152","map04974","Protein digestion and absorption","L-Asparagine",3452,"asparagine",-2.36727682440778,-4.18560328112971,0.000811345456185054,0.00670241898587653
+"C00152","map04978","Mineral absorption","L-Asparagine",3452,"asparagine",-2.36727682440778,-4.18560328112971,0.000811345456185054,0.00670241898587653
+"C00163","map04974","Protein digestion and absorption","Propanoate",3463,NA,NA,NA,NA,NA
+"C00183","map04974","Protein digestion and absorption","L-Valine",3483,"valine",-1.16509324941385,-5.12830223722014,0.000127408145903034,0.00233820600803912
+"C00183","map04978","Mineral absorption","L-Valine",3483,"valine",-1.16509324941385,-5.12830223722014,0.000127408145903034,0.00233820600803912
+"C00188","map04974","Protein digestion and absorption","L-Threonine",3488,"threonine",-2.19100686437283,-4.39401189003025,0.00053461638105923,0.0055405697673411
+"C00188","map04978","Mineral absorption","L-Threonine",3488,"threonine",-2.19100686437283,-4.39401189003025,0.00053461638105923,0.0055405697673411
+"C00246","map04974","Protein digestion and absorption","Butanoic acid",3545,NA,NA,NA,NA,NA
+"C00305","map04978","Mineral absorption","Magnesium cation",3599,NA,NA,NA,NA,NA
+"C00388","map04974","Protein digestion and absorption","Histamine",3678,"histamine",2.12156668623264,3.07128825628606,0.00783017999015,0.0351433275148465
+"C00407","map04974","Protein digestion and absorption","L-Isoleucine",3697,"isoleucine",-1.21308425617305,-4.59849210284305,0.000356458997919393,0.00461776429122849
+"C00407","map04978","Mineral absorption","L-Isoleucine",3697,"isoleucine",-1.21308425617305,-4.59849210284305,0.000356458997919393,0.00461776429122849
+"C00463","map04974","Protein digestion and absorption","Indole",3747,NA,NA,NA,NA,NA
+"C00483","map04974","Protein digestion and absorption","Tyramine",3766,NA,NA,NA,NA,NA
+"C00491","map04974","Protein digestion and absorption","L-Cystine",3774,"cystine",0.943248947262673,0.852451977685646,0.40749625080676,0.604877247291284
+"C01327","map04974","Protein digestion and absorption","Hydrochloric acid",4538,NA,NA,NA,NA,NA
+"C01438","map04974","Protein digestion and absorption","Methane",4618,NA,NA,NA,NA,NA
+"C01468","map04974","Protein digestion and absorption","4-Cresol",4643,"p-cresol sulfate",0.341861631998367,0.487301978406228,0.633156317845617,0.815741561794558
+"C01672","map04974","Protein digestion and absorption","Cadaverine",4816,NA,NA,NA,NA,NA
+"C01673","map04978","Mineral absorption","Calcitriol",4817,NA,NA,NA,NA,NA
+"C01746","map04974","Protein digestion and absorption","Piperidine",4880,NA,NA,NA,NA,NA
+"C02632","map04974","Protein digestion and absorption","2-Methylpropanoate",5612,NA,NA,NA,NA,NA
+"C05996","map04974","Protein digestion and absorption","Branched chain fatty acid",8270,NA,NA,NA,NA,NA
+"C08262","map04974","Protein digestion and absorption","3-Methylbutanoic acid",10461,NA,NA,NA,NA,NA
+"C14819","map04978","Mineral absorption","Fe3+",17395817,NA,NA,NA,NA,NA
+"C16138","map04974","Protein digestion and absorption","L-Pyrrolysine",47205448,NA,NA,NA,NA,NA
+"C18319","map04974","Protein digestion and absorption","2-Methylbutyrate",103061501,NA,NA,NA,NA,NA

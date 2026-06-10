@@ -1,0 +1,40 @@
+"Resource","Resource Group","Interaction Type","Membership Bucket","Number of Targets","Share of Targets"
+"metsigdb_chemicalclass","Annotation resources","metabolite-annotation","in 1 term",145820,1
+"metsigdb_macdb","Cancer association resources","metabolite-cancer","in 1 term",3067,0.567542561065877
+"metsigdb_macdb","Cancer association resources","metabolite-cancer","in 2 terms",805,0.148963730569948
+"metsigdb_macdb","Cancer association resources","metabolite-cancer","in >2 terms",1532,0.283493708364175
+"metsigdb_gaude_pathways","Derived pathway resources","pathway-metabolic_enzyme","in 1 term",1206,0.830006882312457
+"metsigdb_gaude_pathways","Derived pathway resources","pathway-metabolic_enzyme","in 2 terms",147,0.101169993117688
+"metsigdb_gaude_pathways","Derived pathway resources","pathway-metabolic_enzyme","in >2 terms",100,0.0688231245698555
+"metsigdb_gaude_pathways","Derived pathway resources","pathway-metabolite","in 1 term",208,0.253041362530414
+"metsigdb_gaude_pathways","Derived pathway resources","pathway-metabolite","in 2 terms",135,0.164233576642336
+"metsigdb_gaude_pathways","Derived pathway resources","pathway-metabolite","in >2 terms",479,0.582725060827251
+"metsigdb_hallmarks","Derived pathway resources","pathway-metabolic_enzyme","in 1 term",2671,0.60926094890511
+"metsigdb_hallmarks","Derived pathway resources","pathway-metabolic_enzyme","in 2 terms",1002,0.228558394160584
+"metsigdb_hallmarks","Derived pathway resources","pathway-metabolic_enzyme","in >2 terms",711,0.162180656934307
+"metsigdb_hallmarks","Derived pathway resources","pathway-metabolite","in 1 term",95,0.126162018592297
+"metsigdb_hallmarks","Derived pathway resources","pathway-metabolite","in 2 terms",118,0.156706507304117
+"metsigdb_hallmarks","Derived pathway resources","pathway-metabolite","in >2 terms",540,0.717131474103586
+"metsigdb_metalinks","Interaction resources","metabolite-protein","in 1 term",220,0.197132616487455
+"metsigdb_metalinks","Interaction resources","metabolite-protein","in 2 terms",109,0.0976702508960574
+"metsigdb_metalinks","Interaction resources","metabolite-protein","in >2 terms",787,0.705197132616487
+"metsigdb_metalinks__enzyme_metabolite","Interaction resources","metabolite-protein","in 1 term",209,0.357876712328767
+"metsigdb_metalinks__enzyme_metabolite","Interaction resources","metabolite-protein","in 2 terms",93,0.159246575342466
+"metsigdb_metalinks__enzyme_metabolite","Interaction resources","metabolite-protein","in >2 terms",282,0.482876712328767
+"metsigdb_metalinks__other_protein_metabolite","Interaction resources","metabolite-protein","in 1 term",177,0.227799227799228
+"metsigdb_metalinks__other_protein_metabolite","Interaction resources","metabolite-protein","in 2 terms",103,0.132561132561133
+"metsigdb_metalinks__other_protein_metabolite","Interaction resources","metabolite-protein","in >2 terms",497,0.63963963963964
+"metsigdb_metalinks__receptor_metabolite","Interaction resources","metabolite-protein","in 1 term",130,0.348525469168901
+"metsigdb_metalinks__receptor_metabolite","Interaction resources","metabolite-protein","in 2 terms",51,0.136729222520107
+"metsigdb_metalinks__receptor_metabolite","Interaction resources","metabolite-protein","in >2 terms",192,0.514745308310992
+"metsigdb_metalinks__transporter_metabolite","Interaction resources","metabolite-protein","in 1 term",75,0.194805194805195
+"metsigdb_metalinks__transporter_metabolite","Interaction resources","metabolite-protein","in 2 terms",47,0.122077922077922
+"metsigdb_metalinks__transporter_metabolite","Interaction resources","metabolite-protein","in >2 terms",263,0.683116883116883
+"metsigdb_kegg","Pathway resources","pathway-metabolite","in 1 term",1635,0.250574712643678
+"metsigdb_kegg","Pathway resources","pathway-metabolite","in 2 terms",2038,0.312337164750958
+"metsigdb_kegg","Pathway resources","pathway-metabolite","in >2 terms",2852,0.437088122605364
+"metsigdb_reactome","Pathway resources","pathway-metabolite","in 2 terms",26,0.008309364014062
+"metsigdb_reactome","Pathway resources","pathway-metabolite","in >2 terms",3103,0.991690635985938
+"metsigdb_wikipathways","Pathway resources","pathway-metabolite","in 1 term",4462,0.647041763341067
+"metsigdb_wikipathways","Pathway resources","pathway-metabolite","in 2 terms",1121,0.162558004640371
+"metsigdb_wikipathways","Pathway resources","pathway-metabolite","in >2 terms",1313,0.190400232018561

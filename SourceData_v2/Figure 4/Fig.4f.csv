@@ -1,0 +1,10 @@
+"Regulation.Grouping","SiRCle.cluster.Name","Number.of.Features"
+"RG2_Significant","Both_UP (Released/Consumed)",2
+"RG2_Significant","Both_DOWN (Released/Consumed)",10
+"RG2_Significant","Opposite (Consumed DOWN)",2
+"RG2_Significant","Opposite (Released UP)",2
+"RG2_Significant","Both_DOWN (Consumed)",2
+"RG2_Significant","core_DOWN (Released/Consumed)",4
+"RG2_Significant","core_UP (Released/Consumed)",2
+"RG2_Significant","core_UP (Released)",1
+"RG2_Significant","core_DOWN (Consumed)",1

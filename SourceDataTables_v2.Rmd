@@ -1,0 +1,957 @@
+﻿---
+title: "SourceDataTable_v2"
+author:
+  - name: Christina Schmidt
+    affiliation:
+    - Heidelberg University
+output:
+  html_document:
+    self_contained: true
+    toc: true
+    toc_float: true
+    toc_depth: 5
+    code_folding: show
+vignette: >
+  %\VignetteIndexEntry{Standard Metabolomics}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmdarkdown}
+editor_options:
+  chunk_output_type: console
+---
+
+<style>
+.vscroll-plot {
+    width: 850px;
+    height: 500px;
+    overflow-y: scroll;
+    overflow-x: hidden;
+}
+</style>
+
+```{r chunk_setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    comment = "#>"
+)
+```
+
+install the required dependencies and load the libraries:
+```{r, message=FALSE, warning=FALSE}
+#dependencies that need to be loaded:
+library(dplyr)
+library(magrittr)
+library(tidyverse)
+library(readxl)
+library(MetaProViz)
+```
+
+```{r}
+read_xlsx_all <- function(url) {
+  tmp <- tempfile(fileext = ".xlsx")
+  download.file(url, tmp, mode = "wb")
+  
+  sheets <- excel_sheets(tmp)
+  lapply(sheets, function(s) read_excel(tmp, sheet = s)) |>
+    setNames(sheets)
+}
+```
+
+# Compile the source data tables for the figures
+```{r}
+#Create output folder
+Output_folder <- file.path(getwd(), "SourceData_v2")
+if (!dir.exists(Output_folder)) {dir.create(Output_folder)} # Make Results folder
+```
+
+## Figure 1
+Not applicable to Fig. 1a-b as Schematics.
+```{r}
+# Create needed output folders
+Fig1 <- file.path(Output_folder, "Figure 1")
+if (!dir.exists(Fig1)) {dir.create(Fig1)} 
+
+Fig1C <- Fig1
+if (!dir.exists(Fig1C)) {dir.create(Fig1C)}
+
+Fig1D <- Fig1
+if (!dir.exists(Fig1D)) {dir.create(Fig1D)}
+
+#---------------------------------------------------------------------------------
+# Add Figure Source data and save as .csv files within the respective folders:
+
+# Fig1C
+Table_EV1_Resource_Level <- read_excel("Table_EV1.xlsx", sheet = "Resource_Level")
+write.csv(Table_EV1_Resource_Level , 
+          paste0(Fig1C ,"/Fig.1c.csv"), 
+          row.names = FALSE)
+
+# Fig1D
+Table_EV1_Term_Size_Distribution <- read_excel("Table_EV1.xlsx", sheet = "Term_Size_Distribution")
+write.csv(Table_EV1_Term_Size_Distribution , 
+          paste0(Fig1D ,"/Fig.1d.csv"), 
+          row.names = FALSE)
+
+```
+
+## Figure 2
+Not applicable to Fig 2A and D as Schematics.
+```{r}
+# Create needed output folders
+Fig2 <- file.path(Output_folder, "Figure 2")
+if (!dir.exists(Fig2)) {dir.create(Fig2)} 
+
+Fig2B <- Fig2
+if (!dir.exists(Fig2B)) {dir.create(Fig2B)}  
+
+Fig2C <- Fig2
+if (!dir.exists(Fig2C)) {dir.create(Fig2C)}  
+
+
+#---------------------------------------------------------------------------------
+# Add Figure Source data and save as .csv files within the respective folders:
+
+# Fig 2B
+Table_EV2_Raw_Feature_Metadata <- read_excel("Table_EV2.xlsx", sheet = "Raw_Feature_Metadata")
+Table_EV2_Feature_Metadata_EquivalentID <- read_excel("Table_EV2.xlsx", sheet = "Feature_Metadata_EquivalentID")
+
+# These two tables were used to generate both upsetplots
+# append them using rbind, making same column order and adding a "Version" column, 
+# indicating whether it is the "Original" (left) or "Adapted" (right) plot
+
+Table_EV2_Raw_Feature_Metadata <- 
+  Table_EV2_Raw_Feature_Metadata %>%
+    mutate(
+      CHEBI = NA_character_,
+      manual_correction = NA_character_,
+      correction_tbl = NA_character_,
+      Plot = "Original"
+    ) %>%
+    select(
+        Plot,
+        Metabolite,
+        CAS,
+        SUPER_PATHWAY,
+        SUB_PATHWAY,
+        COMP_ID,
+        PLATFORM,
+        RI,
+        MASS,
+        HMDB,
+        KEGG,
+        PUBCHEM,
+        CHEBI,
+        manual_correction,
+        correction_tbl
+    )
+
+Table_EV2_Feature_Metadata_EquivalentID <- 
+  Table_EV2_Feature_Metadata_EquivalentID %>%
+    mutate(
+      Plot = "Adapted"
+    ) %>%
+    select(
+        Plot,
+        Metabolite,
+        CAS,
+        SUPER_PATHWAY,
+        SUB_PATHWAY,
+        COMP_ID,
+        PLATFORM,
+        RI,
+        MASS,
+        HMDB,
+        KEGG,
+        PUBCHEM,
+        CHEBI,
+        manual_correction,
+        correction_tbl
+    )
+
+combined <- rbind(Table_EV2_Raw_Feature_Metadata, Table_EV2_Feature_Metadata_EquivalentID)
+
+write.csv(combined, 
+          paste0(Fig2B ,"/Fig.2b.csv"), 
+          row.names = FALSE)
+
+
+# Fig 2C
+
+Table_EV2_ID_Summary <- read_excel("Table_EV2.xlsx", sheet = "ID_Summary")
+Table_EV2_ID_Summary_Deltas <- read_excel("Table_EV2.xlsx", sheet = "ID_Summary_Deltas")
+combined <- rbind(Table_EV2_ID_Summary, Table_EV2_ID_Summary_Deltas)
+combined <- combined %>% select(row_name, Total_IDs)
+
+write.csv(combined, 
+          paste0(Fig2C ,"/Fig.2c.csv"), 
+          row.names = FALSE)
+
+```
+
+## Figure 3
+Not applicable to Fig 3A as Schematics
+```{r}
+# Create needed output folders
+Fig3 <- file.path(Output_folder, "Figure 3")
+if (!dir.exists(Fig3)) {dir.create(Fig3)} 
+
+Fig3B <- Fig3
+if (!dir.exists(Fig3B)) {dir.create(Fig3B)}  
+
+Fig3C <- Fig3
+if (!dir.exists(Fig3C)) {dir.create(Fig3C)}  
+
+Fig3D <- Fig3
+if (!dir.exists(Fig3D)) {dir.create(Fig3D)}
+
+Fig3E <- Fig3
+if (!dir.exists(Fig3E)) {dir.create(Fig3E)}
+
+Fig3F <- Fig3
+if (!dir.exists(Fig3F)) {dir.create(Fig3F)}
+
+Fig3G <- Fig3
+if (!dir.exists(Fig3G)) {dir.create(Fig3G)}
+
+#---------------------------------------------------------------------------------
+# Add Figure Source data and save as .csv files within the respective folders:
+
+## Fig3B = Table EV3, sheet  1 "Raw data." --> needs data wrangling
+data(intracell_raw)
+
+CellPlot_Intra <- intracell_raw%>%
+  filter(Conditions != "Pool")%>%
+   mutate(Celltype = case_when(Conditions=="HK2" ~ 'Healthy',
+                               Conditions=="786-O" ~ 'PrimaryTumour',
+                               TRUE ~ 'MetastaticTumour'))
+
+CellPlot_Intra$Count <- 1
+CellPlot_Intra$CelltypeFactor <- factor(CellPlot_Intra$Celltype, levels = c("Healthy","PrimaryTumour", "MetastaticTumour"))
+
+CellPlot_Intra_select <- CellPlot_Intra %>%
+  select(Code, Conditions, Analytical_Replicates, Biological_Replicates, Celltype, Count)
+
+write.csv(CellPlot_Intra_select, 
+          paste0(Fig3B ,"/Fig.3b.csv"), 
+          row.names = FALSE)
+
+## Fig3C = Table EV3, sheet 2
+PoolEstimationCV <- read_excel("Table_EV3.xlsx", sheet = "PoolEstimationCV")
+
+write.csv(PoolEstimationCV, 
+          paste0(Fig3C ,"/Fig.3c.csv"), 
+          row.names = FALSE)
+
+## Fig3D = Table EV3, sheet 3
+MediaBlankCV <- read_excel("Table_EV3.xlsx", sheet = "MediaBlankCV")
+
+write.csv(MediaBlankCV, 
+          paste0(Fig3D ,"/Fig.3d.csv"), 
+          row.names = FALSE)
+
+## Fig3E = PCA Pool QC
+# Load from BoRxiv branch:
+Pool_Estimation_result <- read.csv(
+    "https://raw.githubusercontent.com/saezlab/MetaProViz/BioRxiv/Cells_CoRe/MetaProViz_Results/Processing/pool_estimation/pool_estimation_data_2025-08-01.csv",
+    sep=","
+  )%>%
+  column_to_rownames("Code")
+
+#Run prcomp to generate PCA results and check plot
+PCA_RES <- prcomp(as.matrix(Pool_Estimation_result), scale. = as.logical(TRUE))
+autoplot(PCA_RES)
+
+#extract PCA loading:
+pca_var <- (PCA_RES$sdev^2) / sum(PCA_RES$sdev^2)
+
+pca_pc1_pc2_df <- as.data.frame(PCA_RES$x) %>%
+  rownames_to_column("Code") %>%
+  transmute(
+    Code,
+    PC1,
+    PC2,
+    PC1_variance_pct = round(pca_var[1] * 100, 2),
+    PC2_variance_pct = round(pca_var[2] * 100, 2)
+  )
+
+ggplot(pca_pc1_pc2_df, aes(x = PC1, y = PC2)) +
+  geom_point(size = 3, alpha = 0.8, color = "#2C7FB8") +
+  labs(x = paste0("PC1 (", sprintf("%.2f", unique(pca_pc1_pc2_df$PC1_variance_pct)[1]), "%)"),
+       y = paste0("PC2 (", sprintf("%.2f", unique(pca_pc1_pc2_df$PC2_variance_pct)[1]), "%)"))
+
+#sAVE:
+write.csv(pca_pc1_pc2_df , 
+          paste0(Fig3E ,"/Fig.3e.csv"), 
+          row.names = FALSE)
+
+## Fig3F = Before/After TIC
+RawData <- read_excel("Table_EV3.xlsx", sheet = "RawData")%>%
+  mutate(Panel = "LEFT", .before = 1)
+
+ProcessedData <- read_excel("Table_EV3.xlsx", sheet = "ProcessedData")%>%
+  mutate(Panel = "RIGHT", .before = 1)
+
+CombinedData <- bind_rows(RawData, ProcessedData)
+
+write.csv(CombinedData,
+          paste0(Fig3F ,"/Fig.3f.csv"), 
+          row.names = FALSE)
+
+## Fig3G = PCA outliers
+# The figures have been generated within MetaProViz functions and the data tables have not been saved. 
+#Hence, we will extract the data now:
+
+###-----------------------------
+# Prepare the input:
+data(medium_raw)
+
+Media <- medium_raw%>%
+column_to_rownames("Code")
+
+Media_input <- Media%>%
+subset(!Conditions=="Pool", select = -c(1:3))#remove pool samples and remove the information columns
+
+Media_Metadata <- Media%>%
+subset(!Conditions=="Pool", select = c(1:3))#remove pool samples and keep the information columns only
+
+# data files:
+input_data <- Media_input
+data <- Media_input
+data %<>% as.data.frame()
+data %<>% mutate_all(~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .))
+data <- as.data.frame(mutate_all(as.data.frame(data), function(x) as.numeric(as.character(x))))
+
+metadata_sample <- Media_Metadata
+
+# parameter info
+metadata_info = c(Conditions = "Conditions",
+                  Biological_Replicates = "Biological_Replicates",
+                  core_norm_factor = "GrowthFactor",
+                  core_media = "blank")
+                                                
+featurefilt = "Modified"
+                            
+cutoff_featurefilt = 0.8
+                                                
+mvi_percentage=50
+                                                
+hotellins_confidence = 0.99# We perform outlier testing using 0.99 confidence interval
+                                                
+core = TRUE
+
+tic = TRUE
+
+#1 Feature filtering:
+data_Filtered <- MetaProViz:::feature_filtering(
+            data = data,
+            featurefilt = featurefilt,
+            cutoff_featurefilt = cutoff_featurefilt,
+            metadata_sample = metadata_sample,
+            metadata_info = metadata_info,
+            core = core)
+
+data_Filt <- data_Filtered[["DF"]]
+
+#MVI
+mviRes <- MetaProViz:::mvi_imputation(
+            data = data_Filt,
+            metadata_sample = metadata_sample,
+            metadata_info = metadata_info,
+            core = core,
+            mvi_percentage = mvi_percentage)
+
+# Perform tic
+ticRes_List <- MetaProViz:::tic_norm(
+            data = mviRes,
+            metadata_sample = metadata_sample,
+            metadata_info = metadata_info,
+            tic = tic)
+ticRes <- ticRes_List[["DF"]][["data_tic"]]
+
+#Core
+data_coreNorm <- MetaProViz:::core_norm(
+            data = ticRes,
+            metadata_sample = metadata_sample,
+            metadata_info = metadata_info)
+
+ticRes <- data_coreNorm[["DF"]][["core_Norm"]]
+data_norm <- ticRes %>% as.data.frame()
+
+#Outlier Analysis
+OutlierRes <- MetaProViz:::outlier_detection(
+        data = data_norm,
+        metadata_sample = metadata_sample,
+        metadata_info = metadata_info,
+        core = core,
+        hotellins_confidence = hotellins_confidence)
+##----------------------------------------------------------------------------------
+
+#Get the PCA scores and variance explained for the QC PCA plot:
+qc_scores <- OutlierRes$DF$QC_PCA_scores_Final
+qc_variance <- OutlierRes$DF$QC_PCA_variance_Final
+
+qc_scores_meta <- qc_scores %>%
+  left_join(
+    metadata_sample %>%
+      rownames_to_column("Sample") %>%
+      select(Sample, Conditions, Biological_Replicates),
+    by = "Sample"
+  ) %>%
+  left_join(
+    OutlierRes$DF$data_outliers %>%
+      rownames_to_column("Sample") %>%
+      select(Sample, Outliers),
+    by = "Sample"
+  )
+
+ggplot(qc_scores_meta, aes(x = PC1, y = PC2, color = Conditions, shape = Outliers)) +
+  geom_point(size = 3) +
+  labs(
+    title = "QC PCA (Final - Colored by Condition)",
+    x = paste0("PC1 (", round(qc_variance$VarianceExplained[1]*100, 2), "%)"),
+    y = paste0("PC2 (", round(qc_variance$VarianceExplained[2]*100, 2), "%)")
+  ) +
+  theme_classic()
+
+#Save
+write.csv(qc_scores_meta , 
+          paste0(Fig3G ,"/Fig.3g.csv"), 
+          row.names = FALSE)
+```
+
+## Figure 4
+```{r}
+# Create needed output folders
+Fig4 <- file.path(Output_folder, "Figure 4")
+if (!dir.exists(Fig4)) {dir.create(Fig4)} 
+
+Fig4A <- Fig4
+if (!dir.exists(Fig4A)) {dir.create(Fig4A)}
+
+Fig4B <- Fig4
+if (!dir.exists(Fig4B)) {dir.create(Fig4B)}  
+
+Fig4C <- Fig4
+if (!dir.exists(Fig4C)) {dir.create(Fig4C)}  
+
+Fig4D <- Fig4
+if (!dir.exists(Fig4D)) {dir.create(Fig4D)}
+
+Fig4E <- Fig4
+if (!dir.exists(Fig4E)) {dir.create(Fig4E)}
+
+Fig4F <- Fig4
+if (!dir.exists(Fig4F)) {dir.create(Fig4F)}
+
+Fig4G <- Fig4
+if (!dir.exists(Fig4G)) {dir.create(Fig4G)}
+
+Fig4H <- Fig4
+if (!dir.exists(Fig4H)) {dir.create(Fig4H)}
+
+#---------------------------------------------------------------------------------
+# Add Figure Source data and save as .csv files within the respective folders:
+
+## Fig4A = Table_EV3
+DMA_786O_vs_HK2<- read_excel("Table_EV3.xlsx", sheet = "DMA_786-O_vs_HK2")
+
+write.csv(DMA_786O_vs_HK2, 
+          paste0(Fig4A ,"/Fig.4a.csv"), 
+          row.names = FALSE)
+
+## Fig4B = Table_EV3
+DMAFeatureMetadata<- read_excel("Table_EV3.xlsx", sheet = "DMA_FeatureMetadata")%>%
+  select(-HMDB, -KEGG.ID, -KEGGCompound)%>%
+  drop_na()
+
+write.csv(DMAFeatureMetadata, 
+          paste0(Fig4B ,"/Fig.4b.csv"), 
+          row.names = FALSE)
+
+## Fig4C = Table_EV4, sheet ""
+ProcessedData <- read_excel("Table_EV3.xlsx", sheet = "ProcessedData")
+
+# 1) Columns in ProcessedData that are sample metadata (not metabolites)
+sample_cols <- c("Code", "Conditions", "Biological_Replicates", "GrowthFactor", "Outliers")
+
+# 2) Convert metabolite columns to long format (one row = one heatmap cell)
+heatmap_plot_df <- ProcessedData %>%
+  pivot_longer(
+    cols = -all_of(sample_cols),
+    names_to = "Metabolite",
+    values_to = "Abundance"
+  ) %>%
+  left_join(
+    DMAFeatureMetadata %>%
+      select(all_of(c("Metabolite", "Pathway", "core_HK2", "core_786-O", "core_786-M1A"))),
+    by = "Metabolite"
+  )%>%
+  filter(Outliers != "Outlier_filtering_round_1") %>%
+  filter(!Metabolite %in% c("valine-d8", "hipppuric acid-d5"))  %>%
+  filter(Pathway == "Amino acid metabolism") %>%
+  select(-Biological_Replicates, -GrowthFactor, -Outliers)
+
+write.csv(heatmap_plot_df, 
+          paste0(Fig4C ,"/Fig.4c.csv"), 
+          row.names = FALSE)
+
+## Fig4D
+DMA_786O_vs_HK2_Intra <- read_excel("Table_EV4.xlsx", sheet = "DMA_786-O_vs_HK2")
+
+write.csv(DMA_786O_vs_HK2_Intra, 
+          paste0(Fig4D ,"/Fig.4d.csv"), 
+          row.names = FALSE)
+
+## Fig4E Alluvial plot
+data(mca_core_rules)
+
+MCA_core_Compressed <- mca_core_rules %>%
+  mutate(Intra = case_when(
+    Intra %in% c("UP", "DOWN") ~ Intra,  # Keep "UP" and "DOWN" as they are
+    Intra %in% c("Not Detected", "Significant Negative", "Significant Positive", "Not Significant") ~ "No Change",
+    TRUE ~ NA_character_  # Handle unexpected values
+  )) %>%
+  mutate(CoRe = case_when(
+    CoRe %in% c("UP", "DOWN") ~ CoRe,  # Keep "UP" and "DOWN" as they are
+    CoRe %in% c("Not Detected", "Significant Negative", "Significant Positive", "Not Significant") ~ "No Change",
+    TRUE ~ NA_character_  # Handle unexpected values
+  ))%>%
+  distinct(Intra, CoRe, Core_Direction, .keep_all = TRUE)%>%  # Keep only unique rows based on these columns
+  filter(!Core_Direction=="Not Detected")#remove the "Not Detected" as we are only interested in the released/consumed metabolites
+
+write.csv(MCA_core_Compressed, 
+          paste0(Fig4E ,"/Fig.4e.csv"), 
+          row.names = FALSE)
+
+## Fig4F MCA_Summary Table
+MCA2Cond_Summary <- read_excel("Table_EV3.xlsx", sheet = "MCA2Cond_Summary")%>%
+  filter(`Regulation.Grouping`=="RG2_Significant")%>%
+  filter(!`SiRCle.cluster.Name`=="Background = FALSE")%>%
+  filter(!`SiRCle.cluster.Name`=="None")
+
+write.csv(MCA2Cond_Summary, 
+          paste0(Fig4F ,"/Fig.4f.csv"), 
+          row.names = FALSE)
+
+## Fig4G
+MCA2Cond_786M1A_vs_HK2 <- read_excel("Table_EV3.xlsx", sheet = "MCA2Cond_786M1A_vs_HK2")%>%
+  filter(RG2_Significant =="Both_DOWN (Released/Consumed)")
+
+Heatmap_Meatbs <- MCA2Cond_786M1A_vs_HK2$Metabolite
+
+heatmap_plot_df <- ProcessedData %>%
+  pivot_longer(
+    cols = -all_of(sample_cols),
+    names_to = "Metabolite",
+    values_to = "Abundance"
+  ) %>%
+  left_join(
+    DMAFeatureMetadata %>%
+      select(all_of(c("Metabolite", "Pathway", "core_HK2", "core_786-O", "core_786-M1A"))),
+    by = "Metabolite"
+  )%>%
+  filter(Outliers != "Outlier_filtering_round_1") %>%
+  filter(!Metabolite %in% c("valine-d8", "hipppuric acid-d5"))  %>%
+  #filter(Pathway == "Amino acid metabolism") %>% #Select for metabolites from cluster!
+  select(-Biological_Replicates, -GrowthFactor, -Outliers)
+
+write.csv(heatmap_plot_df, 
+          paste0(Fig4G ,"/Fig.4g.csv"), 
+          row.names = FALSE)
+
+## Fig4H
+#Needs to be compiled from both processed intra and processed core data. 
+ProcessedData_Core <- read_excel("Table_EV3.xlsx", sheet = "ProcessedData")%>%
+  select(Code, Conditions, Biological_Replicates, methionine)%>%
+  mutate(Panel = "CoRe", .before = 1)
+
+
+ProcessedData_Intra <- read_excel("Table_EV4.xlsx", sheet = "ProcessedData")%>%
+  select(Code, Conditions, Biological_Replicates, methionine)%>%
+  mutate(Panel = "Intra", .before = 1)
+
+Processed_CombinedData <- bind_rows(ProcessedData_Core, ProcessedData_Intra)
+
+write.csv(Processed_CombinedData,
+          paste0(Fig4H ,"/Fig.4h.csv"), 
+          row.names = FALSE)
+
+```
+
+## Figure 5
+```{r}
+# Create needed output folders
+Fig5 <- file.path(Output_folder, "Figure 5")
+if (!dir.exists(Fig5)) {dir.create(Fig5)} 
+
+Fig5A <- Fig5
+if (!dir.exists(Fig5A)) {dir.create(Fig5A)}
+
+Fig5B <- Fig5
+if (!dir.exists(Fig5B)) {dir.create(Fig5B)}  
+
+Fig5C <- Fig5
+if (!dir.exists(Fig5C)) {dir.create(Fig5C)}  
+
+Fig5D <- Fig5
+if (!dir.exists(Fig5D)) {dir.create(Fig5D)}
+
+Fig5E <- Fig5
+if (!dir.exists(Fig5E)) {dir.create(Fig5E)}
+
+Fig5F <- Fig5
+if (!dir.exists(Fig5F)) {dir.create(Fig5F)}
+
+#-----------------------------------------------------------------------------
+# Add Figure Source data and save as .csv files within the respective folders:
+
+## Fig5A
+data(tissue_norm)
+
+TissuePlot <- tissue_norm%>%
+  column_to_rownames("Code")%>%
+  filter(TISSUE_TYPE != "NORMAL")%>%
+  separate(`TYPE-STAGE`, into=c("Type", "Stage"), sep="-", remove=FALSE)
+TissuePlot$Count <- 1
+
+TissuePlot$AGEFactor <- factor(TissuePlot$AGE, levels = c("Young","Middle", "Old"))
+
+ggplot2::ggplot(TissuePlot, ggplot2::aes(fill=Stage, y=Count, x=AGEFactor)) + 
+        ggplot2::geom_bar(position="stack", stat="identity")+
+        ggplot2::scale_fill_manual(values = c("STAGE I" = "#006384"  , "STAGE II" = "#9F0162", "STAGE III" = "#00735C" , "STAGE IV" = "grey" ))+
+        ggplot2::theme_classic()+
+        ggplot2::ggtitle("ccRCC patients metadata")+
+        ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1))+
+        ggplot2::labs(subtitle="Age at surgery <42 = Young,  >58 = Old, else = Middle", x = "Age", y = "Number of Patients")
+
+write.csv(TissuePlot , 
+          paste0(Fig5A ,"/Fig.5a.csv"), 
+          row.names = FALSE)
+
+## Fig5B
+Stat_results <- read_excel("Table_EV2.xlsx", sheet = "MetaAnalysis_AOV")
+
+data_Heat <-
+        Stat_results %>%
+        filter(tukeyHSD_p.adjusted < 0.05) %>%
+        # Filter for significant results
+        # Exclude Residuals row
+        filter(Explained_Variance > 1) %>%
+        distinct(
+            term,
+            PC,
+            .keep_all = TRUE
+        ) %>%  # only keep unique term~PC combinations AND STATS
+        select(term, PC, Explained_Variance) %>%
+        pivot_wider(names_from = PC, values_from = Explained_Variance) %>%
+        column_to_rownames("term") %>%
+        mutate_all(~ replace(., is.na(.), 0L))
+
+write.csv(data_Heat,
+          paste0(Fig5B ,"/Fig.5b.csv"),
+          row.names = TRUE)
+
+## Fig5C alluvial plot
+data("mca_twocond_rules")
+
+MCA_twocond_Compressed <- mca_twocond_rules %>%
+  mutate(Cond1 = case_when(
+    Cond1 %in% c("UP", "DOWN") ~ Cond1,  # Keep "UP" and "DOWN" as they are
+    Cond1 %in% c("Not Detected", "Significant Negative", "Significant Positive", "Not Significant") ~ "No Change",
+    TRUE ~ NA_character_  # Handle unexpected values
+  )) %>%
+  mutate(Cond2 = case_when(
+    Cond2 %in% c("UP", "DOWN") ~ Cond2,  # Keep "UP" and "DOWN" as they are
+    Cond2 %in% c("Not Detected", "Significant Negative", "Significant Positive", "Not Significant") ~ "No Change",
+    TRUE ~ NA_character_  # Handle unexpected values
+  ))%>%
+  distinct(Cond1, Cond2, .keep_all = TRUE)
+
+write.csv(MCA_twocond_Compressed, 
+          paste0(Fig5C ,"/Fig.5c.csv"), 
+          row.names = FALSE)
+
+## Fig5D 
+#Select Dipeptides
+Dipeptides <- read_excel("Table_EV2.xlsx", sheet = "Raw_Feature_Metadata")%>%
+  filter(SUB_PATHWAY == "Dipeptide")%>%
+  select(Metabolite)
+
+#Tumour versus Normal Young --> Selection Dipeptides
+DMA_Young <- read_excel("Table_EV2.xlsx", sheet = "DMA_TUMOR_vs_NORMAL_Young")%>%
+  select(Metabolite, Log2FC, p.adj)%>%
+  filter(Metabolite %in% Dipeptides$Metabolite)%>%
+  mutate(Panel = "Young", .before = 1)
+
+#Tumour versus Normal Old --> Selection Dipeptides
+DMA_Old <- read_excel("Table_EV2.xlsx", sheet = "DMA_TUMOR_vs_NORMAL_Old")%>%
+  select(Metabolite, Log2FC, p.adj)%>%
+  filter(Metabolite %in% Dipeptides$Metabolite)%>%
+  mutate(Panel = "Old", .before = 1)
+
+# Addition biological clusters
+MCA_2Cond <- read_excel("Table_EV2.xlsx", sheet = "MCA2Cond_Old-Young") %>%
+  select(Metabolite, RG2_Significant)
+
+DMA_Young <- merge(DMA_Young, MCA_2Cond, by = "Metabolite", all.x = TRUE)
+DMA_Old <- merge(DMA_Old, MCA_2Cond, by = "Metabolite", all.x = TRUE)
+
+#Cobine and save
+CombinedData_YO <- bind_rows(DMA_Young, DMA_Old)
+
+write.csv(CombinedData_YO,
+          paste0(Fig5D ,"/Fig.5d.csv"), 
+          row.names = FALSE)
+
+
+## Fig5E
+# Select pathway metabolites
+
+volcano_plot_source_data_Young <- 
+  read.csv2("Patients_Metadata/MetaProViz_Results/Enrichment/volcano_plot_source_data_Young.csv") %>%
+  select(-X) %>%
+  filter(
+      term == "Mineral absorption" | term == "Protein digestion and absorption"
+    ) 
+
+write.csv(volcano_plot_source_data_Young, 
+          paste0(Fig5E ,"/Fig.5e.csv"), 
+          row.names = FALSE)
+
+## Fig5F
+# read in cluster_summary and similarity_matrix from Table EV2
+
+clustered_data <- read_excel("Table_EV2.xlsx", sheet = "ORA_Clustered_Data")
+cluster_similarity_matrix <- read_excel("Table_EV2.xlsx", sheet = "ORA_Cluster_Similarity_Matrix")
+
+write.csv(clustered_data, 
+          paste0(Fig5F ,"/Fig.5f_1.csv"), 
+          row.names = FALSE)
+write.csv(cluster_similarity_matrix, 
+          paste0(Fig5F ,"/Fig.5f_2.csv"), 
+          row.names = FALSE)
+
+```
+
+
+## EV Figure 1
+```{r}
+# Create needed output folders
+FigEV1 <- file.path(Output_folder, "Figure EV1")
+if (!dir.exists(FigEV1)) {dir.create(FigEV1)} 
+
+FigEV1A <- FigEV1
+if (!dir.exists(FigEV1A)) {dir.create(FigEV1A)} 
+
+FigEV1B <- FigEV1
+if (!dir.exists(FigEV1B)) {dir.create(FigEV1B)} 
+
+FigEV1C <- FigEV1
+if (!dir.exists(FigEV1C)) {dir.create(FigEV1C)} 
+
+
+# Fig EV1a
+Table_EV2_AlanineMetaboliteIDs <- read_excel("Table_EV2.xlsx", sheet = "AlanineMetaboliteIDs")
+
+write.csv(Table_EV2_AlanineMetaboliteIDs, 
+          paste0(FigEV1A ,"/Fig.EV1a.csv"), 
+          row.names = FALSE)
+
+# Fig EV1b
+Table_EV2_ID_Summary <- read_excel("Table_EV2.xlsx", sheet = "ID_Summary")
+Table_EV2_ID_Summary_Deltas <- read_excel("Table_EV2.xlsx", sheet = "ID_Summary_Deltas")
+combined <- rbind(Table_EV2_ID_Summary, Table_EV2_ID_Summary_Deltas)
+
+write.csv(combined , 
+          paste0(FigEV1B ,"/Fig.EV1b.csv"), 
+          row.names = FALSE)
+
+
+# Fig EV1c
+Table_EV2_Alanine_MappingAmbiguities <- read_excel("Table_EV2.xlsx", sheet = "Alanine_MappingAmbiguities")
+
+write.csv(Table_EV2_Alanine_MappingAmbiguities, 
+          paste0(FigEV1C ,"/Fig.EV1c.csv"), 
+          row.names = FALSE)
+```
+
+
+## EV Figure 2
+
+```{r}
+# Create needed output folders
+FigEV2 <- file.path(Output_folder, "Figure EV2")
+if (!dir.exists(FigEV2)) {dir.create(FigEV2)} 
+
+FigEV2A <- FigEV2
+if (!dir.exists(FigEV2A)) {dir.create(FigEV2A)}
+
+FigEV2B <- FigEV2
+if (!dir.exists(FigEV2B)) {dir.create(FigEV2B)}  
+
+FigEV2C <- FigEV2
+if (!dir.exists(FigEV2C)) {dir.create(FigEV2C)}  
+
+FigEV2D <- FigEV2
+if (!dir.exists(FigEV2D)) {dir.create(FigEV2D)}
+
+FigEV2E <- FigEV2
+if (!dir.exists(FigEV2E)) {dir.create(FigEV2E)}
+
+#-----------------------------------------------------------------------------
+# Add Figure Source data and save as .csv files within the respective folders:
+
+## FigEV 2A = Table EV3, sheet 2
+PoolEstimationCV <- read_excel("Table_EV3.xlsx", sheet = "PoolEstimationCV")
+
+write.csv(PoolEstimationCV, 
+          paste0(FigEV2A ,"/Fig.EV2a.csv"), 
+          row.names = FALSE)
+
+## FigEV 2B = Table EV3, sheet 3
+MediaBlankCV <- read_excel("Table_EV3.xlsx", sheet = "MediaBlankCV")
+
+write.csv(MediaBlankCV, 
+          paste0(FigEV2B ,"/Fig.EV2b.csv"), 
+          row.names = FALSE)
+
+## FigEV 2C = PCA plot
+# We use the data we created for Fig 3g (see above)
+qc_scores_meta$Biological_Replicates <- as.factor(qc_scores_meta$Biological_Replicates)
+
+#Save
+write.csv(qc_scores_meta , 
+          paste0(FigEV2B ,"/Fig.EV2c.csv"), 
+          row.names = FALSE)
+
+## FigEV 2D: Filtering round 1 Hotellins plot
+round_num <- 1
+hotellings_df <- OutlierRes$DF[[paste0("Hotellings_results_Round", round_num)]]# generated for Fig. 3G (see above)
+
+ggplot(hotellings_df, aes(x = Samples, y = `Group summary statistics`)) +
+  geom_point(color = "blue", size = 2)
+
+write.csv(hotellings_df , 
+          paste0(FigEV2B ,"/Fig.EV2d.csv"), 
+          row.names = FALSE)
+
+
+## FigEV 2E Screeplot uses PCA results from Filtering round 1:
+variance_round1 <- OutlierRes$DF$PCA_variance_Round1 %>%# generated for Fig. 3G (see above)
+  mutate(
+    PC_num = seq_len(n()),
+    VariancePercent = VarianceExplained * 100
+  ) %>%
+  slice(1:min(20, n()))
+
+ggplot(variance_round1, aes(x = PC_num, y = VariancePercent)) +
+  geom_col(width = 1, fill = "grey70", color = "grey40") +
+  geom_line(aes(group = 1), color = "black", linewidth = 0.5) +
+  geom_point(color = "black", size = 1.5) +
+  geom_text(
+    aes(label = sprintf("%.2f", round(VariancePercent, 1))),
+    vjust = -0.3,
+    size = 3
+  ) +
+  scale_x_continuous(
+    breaks = variance_round1$PC_num,
+    expand = c(0, 0)
+  ) +
+  scale_y_continuous(
+    expand = expansion(mult = c(0, 0.08))
+  ) +
+  labs(
+    title = "PCA Explained Variance Plot Filtering Round 1",
+    x = "Principal Component",
+    y = "Explained variance (%)"
+  ) +
+  theme_classic()
+
+write.csv(variance_round1 , 
+          paste0(FigEV2E ,"/Fig.EV2e.csv"), 
+          row.names = FALSE)
+
+```
+
+## Create Zips
+```{r}
+# Create one zip per main figure folder and one combined EV zip.
+zip_root <- file.path(getwd(), "SourceData_v2")
+zip_output <- file.path(zip_root, "zips")
+if (!dir.exists(zip_output)) {dir.create(zip_output)}
+
+zip_one_folder <- function(folder_name, zip_name) {
+  folder_path <- file.path(zip_root, folder_name)
+  if (!dir.exists(folder_path)) {
+    message("Skipping missing folder: ", folder_name)
+    return(invisible(NULL))
+  }
+
+  old_wd <- getwd()
+  on.exit(setwd(old_wd), add = TRUE)
+  setwd(zip_root)
+
+  zipfile <- file.path(zip_output, zip_name)
+  utils::zip(
+    zipfile = zipfile,
+    files = folder_name,
+    flags = "-r9X"
+  )
+}
+
+# Main figures: one zip file per figure
+zip_one_folder("Figure 1", "SD figure 1.zip")
+zip_one_folder("Figure 2", "SD figure 2.zip")
+zip_one_folder("Figure 3", "SD figure 3.zip")
+zip_one_folder("Figure 4", "SD figure 4.zip")
+zip_one_folder("Figure 5", "SD figure 5.zip")
+
+# EV figures: include in one shared zip
+ev_tmp <- file.path(zip_root, "EV_source_data")
+if (dir.exists(ev_tmp)) {
+  unlink(ev_tmp, recursive = TRUE, force = TRUE)
+}
+dir.create(ev_tmp)
+
+if (dir.exists(file.path(zip_root, "Figure EV1"))) {
+  file.copy(
+    from = file.path(zip_root, "Figure EV1"),
+    to = ev_tmp,
+    recursive = TRUE
+  )
+}
+if (dir.exists(file.path(zip_root, "Figure EV2"))) {
+  file.copy(
+    from = file.path(zip_root, "Figure EV2"),
+    to = ev_tmp,
+    recursive = TRUE
+  )
+}
+
+old_wd <- getwd()
+setwd(zip_root)
+utils::zip(
+  zipfile = file.path(zip_output, "SD EV figures.zip"),
+  files = "EV_source_data",
+  flags = "-r9X"
+)
+setwd(old_wd)
+
+unlink(ev_tmp, recursive = TRUE, force = TRUE)
+```
+
+
+
+
+
+
+
+
+
+
+# Session information
+
+```{r session_info, echo=FALSE}
+options(width = 120)
+sessionInfo()
+```
+
