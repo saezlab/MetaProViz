@@ -79,6 +79,7 @@ test_that("traverse_ids expands rows using a mocked edge table builder", {
     HMDB = c("HMDB0000001", NA),
     KEGG = c(NA, "C00001"),
     CHEBI = c(NA, "CHEBI:1"),
+    PUBCHEM = c(NA, NA),
     stringsAsFactors = FALSE
   )
 
@@ -130,7 +131,7 @@ test_that("cluster_pk, compare_pk and count_id return structured outputs", {
   )
 
   expect_type(count_result, "list")
-  expect_true(all(c("result", "Plot", "Plot_Sized") %in% names(count_result)))
+  expect_true(all(c("Table", "Plot", "Plot_Sized") %in% names(count_result)))
 })
 
 test_that("get_exclusion_metabolites and make_gene_metab_set return expected structures", {

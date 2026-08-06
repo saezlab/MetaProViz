@@ -28,7 +28,7 @@ viz_metabolite_protein_network(
 \item{feature_metadata}{Data frame containing at least an HMDB identifier
 column and, optionally, a metabolite-name column.}
 
-\item{metalinks_df}{Data frame returned by \code{\link{metsigdb_metalinks}} or any
+\item{metalinks_df}{Data frame returned by \code{\link[=metsigdb_metalinks]{metsigdb_metalinks()}} or any
 subset of it. The input must contain at least the columns \code{hmdb} and
 \code{gene_symbol}. If present, the columns \code{metabolite}, \code{protein_type},
 \code{protein_type_clean}, \code{transport_direction}, \code{type},
@@ -57,7 +57,6 @@ plot files. \strong{Default = "metalinks_network"}}
 
 \item{height}{\emph{Optional: } Plot height in inches for saved plots.
 \strong{Default = 8}}
-
 
 \item{hmdb_sep}{\emph{Optional: } Separator used for multiple HMDB IDs in a
 single cell of \code{feature_metadata[[hmdb_col]]}. \strong{Default = ";"}}
@@ -103,16 +102,18 @@ If \code{return_data = FALSE}, the plot is returned invisibly.
 }
 \description{
 Plot a directed metabolite-protein interaction network based on the tables
-returned by \code{\link{metsigdb_metalinks}}. The function also accepts pre-filtered
+returned by \code{\link[=metsigdb_metalinks]{metsigdb_metalinks()}}. The function also accepts pre-filtered
 subsets of the MetalinksDB interaction table and subsets of metabolite
 metadata.
-
+}
+\details{
 HMDB identifiers in \code{feature_metadata} and \code{metalinks_df} are normalized
 before matching. Metabolite names are encouraged but not required. If
 \code{metabolite_col} is omitted, or if some metabolite names are missing, the
 corresponding normalized HMDB identifiers are used as metabolite labels.
 }
-\examples{\dontrun{
+\examples{
+\dontrun{
 metalinks_transporters <- metsigdb_metalinks(
     cell_location = c("Extracellular"),
     tissue_location = c("Kidney", "All Tissues"),
@@ -136,4 +137,6 @@ viz_metabolite_protein_network(
     save_plot = NULL,
     print_plot = FALSE
 )
-}}
+}
+
+}

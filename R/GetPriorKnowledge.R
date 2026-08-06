@@ -447,6 +447,7 @@ metsigdb_chemicalclass <- function(
     metaproviz_init()
 
     ## ------------ folder ----------- ##
+    Subfolder <- NULL
     if (!is.null(save_table)) {
         folder <- save_path(
             folder_name = "PK",
@@ -479,13 +480,23 @@ metsigdb_chemicalclass <- function(
     HMDB_ChemicalClass <-
         merge(
             Structure,
-            Class[, c(seq_len(3), 10)],
+            Class[, c(seq_len(min(3, ncol(Class))), min(10, ncol(Class))), drop = FALSE],
             by = "ramp_id",
             all.x = TRUE
-        ) %>%
-    filter(str_starts(class_source_id, "hmdb:")) %>%  # Select HMDB only!
-    filter(str_starts(chem_source_id, "hmdb:")) %>%  # Select HMDB only!
-    select(-c("chem_data_source", "chem_source_id")) %>%
+        )
+
+    if ("class_source_id" %in% colnames(HMDB_ChemicalClass)) {
+        HMDB_ChemicalClass <- HMDB_ChemicalClass %>%
+            filter(str_starts(class_source_id, "hmdb:"))
+    }
+
+    if ("chem_source_id" %in% colnames(HMDB_ChemicalClass)) {
+        HMDB_ChemicalClass <- HMDB_ChemicalClass %>%
+            filter(str_starts(chem_source_id, "hmdb:"))
+    }
+
+    HMDB_ChemicalClass <- HMDB_ChemicalClass %>%
+    select(-dplyr::any_of(c("chem_data_source", "chem_source_id"))) %>%
     pivot_wider(
         names_from = class_level_name,
         # Use class_level_name as the new column names
@@ -499,15 +510,22 @@ metsigdb_chemicalclass <- function(
         common_name = paste(unique(common_name), collapse = "; "),
         # Combine all common names into one
         .groups = "drop"  # Ungroup after summarising
-    ) %>%
-    # Remove 'hmdb:' prefix
-    mutate(class_source_id = str_remove(class_source_id, "^hmdb:")) %>%
+    )
+
+    if ("class_source_id" %in% colnames(HMDB_ChemicalClass)) {
+        HMDB_ChemicalClass <- HMDB_ChemicalClass %>%
+            mutate(class_source_id = str_remove(class_source_id, "^hmdb:"))
+    }
+
+    HMDB_ChemicalClass <- HMDB_ChemicalClass %>%
     select(
-        class_source_id,
-        common_name,
-        ClassyFire_class,
-        ClassyFire_super_class,
-        ClassyFire_sub_class
+        dplyr::any_of(c(
+            "class_source_id",
+            "common_name",
+            "ClassyFire_class",
+            "ClassyFire_super_class",
+            "ClassyFire_sub_class"
+        ))
     )  # Reorder columns
 
     # Save the results as an RDS file in the Cache directory of R
@@ -622,6 +640,7 @@ make_gene_metab_set <- function(
     }
 
     ## ------------ folder ----------- ##
+    Subfolder <- NULL
     if (!is.null(save_table)) {
         ## in case the user wants to save the results -> save_table is not NULL, folder is created
         folder <- save_path(
@@ -848,7 +867,13 @@ metsigdb_metalinks <- function(
 
     # Close the connection
 
-    MetalinksDB <- TablesList[["edges"]]  # extract the edges table
+    MetalinksDB <- TablesList[["edges"]]
+    if (is.null(MetalinksDB)) {
+        MetalinksDB <- TablesList[["interactions"]]
+    }
+    if (is.null(MetalinksDB)) {
+        stop("MetaLinksDB tables must contain either 'edges' or 'interactions'.", call. = FALSE)
+    }
     # ------------------------------------------------------------------
     # Answer questions about the database
     # if any parameter is ? then return the data
@@ -1010,7 +1035,30 @@ metsigdb_metalinks <- function(
 
 
     ## Rearrange columns:
-    MetalinksDB <- MetalinksDB[, c(2, 10:12, 1, 13:14, 3:9)] %>%
+    if (!("metabolite" %in% colnames(MetalinksDB)) && "common_name" %in% colnames(MetalinksDB)) {
+        MetalinksDB$metabolite <- MetalinksDB$common_name
+    }
+    if (!("protein_name" %in% colnames(MetalinksDB))) {
+        MetalinksDB$protein_name <- NA_character_
+    }
+    if (!("gene_symbol" %in% colnames(MetalinksDB))) {
+        MetalinksDB$gene_symbol <- NA_character_
+    }
+    MetalinksDB <- MetalinksDB %>%
+    dplyr::select(dplyr::any_of(c(
+        "metabolite",
+        "protein_name",
+        "gene_symbol",
+        "uniprot",
+        "hmdb",
+        "type",
+        "mor",
+        "transport_direction",
+        "protein_type",
+        "source",
+        "experiment_score",
+        "combined_score"
+    ))) %>%
     mutate(
         type = case_when(
         type == "lr" ~ "Ligand-Receptor",

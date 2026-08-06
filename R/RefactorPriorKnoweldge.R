@@ -189,6 +189,7 @@ translate_id <- function(
     }
 
     # # ------------------  Create output folders and path ------------------- ##
+    Subfolder <- NULL
     if (!is.null(save_table)) {
         folder <-
             save_path(
@@ -491,7 +492,7 @@ equivalent_id <- function(
     # Check that metadata_info[['InputID']] has no duplications within one group
     # --> should not be the case --> remove duplications and inform the user/
     # ask if they forget to set groupings column
-    doublons <- data[duplicated(data[[metadata_info[["InputID"]]]]), ]
+    doublons <- data[duplicated(data[[metadata_info[["InputID"]]]]), , drop = FALSE]
 
     if (nrow(doublons) > 0L) {
         data <-
@@ -514,6 +515,7 @@ equivalent_id <- function(
     }
 
     # # ------------------  Create output folders and path ------------------- ##
+    Subfolder <- NULL
     if (!is.null(save_table)) {
         folder <-
             save_path(
@@ -5133,6 +5135,7 @@ count_id <- function(
     .data <- entry_count <- id_label <- NULL
 
     # # ------------------  Create output folders and path ------------------- ##
+    Subfolder <- NULL
     if (!is.null(save_table)) {
         folder <- save_path(
             folder_name = "PK",

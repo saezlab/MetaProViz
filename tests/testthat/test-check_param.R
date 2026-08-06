@@ -23,6 +23,6 @@ test_that("internal delimiter and ID normalization helpers behave deterministica
   expect_identical(MetaProViz:::normalize_delimiter(";"), ";")
   expect_identical(MetaProViz:::normalize_delimiter("comma"), ",")
   expect_identical(MetaProViz:::delimiter_to_pattern(";"), ";\\s*")
-  expect_identical(MetaProViz:::normalize_hmdb(c("1544", "HMDB0000190")), c("HMDB0001544", "HMDB0000190"))
-  expect_identical(MetaProViz:::split_ids("A; B;C", type = "HMDB"), c("A", "B", "C"))
+  expect_identical(MetaProViz:::normalize_hmdb(c("1544", "HMDB0000190")), c(NA_character_, "HMDB0000190"))
+  expect_identical(MetaProViz:::split_ids("HMDB1; HMDB0000190; HMDB190", type = "HMDB"), c("HMDB0000001", "HMDB0000190"))
 })

@@ -1081,9 +1081,10 @@ check_param_ora <- function(
                 log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             } else {
-                input_pathway %<>%
-                rename("term" = metadata_info[["PathwayTerm"]])
-                input_pathway$Description <- input_pathway$term
+                input_pathway$term <- input_pathway[[metadata_info[["PathwayTerm"]]]]
+                if (!("Description" %in% colnames(input_pathway))) {
+                    input_pathway$Description <- input_pathway$term
+                }
             }
         } else {
             message <- paste0("metadata_info must provide the column name for PathwayTerm in input_pathway")
@@ -1103,8 +1104,7 @@ check_param_ora <- function(
                 log_trace(paste("Error ", message, sep = ""))
                 stop(message)
             } else {
-                input_pathway %<>%
-                rename("gene" = metadata_info[["PathwayFeature"]])
+                input_pathway$gene <- input_pathway[[metadata_info[["PathwayFeature"]]]]
             }
         } else {
             message <- paste0("metadata_info must provide the column name for PathwayFeature in input_pathway")
@@ -1267,12 +1267,16 @@ check_param_mca <- function(
             log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
-        if (length(data_c1[duplicated(data_c1[[feature]]), feature]) > 0) {
+        data_c1_feature <- data_c1[[feature]]
+        data_c1_feature <- data_c1_feature[!is.na(data_c1_feature)]
+        if (length(data_c1_feature[duplicated(data_c1_feature)]) > 0) {
             message <- paste0("Duplicated features of data_c1, whilst features must be unique")
             log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
-        if (length(data_c2[duplicated(data_c2[[feature]]), feature]) > 0) {
+        data_c2_feature <- data_c2[[feature]]
+        data_c2_feature <- data_c2_feature[!is.na(data_c2_feature)]
+        if (length(data_c2_feature[duplicated(data_c2_feature)]) > 0) {
             message <- paste0("Duplicated features of data_c2, whilst features must be unique")
             log_trace(paste("Error ", message, sep = ""))
             stop(message)
@@ -1295,12 +1299,16 @@ check_param_mca <- function(
             log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
-        if (length(data_intra[duplicated(data_intra[[feature]]), feature]) > 0) {
+        data_intra_feature <- data_intra[[feature]]
+        data_intra_feature <- data_intra_feature[!is.na(data_intra_feature)]
+        if (length(data_intra_feature[duplicated(data_intra_feature)]) > 0) {
             message <- paste0("Duplicated features of data_intra, whilst features must be unique")
             log_trace(paste("Error ", message, sep = ""))
             stop(message)
         }
-        if (length(data_core[duplicated(data_core[[feature]]), feature]) > 0) {
+        data_core_feature <- data_core[[feature]]
+        data_core_feature <- data_core_feature[!is.na(data_core_feature)]
+        if (length(data_core_feature[duplicated(data_core_feature)]) > 0) {
             message <- paste0("Duplicated features of data_core, whilst features must be unique")
             log_trace(paste("Error ", message, sep = ""))
             stop(message)

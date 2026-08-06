@@ -42,8 +42,8 @@ incompatible features are cleaned by retaining a single ID according to
 
 \item{completely_incompatible_priority}{Character vector defining the
 namespace priority for resolving completely incompatible features.
-Supported values are \code{HMDB}, \code{KEGG}, \code{CHEBI}, and \code{PUBCHEM}.
-The default priority is \code{c("HMDB", "CHEBI", "PUBCHEM", "KEGG")}.}
+Supported values are \code{HMDB}, \code{KEGG}, \code{CHEBI}, and \code{PUBCHEM}. The default
+priority is \code{c("HMDB", "CHEBI", "PUBCHEM", "KEGG")}.}
 }
 \value{
 Named list with at least five data frames:
