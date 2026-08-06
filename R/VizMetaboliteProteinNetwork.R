@@ -168,7 +168,7 @@ viz_metabolite_protein_network <- function(
         label_degree_min = label_degree_min
     )
 
-    log_info("viz_metabolite_protein_network: Metalinks metabolite-protein network")
+    logger::log_info("viz_metabolite_protein_network: Metalinks metabolite-protein network")
 
     label_mode <- match.arg(label_mode)
     if (isTRUE(full_labels)) {
