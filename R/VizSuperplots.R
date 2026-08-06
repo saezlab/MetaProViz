@@ -294,11 +294,14 @@ viz_superplot <- function(
     }
 
     ## ------------ Create Results output folder ----------- ##
+    folder <- NULL
     if (!is.null(save_plot)) {
         folder <- save_path(folder_name = paste(plot_type, "Plots", sep = ""),
                                     path = path)
+        log_info("viz_superplot results saved at ", folder)
+    } else {
+        log_info("viz_superplot results are not being saved because save_plot is NULL")
     }
-    log_info("viz_superplot results saved at ", folder)
 
     ##########################################################################
     ## ------------ Prepare Input ----------- ##

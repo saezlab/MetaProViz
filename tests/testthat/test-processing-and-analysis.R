@@ -1,14 +1,14 @@
 test_that("processing returns DF and Plot outputs on bundled data", {
   fx <- mpv_intracell_fixture()
 
-  result <- processing(
+  result <- suppressWarnings(processing(
     data = fx$data,
     metadata_sample = fx$metadata_sample,
     metadata_info = fx$metadata_info[c("Conditions", "Biological_Replicates")],
     save_plot = NULL,
     save_table = NULL,
     print_plot = FALSE
-  )
+  ))
 
   expect_type(result, "list")
   expect_true(all(c("DF", "Plot") %in% names(result)))
@@ -56,7 +56,7 @@ test_that("pool_estimation returns variability outputs for pool samples", {
 test_that("dma returns differential analysis tables on a small subset", {
   fx <- mpv_intracell_fixture(10)
 
-  result <- dma(
+  result <- suppressWarnings(dma(
     data = fx$data,
     metadata_sample = fx$metadata_sample,
     metadata_info = c(Conditions = "Conditions"),
@@ -66,7 +66,7 @@ test_that("dma returns differential analysis tables on a small subset", {
     save_plot = NULL,
     save_table = NULL,
     print_plot = FALSE
-  )
+  ))
 
   expect_type(result, "list")
   expect_true(any(vapply(result, is.list, logical(1))))
@@ -75,13 +75,13 @@ test_that("dma returns differential analysis tables on a small subset", {
 test_that("metadata_analysis summarizes PCA and ANOVA outputs", {
   fx <- mpv_intracell_fixture(10)
 
-  result <- metadata_analysis(
+  result <- suppressWarnings(metadata_analysis(
     data = fx$data,
     metadata_sample = fx$metadata_sample,
     save_plot = NULL,
     save_table = NULL,
     print_plot = FALSE
-  )
+  ))
 
   expect_type(result, "list")
   expect_true(all(c("res_prcomp", "res_loadings", "res_topBottomFeatures", "res_aov", "res_summary") %in% names(result)))
@@ -102,7 +102,8 @@ test_that("meta_pk returns a metadata-derived prior knowledge table", {
 })
 
 test_that("mca_2cond and mca_core return summary/result tables", {
-  dma_df <- mpv_intracell_dma_fixture(12)
+  dma_df <- mpv_intracell_dma_fixture(20)
+  dma_df <- dma_df[!duplicated(dma_df$Metabolite), , drop = FALSE]
   cond1 <- dma_df[1:8, c("Metabolite", "Log2FC", "p.adj"), drop = FALSE]
   cond2 <- dma_df[5:12, c("Metabolite", "Log2FC", "p.adj"), drop = FALSE]
 

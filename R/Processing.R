@@ -157,6 +157,7 @@ processing <- function(
     )
 
     ## ------------------  Create output folders  and path ------------------- ##
+    Subfolder <- NULL
     if (!is.null(save_plot) | !is.null(save_table) ) {
         folder <- save_path(
             folder_name = "Processing",
@@ -717,6 +718,7 @@ pool_estimation <- function(
     }
 
     ## ------------------  Create output folders  and path ------------------- ##
+    Subfolder <- NULL
     if (!is.null(save_plot) | !is.null(save_table) ) {
         folder <- save_path(
             folder_name = "Processing",
@@ -831,8 +833,8 @@ pool_estimation <- function(
                                 color = "black",
                                 fill = "white"
                             )+
-                            geom_vline(aes(xintercept = cutoff_cv),
-                            color = "darkred", linetype = "dashed", size = 1)+
+                            geom_vline(xintercept = cutoff_cv,
+                            color = "darkred", linetype = "dashed", linewidth = 1)+
                             geom_density(alpha = .2, fill = "#FF6666") +
                             labs(
                                 title = "CV for metabolites of Pool samples",
@@ -855,7 +857,7 @@ pool_estimation <- function(
     Plot_cv_result_df <- result_df_final_out %>%
     mutate(HighVar = ifelse((CV > cutoff_cv), paste("> CV", cutoff_cv, sep = ""), paste("< CV", cutoff_cv, sep = "")))
 
-    ViolinCV <- invisible(ggplot( Plot_cv_result_df, aes(y = CV, x = HighVar, label = Plot_cv_result_df$Metabolite))+
+    ViolinCV <- invisible(ggplot( Plot_cv_result_df, aes(y = CV, x = HighVar))+
     geom_violin(alpha = 0.5, fill = "#FF6666")+
     geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
     geom_text_repel(
@@ -1449,7 +1451,7 @@ tic_norm <- function(
     RLA_data_raw <-
         ggplot(
             RLA_data_long,
-            aes_string(x = "Samples", y = "Intensity", color = metadata_info[["Conditions"]])
+            aes(x = Samples, y = Intensity, color = .data[[metadata_info[["Conditions"]]]])
         ) +
         geom_boxplot() +
         geom_hline(yintercept = 0, color = "red", linetype = "solid") +
@@ -1500,7 +1502,7 @@ tic_norm <- function(
         RLA_data_norm <-
             ggplot(
                 RLA_data_long,
-                aes_string(x = "Samples", y = "Intensity", color = metadata_info[["Conditions"]])
+                aes(x = Samples, y = Intensity, color = .data[[metadata_info[["Conditions"]]]])
             ) +
             geom_boxplot() +
             geom_hline(yintercept = 0, color = "red", linetype = "solid") +
@@ -1704,7 +1706,7 @@ core_norm <- function(
         Plot_cv_result_df <- cv_result_df %>%
         mutate(HighVar = ifelse(HighVar, "> CV 30", "< CV 30"))
 
-        ViolinCV <- invisible(ggplot(Plot_cv_result_df, aes(y = CV, x = HighVar, label = row.names(cv_result_df)))+
+        ViolinCV <- invisible(ggplot(Plot_cv_result_df, aes(y = CV, x = HighVar))+
         geom_violin(alpha = 0.5, fill = "#FF6666")+
         geom_dotplot(binaxis = "y", stackdir = "center", dotsize = 0.5) +
         geom_text_repel(

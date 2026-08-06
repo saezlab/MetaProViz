@@ -144,6 +144,7 @@ metadata_analysis <- function(
     }
 
     # # ------------ Create Results output folder ----------- ##
+    folder <- NULL
     if (!is.null(save_plot) | !is.null(save_table)) {
         folder <- save_path(
             folder_name = "MetadataAnalysis",
@@ -205,19 +206,40 @@ metadata_analysis <- function(
                     term != "Residuals"
                 )  # Exclude Residuals row
 
-            tukey_result <- TukeyHSD(anova_result)  # Perform Tukey test
-            # tidy --> convert statistics into table
-            tukey_result_tidy <- tidy(tukey_result)
+            if (nrow(anova_row) == 0L) {
+                anova_row <- tibble::tibble(
+                    term = NA_character_,
+                    sumsq = NA_real_,
+                    meansq = NA_real_,
+                    statistic = NA_real_,
+                    p.value = NA_real_
+                )
+            }
 
-            # lm_result_p.val <- lsmeans((lm(Formula, data = PCA.res_Info)),  pairwiseFormula , adjust=NULL)# adjust=NULL leads to the p-value!
-            # lm_result_p.adj <- lsmeans((lm(Formula, data = PCA.res_Info)), pairwiseFormula, adjust="FDR")
-            # lm_result <- as.data.frame(lm_result_p.val$contrasts)
-            # lm_result$p.adj <- as.data.frame(lm_result_p.adj$contrasts)[,"p.value"]
+            if (is.factor(PCA.res_Info[[meta_col]]) && nlevels(droplevels(PCA.res_Info[[meta_col]])) >= 2L) {
+                tukey_result <- TukeyHSD(anova_result)  # Perform Tukey test
+                tukey_result_tidy <- tidy(tukey_result)
+                if (nrow(tukey_result_tidy) == 0L) {
+                    tukey_result_tidy <- tibble::tibble(
+                        contrast = NA_character_,
+                        adj.p.value = NA_real_
+                    )
+                }
+            } else {
+                tukey_result_tidy <- tibble::tibble(
+                    contrast = NA_character_,
+                    adj.p.value = NA_real_
+                )
+            }
+
+            if (nrow(tukey_result_tidy) > 1L) {
+                anova_row <- anova_row[rep(1L, nrow(tukey_result_tidy)), , drop = FALSE]
+            }
 
             # Combine results
             combined_result <- data.frame(
                 tukeyHSD_Contrast = tukey_result_tidy$contrast,
-                PC = pc_col,
+                PC = rep(pc_col, nrow(tukey_result_tidy)),
                 term = anova_row$term,
                 anova_sumsq = anova_row$sumsq,
                 anova_meansq = anova_row$meansq,
