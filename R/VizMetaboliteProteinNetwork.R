@@ -133,7 +133,7 @@ viz_metabolite_protein_network <- function(
     label_repel = TRUE,
     label_degree_min = 2
 ) {
-    .validate_viz_metabolite_protein_network(
+    check_param_VizMetaboliteProteinNetwork(
         feature_metadata = feature_metadata,
         metalinks_df = metalinks_df,
         metabolite_col = metabolite_col,
@@ -309,96 +309,6 @@ viz_metabolite_protein_network <- function(
     }
 
     invisible(plot_obj)
-}
-
-#' @noRd
-.validate_viz_metabolite_protein_network <- function(
-    feature_metadata,
-    metalinks_df,
-    metabolite_col,
-    hmdb_col,
-    save_plot,
-    path,
-    plot_name,
-    width,
-    height,
-    hmdb_sep,
-    return_data,
-    print_plot,
-    full_labels,
-    label_mode,
-    label_max_chars,
-    label_repel,
-    label_degree_min
-) {
-    if (!is.data.frame(feature_metadata)) {
-        stop("`feature_metadata` must be a data.frame.")
-    }
-    if (!is.data.frame(metalinks_df)) {
-        stop("`metalinks_df` must be a data.frame.")
-    }
-    if (!is.null(metabolite_col)) {
-        if (!is.character(metabolite_col) || length(metabolite_col) != 1L ||
-            is.na(metabolite_col) || metabolite_col == "") {
-            stop("`metabolite_col` must be NULL or a single non-empty column name.")
-        }
-        if (!metabolite_col %in% colnames(feature_metadata)) {
-            stop("`metabolite_col` not found in `feature_metadata`: ", metabolite_col)
-        }
-    }
-    if (!is.character(hmdb_col) || length(hmdb_col) != 1L || is.na(hmdb_col) || hmdb_col == "") {
-        stop("`hmdb_col` must be a single non-empty column name.")
-    }
-    if (!hmdb_col %in% colnames(feature_metadata)) {
-        stop("`hmdb_col` not found in `feature_metadata`: ", hmdb_col)
-    }
-    if (!"hmdb" %in% colnames(metalinks_df)) {
-        stop("`metalinks_df` must contain a `hmdb` column.")
-    }
-    if (!"gene_symbol" %in% colnames(metalinks_df)) {
-        stop("`metalinks_df` must contain a `gene_symbol` column.")
-    }
-    if (!is.null(path) && (!is.character(path) || length(path) != 1L || is.na(path) || path == "")) {
-        stop("`path` must be NULL or a single non-empty character string.")
-    }
-    if (!is.character(plot_name) || length(plot_name) != 1L || is.na(plot_name) || plot_name == "") {
-        stop("`plot_name` must be a single non-empty character string.")
-    }
-    if (!is.numeric(width) || length(width) != 1L || is.na(width) || width <= 0) {
-        stop("`width` must be a single positive number.")
-    }
-    if (!is.numeric(height) || length(height) != 1L || is.na(height) || height <= 0) {
-        stop("`height` must be a single positive number.")
-    }
-    if (!is.character(hmdb_sep) || length(hmdb_sep) != 1L || is.na(hmdb_sep) || hmdb_sep == "") {
-        stop("`hmdb_sep` must be a single non-empty separator string.")
-    }
-    if (!is.logical(return_data) || length(return_data) != 1L || is.na(return_data)) {
-        stop("`return_data` must be TRUE or FALSE.")
-    }
-    if (!is.logical(print_plot) || length(print_plot) != 1L || is.na(print_plot)) {
-        stop("`print_plot` must be TRUE or FALSE.")
-    }
-    if (!is.logical(full_labels) || length(full_labels) != 1L || is.na(full_labels)) {
-        stop("`full_labels` must be TRUE or FALSE.")
-    }
-    if (!is.character(label_mode) || length(label_mode) < 1L) {
-        stop("`label_mode` must be one of \"reduced\" or \"all\".")
-    }
-    if (!is.numeric(label_max_chars) || length(label_max_chars) != 1L ||
-        is.na(label_max_chars) || label_max_chars < 4) {
-        stop("`label_max_chars` must be a single number greater than or equal to 4.")
-    }
-    if (!is.logical(label_repel) || length(label_repel) != 1L || is.na(label_repel)) {
-        stop("`label_repel` must be TRUE or FALSE.")
-    }
-    if (!is.numeric(label_degree_min) || length(label_degree_min) != 1L ||
-        is.na(label_degree_min) || label_degree_min < 1) {
-        stop("`label_degree_min` must be a single number greater than or equal to 1.")
-    }
-
-    .normalize_metalinks_network_save_plot(save_plot)
-    invisible(TRUE)
 }
 
 #' @noRd

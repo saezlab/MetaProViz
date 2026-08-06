@@ -1834,3 +1834,124 @@ check_param_VizGraph <- function(
 }
 
 
+#' Check input parameters for viz_metabolite_protein_network
+#'
+#' @param feature_metadata Data frame with HMDB identifiers and optional metabolite labels.
+#' @param metalinks_df MetalinksDB table or subset thereof.
+#' @param metabolite_col Optional metabolite label column name.
+#' @param hmdb_col HMDB column name in `feature_metadata`.
+#' @param save_plot File extension(s) or NULL.
+#' @param path Output path or NULL.
+#' @param plot_name Plot title and basename.
+#' @param width Plot width in inches.
+#' @param height Plot height in inches.
+#' @param hmdb_sep Separator for multiple HMDB IDs in a single cell.
+#' @param return_data Logical flag for list return.
+#' @param print_plot Logical flag for printing.
+#' @param full_labels Logical shortcut for labeling all nodes.
+#' @param label_mode Labeling mode.
+#' @param label_max_chars Maximum label width before truncation.
+#' @param label_repel Logical flag for repelled labels.
+#' @param label_degree_min Minimum degree required when `label_mode = "reduced"`.
+#'
+#' @return Invisible TRUE if checks pass.
+#'
+#' @noRd
+check_param_VizMetaboliteProteinNetwork <- function(
+    feature_metadata,
+    metalinks_df,
+    metabolite_col,
+    hmdb_col,
+    save_plot,
+    path,
+    plot_name,
+    width,
+    height,
+    hmdb_sep,
+    return_data,
+    print_plot,
+    full_labels,
+    label_mode,
+    label_max_chars,
+    label_repel,
+    label_degree_min
+) {
+    if (!is.data.frame(feature_metadata)) {
+        stop("`feature_metadata` must be a data.frame.")
+    }
+    if (!is.data.frame(metalinks_df)) {
+        stop("`metalinks_df` must be a data.frame.")
+    }
+    if (!is.null(metabolite_col)) {
+        if (!is.character(metabolite_col) || length(metabolite_col) != 1L ||
+            is.na(metabolite_col) || metabolite_col == "") {
+            stop("`metabolite_col` must be NULL or a single non-empty column name.")
+        }
+        if (!metabolite_col %in% colnames(feature_metadata)) {
+            stop("`metabolite_col` not found in `feature_metadata`: ", metabolite_col)
+        }
+    }
+    if (!is.character(hmdb_col) || length(hmdb_col) != 1L || is.na(hmdb_col) || hmdb_col == "") {
+        stop("`hmdb_col` must be a single non-empty column name.")
+    }
+    if (!hmdb_col %in% colnames(feature_metadata)) {
+        stop("`hmdb_col` not found in `feature_metadata`: ", hmdb_col)
+    }
+    if (!"hmdb" %in% colnames(metalinks_df)) {
+        stop("`metalinks_df` must contain a `hmdb` column.")
+    }
+    if (!"gene_symbol" %in% colnames(metalinks_df)) {
+        stop("`metalinks_df` must contain a `gene_symbol` column.")
+    }
+    if (!is.null(path) && (!is.character(path) || length(path) != 1L || is.na(path) || path == "")) {
+        stop("`path` must be NULL or a single non-empty character string.")
+    }
+    if (!is.character(plot_name) || length(plot_name) != 1L || is.na(plot_name) || plot_name == "") {
+        stop("`plot_name` must be a single non-empty character string.")
+    }
+    if (!is.numeric(width) || length(width) != 1L || is.na(width) || width <= 0) {
+        stop("`width` must be a single positive number.")
+    }
+    if (!is.numeric(height) || length(height) != 1L || is.na(height) || height <= 0) {
+        stop("`height` must be a single positive number.")
+    }
+    if (!is.character(hmdb_sep) || length(hmdb_sep) != 1L || is.na(hmdb_sep) || hmdb_sep == "") {
+        stop("`hmdb_sep` must be a single non-empty separator string.")
+    }
+    if (!is.logical(return_data) || length(return_data) != 1L || is.na(return_data)) {
+        stop("`return_data` must be TRUE or FALSE.")
+    }
+    if (!is.logical(print_plot) || length(print_plot) != 1L || is.na(print_plot)) {
+        stop("`print_plot` must be TRUE or FALSE.")
+    }
+    if (!is.logical(full_labels) || length(full_labels) != 1L || is.na(full_labels)) {
+        stop("`full_labels` must be TRUE or FALSE.")
+    }
+    if (!is.character(label_mode) || length(label_mode) < 1L) {
+        stop("`label_mode` must be one of \"reduced\" or \"all\".")
+    }
+    if (!is.numeric(label_max_chars) || length(label_max_chars) != 1L ||
+        is.na(label_max_chars) || label_max_chars < 4) {
+        stop("`label_max_chars` must be a single number greater than or equal to 4.")
+    }
+    if (!is.logical(label_repel) || length(label_repel) != 1L || is.na(label_repel)) {
+        stop("`label_repel` must be TRUE or FALSE.")
+    }
+    if (!is.numeric(label_degree_min) || length(label_degree_min) != 1L ||
+        is.na(label_degree_min) || label_degree_min < 1) {
+        stop("`label_degree_min` must be a single number greater than or equal to 1.")
+    }
+
+    save_plot_options <- c("svg", "pdf", "png")
+    if (!is.null(save_plot) && !all(save_plot %in% save_plot_options)) {
+        stop(
+            "save_plot must be one of: ",
+            paste(save_plot_options, collapse = ", "),
+            ", or NULL."
+        )
+    }
+
+    invisible(TRUE)
+}
+
+
