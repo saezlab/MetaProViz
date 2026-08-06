@@ -9,7 +9,10 @@ seed_id_compatibility_check(
   id_types = c("HMDB", "KEGG", "CHEBI", "PUBCHEM"),
   delimiter = c(";", ","),
   verbose = FALSE,
-  edge_table = NULL
+  edge_table = NULL,
+  handle_partially_compatible = FALSE,
+  handle_completely_incompatible = FALSE,
+  completely_incompatible_priority = c("HMDB", "CHEBI", "PUBCHEM", "KEGG")
 )
 }
 \arguments{
@@ -29,11 +32,27 @@ construction diagnostics to the console.}
 
 \item{edge_table}{Optional precomputed bidirectional edge table with columns
 \code{id1}, \code{type1}, \code{id2}, \code{type2}. If \code{NULL}, the table is built internally.}
+
+\item{handle_partially_compatible}{Logical; if \code{TRUE}, partially compatible
+features are cleaned by retaining only IDs from compatible pairs.}
+
+\item{handle_completely_incompatible}{Logical; if \code{TRUE}, completely
+incompatible features are cleaned by retaining a single ID according to
+\code{completely_incompatible_priority}.}
+
+\item{completely_incompatible_priority}{Character vector defining the
+namespace priority for resolving completely incompatible features.
+Supported values are \code{HMDB}, \code{KEGG}, \code{CHEBI}, and \code{PUBCHEM}.
+The default priority is \code{c("HMDB", "CHEBI", "PUBCHEM", "KEGG")}.}
 }
 \value{
-Named list with two data frames:
+Named list with at least five data frames:
 \item{ID_pair_compatibility}{Long-format table with one unique unordered seed-ID pair per input row. The first column \code{original_row_id} stores the original input row name. The table also includes \code{pair_compatible}, \code{compatibility_path} (\code{direct}, \code{secondary}, \code{no_match}), and grouped \code{all_seed_ids_compatible}.}
 \item{data_with_compatibility}{Original input data with appended \code{all_seed_ids_compatible} per input row (rows with fewer than two seed IDs are \code{TRUE}).}
+\item{feature_compatibility_summary}{One row per input feature summarizing compatibility counts and assigning \code{fully_compatible}, \code{partially_compatible}, or \code{completely_incompatible}.}
+\item{data_after_handling}{Feature-level table after optional automatic handling. If no handling is enabled, this matches the raw feature-level output aside from added summary columns.}
+\item{ID_pair_compatibility_after_handling}{Pair-level compatibility table recomputed from \code{data_after_handling}.}
+If either handling option is enabled, the return object also includes \code{handling_summary_text} and \code{handling_summary_metrics}.
 }
 \description{
 Creates a long-format permutation table where each row represents one unique

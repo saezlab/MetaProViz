@@ -2239,10 +2239,23 @@ checkmatch_pk_to_data <- function(
 #'     construction diagnostics to the console.
 #' @param edge_table Optional precomputed bidirectional edge table with columns
 #'     `id1`, `type1`, `id2`, `type2`. If `NULL`, the table is built internally.
+#' @param handle_partially_compatible Logical; if `TRUE`, partially compatible
+#'     features are cleaned by retaining only IDs from compatible pairs.
+#' @param handle_completely_incompatible Logical; if `TRUE`, completely
+#'     incompatible features are cleaned by retaining a single ID according to
+#'     `completely_incompatible_priority`.
+#' @param completely_incompatible_priority Character vector defining the
+#'     namespace priority for resolving completely incompatible features.
+#'     Supported values are `HMDB`, `KEGG`, `CHEBI`, and `PUBCHEM`. The default
+#'     priority is `c("HMDB", "CHEBI", "PUBCHEM", "KEGG")`.
 #'
-#' @return Named list with two data frames:
+#' @return Named list with at least five data frames:
 #' \item{ID_pair_compatibility}{Long-format table with one unique unordered seed-ID pair per input row. The first column `original_row_id` stores the original input row name. The table also includes `pair_compatible`, `compatibility_path` (`direct`, `secondary`, `no_match`), and grouped `all_seed_ids_compatible`.}
 #' \item{data_with_compatibility}{Original input data with appended `all_seed_ids_compatible` per input row (rows with fewer than two seed IDs are `TRUE`).}
+#' \item{feature_compatibility_summary}{One row per input feature summarizing compatibility counts and assigning `fully_compatible`, `partially_compatible`, or `completely_incompatible`.}
+#' \item{data_after_handling}{Feature-level table after optional automatic handling. If no handling is enabled, this matches the raw feature-level output aside from added summary columns.}
+#' \item{ID_pair_compatibility_after_handling}{Pair-level compatibility table recomputed from `data_after_handling`.}
+#' If either handling option is enabled, the return object also includes `handling_summary_text` and `handling_summary_metrics`.
 #'
 #' @export
 seed_id_compatibility_check <- function(
@@ -2250,7 +2263,10 @@ seed_id_compatibility_check <- function(
     id_types = c("HMDB", "KEGG", "CHEBI", "PUBCHEM"),
     delimiter = c(";", ","),
     verbose = FALSE,
-    edge_table = NULL
+    edge_table = NULL,
+    handle_partially_compatible = FALSE,
+    handle_completely_incompatible = FALSE,
+    completely_incompatible_priority = c("HMDB", "CHEBI", "PUBCHEM", "KEGG")
 ) {
     
     metaproviz_init()
@@ -2308,13 +2324,93 @@ seed_id_compatibility_check <- function(
             dplyr::distinct()
     }
     
-    seed_id_compatibility_from_prepared(
+    priority_types <- normalize_id_types(completely_incompatible_priority)
+    
+    if (length(priority_types) == 0L) {
+        stop(
+            "completely_incompatible_priority must contain at least one supported ID type.",
+            call. = FALSE
+        )
+    }
+    
+    unsupported_priority_types <- setdiff(priority_types, supported_id_types())
+    if (length(unsupported_priority_types) > 0L) {
+        stop(
+            sprintf(
+                "Unsupported completely_incompatible_priority values: %s",
+                paste(unsupported_priority_types, collapse = ", ")
+            ),
+            call. = FALSE
+        )
+    }
+    
+    compatibility <- seed_id_compatibility_from_prepared(
         data_output = prep$data_output,
         data_prepared = prep$data_prepared,
         edge_table = edge_table,
         selected_types = selected_types,
         split_pattern = split_pattern
     )
+    
+    feature_summary <- summarize_feature_compatibility(
+        pair_tbl = compatibility$ID_pair_compatibility,
+        data_with_compatibility = compatibility$data_with_compatibility,
+        data_prepared = prep$data_prepared,
+        split_pattern = split_pattern
+    )
+    
+    handled_feature_data <- apply_seed_compatibility_handling(
+        data_with_compatibility = compatibility$data_with_compatibility,
+        feature_summary = feature_summary,
+        pair_tbl = compatibility$ID_pair_compatibility,
+        selected_types = selected_types,
+        split_pattern = split_pattern,
+        handle_partially_compatible = handle_partially_compatible,
+        handle_completely_incompatible = handle_completely_incompatible,
+        completely_incompatible_priority = priority_types
+    )
+    
+    handled_prepared <- prepare_input_for_traversal(
+        data = handled_feature_data$data_after_handling,
+        selected_types = selected_types
+    )
+    
+    compatibility_after_handling <- seed_id_compatibility_from_prepared(
+        data_output = handled_prepared$data_output,
+        data_prepared = handled_prepared$data_prepared,
+        edge_table = edge_table,
+        selected_types = selected_types,
+        split_pattern = split_pattern
+    )
+    
+    result <- list(
+        ID_pair_compatibility = compatibility$ID_pair_compatibility,
+        data_with_compatibility = compatibility$data_with_compatibility,
+        feature_compatibility_summary = feature_summary,
+        data_after_handling = handled_feature_data$data_after_handling,
+        ID_pair_compatibility_after_handling = compatibility_after_handling$ID_pair_compatibility
+    )
+    
+    if (isTRUE(handle_partially_compatible) || isTRUE(handle_completely_incompatible)) {
+        handling_summary <- build_seed_handling_summary(
+            feature_summary = feature_summary,
+            data_before = compatibility$data_with_compatibility,
+            data_after = handled_feature_data$data_after_handling,
+            pair_before = compatibility$ID_pair_compatibility,
+            pair_after = compatibility_after_handling$ID_pair_compatibility,
+            split_pattern = split_pattern,
+            selected_types = selected_types,
+            handle_partially_compatible = handle_partially_compatible,
+            handle_completely_incompatible = handle_completely_incompatible,
+            completely_incompatible_priority = priority_types,
+            handling_flags = handled_feature_data$handling_flags
+        )
+        
+        result$handling_summary_text <- handling_summary$summary_text
+        result$handling_summary_metrics <- handling_summary$summary_metrics
+    }
+    
+    result
 }
 
 
@@ -3040,6 +3136,463 @@ seed_id_compatibility_from_prepared <- function(
     list(
         ID_pair_compatibility = permutation_df,
         data_with_compatibility = data_with_compatibility
+    )
+}
+
+
+#' @noRd
+summarize_feature_compatibility <- function(
+    pair_tbl,
+    data_with_compatibility,
+    data_prepared,
+    split_pattern
+) {
+    row_ids <- seq_len(nrow(data_with_compatibility))
+    
+    if (nrow(pair_tbl) == 0L) {
+        pair_summary <- tibble::tibble(
+            row_id = integer(),
+            original_row_id = character(),
+            n_pairs = integer(),
+            n_true = integer(),
+            n_false = integer()
+        )
+    } else {
+        pair_summary <- pair_tbl %>%
+            dplyr::group_by(row_id, original_row_id) %>%
+            dplyr::summarise(
+                n_pairs = sum(!is.na(seed1_id) & !is.na(seed2_id)),
+                n_true = sum(pair_compatible %in% TRUE, na.rm = TRUE),
+                n_false = sum(pair_compatible %in% FALSE, na.rm = TRUE),
+                .groups = "drop"
+            )
+    }
+    
+    original_row_ids <- rownames(data_with_compatibility)
+    if (is.null(original_row_ids)) {
+        original_row_ids <- as.character(row_ids)
+    }
+    original_row_ids <- as.character(original_row_ids)
+    missing_row_ids <- is.na(original_row_ids) | original_row_ids == ""
+    original_row_ids[missing_row_ids] <- as.character(row_ids)[missing_row_ids]
+    
+    seed_counts <- vapply(
+        row_ids,
+        function(i) {
+            seed_tbl <- build_seed_table_row(
+                hmdb = data_prepared$HMDB[[i]],
+                kegg = data_prepared$KEGG[[i]],
+                chebi = data_prepared$CHEBI[[i]],
+                pubchem = data_prepared$PUBCHEM[[i]],
+                selected_types = supported_id_types(),
+                split_pattern = split_pattern
+            )
+            nrow(seed_tbl)
+        },
+        integer(1)
+    )
+    
+    tibble::tibble(
+        row_id = row_ids,
+        original_row_id = original_row_ids,
+        n_seed_ids = seed_counts,
+        all_seed_ids_compatible = data_with_compatibility$all_seed_ids_compatible
+    ) %>%
+        dplyr::left_join(pair_summary, by = c("row_id", "original_row_id")) %>%
+        dplyr::mutate(
+            n_pairs = dplyr::coalesce(n_pairs, 0L),
+            n_true = dplyr::coalesce(n_true, 0L),
+            n_false = dplyr::coalesce(n_false, 0L),
+            compatibility_class = dplyr::case_when(
+                all_seed_ids_compatible %in% TRUE ~ "fully_compatible",
+                all_seed_ids_compatible %in% FALSE & n_true > 0L & n_false > 0L ~ "partially_compatible",
+                all_seed_ids_compatible %in% FALSE & n_true == 0L & n_false > 0L ~ "completely_incompatible",
+                TRUE ~ "fully_compatible"
+            )
+        )
+}
+
+
+#' @noRd
+apply_seed_compatibility_handling <- function(
+    data_with_compatibility,
+    feature_summary,
+    pair_tbl,
+    selected_types,
+    split_pattern,
+    handle_partially_compatible,
+    handle_completely_incompatible,
+    completely_incompatible_priority
+) {
+    data_after_handling <- tibble::as_tibble(data_with_compatibility) %>%
+        dplyr::mutate(row_id = seq_len(nrow(data_with_compatibility))) %>%
+        dplyr::left_join(
+            feature_summary %>%
+                dplyr::select(
+                    row_id,
+                    original_row_id,
+                    n_seed_ids,
+                    n_pairs,
+                    n_true,
+                    n_false,
+                    compatibility_class
+                ),
+            by = "row_id"
+        ) %>%
+        dplyr::mutate(
+            partial_handling_applied = FALSE,
+            complete_handling_applied = FALSE,
+            complete_handling_unresolved = FALSE,
+            retained_priority_namespace = NA_character_
+        )
+    
+    partial_rows <- feature_summary$row_id[
+        feature_summary$compatibility_class %in% "partially_compatible"
+    ]
+    complete_rows <- feature_summary$row_id[
+        feature_summary$compatibility_class %in% "completely_incompatible"
+    ]
+    
+    if (isTRUE(handle_partially_compatible) && length(partial_rows) > 0L) {
+        retained_partial <- build_partial_retained_ids(
+            pair_tbl = pair_tbl,
+            target_rows = partial_rows,
+            selected_types = selected_types
+        )
+        
+        for (i in seq_len(nrow(retained_partial))) {
+            row_id <- retained_partial$row_id[[i]]
+            row_idx <- which(data_after_handling$row_id %in% row_id)
+            data_after_handling <- update_namespace_columns(
+                data = data_after_handling,
+                row_idx = row_idx,
+                retained_tbl = retained_partial$retained_ids[[i]],
+                selected_types = selected_types
+            )
+            data_after_handling$partial_handling_applied[[row_idx]] <- TRUE
+        }
+    }
+    
+    if (isTRUE(handle_completely_incompatible) && length(complete_rows) > 0L) {
+        for (row_id in complete_rows) {
+            row_idx <- which(data_after_handling$row_id %in% row_id)
+            retained_complete <- retain_one_completely_incompatible_id(
+                row_data = data_after_handling[row_idx, , drop = FALSE],
+                split_pattern = split_pattern,
+                priority_types = completely_incompatible_priority
+            )
+            
+            if (nrow(retained_complete$retained_ids) > 0L) {
+                data_after_handling <- update_namespace_columns(
+                    data = data_after_handling,
+                    row_idx = row_idx,
+                    retained_tbl = retained_complete$retained_ids,
+                    selected_types = selected_types
+                )
+                data_after_handling$complete_handling_applied[[row_idx]] <- TRUE
+                data_after_handling$retained_priority_namespace[[row_idx]] <- retained_complete$retained_type
+            } else {
+                data_after_handling$complete_handling_unresolved[[row_idx]] <- TRUE
+            }
+        }
+    }
+    
+    handling_flags <- data_after_handling %>%
+        dplyr::select(
+            row_id,
+            partial_handling_applied,
+            complete_handling_applied,
+            complete_handling_unresolved,
+            retained_priority_namespace
+        )
+    
+    data_after_handling <- data_after_handling %>%
+        dplyr::select(-row_id)
+    
+    list(
+        data_after_handling = data_after_handling,
+        handling_flags = handling_flags
+    )
+}
+
+
+#' @noRd
+build_partial_retained_ids <- function(pair_tbl, target_rows, selected_types) {
+    compatible_pairs <- pair_tbl %>%
+        dplyr::filter(
+            row_id %in% target_rows,
+            compatibility_path != "no_match",
+            !is.na(seed1_id),
+            !is.na(seed2_id)
+        )
+    
+    retained_ids <- lapply(
+        target_rows,
+        function(target_row_id) {
+            pair_subset <- compatible_pairs %>%
+                dplyr::filter(row_id %in% target_row_id)
+            
+            if (nrow(pair_subset) == 0L) {
+                return(empty_retained_ids_table())
+            }
+            
+            dplyr::bind_rows(
+                pair_subset %>%
+                    dplyr::transmute(type = seed1_type, id = seed1_id),
+                pair_subset %>%
+                    dplyr::transmute(type = seed2_type, id = seed2_id)
+            ) %>%
+                dplyr::filter(type %in% selected_types) %>%
+                dplyr::distinct() %>%
+                dplyr::arrange(match(type, supported_id_types()), id)
+        }
+    )
+    
+    tibble::tibble(
+        row_id = target_rows,
+        retained_ids = retained_ids
+    )
+}
+
+
+#' @noRd
+empty_retained_ids_table <- function() {
+    tibble::tibble(
+        type = character(),
+        id = character()
+    )
+}
+
+
+#' @noRd
+update_namespace_columns <- function(data, row_idx, retained_tbl, selected_types) {
+    for (id_type in supported_id_types()) {
+        if (!(id_type %in% colnames(data))) {
+            next
+        }
+        
+        if (id_type %in% selected_types) {
+            ids <- retained_tbl$id[retained_tbl$type %in% id_type]
+            data[[id_type]][[row_idx]] <- format_output_ids(ids, id_type)
+        }
+    }
+    
+    data
+}
+
+
+#' @noRd
+retain_one_completely_incompatible_id <- function(
+    row_data,
+    split_pattern,
+    priority_types
+) {
+    retained_tbl <- empty_retained_ids_table()
+    retained_type <- NA_character_
+    
+    for (id_type in priority_types) {
+        if (!(id_type %in% colnames(row_data))) {
+            next
+        }
+        
+        ids <- split_ids(row_data[[id_type]][[1]], type = id_type, split_pattern = split_pattern)
+        if (length(ids) == 0L) {
+            next
+        }
+        
+        retained_tbl <- tibble::tibble(
+            type = id_type,
+            id = ids[[1]]
+        )
+        retained_type <- id_type
+        break
+    }
+    
+    list(
+        retained_ids = retained_tbl,
+        retained_type = retained_type
+    )
+}
+
+
+#' @noRd
+count_ids_by_namespace <- function(data, split_pattern, selected_types = supported_id_types()) {
+    per_type <- lapply(
+        selected_types,
+        function(id_type) {
+            values <- if (id_type %in% colnames(data)) data[[id_type]] else rep(NA_character_, nrow(data))
+            ids <- unlist(
+                lapply(values, split_ids, type = id_type, split_pattern = split_pattern),
+                use.names = FALSE
+            )
+            tibble::tibble(
+                namespace = id_type,
+                present_ids = length(ids)
+            )
+        }
+    )
+    
+    dplyr::bind_rows(per_type)
+}
+
+
+#' @noRd
+build_seed_handling_summary <- function(
+    feature_summary,
+    data_before,
+    data_after,
+    pair_before,
+    pair_after,
+    split_pattern,
+    selected_types,
+    handle_partially_compatible,
+    handle_completely_incompatible,
+    completely_incompatible_priority,
+    handling_flags
+) {
+    before_id_counts <- count_ids_by_namespace(
+        data = data_before,
+        split_pattern = split_pattern,
+        selected_types = selected_types
+    )
+    after_id_counts <- count_ids_by_namespace(
+        data = data_after,
+        split_pattern = split_pattern,
+        selected_types = selected_types
+    )
+    
+    id_count_summary <- before_id_counts %>%
+        dplyr::left_join(after_id_counts, by = "namespace", suffix = c("_before", "_after")) %>%
+        dplyr::mutate(
+            removed_ids = present_ids_before - present_ids_after
+        )
+    
+    total_ids_before <- sum(id_count_summary$present_ids_before)
+    total_ids_after <- sum(id_count_summary$present_ids_after)
+    total_ids_removed <- total_ids_before - total_ids_after
+    
+    feature_class_counts <- feature_summary %>%
+        dplyr::count(compatibility_class, name = "n_features")
+    class_counts <- setNames(feature_class_counts$n_features, feature_class_counts$compatibility_class)
+    
+    partial_changed <- sum(handling_flags$partial_handling_applied %in% TRUE)
+    complete_changed <- sum(handling_flags$complete_handling_applied %in% TRUE)
+    complete_unresolved <- sum(handling_flags$complete_handling_unresolved %in% TRUE)
+    
+    feature_count <- nrow(feature_summary)
+    changed_features <- partial_changed + complete_changed
+    changed_fraction <- if (feature_count > 0L) changed_features / feature_count else 0
+    removal_fraction <- if (total_ids_before > 0L) total_ids_removed / total_ids_before else 0
+    
+    pair_counts <- tibble::tibble(
+        stage = c("before", "after"),
+        total_pairs = c(
+            sum(!is.na(pair_before$seed1_id) & !is.na(pair_before$seed2_id)),
+            sum(!is.na(pair_after$seed1_id) & !is.na(pair_after$seed2_id))
+        ),
+        compatible_pairs = c(
+            sum(pair_before$pair_compatible %in% TRUE, na.rm = TRUE),
+            sum(pair_after$pair_compatible %in% TRUE, na.rm = TRUE)
+        ),
+        incompatible_pairs = c(
+            sum(pair_before$pair_compatible %in% FALSE, na.rm = TRUE),
+            sum(pair_after$pair_compatible %in% FALSE, na.rm = TRUE)
+        )
+    )
+    
+    summary_text <- paste(
+        sprintf(
+            paste0(
+                "Processed %d feature(s): %d fully compatible, %d partially compatible, ",
+                "%d completely incompatible."
+            ),
+            feature_count,
+            unname(if ("fully_compatible" %in% names(class_counts)) class_counts[["fully_compatible"]] else 0L),
+            unname(if ("partially_compatible" %in% names(class_counts)) class_counts[["partially_compatible"]] else 0L),
+            unname(if ("completely_incompatible" %in% names(class_counts)) class_counts[["completely_incompatible"]] else 0L)
+        ),
+        sprintf(
+            paste0(
+                "ID pairs before handling: %d total, %d compatible, %d incompatible; ",
+                "after handling: %d total, %d compatible, %d incompatible."
+            ),
+            pair_counts$total_pairs[[1]],
+            pair_counts$compatible_pairs[[1]],
+            pair_counts$incompatible_pairs[[1]],
+            pair_counts$total_pairs[[2]],
+            pair_counts$compatible_pairs[[2]],
+            pair_counts$incompatible_pairs[[2]]
+        ),
+        sprintf(
+            paste0(
+                "User choices: handle_partially_compatible=%s, ",
+                "handle_completely_incompatible=%s, priority=%s."
+            ),
+            handle_partially_compatible,
+            handle_completely_incompatible,
+            paste(completely_incompatible_priority, collapse = " > ")
+        ),
+        sprintf(
+            paste0(
+                "Handling changed %d feature(s) overall (%d partial, %d complete); ",
+                "%d completely incompatible feature(s) remained unresolved."
+            ),
+            changed_features,
+            partial_changed,
+            complete_changed,
+            complete_unresolved
+        ),
+        sprintf(
+            paste0(
+                "IDs before handling: %d overall; after handling: %d overall; ",
+                "removed: %d (%.2f%%)."
+            ),
+            total_ids_before,
+            total_ids_after,
+            total_ids_removed,
+            removal_fraction * 100
+        ),
+        sprintf(
+            "Proportion of features changed: %.2f%%.",
+            changed_fraction * 100
+        ),
+        sprintf(
+            "Per-namespace counts before/after: %s.",
+            paste(
+                sprintf(
+                    "%s %d->%d",
+                    id_count_summary$namespace,
+                    id_count_summary$present_ids_before,
+                    id_count_summary$present_ids_after
+                ),
+                collapse = "; "
+            )
+        )
+    )
+    
+    summary_metrics <- list(
+        user_choices = list(
+            handle_partially_compatible = handle_partially_compatible,
+            handle_completely_incompatible = handle_completely_incompatible,
+            completely_incompatible_priority = completely_incompatible_priority
+        ),
+        feature_class_counts = feature_class_counts,
+        pair_counts = pair_counts,
+        id_count_summary = id_count_summary,
+        effect_sizes = tibble::tibble(
+            changed_features = changed_features,
+            changed_feature_fraction = changed_fraction,
+            total_ids_before = total_ids_before,
+            total_ids_after = total_ids_after,
+            total_ids_removed = total_ids_removed,
+            id_removal_fraction = removal_fraction,
+            complete_unresolved = complete_unresolved
+        )
+    )
+    
+    list(
+        summary_text = summary_text,
+        summary_metrics = summary_metrics
     )
 }
 #' @noRd
