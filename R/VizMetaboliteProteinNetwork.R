@@ -51,8 +51,6 @@
 #'     \strong{Default = 10}
 #' @param height \emph{Optional: } Plot height in inches for saved plots.
 #'     \strong{Default = 8}
-#' @param dpi \emph{Optional: } Plot resolution for PNG output.
-#'     \strong{Default = 300}
 #' @param hmdb_sep \emph{Optional: } Separator used for multiple HMDB IDs in a
 #'     single cell of `feature_metadata[[hmdb_col]]`. \strong{Default = ";"}
 #' @param return_data \emph{Optional: } If `TRUE`, return a list containing the
@@ -88,42 +86,31 @@
 #' If `return_data = FALSE`, the plot is returned invisibly.
 #'
 #' @examples
-#' feature_metadata <- data.frame(
-#'     Metabolite = c("Lactate", "Succinate", NA),
-#'     hmdb = c("HMDB0000190", "1544", "HMDB0000254; HMDB0000331"),
-#'     stringsAsFactors = FALSE
-#' )
+#' \dontrun{
+#' metalinks_transporters <- metsigdb_metalinks(
+#'     cell_location = c("Extracellular"),
+#'     tissue_location = c("Kidney", "All Tissues"),
+#'     biospecimen_location = c("Blood", "Urine")
+#' ) |>
+#'     dplyr::filter(stringr::str_detect(tolower(protein_type_clean), "transporter")) |>
+#'     dplyr::distinct(hmdb, .keep_all = TRUE) |>
+#'     dplyr::slice_head(n = 10)
 #'
-#' metalinks_subset <- data.frame(
-#'     hmdb = c("HMDB0000190", "HMDB0001544", "HMDB0000254"),
-#'     gene_symbol = c("HCAR1", "SLC13A3", "OXGR1"),
-#'     protein_type = c("receptor", "transporter", "receptor"),
-#'     protein_type_clean = c("Receptor", "Transporter", "Receptor"),
-#'     transport_direction = c(NA, "in", NA),
-#'     type = c("Ligand-Receptor", "Production-Degradation", "Ligand-Receptor"),
-#'     mode_of_regulation = c("Activating", NA, "Activating"),
-#'     interaction_family = c("Receptor", "Transporter", "Receptor"),
-#'     source = c("Example", "Example", "Example"),
-#'     stringsAsFactors = FALSE
-#' )
+#' feature_metadata <- metalinks_transporters |>
+#'     dplyr::transmute(
+#'         Metabolite = dplyr::coalesce(.data$metabolite, .data$hmdb),
+#'         hmdb = .data$hmdb
+#'     )
 #'
-#' res <- viz_metabolite_protein_network(
+#' viz_metabolite_protein_network(
 #'     feature_metadata = feature_metadata,
-#'     metalinks_df = metalinks_subset,
+#'     metalinks_df = metalinks_transporters,
 #'     metabolite_col = "Metabolite",
 #'     hmdb_col = "hmdb",
 #'     save_plot = NULL,
 #'     print_plot = FALSE
 #' )
-#'
-#' # HMDB identifiers are used as fallback labels when metabolite names are missing.
-#' res_no_names <- viz_metabolite_protein_network(
-#'     feature_metadata = feature_metadata["hmdb"],
-#'     metalinks_df = metalinks_subset,
-#'     hmdb_col = "hmdb",
-#'     save_plot = NULL,
-#'     print_plot = FALSE
-#' )
+#' }
 #'
 #' @importFrom logger log_info
 #' @export
@@ -137,7 +124,6 @@ viz_metabolite_protein_network <- function(
     plot_name = "metalinks_network",
     width = 10,
     height = 8,
-    dpi = 300,
     hmdb_sep = ";",
     return_data = TRUE,
     print_plot = TRUE,
@@ -157,7 +143,6 @@ viz_metabolite_protein_network <- function(
         plot_name = plot_name,
         width = width,
         height = height,
-        dpi = dpi,
         hmdb_sep = hmdb_sep,
         return_data = return_data,
         print_plot = print_plot,
@@ -307,8 +292,7 @@ viz_metabolite_protein_network <- function(
         path = path,
         plot_name = plot_name,
         width = width,
-        height = height,
-        dpi = dpi
+        height = height
     )
 
     result <- list(
@@ -338,7 +322,6 @@ viz_metabolite_protein_network <- function(
     plot_name,
     width,
     height,
-    dpi,
     hmdb_sep,
     return_data,
     print_plot,
@@ -386,9 +369,6 @@ viz_metabolite_protein_network <- function(
     }
     if (!is.numeric(height) || length(height) != 1L || is.na(height) || height <= 0) {
         stop("`height` must be a single positive number.")
-    }
-    if (!is.numeric(dpi) || length(dpi) != 1L || is.na(dpi) || dpi <= 0) {
-        stop("`dpi` must be a single positive number.")
     }
     if (!is.character(hmdb_sep) || length(hmdb_sep) != 1L || is.na(hmdb_sep) || hmdb_sep == "") {
         stop("`hmdb_sep` must be a single non-empty separator string.")
@@ -781,7 +761,7 @@ viz_metabolite_protein_network <- function(
 }
 
 #' @noRd
-.save_metalinks_network_plot <- function(plot, save_plot, path, plot_name, width, height, dpi) {
+.save_metalinks_network_plot <- function(plot, save_plot, path, plot_name, width, height) {
     if (is.null(save_plot)) {
         return(character(0))
     }
@@ -812,7 +792,6 @@ viz_metabolite_protein_network <- function(
                 width = width,
                 height = height,
                 units = "in",
-                dpi = dpi,
                 limitsize = FALSE
             )
         } else if (fmt == "pdf") {

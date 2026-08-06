@@ -14,7 +14,6 @@ viz_metabolite_protein_network(
   plot_name = "metalinks_network",
   width = 10,
   height = 8,
-  dpi = 300,
   hmdb_sep = ";",
   return_data = TRUE,
   print_plot = TRUE,
@@ -59,8 +58,6 @@ plot files. \strong{Default = "metalinks_network"}}
 \item{height}{\emph{Optional: } Plot height in inches for saved plots.
 \strong{Default = 8}}
 
-\item{dpi}{\emph{Optional: } Plot resolution for PNG output.
-\strong{Default = 300}}
 
 \item{hmdb_sep}{\emph{Optional: } Separator used for multiple HMDB IDs in a
 single cell of \code{feature_metadata[[hmdb_col]]}. \strong{Default = ";"}}
@@ -115,41 +112,28 @@ before matching. Metabolite names are encouraged but not required. If
 \code{metabolite_col} is omitted, or if some metabolite names are missing, the
 corresponding normalized HMDB identifiers are used as metabolite labels.
 }
-\examples{
-feature_metadata <- data.frame(
-    Metabolite = c("Lactate", "Succinate", NA),
-    hmdb = c("HMDB0000190", "1544", "HMDB0000254; HMDB0000331"),
-    stringsAsFactors = FALSE
-)
+\examples{\dontrun{
+metalinks_transporters <- metsigdb_metalinks(
+    cell_location = c("Extracellular"),
+    tissue_location = c("Kidney", "All Tissues"),
+    biospecimen_location = c("Blood", "Urine")
+) |>
+    dplyr::filter(stringr::str_detect(tolower(protein_type_clean), "transporter")) |>
+    dplyr::distinct(hmdb, .keep_all = TRUE) |>
+    dplyr::slice_head(n = 10)
 
-metalinks_subset <- data.frame(
-    hmdb = c("HMDB0000190", "HMDB0001544", "HMDB0000254"),
-    gene_symbol = c("HCAR1", "SLC13A3", "OXGR1"),
-    protein_type = c("receptor", "transporter", "receptor"),
-    protein_type_clean = c("Receptor", "Transporter", "Receptor"),
-    transport_direction = c(NA, "in", NA),
-    type = c("Ligand-Receptor", "Production-Degradation", "Ligand-Receptor"),
-    mode_of_regulation = c("Activating", NA, "Activating"),
-    interaction_family = c("Receptor", "Transporter", "Receptor"),
-    source = c("Example", "Example", "Example"),
-    stringsAsFactors = FALSE
-)
+feature_metadata <- metalinks_transporters |>
+    dplyr::transmute(
+        Metabolite = dplyr::coalesce(.data$metabolite, .data$hmdb),
+        hmdb = .data$hmdb
+    )
 
-res <- viz_metabolite_protein_network(
+viz_metabolite_protein_network(
     feature_metadata = feature_metadata,
-    metalinks_df = metalinks_subset,
+    metalinks_df = metalinks_transporters,
     metabolite_col = "Metabolite",
     hmdb_col = "hmdb",
     save_plot = NULL,
     print_plot = FALSE
 )
-
-# HMDB identifiers are used as fallback labels when metabolite names are missing.
-res_no_names <- viz_metabolite_protein_network(
-    feature_metadata = feature_metadata["hmdb"],
-    metalinks_df = metalinks_subset,
-    hmdb_col = "hmdb",
-    save_plot = NULL,
-    print_plot = FALSE
-)
-}
+}}
