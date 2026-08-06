@@ -2370,8 +2370,23 @@ seed_id_compatibility_check <- function(
         completely_incompatible_priority = priority_types
     )
     
+    data_after_handling_for_pairs <- handled_feature_data$data_after_handling %>%
+        dplyr::select(-dplyr::any_of(c(
+            "original_row_id",
+            "n_seed_ids",
+            "n_pairs",
+            "n_true",
+            "n_false",
+            "all_seed_ids_compatible",
+            "compatibility_class",
+            "partial_handling_applied",
+            "complete_handling_applied",
+            "complete_handling_unresolved",
+            "retained_priority_namespace"
+        )))
+    
     handled_prepared <- prepare_input_for_traversal(
-        data = handled_feature_data$data_after_handling,
+        data = data_after_handling_for_pairs,
         selected_types = selected_types
     )
     
@@ -2408,6 +2423,20 @@ seed_id_compatibility_check <- function(
         
         result$handling_summary_text <- handling_summary$summary_text
         result$handling_summary_metrics <- handling_summary$summary_metrics
+    }
+    
+    if (isTRUE(verbose) || isTRUE(handle_partially_compatible) || isTRUE(handle_completely_incompatible)) {
+        message(paste(
+            "seed_id_compatibility_check() returned:",
+            "- ID_pair_compatibility: raw seed-ID pair QC table.",
+            "- data_with_compatibility: input feature table with raw compatibility flag.",
+            "- feature_compatibility_summary: one row per feature with QC class and counts.",
+            "- data_after_handling: cleaned feature table after optional automatic handling.",
+            "- ID_pair_compatibility_after_handling: pair QC recomputed from cleaned IDs.",
+            if ("handling_summary_text" %in% names(result)) "- handling_summary_text / handling_summary_metrics: concise summary of handling choices and effects." else NULL,
+            sep = "
+"
+        ))
     }
     
     result
@@ -3231,7 +3260,6 @@ apply_seed_compatibility_handling <- function(
                 dplyr::select(
                     row_id,
                     original_row_id,
-                    n_seed_ids,
                     n_pairs,
                     n_true,
                     n_false,
