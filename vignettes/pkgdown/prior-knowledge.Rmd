@@ -566,7 +566,7 @@ plot_name = "Overlap of BioCrates Columns")
 ```{r, echo=FALSE}
 cat(sprintf(
     '<img src="%s" width="100%%" style="display:block; margin:0 auto;"/>',
-    "prior-knowledge.Rmd_compare-pk-2.svg"
+    "prior-knowledge.Rmd_compare-pk-2.svg"#
 ))
 ```
 \
@@ -725,6 +725,76 @@ kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size =
 
 This shows using Multi HMDBs has resulted in more metabolites from Biocrates being able to be linked to MetalinksDB than what would have been possible if we only used the first HMDB available to us.
 Hence while having multiple IDs for a single detected peak may add complexity, we would recommend against prematurely dropping any IDs until you map to the PK or have thoroughly assessed what impact the removal may have.
+
+## 4 Deeper investigation of MetalinksDB metabolite-protein interactions
+Now that we have investigated the coverage of metabolite ID annotations and their connections and matches to Prior Knowledge, we can go a step further and look into the interaction mechanisms of metabolite features with MetalinksDB transporter- and receptor proteins, as well as metabolic enzymes.
+For that, we will subset MetalinksDB by the "interaction_family" column, which is subset in one of the following categories: "Other protein-metabolite", "Transporter-metabolite", "Receptor-metabolite", and "Enzyme-metabolite", using the 'viz_metabolite_protein_network()' function.
+
+```{r}
+# get metalinksdb subsets bsaed on interaction_family
+metalinks_receptor <- MetaLinksDB %>% filter(interaction_family == "Receptor-metabolite")
+metalinks_transporter <- MetaLinksDB %>% filter(interaction_family == "Transporter-metabolite")
+metalinks_metabolic_enzyme <- MetaLinksDB %>% filter(interaction_family == "Enzyme-metabolite")
+
+# receptor-network
+biocrates_metalinks_receptor <- viz_metabolite_protein_network(
+  feature_metadata = biocrates_features,
+  metalinks_df = metalinks_receptor,
+  metabolite_col = "TrivialName",
+  hmdb_col = "HMDB",
+  save_plot = NULL,
+  path = NULL,
+  plot_name = "biocrates_to_metalinks_receptor_network",
+  hmdb_sep = ",",  # biocrates_features has possibly multiple HMDB IDs per feature, separated by ", "
+  return_data = TRUE,
+  print_plot = TRUE,
+  full_labels = FALSE,
+  label_mode = "reduced",
+  label_max_chars = 20,
+  label_repel = TRUE,
+  label_degree_min = 2
+  )
+
+# transporter-network
+biocrates_metalinks_transporter <- viz_metabolite_protein_network(
+  feature_metadata = biocrates_features,
+  metalinks_df = metalinks_transporter,
+  metabolite_col = "TrivialName",
+  hmdb_col = "HMDB",
+  save_plot = NULL,
+  path = NULL,
+  plot_name = "biocrates_to_metalinks_transporter_network",
+  hmdb_sep = ",",
+  return_data = TRUE,
+  print_plot = TRUE,
+  full_labels = FALSE,
+  label_mode = "reduced",
+  label_max_chars = 20,
+  label_repel = TRUE,
+  label_degree_min = 2
+  )
+
+# metabolic-enzyme-network
+biocrates_metalinks_metabolic_enzyme <- viz_metabolite_protein_network(
+  feature_metadata = biocrates_features,
+  metalinks_df = metalinks_metabolic_enzyme,
+  metabolite_col = "TrivialName",
+  hmdb_col = "HMDB",
+  save_plot = NULL,
+  path = NULL,
+  plot_name = "biocrates_to_metalinks_metabolic_enzyme_network",
+  hmdb_sep = ",",
+  return_data = TRUE,
+  print_plot = TRUE,
+  full_labels = FALSE,
+  label_mode = "reduced",
+  label_max_chars = 20,
+  label_repel = TRUE,
+  label_degree_min = 2
+  )
+
+```
+
 
 :::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
