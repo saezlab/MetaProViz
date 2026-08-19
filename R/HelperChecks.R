@@ -537,55 +537,6 @@ check_param_processing <- function(
     mvi_percentage = 50,
     hotellins_confidence = 0.99
 ) {
-
-    if (is.vector(metadata_info)) {
-        # -------------metadata_info
-        # core
-        if (core) {  # parse core normalisation factor
-            message <- paste0("For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.")
-            log_trace(paste("Message ", message, sep = ""))
-            message(message)
-            if ("core_media" %in% names(metadata_info)) {
-                # Check for core_media samples
-                if (length(grep(metadata_info[["core_media"]], metadata_sample[[metadata_info[["Conditions"]]]])) < 1) {
-                    message <- paste0("No core_media samples were provided in the 'Conditions' in the metadata_sample. For a core experiment control media samples without cells have to be measured and be added in the 'Conditions'
-                                    column labeled as 'core_media' (see @param section). Please make sure that you used the correct labelling or whether you need core = FALSE for your analysis")
-                    log_trace(paste("Error ", message, sep = ""))
-                    stop(message)
-                }
-            }
-
-            if (!("core_norm_factor" %in% names(metadata_info))) {
-                message <- paste0("No growth rate or growth factor provided for normalising the core result, hence core_norm_factor set to 1 for each sample")
-                log_trace(paste("Warning ", message, sep = ""))
-                warning(message)
-            }
-        }
-    }
-
-    # -------------General parameters
-    Feature_Filtering_options <- c("Standard", "Modified")
-
-    if (!(is.null(featurefilt) || featurefilt %in% Feature_Filtering_options)) {
-        ## featurefilt is Neither NULL nor in the options
-        message <-
-            paste0(
-                "Check input. The selected featurefilt option is not valid. Please set to NULL or select one of the folowwing: ",
-                paste(Feature_Filtering_options, collapse = ", "),
-                "."
-            )
-        log_trace(paste("Error ", message, sep = ""))
-        stop(message)
-    }
-    if (
-        !is.numeric(cutoff_featurefilt) |
-        cutoff_featurefilt > 1 |
-        cutoff_featurefilt < 0
-    ) {
-        message <- paste0("Check input. The selected cutoff_featurefilt should be numeric and between 0 and 1.")
-        log_trace(paste("Error ", message, sep = ""))
-        stop(message)
-    }
     if (!is.logical(tic)) {
         message <- paste0("Check input. The tic value should be either `TRUE` if tic normalization is to be performed or `FALSE` if no data normalization is to be applied.")
         log_trace(paste("Error ", message, sep = ""))
@@ -596,17 +547,123 @@ check_param_processing <- function(
         log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
+}
+
+
+#
+# processing helper function: stage-specific validation
+#
+
+#' @importFrom logger log_trace
+#' @noRd
+check_param_feature_filtering <- function(
+    metadata_sample,
+    metadata_info,
+    core = FALSE,
+    featurefilt = "Modified",
+    cutoff_featurefilt = 0.8
+) {
+    Feature_Filtering_options <- c("Standard", "Modified")
+
+    if (!(is.null(featurefilt) || featurefilt %in% Feature_Filtering_options)) {
+        message <-
+            paste0(
+                "Check input. The selected featurefilt option is not valid. Please set to NULL or select one of the folowwing: ",
+                paste(Feature_Filtering_options, collapse = ", "),
+                "."
+            )
+        log_trace(paste("Error ", message, sep = ""))
+        stop(message)
+    }
+
+    if (
+        !is.numeric(cutoff_featurefilt) |
+        length(cutoff_featurefilt) != 1 |
+        is.na(cutoff_featurefilt) |
+        cutoff_featurefilt > 1 |
+        cutoff_featurefilt < 0
+    ) {
+        message <- paste0("Check input. The selected cutoff_featurefilt should be numeric and between 0 and 1.")
+        log_trace(paste("Error ", message, sep = ""))
+        stop(message)
+    }
+
+    if (core) {
+        check_param_processing_core(
+            metadata_sample = metadata_sample,
+            metadata_info = metadata_info,
+            core = core,
+            warn_missing_core_norm_factor = FALSE
+        )
+    }
+}
+
+#' @importFrom logger log_trace
+#' @noRd
+check_param_mvi_imputation <- function(
+    metadata_sample,
+    metadata_info,
+    core = FALSE,
+    mvi_percentage = 50
+) {
     if (
         !is.numeric(mvi_percentage) |
-        hotellins_confidence > 100 |
-        hotellins_confidence < 0
+        length(mvi_percentage) != 1 |
+        is.na(mvi_percentage) |
+        mvi_percentage > 100 |
+        mvi_percentage < 0
     ) {
         message <- paste0("Check input. The selected mvi_percentage value should be numeric and between 0 and 100.")
         log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
+
+    if (core) {
+        check_param_processing_core(
+            metadata_sample = metadata_sample,
+            metadata_info = metadata_info,
+            core = core,
+            warn_missing_core_norm_factor = FALSE
+        )
+    }
+}
+
+#' @importFrom logger log_trace
+#' @noRd
+check_param_tic_norm <- function(tic = TRUE) {
+    if (!is.logical(tic)) {
+        message <- paste0("Check input. The tic value should be either `TRUE` if tic normalization is to be performed or `FALSE` if no data normalization is to be applied.")
+        log_trace(paste("Error ", message, sep = ""))
+        stop(message)
+    }
+}
+
+#' @importFrom logger log_trace
+#' @noRd
+check_param_core_norm <- function(
+    metadata_sample,
+    metadata_info
+) {
+    check_param_processing_core(
+        metadata_sample = metadata_sample,
+        metadata_info = metadata_info,
+        core = TRUE,
+        warn_missing_core_norm_factor = TRUE
+    )
+}
+
+#' @importFrom logger log_trace
+#' @noRd
+check_param_outlier_detection <- function(
+    metadata_sample,
+    metadata_info,
+    core = FALSE,
+    hotellins_confidence = 0.99
+) {
     if (
         !is.numeric(hotellins_confidence) |
+        length(hotellins_confidence) != 1 |
+        is.na(hotellins_confidence) |
         hotellins_confidence > 1 |
         hotellins_confidence < 0
     ) {
@@ -614,6 +671,52 @@ check_param_processing <- function(
         log_trace(paste("Error ", message, sep = ""))
         stop(message)
     }
+
+    if (core) {
+        check_param_processing_core(
+            metadata_sample = metadata_sample,
+            metadata_info = metadata_info,
+            core = core,
+            warn_missing_core_norm_factor = FALSE
+        )
+    }
+}
+
+#' @importFrom logger log_trace
+#' @noRd
+check_param_processing_core <- function(
+    metadata_sample,
+    metadata_info,
+    core = FALSE,
+    warn_missing_core_norm_factor = TRUE
+) {
+    if (!core) {
+        return(invisible(NULL))
+    }
+
+    if (!is.vector(metadata_info) || !("core_media" %in% names(metadata_info))) {
+        message <- paste0("For core preprocessing please provide `metadata_info[['core_media']]` to identify the control media samples.")
+        log_trace(paste("Error ", message, sep = ""))
+        stop(message)
+    }
+
+    message <- paste0("For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.")
+    log_trace(paste("Message ", message, sep = ""))
+    message(message)
+
+    if (length(grep(metadata_info[["core_media"]], metadata_sample[[metadata_info[["Conditions"]]]])) < 1) {
+        message <- paste0("No core_media samples were provided in the 'Conditions' in the metadata_sample. For a core experiment control media samples without cells have to be measured and be added in the 'Conditions' column labeled as 'core_media' (see @param section). Please make sure that you used the correct labelling or whether you need core = FALSE for your analysis")
+        log_trace(paste("Error ", message, sep = ""))
+        stop(message)
+    }
+
+    if (warn_missing_core_norm_factor && !("core_norm_factor" %in% names(metadata_info))) {
+        message <- paste0("No growth rate or growth factor provided for normalising the core result, hence core_norm_factor set to 1 for each sample")
+        log_trace(paste("Warning ", message, sep = ""))
+        warning(message)
+    }
+
+    invisible(NULL)
 }
 
 

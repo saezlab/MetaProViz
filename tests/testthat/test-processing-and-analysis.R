@@ -125,3 +125,109 @@ test_that("mca_2cond and mca_core return summary/result tables", {
   expect_type(result_core, "list")
   expect_true(any(grepl("summary", names(result_core), ignore.case = TRUE)))
 })
+
+
+test_that("standalone preprocessing stages work on valid input", {
+  fx <- mpv_intracell_fixture()
+  metadata_info <- fx$metadata_info[c("Conditions", "Biological_Replicates")]
+
+  filtered <- feature_filtering(
+    data = fx$data,
+    metadata_sample = fx$metadata_sample,
+    metadata_info = metadata_info,
+    core = FALSE,
+    featurefilt = "Standard",
+    cutoff_featurefilt = 0.8
+  )
+  expect_type(filtered, "list")
+  expect_true(all(c("DF", "RemovedMetabolites") %in% names(filtered)))
+
+  imputed <- mvi_imputation(
+    data = filtered$DF,
+    metadata_sample = fx$metadata_sample,
+    metadata_info = metadata_info,
+    core = FALSE,
+    mvi_percentage = 50
+  )
+  expect_s3_class(imputed, "data.frame")
+
+  tic_res <- suppressWarnings(tic_norm(
+    data = imputed,
+    metadata_sample = fx$metadata_sample,
+    metadata_info = c(Conditions = metadata_info[["Conditions"]]),
+    tic = TRUE
+  ))
+  expect_type(tic_res, "list")
+  expect_true(all(c("DF", "Plot") %in% names(tic_res)))
+
+  outlier_res <- suppressWarnings(outlier_detection(
+    data = tic_res$DF$data_tic,
+    metadata_sample = fx$metadata_sample,
+    metadata_info = metadata_info,
+    core = FALSE,
+    hotellins_confidence = 0.99
+  ))
+  expect_type(outlier_res, "list")
+  expect_true(all(c("DF", "Plot") %in% names(outlier_res)))
+})
+
+test_that("standalone preprocessing stages validate their own parameters", {
+  fx <- mpv_intracell_fixture(8)
+  metadata_info <- fx$metadata_info[c("Conditions", "Biological_Replicates")]
+
+  expect_error(
+    feature_filtering(
+      data = fx$data,
+      metadata_sample = fx$metadata_sample,
+      metadata_info = metadata_info,
+      featurefilt = "bad"
+    ),
+    "featurefilt"
+  )
+
+  expect_error(
+    mvi_imputation(
+      data = fx$data,
+      metadata_sample = fx$metadata_sample,
+      metadata_info = metadata_info,
+      mvi_percentage = 150
+    ),
+    "mvi_percentage"
+  )
+
+  expect_error(
+    tic_norm(
+      data = fx$data,
+      metadata_sample = fx$metadata_sample,
+      metadata_info = c(Conditions = metadata_info[["Conditions"]]),
+      tic = "yes"
+    ),
+    "tic value"
+  )
+
+  expect_error(
+    outlier_detection(
+      data = fx$data,
+      metadata_sample = fx$metadata_sample,
+      metadata_info = metadata_info,
+      hotellins_confidence = 2
+    ),
+    "hotellins_confidence"
+  )
+})
+
+
+test_that("standalone core_norm works on valid CoRe-style input", {
+  fx <- mpv_medium_fixture(20)
+
+  result <- suppressWarnings(core_norm(
+    data = fx$data,
+    metadata_sample = fx$metadata_sample,
+    metadata_info = fx$metadata_info
+  ))
+
+  expect_type(result, "list")
+  expect_true(all(c("DF", "Plot") %in% names(result)))
+  expect_true(all(c("CV_core_blank", "core_Norm") %in% names(result$DF)))
+  expect_s3_class(result$DF$core_Norm, "data.frame")
+})

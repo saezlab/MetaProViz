@@ -994,6 +994,9 @@ pool_estimation <- function(
 #'
 #' @return List with two elements: filtered matrix  and features filtered
 #'
+#' This function can be used as a standalone preprocessing step on raw input
+#' data with matching sample metadata.
+#'
 #' @examples
 #' data(intracell_raw)
 #' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
@@ -1013,7 +1016,7 @@ pool_estimation <- function(
 #' @importFrom dplyr filter mutate_all
 #' @importFrom magrittr %>% %<>%
 #' @importFrom logger log_info log_trace
-#' @noRd
+#' @export
 feature_filtering <- function(
         data,
         metadata_sample,
@@ -1024,6 +1027,20 @@ feature_filtering <- function(
 ) {
     ## ------------ Create log file ----------- ##
     metaproviz_init()
+
+    check_param(
+        data = data,
+        metadata_sample = metadata_sample,
+        metadata_info = metadata_info,
+        core = core
+    )
+    check_param_feature_filtering(
+        metadata_sample = metadata_sample,
+        metadata_info = metadata_info,
+        core = core,
+        featurefilt = featurefilt,
+        cutoff_featurefilt = cutoff_featurefilt
+    )
 
     ## ------------------ Prepare the data ------------------- ##
     feat_filt_data <- as.data.frame(data) %>%
@@ -1182,6 +1199,9 @@ feature_filtering <- function(
 #'
 #' @return DF with imputed values
 #'
+#' This function can be used on raw or already filtered data, provided sample
+#' metadata and condition information are available.
+#'
 #' @examples
 #' data(intracell_raw)
 #' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
@@ -1203,7 +1223,7 @@ feature_filtering <- function(
 #' @importFrom tibble column_to_rownames
 #' @importFrom logger log_info
 #' @importFrom tidyselect everything where
-#' @noRd
+#' @export
 mvi_imputation <- function(
         data,
         metadata_sample,
@@ -1211,6 +1231,19 @@ mvi_imputation <- function(
         core = FALSE,
         mvi_percentage = 50
 ) {
+
+    check_param(
+        data = data,
+        metadata_sample = metadata_sample,
+        metadata_info = metadata_info,
+        core = core
+    )
+    check_param_mvi_imputation(
+        metadata_sample = metadata_sample,
+        metadata_info = metadata_info,
+        core = core,
+        mvi_percentage = mvi_percentage
+    )
 
     # NSE vs. R CMD check workaround
     Conditions <- NULL
@@ -1376,6 +1409,10 @@ mvi_imputation <- function(
 #' @return List with two elements: DF (including output table) and Plot (including
 #'     all plots generated)
 #'
+#' This function can be used independently on numeric data with matching sample
+#' metadata. Missing values and zero handling should already be in a reasonable
+#' state for the intended normalization.
+#'
 #' @examples
 #' data(intracell_raw)
 #' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
@@ -1398,13 +1435,20 @@ mvi_imputation <- function(
 #' @importFrom grDevices dev.new dev.off
 #' @importFrom stats median
 #' @importFrom tidyselect everything
-#' @noRd
+#' @export
 tic_norm <- function(
         data,
         metadata_sample,
         metadata_info,
         tic = TRUE
 ) {
+
+    check_param(
+        data = data,
+        metadata_sample = metadata_sample,
+        metadata_info = metadata_info
+    )
+    check_param_tic_norm(tic = tic)
 
     # NSE vs. R CMD check workaround
     median <- NULL
@@ -1560,6 +1604,9 @@ tic_norm <- function(
 #' @return List with two elements: DF (including output table) and Plot (including
 #'     all plots generated)
 #'
+#' This function is intended for standalone CoRe-style experiments with
+#' control-media metadata available via `metadata_info`.
+#'
 #' @examples
 #' Media <-
 #'     medium_raw %>%
@@ -1585,12 +1632,23 @@ tic_norm <- function(
 #' @importFrom dplyr case_when summarise_all mutate rowwise mutate_all select filter pull
 #' @importFrom grDevices dev.new dev.off
 #' @importFrom stats fisher.test sd var
-#' @noRd
+#' @export
 core_norm <- function(
         data,
         metadata_sample,
         metadata_info
 ) {
+
+    check_param(
+        data = data,
+        metadata_sample = metadata_sample,
+        metadata_info = metadata_info,
+        core = TRUE
+    )
+    check_param_core_norm(
+        metadata_sample = metadata_sample,
+        metadata_info = metadata_info
+    )
 
     # NSE vs. R CMD check workaround
     Sample_type <- CV <- density <- HighVar <- NULL
@@ -1939,6 +1997,10 @@ core_norm <- function(
 #' @return List with two elements: : DF (including output tables) and Plot
 #'     (including all plots generated)
 #'
+#' This function can be run independently, but PCA-based outlier detection is
+#' recommended on already preprocessed data such as filtered, imputed, and where
+#' appropriate normalized input.
+#'
 #' @examples
 #' data(intracell_raw)
 #' Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
@@ -1967,7 +2029,7 @@ core_norm <- function(
 #' @importFrom logger log_info log_trace
 #' @importFrom grDevices dev.new dev.off
 #' @importFrom stats relevel var
-#' @noRd
+#' @export
 outlier_detection <- function(
         data,
         metadata_sample,
@@ -1975,6 +2037,19 @@ outlier_detection <- function(
         core = FALSE,
         hotellins_confidence = 0.99
 ) {
+
+    check_param(
+        data = data,
+        metadata_sample = metadata_sample,
+        metadata_info = metadata_info,
+        core = core
+    )
+    check_param_outlier_detection(
+        metadata_sample = metadata_sample,
+        metadata_info = metadata_info,
+        core = core,
+        hotellins_confidence = hotellins_confidence
+    )
 
     # NSE vs. R CMD check workaround
     Samples <- `Group summary statistics` <- Outliers <- NULL

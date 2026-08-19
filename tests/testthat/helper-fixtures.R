@@ -41,6 +41,24 @@ mpv_core_dma_fixture <- function(n = 20) {
   )
 }
 
+
+mpv_medium_fixture <- function(n = 20) {
+  raw <- mpv_load_dataset("medium_raw")
+  raw <- raw[seq_len(min(n, nrow(raw))), , drop = FALSE]
+  df <- tibble::column_to_rownames(raw, "Code")
+
+  list(
+    data = df[, -c(1:3), drop = FALSE],
+    metadata_sample = df[, c(1:3), drop = FALSE],
+    metadata_info = c(
+      Conditions = "Conditions",
+      Biological_Replicates = "Biological_Replicates",
+      core_norm_factor = "GrowthFactor",
+      core_media = "blank"
+    )
+  )
+}
+
 mpv_simple_pathway_fixture <- function() {
   data.frame(
     term = c("Pathway A", "Pathway A", "Pathway B", "Pathway B"),
