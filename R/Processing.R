@@ -37,6 +37,13 @@
 #'     input data based on unique sample identifiers used as row names. Must
 #'     contain Conditions column. If experiment has no multiple conditions,
 #'     assign all samples to same condition. Default: NULL.
+#' @param metadata_feature Data frame (optional). Only used if data is not a
+#'     SummarizedExperiment (if it is, this is instead extracted from rowData).
+#'     Contains feature-level metadata, with feature identifiers matching the
+#'     column names of data as row names. Only required if featurefilt =
+#'     "Manual", in which case it must contain a logical TRUE/FALSE column
+#'     (TRUE = remove this feature) named "FilteredFeatures", or as configured
+#'     via metadata_info. Default: NULL.
 #' @param metadata_info Named character vector (optional). Contains names of experimental
 #'     parameters: c(Conditions="ColumnName",
 #'     Biological_Replicates="ColumnName"). Column "Conditions" (mandatory)
@@ -45,14 +52,22 @@
 #'     (optional) contains numerical values. For core=TRUE, must also add
 #'     core_norm_factor="ColumnName" and core_media="ColumnName". Column
 #'     core_norm_factor is used for normalization; core_media specifies media
-#'     controls in Conditions. Default: c(Conditions="Conditions").
+#'     controls in Conditions. Optionally, FilteredFeatures="ColumnName" names
+#'     the column in metadata_feature holding the manual TRUE/FALSE flags for
+#'     featurefilt = "Manual"; if not given, a column literally named
+#'     "FilteredFeatures" is expected. Default: c(Conditions="Conditions").
 #' @param featurefilt Character (optional). If NULL, no feature filtering is performed. If
 #'     "Standard", applies 80% filtering rule (Bijlsma et al., 2006) on
 #'     metabolite features across whole dataset. If "Modified", filtering is
 #'     done per condition and Conditions column must be provided (Yang et al.,
-#'     2015). Default: "Standard".
-#' @param cutoff_featurefilt Numeric (optional). Percentage threshold for feature filtering. Default:
-#'     0.8.
+#'     2015). If "Manual", the features to remove are taken directly from
+#'     metadata_feature instead of being computed from a cutoff. If the
+#'     expected column is missing from metadata_feature, a warning is raised
+#'     and "Modified" is used instead; if "Modified" itself cannot be used
+#'     because Conditions has fewer than 2 levels, a further warning is raised
+#'     and "Standard" is used. Default: "Standard".
+#' @param cutoff_featurefilt Numeric (optional). Percentage threshold for feature filtering. Ignored
+#'     if featurefilt = "Manual". Default: 0.8.
 #' @param tic Logical (optional). Whether total ion count normalization is performed.
 #'     Default: TRUE.
 #' @param mvi Logical (optional). Whether missing value imputation (MVI) based on half
@@ -79,7 +94,12 @@
 #'     Default: NULL.
 #'
 #' @return List with two elements: DF (all output tables generated) and Plot (all
-#'     plots generated).
+#'     plots generated). If featurefilt is not NULL, DF includes a
+#'     Feature_matrix table listing every input feature (not only the removed
+#'     ones) with a FilteredFeatures column (TRUE/FALSE). If data is a
+#'     SummarizedExperiment, the same FilteredFeatures column is added to the
+#'     rowData (feature matrix) of the returned data_Rawdata
+#'     SummarizedExperiment.
 #'
 #' @examples
 #' data(intracell_raw)
@@ -105,6 +125,7 @@
 processing <- function(
         data,
         metadata_sample = NULL,
+        metadata_feature = NULL,
         metadata_info = c(Conditions = "Conditions"),
         featurefilt = "Modified",
         cutoff_featurefilt = 0.8,
@@ -128,6 +149,7 @@ processing <- function(
         se_list <- process_se(data)
         data <- se_list$data
         metadata_sample <- se_list$metadata_sample
+        metadata_feature <- se_list$metadata_feature
     }
 
     ## ------------------ Check Input ------------------- ##
@@ -135,7 +157,7 @@ processing <- function(
     check_param(
         data = data,
         metadata_sample = metadata_sample,
-        metadata_feature = NULL,
+        metadata_feature = metadata_feature,
         metadata_info = metadata_info,
         save_plot = save_plot,
         save_table = save_table,
@@ -185,10 +207,31 @@ processing <- function(
             cutoff_featurefilt = cutoff_featurefilt,
             metadata_sample = metadata_sample,
             metadata_info = metadata_info,
-            core = core
+            core = core,
+            metadata_feature = metadata_feature
         )
 
         data_Filt <- data_Filtered[["DF"]]
+
+        # Add the feature filtering outcome to the feature metadata
+        # (metadata_feature), covering every feature in data, not only the
+        # ones removed. Features absent from a user-supplied metadata_feature
+        # get NA for any pre-existing columns, but always a real TRUE/FALSE
+        # for FilteredFeatures.
+        if (is.null(metadata_feature)) {
+            metadata_feature <- data_Filtered[["FilteredFeatures"]]["FilteredFeatures"]
+        } else {
+            metadata_feature <-
+                merge(
+                    data.frame(FeatureID = rownames(data_Filtered[["FilteredFeatures"]]), stringsAsFactors = FALSE),
+                    metadata_feature %>% rownames_to_column("FeatureID"),
+                    by = "FeatureID",
+                    all.x = TRUE
+                ) %>%
+                column_to_rownames("FeatureID")
+            metadata_feature <- metadata_feature[rownames(data_Filtered[["FilteredFeatures"]]), , drop = FALSE]
+            metadata_feature$FilteredFeatures <- data_Filtered[["FilteredFeatures"]][rownames(metadata_feature), "FilteredFeatures"]
+        }
     } else {
         data_Filt <- data
     }
@@ -276,7 +319,10 @@ processing <- function(
     # Add metabolites that where removed as part of the feature filtering
     if (!is.null(featurefilt)) {
 
-        if (length(data_Filtered[["RemovedMetabolites"]]) == 0) {
+        RemovedMetabolites <-
+            data_Filtered[["FilteredFeatures"]][["FeatureID"]][data_Filtered[["FilteredFeatures"]][["FilteredFeatures"]]]
+
+        if (length(RemovedMetabolites) == 0) {
 
             DFList$Filtered_metabolites <-
                 as.data.frame(
@@ -292,13 +338,17 @@ processing <- function(
             DFList$Filtered_metabolites <-
                 as.data.frame(
                     list(
-                        feature_filtering = rep(featurefilt, length(data_Filtered[["RemovedMetabolites"]])),
-                        cutoff_featurefilt = rep(cutoff_featurefilt, length(data_Filtered[["RemovedMetabolites"]])),
-                        RemovedMetabolites = data_Filtered[["RemovedMetabolites"]]
+                        feature_filtering = rep(featurefilt, length(RemovedMetabolites)),
+                        cutoff_featurefilt = rep(cutoff_featurefilt, length(RemovedMetabolites)),
+                        RemovedMetabolites = RemovedMetabolites
                     )
                 )
 
         }
+
+        # Feature matrix listing all input features (not only the removed
+        # ones), with the FilteredFeatures flag added as a column.
+        DFList$Feature_matrix <- metadata_feature %>% rownames_to_column("Metabolite")
 
     }
 
@@ -366,10 +416,19 @@ processing <- function(
             colData = DataFrame(coldata_df)
         )
 
+        # Add the feature filtering outcome to the feature matrix (rowData) of
+        # the raw data SE, so it is available even though filtered-out
+        # features are no longer present in Preprocessing_output.
+        data_Rawdata_se <- input_data
+        if (!is.null(featurefilt)) {
+            SummarizedExperiment::rowData(data_Rawdata_se) <-
+                DataFrame(metadata_feature[rownames(data_Rawdata_se), , drop = FALSE])
+        }
+
         #Make list of se files:
         Se_list <-
             list(
-                "data_Rawdata" = input_data,
+                "data_Rawdata" = data_Rawdata_se,
                 "Preprocessing_output" = se_new
             )
         Res_List <-
@@ -988,11 +1047,25 @@ pool_estimation <- function(
 #'     "Modified",filtering is done based on the different conditions, thus a
 #'     column named "Conditions" must be provided in the Input_SettingsFile
 #'     input file including the individual conditions you want to apply the
-#'     filtering to (Yang, J et al., 2015). \strong{Default = Modified}
-#' @param cutoff_featurefilt \emph{Optional: } percentage of feature filtering. \strong{Default =
-#'     0.8}
+#'     filtering to (Yang, J et al., 2015). If set to "Manual", the features to
+#'     remove are taken directly from metadata_feature instead of being
+#'     computed from a cutoff. If the expected column is missing from
+#'     metadata_feature, a warning is raised and "Modified" is used instead; if
+#'     "Modified" itself cannot be used because Conditions has fewer than 2
+#'     levels, a further warning is raised and "Standard" is used.
+#'     \strong{Default = Modified}
+#' @param cutoff_featurefilt \emph{Optional: } percentage of feature filtering. Ignored if
+#'     featurefilt = "Manual". \strong{Default = 0.8}
+#' @param metadata_feature \emph{Optional: } Only used if featurefilt = "Manual". Data frame with
+#'     feature identifiers matching the column names of data as row names, and
+#'     a logical TRUE/FALSE column (TRUE = remove this feature) named
+#'     "FilteredFeatures", or as configured via metadata_info.
+#'     \strong{Default = NULL}
 #'
-#' @return List with two elements: filtered matrix  and features filtered
+#' @return List with two elements: DF (filtered matrix) and FilteredFeatures (a
+#'     data frame with one row per input feature, columns FeatureID and
+#'     FilteredFeatures containing TRUE or FALSE; this column is always named
+#'     "FilteredFeatures" regardless of what it was called in metadata_feature)
 #'
 #' This function can be used as a standalone preprocessing step on raw input
 #' data with matching sample metadata.
@@ -1015,7 +1088,7 @@ pool_estimation <- function(
 #'
 #' @importFrom dplyr filter mutate_all
 #' @importFrom magrittr %>% %<>%
-#' @importFrom logger log_info log_trace
+#' @importFrom logger log_info log_trace log_warn
 #' @export
 feature_filtering <- function(
         data,
@@ -1023,7 +1096,8 @@ feature_filtering <- function(
         metadata_info,
         core = FALSE,
         featurefilt = "Modified",
-        cutoff_featurefilt = 0.8
+        cutoff_featurefilt = 0.8,
+        metadata_feature = NULL
 ) {
     ## ------------ Create log file ----------- ##
     metaproviz_init()
@@ -1031,6 +1105,7 @@ feature_filtering <- function(
     check_param(
         data = data,
         metadata_sample = metadata_sample,
+        metadata_feature = metadata_feature,
         metadata_info = metadata_info,
         core = core
     )
@@ -1049,11 +1124,81 @@ feature_filtering <- function(
 
     if (core) {  # remove core_media samples for feature filtering
         feat_filt_data %<>% filter(!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]])
-        Feature_Filtering <- paste0(featurefilt, "_core")
+    }
+
+    ## ------------------ Resolve fallback chain ------------------- ##
+    # Manual falls back to Modified if the expected column is unavailable;
+    # Modified falls back to Standard if Conditions has fewer than 2 levels.
+    mode <- featurefilt
+    filteredfeatures_col <- "FilteredFeatures"
+
+    if (mode == "Manual") {
+        if (!is.null(metadata_info) && "FilteredFeatures" %in% names(metadata_info)) {
+            filteredfeatures_col <- metadata_info[["FilteredFeatures"]]
+        }
+
+        if (is.null(metadata_feature) || !(filteredfeatures_col %in% colnames(metadata_feature))) {
+            msg <-
+                sprintf(
+                    "featurefilt = \"Manual\" was selected, but no column called \"%s\" was found in metadata_feature. Falling back to featurefilt = \"Modified\".",
+                    filteredfeatures_col
+                )
+            log_warn(msg)
+            message(msg)
+            warning(msg, call. = FALSE)
+            mode <- "Modified"
+        }
+    }
+
+    if (mode == "Modified") {
+        if (core) {
+            feat_filt_Conditions <- metadata_sample[[metadata_info[["Conditions"]]]][!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]]]
+        } else {
+            feat_filt_Conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
+        }
+
+        if (is.null(feat_filt_Conditions) || length(unique(feat_filt_Conditions)) <= 1) {
+            msg <-
+                paste0(
+                    "featurefilt = \"Modified\" requires at least 2 different Conditions in ",
+                    "the `Conditions` column of metadata_sample, but none or only one was ",
+                    "found. Falling back to featurefilt = \"Standard\"."
+                )
+            log_warn(msg)
+            message(msg)
+            warning(msg, call. = FALSE)
+            mode <- "Standard"
+        }
     }
 
     ## ------------------ Perform filtering ------------------ ##
-    if (featurefilt == "Modified") {
+    if (mode == "Manual") {
+        message <-
+            sprintf(
+                "feature_filtering: The features flagged by the user in the \"%s\" column of metadata_feature are removed, instead of computing filtering from a cutoff-based rule.",
+                filteredfeatures_col
+            )
+        log_info(message)
+        message(message)
+
+        ids <- rownames(metadata_feature)
+        flags <- as.logical(metadata_feature[[filteredfeatures_col]])
+
+        unknown_ids <- setdiff(ids, colnames(data))
+        if (length(unknown_ids) > 0) {
+            message <-
+                sprintf(
+                    "metadata_feature contains %d feature identifier(s) not found in data: %s",
+                    length(unknown_ids),
+                    paste0(unknown_ids, collapse = ", ")
+                )
+            log_info(message)
+            message(message)
+        }
+
+        flagged_ids <- unique(ids[flags %in% TRUE])
+        miss <- which(colnames(data) %in% flagged_ids)
+    } else if (mode == "Modified") {
         message <-
             paste0(
                 "feature_filtering: Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values (REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004). ",
@@ -1063,28 +1208,6 @@ feature_filtering <- function(
             )
         log_info(message)
         message(message)
-        if (core) {
-            feat_filt_Conditions <- metadata_sample[[metadata_info[["Conditions"]]]][!metadata_sample[[metadata_info[["Conditions"]]]] == metadata_info[["core_media"]]]
-        } else {
-            feat_filt_Conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
-        }
-
-        if (is.null(unique(feat_filt_Conditions))) {
-            message("Conditions information is missing.")
-            log_trace(message)
-            stop(message)
-        }
-        if (length(unique(feat_filt_Conditions)) == 1) {
-            msg <- paste0(
-                "to perform the Modified feature filtering there have to be at least 2 ",
-                "different Conditions in the `Condition` column in the Experimental ",
-                "design. Consider using the Standard feature filtering option."
-            )
-            log_info(msg)
-            message(msg)
-            log_trace(message)
-            stop(message)
-        }
 
         miss <- c()
         split_Input <-
@@ -1100,24 +1223,7 @@ feature_filtering <- function(
                     miss %<>% append(i)
             }
         }
-
-        if (length(miss) == 0) {  # remove metabolites if any are found
-            message("There where no metabolites exluded")
-            filtered_matrix <- data
-            feat_file_res <- "There where no metabolites exluded"
-        } else {
-            names <- unique(colnames(data)[miss])
-            msg <-
-                sprintf(
-                    "%d metabolites where removed: %s",
-                    length(unique(miss)),
-                    paste0(names, collapse = ", ")
-                )
-            log_info(msg)
-            message(msg)
-            filtered_matrix <- data[, -miss]
-        }
-    } else if (featurefilt == "Standard") {
+    } else if (mode == "Standard") {
         message <-
             paste0(
                 "feature_filtering: Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples (REF: Smilde et. al. (2005), Anal. Chem. 77, 6729-6736., doi:10.1021/ac051080y). ",
@@ -1135,36 +1241,42 @@ feature_filtering <- function(
             if (length(which(is.na(split_Input[, i]))) > (1-cutoff_featurefilt)*nrow(split_Input))
                 miss %<>% append(i)
         }
+    }
 
-        if (length(miss) == 0) {  # remove metabolites if any are found
-            message <- paste0("feature_filtering: There where no metabolites exluded")
-            log_info(message)
-            message(message)
-
-            filtered_matrix <- data
-            feat_file_res <- "There where no metabolites exluded"
-        } else {
-            names <- unique(colnames(data)[miss])
-            message <-
-                paste0(
-                    length(unique(miss)),
-                    " metabolites where removed: ",
-                    paste0(names, collapse = ", ")
-                )
-            log_info(message)
-            message(message)
-            filtered_matrix <- data[, -miss]
-        }
+    if (length(miss) == 0) {  # remove metabolites if any are found
+        message("feature_filtering: There where no metabolites exluded")
+        filtered_matrix <- data
+    } else {
+        names <- unique(colnames(data)[miss])
+        msg <-
+            sprintf(
+                "%d metabolites where removed: %s",
+                length(unique(miss)),
+                paste0(names, collapse = ", ")
+            )
+        log_info(msg)
+        message(msg)
+        filtered_matrix <- data[, -miss]
     }
 
     ## ------------------ Return ------------------ ##
     features_filtered <- unique(colnames(data)[miss]) %>% as.vector()
     filtered_matrix <- as.data.frame(mutate_all(as.data.frame(filtered_matrix), function(x) as.numeric(as.character(x))))
 
+    # Flag every feature in data (not only the ones removed) so the caller
+    # can add this information to feature-level metadata. Always named
+    # "FilteredFeatures" regardless of what the input column was called.
+    FilteredFeatures <-
+        data.frame(
+            FeatureID = colnames(data),
+            FilteredFeatures = colnames(data) %in% features_filtered,
+            row.names = colnames(data)
+        )
+
     Filtered_results <-
         list(
             "DF" = filtered_matrix,
-            "RemovedMetabolites" = features_filtered
+            "FilteredFeatures" = FilteredFeatures
         )
     invisible(return(Filtered_results))
 }

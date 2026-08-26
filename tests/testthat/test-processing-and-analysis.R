@@ -140,7 +140,8 @@ test_that("standalone preprocessing stages work on valid input", {
     cutoff_featurefilt = 0.8
   )
   expect_type(filtered, "list")
-  expect_true(all(c("DF", "RemovedMetabolites") %in% names(filtered)))
+  expect_true(all(c("DF", "FilteredFeatures") %in% names(filtered)))
+  expect_true(all(c("FeatureID", "FilteredFeatures") %in% names(filtered$FilteredFeatures)))
 
   imputed <- mvi_imputation(
     data = filtered$DF,
