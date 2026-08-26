@@ -231,3 +231,107 @@ test_that("standalone core_norm works on valid CoRe-style input", {
   expect_true(all(c("CV_core_blank", "core_Norm") %in% names(result$DF)))
   expect_s3_class(result$DF$core_Norm, "data.frame")
 })
+
+test_that("standalone preprocessing stages support SummarizedExperiment input", {
+  se <- mpv_intracell_se_fixture()
+  metadata_info <- c(
+    Conditions = "Conditions",
+    Biological_Replicates = "Biological_Replicates"
+  )
+
+  filtered <- feature_filtering(
+    data = se,
+    metadata_info = metadata_info,
+    core = FALSE,
+    featurefilt = "Standard",
+    cutoff_featurefilt = 0.8
+  )
+  expect_type(filtered, "list")
+  expect_true(all(c("DF", "RemovedMetabolites", "SE") %in% names(filtered)))
+  expect_true(inherits(filtered$SE, "SummarizedExperiment"))
+  expect_equal(
+    t(as.matrix(SummarizedExperiment::assay(filtered$SE))),
+    as.matrix(filtered$DF),
+    tolerance = 1e-8
+  )
+
+  imputed <- mvi_imputation(
+    data = se,
+    metadata_info = metadata_info,
+    core = FALSE,
+    mvi_percentage = 50
+  )
+  expect_type(imputed, "list")
+  expect_true(all(c("DF", "SE") %in% names(imputed)))
+  expect_true(inherits(imputed$SE, "SummarizedExperiment"))
+  expect_equal(
+    t(as.matrix(SummarizedExperiment::assay(imputed$SE))),
+    as.matrix(imputed$DF),
+    tolerance = 1e-8
+  )
+
+  tic_res <- suppressWarnings(tic_norm(
+    data = se,
+    metadata_info = c(Conditions = metadata_info[["Conditions"]]),
+    tic = TRUE
+  ))
+  expect_type(tic_res, "list")
+  expect_true(all(c("DF", "Plot", "SE") %in% names(tic_res)))
+  expect_true(inherits(tic_res$SE, "SummarizedExperiment"))
+  expect_equal(
+    t(as.matrix(SummarizedExperiment::assay(tic_res$SE))),
+    as.matrix(tic_res$DF$data_tic),
+    tolerance = 1e-8
+  )
+
+  tic_plots <- suppressWarnings(tic_norm(
+    data = se,
+    metadata_info = c(Conditions = metadata_info[["Conditions"]]),
+    tic = FALSE
+  ))
+  expect_type(tic_plots, "list")
+  expect_true("Plot" %in% names(tic_plots))
+  expect_false("SE" %in% names(tic_plots))
+
+  outlier_res <- suppressWarnings(outlier_detection(
+    data = se,
+    metadata_info = metadata_info,
+    core = FALSE,
+    hotellins_confidence = 0.99
+  ))
+  expect_type(outlier_res, "list")
+  expect_true(all(c("DF", "Plot", "SE") %in% names(outlier_res)))
+  expect_true(inherits(outlier_res$SE, "SummarizedExperiment"))
+  expect_true("Outliers" %in% colnames(SummarizedExperiment::colData(outlier_res$SE)))
+  expect_equal(
+    t(as.matrix(SummarizedExperiment::assay(outlier_res$SE))),
+    as.matrix(outlier_res$DF$data_outliers[, colnames(se), drop = FALSE]),
+    tolerance = 1e-8
+  )
+})
+
+test_that("standalone core_norm supports SummarizedExperiment input", {
+  fx <- mpv_medium_fixture(20)
+  se <- SummarizedExperiment::SummarizedExperiment(
+    assays = list(data = t(as.matrix(fx$data))),
+    colData = S4Vectors::DataFrame(fx$metadata_sample)
+  )
+
+  result <- suppressWarnings(core_norm(
+    data = se,
+    metadata_info = fx$metadata_info
+  ))
+
+  expect_type(result, "list")
+  expect_true(all(c("DF", "Plot", "SE") %in% names(result)))
+  expect_true(inherits(result$SE, "SummarizedExperiment"))
+  expect_equal(
+    t(as.matrix(SummarizedExperiment::assay(result$SE))),
+    as.matrix(result$DF$core_Norm),
+    tolerance = 1e-8
+  )
+  expect_equal(
+    rownames(SummarizedExperiment::colData(result$SE)),
+    rownames(result$DF$core_Norm)
+  )
+})

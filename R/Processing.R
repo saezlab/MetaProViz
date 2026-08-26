@@ -1028,6 +1028,12 @@ feature_filtering <- function(
     ## ------------ Create log file ----------- ##
     metaproviz_init()
 
+    se_input <- prepare_se_input(data = data, metadata_sample = metadata_sample)
+    input_data <- se_input$input_data
+    data <- se_input$data
+    metadata_sample <- se_input$metadata_sample
+    metadata_feature <- se_input$metadata_feature
+
     check_param(
         data = data,
         metadata_sample = metadata_sample,
@@ -1166,6 +1172,13 @@ feature_filtering <- function(
             "DF" = filtered_matrix,
             "RemovedMetabolites" = features_filtered
         )
+    if (inherits(input_data, "SummarizedExperiment")) {
+        Filtered_results[["SE"]] <- build_se_from_df(
+            assay_df = filtered_matrix,
+            metadata_sample = metadata_sample,
+            metadata_feature = metadata_feature
+        )
+    }
     invisible(return(Filtered_results))
 }
 
@@ -1231,6 +1244,12 @@ mvi_imputation <- function(
         core = FALSE,
         mvi_percentage = 50
 ) {
+
+    se_input <- prepare_se_input(data = data, metadata_sample = metadata_sample)
+    input_data <- se_input$input_data
+    data <- se_input$data
+    metadata_sample <- se_input$metadata_sample
+    metadata_feature <- se_input$metadata_feature
 
     check_param(
         data = data,
@@ -1384,6 +1403,16 @@ mvi_imputation <- function(
     }
 
     ## ------------------ Return ------------------ ##
+    if (inherits(input_data, "SummarizedExperiment")) {
+        invisible(return(list(
+            "SE" = build_se_from_df(
+                assay_df = filtered_matrix_res,
+                metadata_sample = metadata_sample,
+                metadata_feature = metadata_feature
+            ),
+            "DF" = filtered_matrix_res
+        )))
+    }
     invisible(return(filtered_matrix_res))
 }
 
@@ -1442,6 +1471,12 @@ tic_norm <- function(
         metadata_info,
         tic = TRUE
 ) {
+
+    se_input <- prepare_se_input(data = data, metadata_sample = metadata_sample)
+    input_data <- se_input$input_data
+    data <- se_input$data
+    metadata_sample <- se_input$metadata_sample
+    metadata_feature <- se_input$metadata_feature
 
     check_param(
         data = data,
@@ -1567,11 +1602,17 @@ tic_norm <- function(
 
 
         ## ------------------ Return ------------------ ##
-        Output_list <-
-            list(
-                "DF" = list("data_tic" = as.data.frame(data_tic)),
-                "Plot" = list( "norm_plots" = norm_plots, "RLA_AfterticNorm" = RLA_data_norm, "RLA_BeforeticNorm" = RLA_data_raw )
+        Output_list <- list(
+            "DF" = list("data_tic" = as.data.frame(data_tic)),
+            "Plot" = list( "norm_plots" = norm_plots, "RLA_AfterticNorm" = RLA_data_norm, "RLA_BeforeticNorm" = RLA_data_raw )
+        )
+        if (inherits(input_data, "SummarizedExperiment")) {
+            Output_list[["SE"]] <- build_se_from_df(
+                assay_df = as.data.frame(data_tic),
+                metadata_sample = metadata_sample,
+                metadata_feature = metadata_feature
             )
+        }
         invisible(return(Output_list))
     } else {
         ## ------------------ Return ------------------ ##
@@ -1639,6 +1680,14 @@ core_norm <- function(
         metadata_info
 ) {
 
+    metaproviz_init()
+
+    se_input <- prepare_se_input(data = data, metadata_sample = metadata_sample)
+    input_data <- se_input$input_data
+    data <- se_input$data
+    metadata_sample <- se_input$metadata_sample
+    metadata_feature <- se_input$metadata_feature
+
     check_param(
         data = data,
         metadata_sample = metadata_sample,
@@ -1652,11 +1701,12 @@ core_norm <- function(
 
     # NSE vs. R CMD check workaround
     Sample_type <- CV <- density <- HighVar <- NULL
+    PlotList <- list()
     ## ------------------ Prepare the data ------------------- ##
     data_tic <- data
     data_tic[is.na(data_tic)] <- 0
-
-    ## ------------------ Perform QC ------------------- ##
+    data_tic <- data
+    data_tic[is.na(data_tic)] <- 0
     Conditions <- metadata_sample[[metadata_info[["Conditions"]]]]
     core_medias <- data_tic[grep(metadata_info[["core_media"]], Conditions), ]
 
@@ -1666,7 +1716,13 @@ core_norm <- function(
         warning(message)
 
         core_media_df <- core_medias %>% t() %>% as.data.frame()
-        colnames(core_medias) <- "core_mediaMeans"
+        colnames(core_media_df) <- "core_mediaMeans"
+        cv_result_df <- data.frame(
+            CV = rep(0, ncol(core_medias)),
+            HighVar = FALSE,
+            MissingValuepercentage = colMeans(is.na(core_medias)) * 100,
+            row.names = colnames(core_medias)
+        )
     } else {
         ##########################################################################
         ## ------------------ QC Plots
@@ -1963,6 +2019,13 @@ core_norm <- function(
 
     # Return
     Output_list <- list("DF" = DF_list, "Plot" = PlotList)
+    if (inherits(input_data, "SummarizedExperiment")) {
+        Output_list[["SE"]] <- build_se_from_df(
+            assay_df = data_tic_coreNorm,
+            metadata_sample = metadata_sample,
+            metadata_feature = metadata_feature
+        )
+    }
     invisible(return(Output_list))
 }
 
@@ -2037,6 +2100,12 @@ outlier_detection <- function(
         core = FALSE,
         hotellins_confidence = 0.99
 ) {
+
+    se_input <- prepare_se_input(data = data, metadata_sample = metadata_sample)
+    input_data <- se_input$input_data
+    data <- se_input$data
+    metadata_sample <- se_input$metadata_sample
+    metadata_feature <- se_input$metadata_feature
 
     check_param(
         data = data,
@@ -2450,5 +2519,14 @@ outlier_detection <- function(
 
     # Return
     Output_list <- list("DF" = DF_list, "Plot" = outlier_plot_list)
+    if (inherits(input_data, "SummarizedExperiment")) {
+        assay_df <- data_norm_filtered_full[, colnames(data), drop = FALSE]
+        coldata_df <- data_norm_filtered_full[, setdiff(colnames(data_norm_filtered_full), colnames(data)), drop = FALSE]
+        Output_list[["SE"]] <- build_se_from_df(
+            assay_df = assay_df,
+            metadata_sample = coldata_df,
+            metadata_feature = metadata_feature
+        )
+    }
     invisible(return(Output_list))
 }
