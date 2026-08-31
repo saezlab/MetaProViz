@@ -28,9 +28,9 @@
 #' (consumption-release/core data).
 #'
 #' @author Christina Schmidt <\email{christina.schmidt@uni-heidelberg.de}>
-#'     and Denes Turei <\email{turei.denes@@gmail.com}> and Dimitrios
-#'     Prymidis and Macabe Daley and Julio Saez-Rodriguez and Christian
-#'     Frezza
+#'     and Jannik Franken and Denes Turei <\email{turei.denes@@gmail.com}>
+#'     and Dimitrios Prymidis and Macabe Daley and Julio Saez-Rodriguez
+#'     and Christian Frezza
 #'
 #' @name MetaProViz
 "_PACKAGE"

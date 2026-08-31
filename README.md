@@ -85,7 +85,7 @@ GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
 
 ## Contributors
 
-Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Jannik Franken, Christian Frezza, Julio Saez-Rodriguez
+Christina Schmidt, Jannik Franken, Denes Turei, Dimitrios Prymidis, Macabe Daley, Christian Frezza, Julio Saez-Rodriguez
 
 ## Citation
 
