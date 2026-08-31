@@ -3094,7 +3094,10 @@ check_param_id_processing <- function(
                 call. = FALSE
             )
         }
-        if (!(translation_from %in% prepare_input_for_traversal(data, selected_types = supported_id_types())$data_output %>% colnames())) {
+        available_columns <- colnames(
+            prepare_input_for_traversal(data, selected_types = supported_id_types())$data_output
+        )
+        if (!(translation_from %in% available_columns)) {
             stop(
                 sprintf("translation_from column '%s' was not found in data.", translation_from),
                 call. = FALSE
