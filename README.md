@@ -89,18 +89,17 @@ Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Jannik Franken
 
 ## Citation
 
-Please cite our bioRxiv preprint: https://www.biorxiv.org/content/10.1101/2025.08.18.670781v1.full
+Please cite our published article: https://link.springer.com/article/10.1038/s44320-026-00231-8
 
 ```
-@article{Schmidt_Turei_Prymidis_Daley_Frezza_Saez-Rodriguez_2025,
+@article{Schmidt_Franken_Turei_Prymidis_Daley_Frezza_Saez-Rodriguez_2026,
          title={Integrated metabolomics data analysis to generate mechanistic hypotheses with MetaProViz},
-         DOI={10.1101/2025.08.18.670781},
-         journal={BioRxiv},
-         author={Schmidt, Christina and Turei, Denes and Prymidis, Dimitrios and Daley, Macabe and Frezza, Christian and Saez-Rodriguez, Julio},
-         year={2025},
+         DOI={10.1038/s44320-026-00231-8},
+         journal={Molecular Systems Biology},
+         author={Schmidt, Christina and Franken, Jannik and Turei, Denes and Prymidis, Dimitrios and Daley, Macabe and Frezza, Christian and Saez-Rodriguez, Julio},
+         year={2026},
          month={Aug}}
 ```
-
 ## References
 
 Clark, David J, Saravana M Dhanasekaran, Francesca Petralia, Jianbo Pan, Xiaoyu Song, Yingwei Hu, Felipe da Veiga Leprevost, et al. 2019. "Integrated Proteogenomic Characterization of Clear Cell Renal Cell Carcinoma." *Cell* 179 (4): 964–983.e31. https://doi.org/10.1016/j.cell.2019.10.007.
