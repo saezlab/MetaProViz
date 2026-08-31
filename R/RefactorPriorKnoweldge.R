@@ -2384,7 +2384,14 @@ seed_id_compatibility_check <- function(
             "partial_handling_applied",
             "complete_handling_applied",
             "complete_handling_unresolved",
-            "retained_priority_namespace"
+            "retained_priority_namespace",
+            "n_HMDB_translated",
+            "n_KEGG_translated",
+            "n_CHEBI_translated",
+            "n_PUBCHEM_translated",
+            "mapping_expanded",
+            "ambiguous_seed",
+            "large_mapping"
         )))
     
     handled_prepared <- prepare_input_for_traversal(
@@ -2638,6 +2645,930 @@ traverse_ids <- function(
     }
     
     result
+}
+
+
+#' Process feature-metadata metabolite IDs in a staged workflow
+#'
+#' Runs an ID-space QC and expansion workflow on feature metadata using the
+#' exported MetaProViz ID helper functions. The workflow always starts with ID
+#' exploration using [compare_pk()] and [count_id()], can optionally perform
+#' automatic seed-ID compatibility handling, and can then run either
+#' [translate_id()] or [traverse_ids()].
+#'
+#' @param data Data frame with feature metadata and zero or more of the columns
+#'     `HMDB`, `KEGG`, `CHEBI`, and `PUBCHEM`. Column names are matched
+#'     case-insensitively to these canonical names.
+#' @param id_types Character vector of workflow-managed ID namespaces. Supported
+#'     values are `HMDB`, `KEGG`, `CHEBI`, and `PUBCHEM`.
+#' @param delimiter Character string indicating whether multiple IDs within one
+#'     cell are separated by semicolons or commas. Accepted values are `";"`,
+#'     `","`, `"semicolon"`, or `"comma"`.
+#' @param run_compatibility_check Logical; if `TRUE`, run
+#'     [seed_id_compatibility_check()] before any expansion step. Default is
+#'     `FALSE`.
+#' @param handle_partially_compatible Logical; forwarded to
+#'     [seed_id_compatibility_check()].
+#' @param handle_completely_incompatible Logical; forwarded to
+#'     [seed_id_compatibility_check()].
+#' @param completely_incompatible_priority Character vector defining the
+#'     namespace priority for resolving completely incompatible features.
+#' @param run_translation Logical; if `TRUE`, run a translation step after the
+#'     compatibility step. Mutually exclusive with `run_traversal`.
+#' @param translation_from Source namespace for [translate_id()]. Required when
+#'     `run_translation = TRUE`.
+#' @param translation_to One or more target namespaces for [translate_id()].
+#'     Required when `run_translation = TRUE`.
+#' @param translation_summary Logical; forwarded to [translate_id()].
+#' @param run_traversal Logical; if `TRUE`, run [traverse_ids()] after the
+#'     compatibility step. Mutually exclusive with `run_translation`. Default is
+#'     `FALSE`.
+#' @param edge_table Optional precomputed bidirectional edge table with columns
+#'     `id1`, `type1`, `id2`, `type2`. If `NULL`, it is built internally when
+#'     required for compatibility checking or traversal.
+#' @param compare_name_col Optional feature-name column passed to [compare_pk()]
+#'     during stage-wise ID-space exploration. If missing from `data`, it is
+#'     ignored automatically by [compare_pk()].
+#' @param save_plot Optional plot file type: `"svg"`, `"png"`, or `"pdf"`. If
+#'     `NULL`, plots are not saved.
+#' @param save_table Optional table file type: `"csv"`, `"xlsx"`, or `"txt"`.
+#'     If `NULL`, tables are not saved.
+#' @param print_plot Logical; whether saved plots should also be printed by
+#'     [save_res()].
+#' @param verbose Logical; forwarded to compatibility and traversal helpers to control their detailed logging. `id_processing()` always prints its own workflow progress and result overview. Default is `FALSE`.
+#' @param path Optional path where results should be saved.
+#'
+#' @return Named list with three top-level entries:
+#' \item{Data}{Feature-metadata tables for each workflow stage, the
+#'     aggregated ID-count summary, stage-wise QC tables, and any raw
+#'     compatibility, translation, or traversal tables produced by enabled
+#'     steps.}
+#' \item{Plot}{Stage-wise [compare_pk()] and [count_id()] plots.}
+#' \item{Workflow}{Chosen settings, steps run, collected stage messages, and a
+#'     final result-overview text.}
+#'
+#' @examples
+#' data(tissue_meta)
+#'
+#' qc_only <- id_processing(
+#'     data = tissue_meta[seq_len(min(40, nrow(tissue_meta))), , drop = FALSE],
+#'     save_plot = NULL,
+#'     save_table = NULL,
+#'     print_plot = FALSE,
+#'     verbose = FALSE
+#' )
+#'
+#' @importFrom dplyr bind_rows group_by left_join mutate rename select summarise
+#' @importFrom dplyr ungroup distinct rename_with any_of arrange first lag across all_of
+#' @export
+id_processing <- function(
+    data,
+    id_types = c("HMDB", "KEGG", "CHEBI", "PUBCHEM"),
+    delimiter = c(";", ","),
+    run_compatibility_check = FALSE,
+    handle_partially_compatible = TRUE,
+    handle_completely_incompatible = TRUE,
+    completely_incompatible_priority = c("HMDB", "CHEBI", "PUBCHEM", "KEGG"),
+    run_translation = FALSE,
+    translation_from = NULL,
+    translation_to = NULL,
+    translation_summary = FALSE,
+    run_traversal = FALSE,
+    edge_table = NULL,
+    compare_name_col = "Metabolite",
+    save_plot = "svg",
+    save_table = "csv",
+    print_plot = TRUE,
+    verbose = FALSE,
+    path = NULL
+) {
+    metaproviz_init()
+
+    check_param(
+        data = data,
+        data_num = FALSE,
+        save_plot = save_plot,
+        save_table = save_table,
+        print_plot = print_plot
+    )
+
+    workflow_check <- check_param_id_processing(
+        data = data,
+        id_types = id_types,
+        delimiter = delimiter,
+        run_compatibility_check = run_compatibility_check,
+        run_translation = run_translation,
+        translation_from = translation_from,
+        translation_to = translation_to,
+        run_traversal = run_traversal,
+        verbose = verbose
+    )
+
+    selected_types <- workflow_check$selected_types
+    delimiter_value <- workflow_check$delimiter_value
+    translation_from <- workflow_check$translation_from
+    translation_to <- workflow_check$translation_to
+    compare_name_col <- as.character(compare_name_col)[[1]]
+
+    if (!is.null(save_plot) || !is.null(save_table)) {
+        folder <- save_path(folder_name = "PK", path = path)
+        subfolder <- file.path(folder, "IDProcessing")
+        if (!dir.exists(subfolder)) {
+            dir.create(subfolder)
+        }
+    } else {
+        subfolder <- NULL
+    }
+
+    {
+        cat(sprintf(
+            paste0(
+                "[id_processing] Starting workflow on %d feature(s).\n",
+                "[id_processing] Selected namespaces: %s\n",
+                "[id_processing] Steps enabled: compatibility=%s, translation=%s, traversal=%s\n",
+                "[id_processing] Defaults/assumptions: partial_auto=%s, complete_auto=%s, complete_priority=%s\n"
+            ),
+            nrow(data),
+            paste(selected_types, collapse = ", "),
+            run_compatibility_check,
+            run_translation,
+            run_traversal,
+            handle_partially_compatible,
+            handle_completely_incompatible,
+            paste(normalize_id_types(completely_incompatible_priority), collapse = " > ")
+        ))
+    }
+
+    current_data <- prepare_input_for_traversal(data = data, selected_types = selected_types)$data_output
+    stage_data <- list(
+        input = current_data,
+        after_compatibility = NULL,
+        after_translation = NULL,
+        after_traversal = NULL
+    )
+    qc_by_stage <- list()
+    stage_messages <- character(0)
+    steps_run <- c("initial_exploration")
+    step_results <- list(
+        compatibility_result = NULL,
+        translation_result = NULL,
+        traversal_result = NULL
+    )
+
+    qc_by_stage$input <- run_id_processing_stage_qc(
+        data = current_data,
+        stage_label = "input",
+        selected_types = selected_types,
+        delimiter = delimiter_value,
+        compare_name_col = compare_name_col,
+        save_plot = save_plot,
+        save_table = save_table,
+        print_plot = print_plot,
+        path = subfolder,
+        verbose = verbose
+    )
+    stage_messages <- c(stage_messages, qc_by_stage$input$message)
+
+    if (isTRUE(run_compatibility_check)) {
+        steps_run <- c(steps_run, "compatibility_check")
+        {
+            cat("[id_processing] Running seed_id_compatibility_check().\n")
+        }
+
+        compatibility_result <- seed_id_compatibility_check(
+            data = current_data,
+            id_types = selected_types,
+            delimiter = delimiter_value,
+            verbose = verbose,
+            edge_table = edge_table,
+            handle_partially_compatible = handle_partially_compatible,
+            handle_completely_incompatible = handle_completely_incompatible,
+            completely_incompatible_priority = completely_incompatible_priority
+        )
+        step_results$compatibility_result <- compatibility_result
+        current_data <- strip_seed_handling_qc_columns(compatibility_result$data_after_handling)
+        stage_data$after_compatibility <- current_data
+
+        qc_by_stage$after_compatibility <- run_id_processing_stage_qc(
+            data = current_data,
+            stage_label = "after_compatibility",
+            selected_types = selected_types,
+            delimiter = delimiter_value,
+            compare_name_col = compare_name_col,
+            save_plot = save_plot,
+            save_table = save_table,
+            print_plot = print_plot,
+            path = subfolder,
+            verbose = verbose
+        )
+        stage_messages <- c(stage_messages, qc_by_stage$after_compatibility$message)
+    }
+
+    if (isTRUE(run_translation)) {
+        steps_run <- c(steps_run, "translation")
+        {
+            cat(sprintf(
+                "[id_processing] Running translate_id() from %s to %s.\n",
+                translation_from,
+                paste(translation_to, collapse = ", ")
+            ))
+        }
+
+        translation_result <- run_id_processing_translation(
+            data = current_data,
+            translation_from = translation_from,
+            translation_to = translation_to,
+            delimiter_value = delimiter_value,
+            translation_summary = translation_summary,
+            save_table = save_table,
+            path = subfolder
+        )
+        step_results$translation_result <- translation_result
+        current_data <- translation_result$data_after_translation
+        stage_data$after_translation <- current_data
+
+        qc_by_stage$after_translation <- run_id_processing_stage_qc(
+            data = current_data,
+            stage_label = "after_translation",
+            selected_types = selected_types,
+            delimiter = delimiter_value,
+            compare_name_col = compare_name_col,
+            save_plot = save_plot,
+            save_table = save_table,
+            print_plot = print_plot,
+            path = subfolder,
+            verbose = verbose
+        )
+        stage_messages <- c(stage_messages, qc_by_stage$after_translation$message)
+    }
+
+    if (isTRUE(run_traversal)) {
+        steps_run <- c(steps_run, "traversal")
+        {
+            cat("[id_processing] Running traverse_ids().\n")
+        }
+
+        traversal_result <- traverse_ids(
+            data = current_data,
+            id_types = selected_types,
+            delimiter = delimiter_value,
+            save_table = save_table,
+            path = subfolder,
+            verbose = verbose
+        )
+        step_results$traversal_result <- traversal_result
+        current_data <- materialize_traversed_ids(
+            data = traversal_result$ExpandedDF,
+            selected_types = selected_types
+        )
+        stage_data$after_traversal <- current_data
+
+        qc_by_stage$after_traversal <- run_id_processing_stage_qc(
+            data = current_data,
+            stage_label = "after_traversal",
+            selected_types = selected_types,
+            delimiter = delimiter_value,
+            compare_name_col = compare_name_col,
+            save_plot = save_plot,
+            save_table = save_table,
+            print_plot = print_plot,
+            path = subfolder,
+            verbose = verbose
+        )
+        stage_messages <- c(stage_messages, qc_by_stage$after_traversal$message)
+    }
+
+    id_count_summary <- build_id_processing_count_summary(qc_by_stage = qc_by_stage)
+    compare_pk_summary_by_stage <- extract_compare_pk_tables(qc_by_stage)
+    count_id_tables_by_stage <- extract_count_id_tables(qc_by_stage)
+
+    result_overview_text <- build_id_processing_result_text(
+        steps_run = steps_run,
+        stage_data = stage_data,
+        qc_by_stage = qc_by_stage
+    )
+
+    result <- list(
+        Data = list(
+            input = stage_data$input,
+            after_compatibility = stage_data$after_compatibility,
+            after_translation = stage_data$after_translation,
+            after_traversal = stage_data$after_traversal,
+            id_count_summary = id_count_summary,
+            compare_pk_summary_by_stage = compare_pk_summary_by_stage,
+            count_id_tables_by_stage = count_id_tables_by_stage,
+            compatibility = if (!is.null(step_results$compatibility_result)) {
+                list(
+                    feature_summary = step_results$compatibility_result$feature_compatibility_summary,
+                    pairs_before_handling = step_results$compatibility_result$ID_pair_compatibility,
+                    pairs_after_handling = step_results$compatibility_result$ID_pair_compatibility_after_handling
+                )
+            } else {
+                NULL
+            },
+            translation = if (!is.null(step_results$translation_result)) {
+                list(
+                    input = step_results$translation_result$translation_input,
+                    translated_ids = step_results$translation_result$translated_df
+                )
+            } else {
+                NULL
+            },
+            traversal = if (!is.null(step_results$traversal_result)) {
+                list(
+                    pair_compatibility = step_results$traversal_result$ID_pair_compatibility,
+                    prior_knowledge_edges = step_results$traversal_result$ID_Edges_prior_knowledge
+                )
+            } else {
+                NULL
+            }
+        ),
+        Plot = list(
+            compare_pk_by_stage = lapply(qc_by_stage, function(x) x$compare_pk$upset_plot),
+            count_id_by_stage = lapply(qc_by_stage, function(x) lapply(x$count_id, function(y) y$Plot))
+        ),
+        Workflow = list(
+            settings = list(
+                id_types = selected_types,
+                delimiter = delimiter_value,
+                run_compatibility_check = run_compatibility_check,
+                handle_partially_compatible = handle_partially_compatible,
+                handle_completely_incompatible = handle_completely_incompatible,
+                completely_incompatible_priority = normalize_id_types(completely_incompatible_priority),
+                run_translation = run_translation,
+                translation_from = translation_from,
+                translation_to = translation_to,
+                translation_summary = translation_summary,
+                run_traversal = run_traversal
+            ),
+            steps_run = steps_run,
+            stage_messages = stage_messages,
+            result_overview_text = result_overview_text
+        )
+    )
+    result$Data <- Filter(Negate(is.null), result$Data)
+
+    if (!is.null(subfolder) && (!is.null(save_plot) || !is.null(save_table))) {
+        save_id_processing_outputs(
+            result = result,
+            save_table = save_table,
+            save_plot = save_plot,
+            print_plot = print_plot,
+            path = subfolder
+        )
+    }
+
+    {
+        cat(sprintf("[id_processing] %s\n", paste(stage_messages, collapse = "\n[id_processing] ")))
+        cat(sprintf("[id_processing] %s\n", result_overview_text))
+        cat(paste(
+            "[id_processing] Suggestion: equivalent_id() is not part of this workflow yet.",
+            "If you want additional ambiguity-aware within-namespace expansion, run it afterwards on the final feature metadata.",
+            sep = " "
+        ))
+        cat("\n")
+    }
+
+    result
+}
+
+
+#' @noRd
+check_param_id_processing <- function(
+    data,
+    id_types,
+    delimiter,
+    run_compatibility_check,
+    run_translation,
+    translation_from,
+    translation_to,
+    run_traversal,
+    verbose
+) {
+    selected_types <- normalize_id_types(id_types)
+    if (length(selected_types) == 0L) {
+        stop("id_types must contain at least one supported ID type.", call. = FALSE)
+    }
+
+    unsupported_types <- setdiff(selected_types, supported_id_types())
+    if (length(unsupported_types) > 0L) {
+        stop(
+            sprintf("Unsupported id_types: %s", paste(unsupported_types, collapse = ", ")),
+            call. = FALSE
+        )
+    }
+
+    delimiter_value <- normalize_delimiter(delimiter)
+
+    if (!is.logical(run_compatibility_check) || length(run_compatibility_check) != 1L) {
+        stop("run_compatibility_check must be TRUE or FALSE.", call. = FALSE)
+    }
+    if (!is.logical(run_translation) || length(run_translation) != 1L) {
+        stop("run_translation must be TRUE or FALSE.", call. = FALSE)
+    }
+    if (!is.logical(run_traversal) || length(run_traversal) != 1L) {
+        stop("run_traversal must be TRUE or FALSE.", call. = FALSE)
+    }
+    if (!is.logical(verbose) || length(verbose) != 1L) {
+        stop("verbose must be TRUE or FALSE.", call. = FALSE)
+    }
+    if (isTRUE(run_translation) && isTRUE(run_traversal)) {
+        stop(
+            "run_translation and run_traversal are mutually exclusive. Choose one workflow expansion step per run.",
+            call. = FALSE
+        )
+    }
+
+    if (isTRUE(run_translation)) {
+        if (is.null(translation_from) || length(translation_from) == 0L) {
+            stop("translation_from must be provided when run_translation = TRUE.", call. = FALSE)
+        }
+        translation_from <- normalize_id_types(translation_from)[[1]]
+        if (!(translation_from %in% supported_id_types())) {
+            stop("translation_from must be one of HMDB, KEGG, CHEBI, PUBCHEM.", call. = FALSE)
+        }
+
+        if (is.null(translation_to) || length(translation_to) == 0L) {
+            stop(
+                "translation_to must contain at least one target namespace when run_translation = TRUE.",
+                call. = FALSE
+            )
+        }
+        if (!(translation_from %in% prepare_input_for_traversal(data, selected_types = supported_id_types())$data_output %>% colnames())) {
+            stop(
+                sprintf("translation_from column '%s' was not found in data.", translation_from),
+                call. = FALSE
+            )
+        }
+        translation_to <- normalize_id_types(translation_to)
+        unsupported_targets <- setdiff(translation_to, supported_id_types())
+        if (length(unsupported_targets) > 0L) {
+            stop(
+                sprintf(
+                    "Unsupported translation_to values: %s",
+                    paste(unsupported_targets, collapse = ", ")
+                ),
+                call. = FALSE
+            )
+        }
+    } else {
+        translation_from <- NULL
+        translation_to <- NULL
+    }
+
+    if (!any(tolower(colnames(data)) %in% tolower(selected_types))) {
+        stop("At least one selected ID column must exist in data.", call. = FALSE)
+    }
+
+    list(
+        selected_types = selected_types,
+        delimiter_value = delimiter_value,
+        translation_from = translation_from,
+        translation_to = translation_to
+    )
+}
+
+
+#' @noRd
+strip_seed_handling_qc_columns <- function(data) {
+    data %>%
+        dplyr::select(-dplyr::any_of(c(
+            "original_row_id",
+            "n_seed_ids",
+            "n_pairs",
+            "n_true",
+            "n_false",
+            "all_seed_ids_compatible",
+            "compatibility_class",
+            "partial_handling_applied",
+            "complete_handling_applied",
+            "complete_handling_unresolved",
+            "retained_priority_namespace",
+            "n_HMDB_translated",
+            "n_KEGG_translated",
+            "n_CHEBI_translated",
+            "n_PUBCHEM_translated",
+            "mapping_expanded",
+            "ambiguous_seed",
+            "large_mapping"
+        )))
+}
+
+
+#' @noRd
+materialize_traversed_ids <- function(data, selected_types) {
+    translated_columns <- paste0(selected_types, "_translated")
+
+    for (id_type in selected_types) {
+        translated_column <- paste0(id_type, "_translated")
+        if (translated_column %in% colnames(data)) {
+            data[[id_type]] <- data[[translated_column]]
+        }
+    }
+
+    data %>%
+        dplyr::select(-dplyr::any_of(translated_columns)) %>%
+        strip_seed_handling_qc_columns()
+}
+
+
+#' @noRd
+run_id_processing_stage_qc <- function(
+    data,
+    stage_label,
+    selected_types,
+    delimiter,
+    compare_name_col,
+    save_plot,
+    save_table,
+    print_plot,
+    path,
+    verbose
+) {
+    {
+        cat(sprintf("[id_processing] Quantifying ID space for stage '%s'.\n", stage_label))
+    }
+
+    stage_path <- path
+    if (!is.null(path) && (!is.null(save_plot) || !is.null(save_table))) {
+        stage_path <- file.path(path, stage_label)
+        if (!dir.exists(stage_path)) {
+            dir.create(stage_path)
+        }
+    }
+
+    compare_res <- compare_pk(
+        data = list(Current = data),
+        metadata_info = list(Current = selected_types),
+        name_col = compare_name_col,
+        plot_name = sprintf("ID overlap at stage: %s", stage_label),
+        save_plot = save_plot,
+        save_table = save_table,
+        print_plot = print_plot,
+        path = stage_path
+    )
+
+    count_results <- lapply(
+        selected_types,
+        function(id_type) {
+            count_id(
+                data = data,
+                column = id_type,
+                delimiter = delimiter,
+                title_prefix = sprintf("%s IDs per feature at stage: %s", id_type, stage_label),
+                save_plot = save_plot,
+                save_table = save_table,
+                print_plot = print_plot,
+                path = stage_path
+            )
+        }
+    )
+    names(count_results) <- selected_types
+
+    count_summary <- dplyr::bind_rows(
+        lapply(
+            selected_types,
+            function(id_type) {
+                tbl <- count_results[[id_type]]$Table
+                dplyr::tibble(
+                    stage = stage_label,
+                    namespace = id_type,
+                    n_features = nrow(tbl),
+                    n_no_id = sum(tbl$id_label %in% "No ID"),
+                    n_single_id = sum(tbl$id_label %in% "Single ID"),
+                    n_multiple_ids = sum(tbl$id_label %in% "Multiple IDs"),
+                    n_total_ids = sum(tbl$entry_count, na.rm = TRUE)
+                )
+            }
+        )
+    )
+
+    message <- paste0(
+        "Stage '", stage_label, "': ",
+        paste(
+            sprintf(
+                "%s total_ids=%d no_id=%d single=%d multiple=%d",
+                count_summary$namespace,
+                count_summary$n_total_ids,
+                count_summary$n_no_id,
+                count_summary$n_single_id,
+                count_summary$n_multiple_ids
+            ),
+            collapse = " | "
+        )
+    )
+
+    list(
+        stage = stage_label,
+        compare_pk = compare_res,
+        count_id = count_results,
+        count_summary = count_summary,
+        message = message
+    )
+}
+
+
+#' @noRd
+build_id_processing_count_summary <- function(qc_by_stage) {
+    summary_tbl <- dplyr::bind_rows(lapply(qc_by_stage, function(x) x$count_summary))
+    if (nrow(summary_tbl) == 0L) {
+        return(dplyr::tibble())
+    }
+
+    stage_order <- names(qc_by_stage)
+    summary_tbl$stage <- factor(summary_tbl$stage, levels = stage_order)
+    summary_tbl <- summary_tbl %>%
+        dplyr::arrange(namespace, stage) %>%
+        dplyr::group_by(namespace) %>%
+        dplyr::mutate(
+            delta_no_id_vs_previous = n_no_id - dplyr::lag(n_no_id, default = dplyr::first(n_no_id)),
+            delta_single_id_vs_previous = n_single_id - dplyr::lag(n_single_id, default = dplyr::first(n_single_id)),
+            delta_multiple_id_vs_previous = n_multiple_ids - dplyr::lag(n_multiple_ids, default = dplyr::first(n_multiple_ids)),
+            delta_total_ids_vs_previous = n_total_ids - dplyr::lag(n_total_ids, default = dplyr::first(n_total_ids)),
+            delta_no_id_vs_input = n_no_id - dplyr::first(n_no_id),
+            delta_single_id_vs_input = n_single_id - dplyr::first(n_single_id),
+            delta_multiple_id_vs_input = n_multiple_ids - dplyr::first(n_multiple_ids),
+            delta_total_ids_vs_input = n_total_ids - dplyr::first(n_total_ids)
+        ) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(stage = as.character(stage)) %>%
+        dplyr::select(
+            stage,
+            namespace,
+            n_features,
+            n_no_id,
+            n_single_id,
+            n_multiple_ids,
+            n_total_ids,
+            delta_no_id_vs_previous,
+            delta_single_id_vs_previous,
+            delta_multiple_id_vs_previous,
+            delta_total_ids_vs_previous,
+            delta_no_id_vs_input,
+            delta_single_id_vs_input,
+            delta_multiple_id_vs_input,
+            delta_total_ids_vs_input
+        )
+
+    summary_tbl
+}
+
+
+#' @noRd
+extract_compare_pk_tables <- function(qc_by_stage) {
+    out <- lapply(qc_by_stage, function(x) x$compare_pk$summary_table)
+    names(out) <- names(qc_by_stage)
+    out
+}
+
+
+#' @noRd
+extract_count_id_tables <- function(qc_by_stage) {
+    out <- lapply(
+        qc_by_stage,
+        function(x) {
+            lapply(x$count_id, function(y) y$Table)
+        }
+    )
+    names(out) <- names(qc_by_stage)
+    out
+}
+
+
+#' @noRd
+build_id_processing_result_text <- function(steps_run, stage_data, qc_by_stage) {
+    final_stage <- names(qc_by_stage)[[length(qc_by_stage)]]
+    paste(
+        sprintf("Workflow steps run: %s.", paste(steps_run, collapse = " -> ")),
+        sprintf("Returned Data tables: %s.", paste(names(Filter(Negate(is.null), stage_data)), collapse = ", ")),
+        sprintf("Returned Plot stages: %s.", paste(names(qc_by_stage), collapse = ", ")),
+        sprintf(
+            "Final stage '%s' contains %d feature(s).",
+            final_stage,
+            nrow(stage_data[[final_stage]])
+        )
+    )
+}
+
+
+#' @noRd
+build_id_processing_translation_input <- function(data, translation_from, delimiter_value) {
+    split_pattern <- delimiter_to_pattern(delimiter_value)
+    values <- if (translation_from %in% colnames(data)) data[[translation_from]] else rep(NA_character_, nrow(data))
+
+    long_rows <- lapply(
+        seq_len(nrow(data)),
+        function(i) {
+            ids <- split_ids(values[[i]], type = translation_from, split_pattern = split_pattern)
+            if (length(ids) == 0L) {
+                return(NULL)
+            }
+            data.frame(
+                workflow_row_id = i,
+                workflow_group = paste0("feature_", i),
+                workflow_input_id = ids,
+                stringsAsFactors = FALSE
+            )
+        }
+    )
+    long_rows <- Filter(Negate(is.null), long_rows)
+
+    if (length(long_rows) == 0L) {
+        return(data.frame(
+            workflow_row_id = integer(),
+            workflow_group = character(),
+            workflow_input_id = character(),
+            stringsAsFactors = FALSE
+        ))
+    }
+
+    dplyr::bind_rows(long_rows)
+}
+
+
+#' @noRd
+merge_translated_ids_into_data <- function(
+    data,
+    translation_df,
+    translation_to,
+    delimiter_value
+) {
+    split_pattern <- delimiter_to_pattern(delimiter_value)
+    merged <- data
+
+    if (nrow(translation_df) == 0L) {
+        return(prepare_input_for_traversal(merged, selected_types = supported_id_types())$data_output)
+    }
+
+    rowwise_translation <- translation_df %>%
+        dplyr::group_by(workflow_row_id) %>%
+        dplyr::summarise(
+            dplyr::across(
+                all_of(tolower(translation_to)),
+                ~ paste(unique(stats::na.omit(.x[.x != ""])), collapse = ", ")
+            ),
+            .groups = "drop"
+        )
+
+    for (id_type in translation_to) {
+        target_col <- id_type
+        source_col <- tolower(id_type)
+        if (!(target_col %in% colnames(merged))) {
+            merged[[target_col]] <- NA_character_
+        }
+
+        translated_by_row <- rep(NA_character_, nrow(merged))
+        if (source_col %in% colnames(rowwise_translation)) {
+            translated_by_row[rowwise_translation$workflow_row_id] <- rowwise_translation[[source_col]]
+        }
+
+        merged[[target_col]] <- vapply(
+            seq_len(nrow(merged)),
+            function(i) {
+                existing_ids <- split_ids(
+                    merged[[target_col]][[i]],
+                    type = id_type,
+                    split_pattern = split_pattern
+                )
+                translated_ids <- split_ids(
+                    translated_by_row[[i]],
+                    type = id_type,
+                    split_pattern = ",\\s*"
+                )
+                combined_ids <- unique(c(existing_ids, translated_ids))
+                format_output_ids(combined_ids, id_type)
+            },
+            character(1)
+        )
+    }
+
+    prepare_input_for_traversal(merged, selected_types = supported_id_types())$data_output
+}
+
+
+#' @noRd
+run_id_processing_translation <- function(
+    data,
+    translation_from,
+    translation_to,
+    delimiter_value,
+    translation_summary,
+    save_table,
+    path
+) {
+    translation_input <- build_id_processing_translation_input(
+        data = data,
+        translation_from = translation_from,
+        delimiter_value = delimiter_value
+    )
+
+    if (nrow(translation_input) == 0L) {
+        return(list(
+            translation_input = translation_input,
+            translation_result = NULL,
+            data_after_translation = data
+        ))
+    }
+
+    translation_result <- translate_id(
+        data = translation_input,
+        metadata_info = c(
+            InputID = "workflow_input_id",
+            grouping_variable = "workflow_group"
+        ),
+        from = tolower(translation_from),
+        to = tolower(translation_to),
+        summary = translation_summary,
+        save_table = save_table,
+        path = path
+    )
+
+    translated_df <- translation_result$TranslatedDF
+
+    data_after_translation <- merge_translated_ids_into_data(
+        data = data,
+        translation_df = translated_df,
+        translation_to = translation_to,
+        delimiter_value = delimiter_value
+    )
+
+    list(
+        translation_input = translation_input,
+        translation_result = translation_result,
+        translated_df = translated_df,
+        data_after_translation = data_after_translation
+    )
+}
+
+
+#' @noRd
+save_id_processing_outputs <- function(result, save_table, save_plot, print_plot, path) {
+    df_list <- list(
+        input = result$Data$input,
+        id_count_summary = result$Data$id_count_summary
+    )
+    df_list <- Filter(Negate(is.null), df_list)
+
+    if (!is.null(result$Data$after_compatibility)) {
+        df_list$after_compatibility <- result$Data$after_compatibility
+    }
+    if (!is.null(result$Data$after_translation)) {
+        df_list$after_translation <- result$Data$after_translation
+    }
+    if (!is.null(result$Data$after_traversal)) {
+        df_list$after_traversal <- result$Data$after_traversal
+    }
+
+    compare_tables <- result$Data$compare_pk_summary_by_stage
+    for (stage_name in names(compare_tables)) {
+        df_list[[paste0("compare_pk_", stage_name)]] <- compare_tables[[stage_name]]
+    }
+
+    count_tables <- result$Data$count_id_tables_by_stage
+    for (stage_name in names(count_tables)) {
+        for (id_type in names(count_tables[[stage_name]])) {
+            df_list[[paste0("count_id_", stage_name, "_", id_type)]] <- count_tables[[stage_name]][[id_type]]
+        }
+    }
+
+    if (!is.null(result$Data$compatibility)) {
+        compat <- result$Data$compatibility
+        df_list$compatibility_feature_summary <- compat$feature_summary
+        df_list$compatibility_pairs_before <- compat$pairs_before_handling
+        df_list$compatibility_pairs_after <- compat$pairs_after_handling
+    }
+
+    if (!is.null(result$Data$translation)) {
+        df_list$translation_input <- result$Data$translation$input
+        df_list$translation_translated_ids <- result$Data$translation$translated_ids
+    }
+
+    if (!is.null(result$Data$traversal)) {
+        trav <- result$Data$traversal
+        df_list$traversal_pairs <- trav$pair_compatibility
+        df_list$traversal_edges <- trav$prior_knowledge_edges
+    }
+
+    plot_list <- list()
+    for (stage_name in names(result$Plot$compare_pk_by_stage)) {
+        plot_list[[paste0("compare_pk_", stage_name)]] <- result$Plot$compare_pk_by_stage[[stage_name]]
+    }
+    for (stage_name in names(result$Plot$count_id_by_stage)) {
+        for (id_type in names(result$Plot$count_id_by_stage[[stage_name]])) {
+            plot_list[[paste0("count_id_", stage_name, "_", id_type)]] <- result$Plot$count_id_by_stage[[stage_name]][[id_type]]
+        }
+    }
+
+    save_res(
+        inputlist_df = df_list,
+        inputlist_plot = plot_list,
+        save_table = save_table,
+        save_plot = save_plot,
+        path = path,
+        file_name = "id_processing",
+        core = FALSE,
+        print_plot = print_plot
+    )
 }
 
 
