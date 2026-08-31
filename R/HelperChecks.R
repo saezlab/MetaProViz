@@ -563,7 +563,7 @@ check_param_feature_filtering <- function(
     featurefilt = "Modified",
     cutoff_featurefilt = 0.8
 ) {
-    Feature_Filtering_options <- c("Standard", "Modified")
+    Feature_Filtering_options <- c("Standard", "Modified", "Manual")
 
     if (!(is.null(featurefilt) || featurefilt %in% Feature_Filtering_options)) {
         message <-
@@ -576,6 +576,11 @@ check_param_feature_filtering <- function(
         stop(message)
     }
 
+    # Note: whether metadata_feature is usable for featurefilt = "Manual" is
+    # not validated here, since an unusable metadata_feature is not an error
+    # — feature_filtering() falls back to "Modified"/"Standard" with a
+    # warning instead. cutoff_featurefilt is still validated unconditionally,
+    # since it may end up being used after such a fallback.
     if (
         !is.numeric(cutoff_featurefilt) |
         length(cutoff_featurefilt) != 1 |

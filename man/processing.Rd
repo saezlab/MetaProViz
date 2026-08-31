@@ -7,6 +7,7 @@
 processing(
   data,
   metadata_sample = NULL,
+  metadata_feature = NULL,
   metadata_info = c(Conditions = "Conditions"),
   featurefilt = "Modified",
   cutoff_featurefilt = 0.8,
@@ -34,6 +35,14 @@ input data based on unique sample identifiers used as row names. Must
 contain Conditions column. If experiment has no multiple conditions,
 assign all samples to same condition. Default: NULL.}
 
+\item{metadata_feature}{Data frame (optional). Only used if data is not a
+SummarizedExperiment (if it is, this is instead extracted from rowData).
+Contains feature-level metadata, with feature identifiers matching the
+column names of data as row names. Only required if featurefilt =
+"Manual", in which case it must contain a logical TRUE/FALSE column
+(TRUE = remove this feature) named "FilteredFeatures", or as configured
+via metadata_info. Default: NULL.}
+
 \item{metadata_info}{Named character vector (optional). Contains names of experimental
 parameters: c(Conditions="ColumnName",
 Biological_Replicates="ColumnName"). Column "Conditions" (mandatory)
@@ -42,16 +51,24 @@ feature filtering and PCA color coding. Column "BiologicalReplicates"
 (optional) contains numerical values. For core=TRUE, must also add
 core_norm_factor="ColumnName" and core_media="ColumnName". Column
 core_norm_factor is used for normalization; core_media specifies media
-controls in Conditions. Default: c(Conditions="Conditions").}
+controls in Conditions. Optionally, FilteredFeatures="ColumnName" names
+the column in metadata_feature holding the manual TRUE/FALSE flags for
+featurefilt = "Manual"; if not given, a column literally named
+"FilteredFeatures" is expected. Default: c(Conditions="Conditions").}
 
 \item{featurefilt}{Character (optional). If NULL, no feature filtering is performed. If
 "Standard", applies 80\% filtering rule (Bijlsma et al., 2006) on
 metabolite features across whole dataset. If "Modified", filtering is
 done per condition and Conditions column must be provided (Yang et al.,
-2015). Default: "Standard".}
+2015). If "Manual", the features to remove are taken directly from
+metadata_feature instead of being computed from a cutoff. If the
+expected column is missing from metadata_feature, a warning is raised
+and "Modified" is used instead; if "Modified" itself cannot be used
+because Conditions has fewer than 2 levels, a further warning is raised
+and "Standard" is used. Default: "Standard".}
 
-\item{cutoff_featurefilt}{Numeric (optional). Percentage threshold for feature filtering. Default:
-0.8.}
+\item{cutoff_featurefilt}{Numeric (optional). Percentage threshold for feature filtering. Ignored
+if featurefilt = "Manual". Default: 0.8.}
 
 \item{tic}{Logical (optional). Whether total ion count normalization is performed.
 Default: TRUE.}
@@ -88,7 +105,12 @@ Default: NULL.}
 }
 \value{
 List with two elements: DF (all output tables generated) and Plot (all
-plots generated).
+plots generated). If featurefilt is not NULL, DF includes a
+Feature_matrix table listing every input feature (not only the removed
+ones) with a FilteredFeatures column (TRUE/FALSE). If data is a
+SummarizedExperiment, the same FilteredFeatures column is added to the
+rowData (feature matrix) of the returned data_Rawdata
+SummarizedExperiment.
 }
 \description{
 Applies modular normalization including 80\% filtering rule, total-ion count
