@@ -21,6 +21,15 @@ resource_files:
 editor_options:
   chunk_output_type: console
 ---
+```{=html}
+<style>
+@media (min-width: 992px) { .container, .main-container { width: 82vw !important; max-width: 82vw !important; } }
+pre, pre code { max-width: 100%; font-size: 0.95rem; }
+table { display: block; width: fit-content; max-width: 100%; overflow-x: auto; margin: 1.25rem auto !important; white-space: nowrap; }
+table caption { caption-side: top; text-align: center; font-weight: 600; white-space: normal; }
+</style>
+```
+
 
 ```{r chunk_setup, include = FALSE}
 knitr::opts_chunk$set(
@@ -31,7 +40,7 @@ knitr::opts_chunk$set(
 
 # <img src="../Hexagon_MetaProViz.png" align="right" width="200" />
 
-This vignette demonstrates the `id_processing()` workflow for feature metadata in **MetaProViz**. The function is designed to orchestrate ID-space exploration and optional downstream processing in a transparent way rather than hide the individual helper functions. The workflow can quantify the current ID space, optionally run automatic seed-ID compatibility handling, and then optionally continue with either ID translation or ID traversal.
+This vignette demonstrates the `id_processing()` workflow for feature metadata in **MetaProViz**. The function can quantify the current ID space, perform automatic seed-ID compatibility handling, and expand the ID space through graph traversal.
 
 The vignette uses the packaged `tissue_meta` example. This dataset is the package-safe equivalent of the older Revision-branch feature-metadata workflow, but the workflow shown here intentionally replaces the previously manual ID handling with the automatic compatibility handling now available through `seed_id_compatibility_check()`.
 
@@ -39,6 +48,7 @@ The vignette uses the packaged `tissue_meta` example. This dataset is the packag
 library(MetaProViz)
 library(dplyr)
 library(tibble)
+library(knitr)
 
 data(tissue_meta)
 
@@ -48,15 +58,11 @@ Tissue_MetaData <- tissue_meta %>%
 
 The workflow-managed identifier namespaces are currently `HMDB`, `KEGG`, `CHEBI`, and `PUBCHEM`. These columns are treated as the canonical ID-space columns, while other metadata columns such as names, pathway classes, or platform information are preserved across all workflow stages.
 
-## Default workflow: exploration only
+## Inspection-only workflow
 
-The current default behavior is intentionally conservative. By default, `id_processing()` performs the initial ID-space quantification and then stops. In particular, `run_compatibility_check = FALSE`, `run_translation = FALSE`, `run_traversal = FALSE`, and `verbose = FALSE` by default. This means that users explicitly opt into the more opinionated or more computationally involved processing steps.
+An inspection-only run quantifies the current identifier coverage and overlap structure without changing the feature metadata. The call and its result-inspection code are shown below for reference, but are not evaluated in this vignette.
 
-`verbose` controls detailed logging from the delegated compatibility and traversal helpers. The `id_processing()` workflow itself always prints its stage progress and result overview.
-
-The explicit default call is shown below with every parameter written out:
-
-```{r id-processing-default, eval=TRUE}
+```{r id-processing-default, eval=FALSE}
 id_default <- id_processing(
     data = Tissue_MetaData,
     id_types = c("HMDB", "KEGG", "CHEBI", "PUBCHEM"),
@@ -78,25 +84,21 @@ id_default <- id_processing(
     verbose = FALSE,
     path = NULL
 )
-```
 
-This default run is useful when the first goal is simply to understand the current identifier coverage and overlap structure before deciding whether compatibility handling, translation, or traversal should be applied.
-
-```{r id-processing-default-out, eval=TRUE}
 names(id_default)
 names(id_default$Data)
 names(id_default$Plot)
 names(id_default$Workflow)
-head(id_default$Data$id_count_summary)
-head(id_default$Data$compare_pk_summary_by_stage$input)
-head(id_default$Data$count_id_tables_by_stage$input$HMDB)
+knitr::kable(utils::head(id_default$Data$id_count_summary, 10L), format = "html")
+knitr::kable(utils::head(id_default$Data$compare_pk_summary_by_stage$input, 10L), format = "html")
+knitr::kable(utils::head(id_default$Data$count_id_tables_by_stage$input$HMDB, 10L), format = "html")
 ```
 
 ## Compatibility-check workflow
 
-If you want the function to assess whether multiple IDs assigned to the same feature row are mutually compatible, enable the compatibility step explicitly. With the current defaults for the handling parameters, partially compatible and completely incompatible rows will be handled automatically once the compatibility step is enabled.
+The compatibility-only workflow can assess and handle partially or completely incompatible IDs without traversal. It is shown, but not evaluated, here.
 
-```{r id-processing-qc, eval=TRUE}
+```{r id-processing-qc, eval=FALSE}
 id_qc <- id_processing(
     data = Tissue_MetaData,
     id_types = c("HMDB", "KEGG", "CHEBI", "PUBCHEM"),
@@ -118,12 +120,10 @@ id_qc <- id_processing(
     verbose = FALSE,
     path = NULL
 )
-```
 
-```{r id-processing-qc-out, eval=TRUE}
-head(id_qc$Data$input[, c("Metabolite", "HMDB", "KEGG", "CHEBI", "PUBCHEM")])
-head(id_qc$Data$after_compatibility[, c("Metabolite", "HMDB", "KEGG", "CHEBI", "PUBCHEM")])
-head(id_qc$Data$id_count_summary)
+knitr::kable(utils::head(id_qc$Data$input[, c("Metabolite", "HMDB", "KEGG", "CHEBI", "PUBCHEM")], 10L), format = "html")
+knitr::kable(utils::head(id_qc$Data$after_compatibility[, c("Metabolite", "HMDB", "KEGG", "CHEBI", "PUBCHEM")], 10L), format = "html")
+knitr::kable(utils::head(id_qc$Data$id_count_summary, 10L), format = "html")
 id_qc$Workflow$steps_run
 names(id_qc$Data$compatibility)
 id_qc$Workflow$result_overview_text
@@ -131,9 +131,9 @@ id_qc$Workflow$result_overview_text
 
 ## Translation workflow
 
-If you want to translate one namespace into one or more others, enable the translation step explicitly. Translation and traversal are intentionally mutually exclusive within a single run so that each run remains straightforward to interpret.
+Translation can map one identifier namespace to one or more others. It is also shown but not evaluated; translation and traversal are mutually exclusive within one call.
 
-```{r id-processing-translation, eval=TRUE}
+```{r id-processing-translation, eval=FALSE}
 id_translation <- id_processing(
     data = Tissue_MetaData,
     id_types = c("HMDB", "KEGG", "CHEBI", "PUBCHEM"),
@@ -155,19 +155,17 @@ id_translation <- id_processing(
     verbose = FALSE,
     path = NULL
 )
-```
 
-```{r id-processing-translation-out, eval=TRUE}
-head(id_translation$Data$after_translation[, c("Metabolite", "PUBCHEM", "HMDB", "KEGG")])
-id_translation$Data$id_count_summary
+knitr::kable(utils::head(id_translation$Data$after_translation[, c("Metabolite", "PUBCHEM", "HMDB", "KEGG")], 10L), format = "html")
+knitr::kable(id_translation$Data$id_count_summary, format = "html", caption = "Translation ID-count summary")
 names(id_translation$Data$translation)
-head(id_translation$Data$translation$input)
-head(id_translation$Data$translation$translated_ids)
+knitr::kable(utils::head(id_translation$Data$translation$input, 10L), format = "html")
+knitr::kable(utils::head(id_translation$Data$translation$translated_ids, 10L), format = "html")
 ```
 
 ## Traversal workflow
 
-If you want to expand the seed ID space through the RaMP mapping graph, enable traversal explicitly. This is not part of the default behavior.
+This vignette runs the traversal workflow because it includes the initial ID-space inspection and compatibility handling before expanding the seed ID space through the RaMP mapping graph. The default inspection-only workflow and the translation workflow remain available through `id_processing()` when those focused analyses are needed, but are not run here. Translation and traversal are mutually exclusive within one call.
 
 ```{r id-processing-traversal, eval=TRUE}
 id_traversal <- id_processing(
@@ -193,9 +191,9 @@ id_traversal <- id_processing(
 )
 ```
 
-### Inspecting the traversal return object
+### Inspecting traversal results
 
-The traversal workflow returns stage metadata, QC results, and traversal artifacts in their respective `Data` and `Plot` sections. `Workflow` records only the configuration and execution summary.
+The traversal return object retains the data, summaries, and traversal artifacts needed to inspect each stage of the workflow.
 
 ```{r id-processing-traversal-structure, eval=TRUE}
 names(id_traversal)
@@ -205,87 +203,66 @@ names(id_traversal$Workflow)
 names(id_traversal$Data$traversal)
 ```
 
-The `Data` section contains the input metadata and the metadata produced by each enabled stage:
+The `Data` section contains the input metadata and the metadata produced by the compatibility and traversal stages:
 
 ```{r id-processing-traversal-data-1, eval=TRUE}
-head(id_traversal$Data$input[, c("Metabolite", "HMDB", "KEGG", "CHEBI", "PUBCHEM")])
-head(id_traversal$Data$after_compatibility[, c("Metabolite", "HMDB", "KEGG", "CHEBI", "PUBCHEM")])
-head(id_traversal$Data$after_traversal[, c("Metabolite", "HMDB", "KEGG", "CHEBI", "PUBCHEM")])
+knitr::kable(utils::head(id_traversal$Data$input[, c("Metabolite", "HMDB", "KEGG", "CHEBI", "PUBCHEM")], 10L), format = "html")
+knitr::kable(utils::head(id_traversal$Data$after_compatibility[, c("Metabolite", "HMDB", "KEGG", "CHEBI", "PUBCHEM")], 10L), format = "html")
+knitr::kable(utils::head(id_traversal$Data$after_traversal[, c("Metabolite", "HMDB", "KEGG", "CHEBI", "PUBCHEM")], 10L), format = "html")
 ```
 
-The stage-wise ID-count summary shows whether traversal increased the represented ID space overall and in which namespaces those gains occurred:
-
-```{r id-processing-traversal-data-2, eval=FALSE}
-id_traversal$Data$id_count_summary
-subset(id_traversal$Data$id_count_summary, namespace == "HMDB")
-subset(id_traversal$Data$id_count_summary, namespace == "KEGG")
-subset(id_traversal$Data$id_count_summary, namespace == "CHEBI")
-subset(id_traversal$Data$id_count_summary, namespace == "PUBCHEM")
+```{r id-processing-traversal-data-2, eval=TRUE}
+knitr::kable(id_traversal$Data$id_count_summary, format = "html", caption = "ID-count summary across traversal stages")
 ```
 
-The stage-wise `compare_pk()` summary tables can be compared directly across stages:
+The `compare_pk()` summaries and `count_id()` tables are retained for every stage and namespace:
 
 ```{r id-processing-traversal-data-3, eval=TRUE}
-names(id_traversal$Data$compare_pk_summary_by_stage)
-head(id_traversal$Data$compare_pk_summary_by_stage$input)
-head(id_traversal$Data$compare_pk_summary_by_stage$after_compatibility)
-head(id_traversal$Data$compare_pk_summary_by_stage$after_traversal)
+knitr::kable(utils::head(id_traversal$Data$compare_pk_summary_by_stage$input, 10L), format = "html")
+knitr::kable(utils::head(id_traversal$Data$compare_pk_summary_by_stage$after_compatibility, 10L), format = "html")
+knitr::kable(utils::head(id_traversal$Data$compare_pk_summary_by_stage$after_traversal, 10L), format = "html")
 ```
-
-The underlying `count_id()` tables are also retained for each stage and namespace:
 
 ```{r id-processing-traversal-data-4, eval=TRUE}
-names(id_traversal$Data$count_id_tables_by_stage)
-names(id_traversal$Data$count_id_tables_by_stage$input)
-head(id_traversal$Data$count_id_tables_by_stage$input$HMDB)
-head(id_traversal$Data$count_id_tables_by_stage$after_traversal$HMDB)
-head(id_traversal$Data$count_id_tables_by_stage$after_traversal$KEGG)
+knitr::kable(utils::head(id_traversal$Data$count_id_tables_by_stage$input$HMDB, 10L), format = "html")
+knitr::kable(utils::head(id_traversal$Data$count_id_tables_by_stage$after_traversal$HMDB, 10L), format = "html")
+knitr::kable(utils::head(id_traversal$Data$count_id_tables_by_stage$after_traversal$KEGG, 10L), format = "html")
+knitr::kable(utils::head(id_traversal$Data$count_id_tables_by_stage$after_traversal$CHEBI, 10L), format = "html")
+knitr::kable(utils::head(id_traversal$Data$count_id_tables_by_stage$after_traversal$PUBCHEM, 10L), format = "html")
 ```
 
-### Inspecting the raw traversal artifacts
+The traversal-specific pair-compatibility and edge tables provide the underlying mapping information:
 
-The traversal-specific tables are stored once in `id_traversal$Data$traversal`; the expanded feature metadata is the `after_traversal` stage above.
-
-```{r id-processing-traversal-raw-1, eval=TRUE}
-head(id_traversal$Data$traversal$pair_compatibility)
-head(id_traversal$Data$traversal$prior_knowledge_edges)
+```{r id-processing-traversal-raw, eval=TRUE}
+knitr::kable(utils::head(id_traversal$Data$traversal$pair_compatibility, 10L), format = "html")
+knitr::kable(utils::head(id_traversal$Data$traversal$prior_knowledge_edges, 10L), format = "html")
 ```
-
-The pair-level compatibility table helps explain which seed-ID pairs were coherent before expansion:
-
-```{r id-processing-traversal-raw-2, eval=TRUE}
-colnames(id_traversal$Data$traversal$pair_compatibility)
-unique(id_traversal$Data$traversal$pair_compatibility$compatibility_path)
-table(id_traversal$Data$traversal$pair_compatibility$all_seed_ids_compatible, useNA = "ifany")
-```
-
-The edge table helps interpret the mechanistic basis of the traversal itself:
-
-```{r id-processing-traversal-raw-3, eval=TRUE}
-colnames(id_traversal$Data$traversal$prior_knowledge_edges)
-head(id_traversal$Data$traversal$prior_knowledge_edges[, c("id1", "type1", "id2", "type2")])
-```
-
-### Inspecting workflow metadata and plots
 
 ```{r id-processing-traversal-workflow, eval=TRUE}
-id_traversal$Workflow$settings
-id_traversal$Workflow$steps_run
-id_traversal$Workflow$stage_messages
-id_traversal$Workflow$result_overview_text
+knitr::kable(
+    tibble::enframe(id_traversal$Workflow$settings, name = "Setting", value = "Value") |>
+        mutate(Value = vapply(Value, function(x) paste(unlist(x), collapse = ", "), character(1)), .keep = "unused"),
+    format = "html", caption = "Workflow settings"
+)
+knitr::kable(tibble::tibble(Order = seq_along(id_traversal$Workflow$steps_run), Step = id_traversal$Workflow$steps_run), format = "html", caption = "Enabled workflow steps")
+knitr::kable(tibble::enframe(id_traversal$Workflow$stage_messages, name = "Stage", value = "Message"), format = "html", caption = "Stage messages")
+knitr::kable(tibble::tibble(Result = id_traversal$Workflow$result_overview_text), format = "html", caption = "Workflow result overview")
 ```
 
-```{r id-processing-traversal-plots, eval=TRUE}
-names(id_traversal$Plot$compare_pk_by_stage)
-names(id_traversal$Plot$count_id_by_stage)
-id_traversal$Plot$compare_pk_by_stage$input
-id_traversal$Plot$compare_pk_by_stage$after_traversal
-id_traversal$Plot$count_id_by_stage$after_traversal$HMDB
-id_traversal$Plot$count_id_by_stage$after_traversal$KEGG
+## Traversal workflow: comparison across stages
+
+The following plots compare the input, compatibility-handled, and traversal-expanded ID spaces. For each available stage, `compare_pk()` shows the identifier overlap and `count_id()` shows the number of IDs per feature for all four managed namespaces.
+
+```{r traversal-stage-visual-summary, results='asis', fig.width=8, fig.height=4.5, out.width='85%', fig.show='asis'}
+stages <- names(id_traversal$Plot$compare_pk_by_stage)
+for (stage in stages) {
+    stage_label <- tools::toTitleCase(gsub("_", " ", stage))
+    cat("\n\n### ", stage_label, "\n\n", sep = "")
+    cat("\n\n#### Identifier overlap (`compare_pk()`)\n\n")
+    print(id_traversal$Plot$compare_pk_by_stage[[stage]])
+    for (id_type in c("HMDB", "KEGG", "CHEBI", "PUBCHEM")) {
+        cat("\n\n#### ", id_type, " IDs per feature (`count_id()`)\n\n", sep = "")
+        print(id_traversal$Plot$count_id_by_stage[[stage]][[id_type]])
+    }
+}
 ```
-
-Taken together, these checks provide a detailed audit trail for a traversal run: the feature metadata before and after each stage, the change in the quantifiable ID space, the raw compatibility information, the raw graph edges used for traversal, and the plots and textual summaries that explain what happened.
-
-## Notes
-
-`equivalent_id()` is intentionally not part of `id_processing()` yet. If you want additional ambiguity-aware within-namespace expansion after this workflow, run `equivalent_id()` afterwards on the final feature metadata.
