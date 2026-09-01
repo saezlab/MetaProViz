@@ -34,6 +34,8 @@ navbar:
           href: articles/pkgdown/prior-knowledge.html
         - text: "Sample Metadata Analysis"
           href: articles/pkgdown/sample-metadata.html
+        - text: "Live MetSigDB Resource Composition"
+          href: articles/pkgdown/metsigdb-resource-composition.html
     #customize intro:
     reference:
       text: Reference

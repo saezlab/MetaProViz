@@ -1,0 +1,301 @@
+---
+title: "Live MetSigDB resource composition"
+output:
+  BiocStyle::html_document:
+    self_contained: true
+    toc: true
+    toc_float: true
+    code_folding: hide
+vignette: >
+  %\VignetteIndexEntry{Live MetSigDB resource composition}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+bibliography: metsigdb-resource-composition.bib
+link-citations: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE, warning = FALSE)
+```
+
+# Purpose and scope
+
+This tutorial rebuilds a resource-composition benchmark from live MetSigDB-backed resources, then clusters complete standalone resources. Results are intentionally time-dependent: upstream resources can change. The reported default is `exclude_metabolites = "all"`, which should match the universe used for enrichment.
+
+A *term* is a pathway, class, protein, or cancer label; a *target* is its linked metabolite, enzyme, or protein; and an *interaction* is a unique term--target pair. Term size is targets per term, while recurrence is the number of terms containing a target. Broad terms and recurrent targets can produce overlapping enrichment results; focused terms are usually more specific but have lower coverage. Choose resources using these properties and the identifiers present in your experiment.
+
+The benchmark includes KEGG [@kegg], Reactome [@reactome], WikiPathways [@wikipathways], ClassyFire [@classyfire], MetaLinks [@metalinks], MACdb [@macdb], Gaude [@gaude], and Hallmarks [@hallmarks]. ClassyFire is benchmarked but not clustered because it is an annotation resource rather than an overlapping set collection.
+
+# Live retrieval and benchmark
+
+The following folded code retrieves every resource at knit time. It deliberately fails clearly when a package or upstream source is unavailable.
+
+```{r libraries}
+suppressPackageStartupMessages({
+  library(MetaProViz); library(dplyr); library(tidyr); library(purrr)
+  library(tibble); library(ggplot2); library(knitr); library(scales)
+})
+if (!requireNamespace("ggbreak", quietly = TRUE)) stop("Package `ggbreak` is required to build this vignette.")
+png_dir <- file.path(tempdir(), "metsigdb-resource-composition-png")
+dir.create(png_dir, recursive = TRUE, showWarnings = FALSE)
+```
+
+```{r retrieval-normalization}
+normalise_id <- function(x, prefix, width = 0L) {
+  x <- trimws(as.character(x)); digits <- gsub("[^0-9]", "", x)
+  digits[is.na(x) | x == "" | digits == ""] <- NA_character_
+  if (width > 0L) digits <- ifelse(is.na(digits), NA_character_, sprintf(paste0("%0", width, "d"), as.integer(digits)))
+  paste0(prefix, digits)
+}
+normalise_hmdb <- function(x) normalise_id(x, "HMDB", 7L)
+normalise_kegg <- function(x) normalise_id(x, "C", 5L)
+normalise_chebi <- function(x) normalise_id(x, "CHEBI:")
+normalise_pubchem <- function(x) normalise_id(x, "CID")
+
+fetch_derived <- function(dataset, name, exclusion) {
+  data(list = dataset, package = "MetaProViz", envir = environment())
+  make_gene_metab_set(get(dataset, envir = environment()), metadata_info = c(Target = "gene"),
+    pk_name = name, save_table = NULL, exclude_metabolites = exclusion)$GeneMetabSet |>
+    mutate(interaction_type = if_else(grepl("^HMDB", feature), "pathway-metabolite", "pathway-metabolic_enzyme"))
+}
+
+live_resources <- function(exclusion = "all") {
+  metalinks <- metsigdb_metalinks(exclude_metabolites = exclusion) |>
+    collect() |>
+    mutate(hmdb = normalise_hmdb(hmdb))
+  list(
+    kegg = metsigdb_kegg(exclude_metabolites = exclusion) |> mutate(MetaboliteID = normalise_kegg(MetaboliteID)),
+    reactome = metsigdb_reactome(species = "Homo sapiens", exclude_metabolites = exclusion) |> mutate(chebi_id = normalise_chebi(chebi_id)),
+    wikipathways = metsigdb_wikipathways(species = "Homo sapiens", exclude_metabolites = exclusion),
+    macdb = metsigdb_macdb(exclude_metabolites = exclusion) |> mutate(Metabolite_PubchemID = normalise_pubchem(Metabolite_PubchemID)),
+    chemicalclass = metsigdb_chemicalclass(exclude_metabolites = exclusion),
+    receptor = filter(metalinks, interaction_family == "Receptor-metabolite"),
+    enzyme = filter(metalinks, interaction_family == "Enzyme-metabolite"),
+    transporter = filter(metalinks, interaction_family == "Transporter-metabolite"),
+    gaude = fetch_derived("gaude_pathways", "gaude_pathways", exclusion),
+    hallmarks = fetch_derived("hallmarks", "hallmarks", exclusion)
+  )
+}
+
+# WikiPathways contains mixed identifier types. Direct HMDB values are retained;
+# ChEBI and PubChem values are harmonised through RaMP/OmnipathR.
+harmonise_wikipathways <- function(wp) {
+  wp <- wp |> mutate(.row = row_number(), raw = trimws(as.character(metabolite_id)),
+    hmdb = if_else(grepl("^HMDB[0-9]+$", raw, ignore.case = TRUE), normalise_hmdb(raw), NA_character_),
+    chebi = if_else(grepl("^CHEBI[:_][0-9]+$", raw, ignore.case = TRUE), gsub("[^0-9]", "", raw), NA_character_),
+    pubchem = if_else(grepl("^(CID|PUBCHEM[:_])[0-9]+$", raw, ignore.case = TRUE), gsub("[^0-9]", "", raw), NA_character_))
+  translate <- function(column, type, output) {
+    x <- wp |> filter(!is.na(.data[[column]])) |> select(.row, value = all_of(column))
+    if (!nrow(x)) return(tibble(.row = integer(), !!output := character()))
+    OmnipathR::translate_ids(x, value = type, !!output := "hmdb", ramp = TRUE,
+      entity_type = "smol", keep_untranslated = TRUE, return_df = TRUE) |> select(.row, all_of(output))
+  }
+  wp |> left_join(translate("chebi", "chebi", "hmdb_chebi"), by = ".row") |>
+    left_join(translate("pubchem", "pubchem", "hmdb_pubchem"), by = ".row") |>
+    mutate(hmdb = coalesce(hmdb, normalise_hmdb(hmdb_chebi), normalise_hmdb(hmdb_pubchem))) |>
+    select(-.row, -raw, -chebi, -pubchem, -hmdb_chebi, -hmdb_pubchem)
+}
+
+as_edges <- function(x) bind_rows(
+  transmute(x$kegg, resource = "KEGG", group = "Pathway", type = "pathway-metabolite", term = term, target = MetaboliteID),
+  transmute(x$reactome, resource = "Reactome", group = "Pathway", type = "pathway-metabolite", term = pathway_name, target = chebi_id),
+  transmute(x$wikipathways, resource = "WikiPathways", group = "Pathway", type = "pathway-metabolite", term = pathway_name, target = hmdb),
+  transmute(x$macdb, resource = "MACdb", group = "Cancer association", type = "metabolite-cancer", term = term, target = Metabolite_PubchemID),
+  transmute(x$chemicalclass, resource = "ClassyFire", group = "Annotation", type = "metabolite-annotation", term = ClassyFire_class, target = class_source_id),
+  imap_dfr(x[c("receptor", "enzyme", "transporter")], ~transmute(.x, resource = paste("MetaLinks", .y), group = "Interaction", type = "metabolite-protein", term = gene_symbol, target = hmdb)),
+  imap_dfr(x[c("gaude", "hallmarks")], ~transmute(.x, resource = .y, group = "Derived pathway", type = interaction_type, term = term, target = feature))
+) |> filter(!is.na(term), term != "", !is.na(target), target != "") |> distinct()
+
+composition <- function(edges) {
+  footprint <- edges |> group_by(resource, group, type) |> summarise(terms = n_distinct(term), targets = n_distinct(target), interactions = n(), mean_targets_per_term = interactions / terms, mean_terms_per_target = interactions / targets, .groups = "drop")
+  term_size <- edges |> count(resource, group, type, term, name = "targets_per_term") |> group_by(resource, group, type) |> summarise(min_targets = min(targets_per_term), median_targets = median(targets_per_term), mean_targets = mean(targets_per_term), max_targets = max(targets_per_term), .groups = "drop")
+  recurrence <- edges |> count(resource, group, type, target, name = "terms_per_target") |> mutate(bucket = cut(terms_per_target, c(0, 1, 2, 5, Inf), labels = c("1", "2", "3-5", "6+"))) |> count(resource, group, type, bucket, name = "targets") |> group_by(resource, group, type) |> mutate(share = targets / sum(targets)) |> ungroup()
+  list(footprint = footprint, term_size = term_size, recurrence = recurrence)
+}
+```
+
+```{r benchmark-data}
+default_raw <- live_resources("all"); default_raw$wikipathways <- harmonise_wikipathways(default_raw$wikipathways)
+none_raw <- live_resources(NULL); none_raw$wikipathways <- harmonise_wikipathways(none_raw$wikipathways)
+bench <- composition(as_edges(default_raw)); bench_none <- composition(as_edges(none_raw))
+exclusion <- full_join(bench_none$footprint, bench$footprint, by = c("resource", "group", "type"), suffix = c("_none", "_default")) |>
+  mutate(across(where(is.numeric), ~replace_na(.x, 0)), delta_targets = targets_default - targets_none,
+    delta_interactions = interactions_default - interactions_none,
+    pct_delta_targets = if_else(targets_none > 0, delta_targets / targets_none, NA_real_),
+    pct_delta_interactions = if_else(interactions_none > 0, delta_interactions / interactions_none, NA_real_))
+```
+
+## Composition results
+
+```{r benchmark-tables}
+kable(bench$footprint, digits = 2, caption = "Default-exclusion resource footprint")
+kable(bench$term_size, digits = 2, caption = "Term-size distribution")
+kable(bench$recurrence, digits = 3, caption = "Target recurrence across terms")
+kable(select(exclusion, resource, type, targets_none, targets_default, delta_targets, pct_delta_targets, interactions_none, interactions_default, delta_interactions, pct_delta_interactions), digits = 3, caption = "Effect of default exclusion")
+```
+
+```{r benchmark-figures, fig.width=13, fig.height=7}
+footprint_long <- pivot_longer(bench$footprint, c(terms, targets, interactions), names_to = "metric", values_to = "count")
+ggplot(footprint_long, aes(resource, count, fill = metric)) + geom_col(position = "dodge") + coord_flip() + labs(title = "Resource footprint", x = NULL, y = "Count") + theme_minimal()
+ggplot(bench$term_size, aes(reorder(resource, median_targets), median_targets, fill = type)) + geom_col() + coord_flip() + labs(title = "Median targets per term", x = NULL, y = "Median") + theme_minimal()
+ggplot(bench$recurrence, aes(resource, share, fill = bucket)) + geom_col() + coord_flip() + scale_y_continuous(labels = percent) + labs(title = "Target recurrence", x = NULL, y = "Share of targets") + theme_minimal()
+ggplot(exclusion, aes(resource, pct_delta_targets, fill = type)) + geom_col() + coord_flip() + scale_y_continuous(labels = percent) + labs(title = "Target change after default exclusion", x = NULL, y = "Change") + theme_minimal()
+ggplot(exclusion, aes(resource, pct_delta_interactions, fill = type)) + geom_col() + coord_flip() + scale_y_continuous(labels = percent) + labs(title = "Interaction change after default exclusion", x = NULL, y = "Change") + theme_minimal()
+```
+
+# Clustering complete resources
+
+`cluster_pk()` computes term-set similarity and memberships; `viz_graph()` applies its own display threshold and degree filter. A seed makes community detection and layouts reproducible. Similarity metric, clustering threshold, plotting threshold, degree filter, and layout can materially change the graph. The source-notebook settings below are initial parameters. PNG exports go only to a temporary directory, while each returned graph is rendered inline.
+
+The Reactome composition results above use the complete live resource. Its network rendering, however, is deliberately limited to the 44 pathways below: all are descendants of the Reactome *Metabolism of amino acids and derivatives* pathway. This fixed subset keeps the vignette practical to re-render without repeatedly computing the full, very large Reactome similarity graph; it is therefore an illustrative amino-acid-metabolism subnetwork rather than a whole-Reactome network.
+
+WikiPathways has no equivalent parent--child hierarchy for this purpose. Its rendering is therefore limited by pathway name to the amino-acid metabolism pathways below, including directly connected one-carbon, glutathione, urea-cycle, creatine, and amino-acid-derived neurotransmitter routes. General signaling, transport-only, and disease-only pathways are excluded. As with Reactome, the composition benchmark above still uses the complete live WikiPathways resource; this subset affects only its illustrative network rendering.
+
+```{r cluster-preparation}
+reactome_rendering_pathways <- c(
+  "R-HSA-1237112", "R-HSA-1614517", "R-HSA-1614558", "R-HSA-1614603",
+  "R-HSA-1614635", "R-HSA-209776", "R-HSA-209905", "R-HSA-209931",
+  "R-HSA-209968", "R-HSA-2408499", "R-HSA-2408508", "R-HSA-2408522",
+  "R-HSA-2408550", "R-HSA-2408552", "R-HSA-2408557", "R-HSA-350562",
+  "R-HSA-350864", "R-HSA-351143", "R-HSA-351200", "R-HSA-351202",
+  "R-HSA-389661", "R-HSA-5263617", "R-HSA-5662702", "R-HSA-6783984",
+  "R-HSA-6798163", "R-HSA-70635", "R-HSA-70688", "R-HSA-70895",
+  "R-HSA-70921", "R-HSA-71064", "R-HSA-71240", "R-HSA-71262",
+  "R-HSA-71288", "R-HSA-8849175", "R-HSA-8963684", "R-HSA-8963691",
+  "R-HSA-8963693", "R-HSA-8964208", "R-HSA-8964539", "R-HSA-8964540",
+  "R-HSA-977347", "R-HSA-9858328", "R-HSA-9859138", "R-HSA-9988426"
+)
+wikipathways_rendering_pathways <- c(
+  "Amino acid metabolism",
+  "Alanine and aspartate metabolism",
+  "Glycine metabolism",
+  "Glycine metabolism, including IMDs",
+  "Serine metabolism",
+  "Proline and hydroxyproline pathways",
+  "Leucine, isoleucine and valine metabolism",
+  "Methionine de novo and salvage pathway",
+  "Methionine metabolism leading to sulfur amino acids and related disorders",
+  "Cysteine and methionine catabolism",
+  "Trans-sulfuration pathway",
+  "Trans-sulfuration, one-carbon metabolism and related pathways",
+  "One-carbon metabolism",
+  "Biosynthesis and regeneration of tetrahydrobiopterin and catabolism of phenylalanine",
+  "Tyrosine metabolism and related disorders",
+  "Tryptophan metabolism",
+  "Tryptophan catabolism leading to NAD+ production",
+  "Tryptophan kynurenine pathway in post-COVID syndrome",
+  "Kynurenine pathway and links to cell senescence",
+  "IDO metabolic pathway",
+  "NAD biosynthesis II from tryptophan",
+  "Gut-liver indole metabolism ",
+  "Amino acid metabolism pathway excerpt: histidine catabolism extension",
+  "Urea cycle and metabolism of amino groups",
+  "Urea cycle and associated pathways",
+  "Urea cycle and related diseases",
+  "Glutathione metabolism",
+  "Gamma-glutamyl cycle for the biosynthesis and degradation of glutathione",
+  "Creatine pathway",
+  "GABA metabolism (aka GHB)",
+  "Biogenic amine synthesis",
+  "Carnosine metabolism of glial cells",
+  "Amino acid conjugation",
+  "Amino acid conjugation of benzoic acid",
+  "Amino acid metabolism in triple-negative breast cancer cells"
+)
+kegg <- default_raw$kegg |> group_by(term) |> mutate(n_metabolites_in_pathway = n()) |> ungroup()
+reactome <- default_raw$reactome |>
+  filter(pathway_id %in% reactome_rendering_pathways) |>
+  group_by(pathway_name) |>
+  mutate(n_metabolites_in_pathway = n()) |>
+  ungroup()
+wikipathways <- default_raw$wikipathways |>
+  filter(pathway_name %in% wikipathways_rendering_pathways, !is.na(hmdb)) |>
+  group_by(pathway_name) |>
+  mutate(n_metabolites_in_pathway = n()) |>
+  ungroup()
+macdb <- default_raw$macdb |> group_by(term) |> mutate(n_metabolites_in_pathway = n()) |> ungroup()
+receptor <- default_raw$receptor |> group_by(gene_symbol) |> mutate(n_metabolites_in_pathway = n()) |> ungroup()
+enzyme <- default_raw$enzyme |> group_by(gene_symbol) |> mutate(n_metabolites_in_pathway = n()) |> ungroup()
+transporter <- default_raw$transporter |> group_by(gene_symbol) |> mutate(n_metabolites_in_pathway = n()) |> ungroup()
+derived <- function(x, kind) {
+    filtered <- dplyr::filter(x, interaction_type == kind)
+    target <- if (identical(kind, "pathway-metabolite")) normalise_hmdb(filtered$feature) else as.character(filtered$feature)
+    filtered |> transmute(term, target) |> group_by(term) |> mutate(n_metabolites_in_pathway = n()) |> ungroup()
+}
+gaude_metabolite <- derived(default_raw$gaude, "pathway-metabolite"); gaude_enzyme <- derived(default_raw$gaude, "pathway-metabolic_enzyme")
+hallmarks_metabolite <- derived(default_raw$hallmarks, "pathway-metabolite"); hallmarks_enzyme <- derived(default_raw$hallmarks, "pathway-metabolic_enzyme")
+show_result <- function(x, name, threshold, degree) { set.seed(123); graph <- viz_graph(x$similarity_matrix, x$clusters, plot_threshold = threshold, min_degree = degree, node_sizes = x$node_sizes, show_density = TRUE, save_plot = "png", print_plot = FALSE, plot_name = name, path = png_dir); print(graph); kable(x$cluster_summary, digits = 2, caption = paste(name, "cluster summary")) }
+```
+
+## KEGG
+```{r kegg, fig.width=12, fig.height=8}
+set.seed(123); kegg_cluster <- cluster_pk(kegg, c(metabolite_column="MetaboliteID", pathway_column="term"), similarity="jaccard", input_format="long", threshold=.4, plot_threshold=.5, clust="community", min=2, node_size_column="n_metabolites_in_pathway", show_density=TRUE, save_plot="png", print_plot=FALSE, plot_name="KEGG", path=png_dir); show_result(kegg_cluster, "KEGG", .5, 2)
+```
+
+## Reactome
+```{r reactome, fig.width=12, fig.height=8}
+set.seed(123); reactome_cluster <- cluster_pk(reactome, c(metabolite_column="chebi_id", pathway_column="pathway_name"), similarity="jaccard", input_format="long", threshold=.4, plot_threshold=.4, clust="community", min=4, node_size_column="n_metabolites_in_pathway", show_density=TRUE, save_plot="png", print_plot=FALSE, plot_name="Reactome", path=png_dir); show_result(reactome_cluster, "Reactome", .8, 4)
+```
+
+## WikiPathways
+```{r wikipathways, fig.width=12, fig.height=8}
+set.seed(123); wikipathways_cluster <- cluster_pk(wikipathways, c(metabolite_column="hmdb", pathway_column="pathway_name"), similarity="jaccard", input_format="long", threshold=.3, clust="community", min=2, node_size_column="n_metabolites_in_pathway", show_density=TRUE, save_plot="png", print_plot=FALSE, plot_name="WikiPathways", path=png_dir); show_result(wikipathways_cluster, "WikiPathways", .2, 1)
+```
+
+## MACdb
+```{r macdb, fig.width=12, fig.height=8}
+set.seed(123); macdb_cluster <- cluster_pk(macdb, c(metabolite_column="Metabolite_PubchemID", pathway_column="term"), similarity="jaccard", input_format="long", threshold=.4, plot_threshold=.3, clust="community", min=2, node_size_column="n_metabolites_in_pathway", show_density=TRUE, save_plot="png", print_plot=FALSE, plot_name="MACdb", path=png_dir); show_result(macdb_cluster, "MACdb", .3, 2)
+```
+
+## MetaLinks receptor--metabolite
+
+The receptor--metabolite subset is retained as executable code but is not rendered here because its clustering can take substantially longer than the other resource subsets. Users who need this network can run the chunk locally by changing `eval = FALSE` to `eval = TRUE`.
+
+```{r receptor, eval=FALSE, fig.width=12, fig.height=8}
+set.seed(123); receptor_cluster <- cluster_pk(receptor, c(metabolite_column="hmdb", pathway_column="gene_symbol"), similarity="jaccard", input_format="long", threshold=.4, clust="community", min=2, node_size_column="n_metabolites_in_pathway", show_density=TRUE, save_plot="png", print_plot=FALSE, plot_name="MetaLinks receptor", path=png_dir); show_result(receptor_cluster, "MetaLinks receptor", .3, 2)
+```
+
+## MetaLinks enzyme--metabolite
+
+The enzyme--metabolite subset is retained as executable code but is not rendered here because its clustering can take substantially longer than the other resource subsets. Users who need this network can run the chunk locally by changing `eval = FALSE` to `eval = TRUE`.
+
+```{r enzyme, eval=FALSE, fig.width=12, fig.height=8}
+set.seed(123); enzyme_cluster <- cluster_pk(enzyme, c(metabolite_column="hmdb", pathway_column="gene_symbol"), similarity="jaccard", input_format="long", threshold=.4, clust="community", min=2, node_size_column="n_metabolites_in_pathway", show_density=TRUE, save_plot="png", print_plot=FALSE, plot_name="MetaLinks enzyme", path=png_dir); show_result(enzyme_cluster, "MetaLinks enzyme", .3, 2)
+```
+
+## MetaLinks transporter--metabolite
+```{r transporter, fig.width=12, fig.height=8}
+set.seed(123); transporter_cluster <- cluster_pk(transporter, c(metabolite_column="hmdb", pathway_column="gene_symbol"), similarity="jaccard", input_format="long", threshold=.4, clust="community", min=2, node_size_column="n_metabolites_in_pathway", show_density=TRUE, save_plot="png", print_plot=FALSE, plot_name="MetaLinks transporter", path=png_dir); show_result(transporter_cluster, "MetaLinks transporter", .3, 2)
+```
+
+## Gaude metabolite--pathway and metabolite--enzyme
+```{r gaude, fig.width=12, fig.height=8}
+set.seed(123); gaude_metabolite_cluster <- cluster_pk(gaude_metabolite, c(metabolite_column="target", pathway_column="term"), similarity="jaccard", input_format="long", threshold=.3, plot_threshold=.2, clust="community", min=1, node_size_column="n_metabolites_in_pathway", show_density=TRUE, save_plot="png", print_plot=FALSE, plot_name="Gaude metabolite", path=png_dir); show_result(gaude_metabolite_cluster, "Gaude metabolite--pathway", .2, 1)
+set.seed(123); gaude_enzyme_cluster <- cluster_pk(gaude_enzyme, c(metabolite_column="target", pathway_column="term"), similarity="jaccard", input_format="long", threshold=.2, plot_threshold=.2, clust="community", min=1, node_size_column="n_metabolites_in_pathway", show_density=TRUE, save_plot="png", print_plot=FALSE, plot_name="Gaude enzyme", path=png_dir); show_result(gaude_enzyme_cluster, "Gaude metabolite--enzyme", .2, 1)
+```
+
+## Hallmarks metabolite--pathway and metabolite--enzyme
+```{r hallmarks, fig.width=12, fig.height=8}
+set.seed(123); hallmarks_metabolite_cluster <- cluster_pk(hallmarks_metabolite, c(metabolite_column="target", pathway_column="term"), similarity="jaccard", input_format="long", threshold=.2, plot_threshold=.2, clust="community", min=1, node_size_column="n_metabolites_in_pathway", show_density=TRUE, save_plot="png", print_plot=FALSE, plot_name="Hallmarks metabolite", path=png_dir); show_result(hallmarks_metabolite_cluster, "Hallmarks metabolite--pathway", .2, 1)
+set.seed(123); hallmarks_enzyme_cluster <- cluster_pk(hallmarks_enzyme, c(metabolite_column="target", pathway_column="term"), similarity="overlap_coefficient", input_format="long", threshold=.25, plot_threshold=.1, clust="community", min=1, node_size_column="n_metabolites_in_pathway", show_density=TRUE, save_plot="png", print_plot=FALSE, plot_name="Hallmarks enzyme", path=png_dir); show_result(hallmarks_enzyme_cluster, "Hallmarks metabolite--enzyme", .1, 1)
+```
+
+Temporary PNGs follow the operating system's normal temporary-file lifecycle. The vignette creates no `Results/` directory and no spreadsheet exports.
+
+## Explicit graph calls
+
+For reference, the calls executed by the shared display helper for every analysis are expanded below. They use the resource-specific result object immediately above and the same temporary PNG directory.
+
+```{r explicit-viz-graph-calls, eval=FALSE}
+viz_graph(kegg_cluster$similarity_matrix, kegg_cluster$clusters, plot_threshold=.5, min_degree=2, node_sizes=kegg_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
+viz_graph(reactome_cluster$similarity_matrix, reactome_cluster$clusters, plot_threshold=.8, min_degree=4, node_sizes=reactome_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
+viz_graph(wikipathways_cluster$similarity_matrix, wikipathways_cluster$clusters, plot_threshold=.2, min_degree=1, node_sizes=wikipathways_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
+viz_graph(macdb_cluster$similarity_matrix, macdb_cluster$clusters, plot_threshold=.3, min_degree=2, node_sizes=macdb_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
+viz_graph(receptor_cluster$similarity_matrix, receptor_cluster$clusters, plot_threshold=.3, min_degree=2, node_sizes=receptor_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
+viz_graph(enzyme_cluster$similarity_matrix, enzyme_cluster$clusters, plot_threshold=.3, min_degree=2, node_sizes=enzyme_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
+viz_graph(transporter_cluster$similarity_matrix, transporter_cluster$clusters, plot_threshold=.3, min_degree=2, node_sizes=transporter_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
+viz_graph(gaude_metabolite_cluster$similarity_matrix, gaude_metabolite_cluster$clusters, plot_threshold=.2, min_degree=1, node_sizes=gaude_metabolite_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
+viz_graph(gaude_enzyme_cluster$similarity_matrix, gaude_enzyme_cluster$clusters, plot_threshold=.2, min_degree=1, node_sizes=gaude_enzyme_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
+viz_graph(hallmarks_metabolite_cluster$similarity_matrix, hallmarks_metabolite_cluster$clusters, plot_threshold=.2, min_degree=1, node_sizes=hallmarks_metabolite_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
+viz_graph(hallmarks_enzyme_cluster$similarity_matrix, hallmarks_enzyme_cluster$clusters, plot_threshold=.1, min_degree=1, node_sizes=hallmarks_enzyme_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
+```
