@@ -2694,7 +2694,7 @@ traverse_ids <- function(
 #' @param save_table Optional table file type: `"csv"`, `"xlsx"`, or `"txt"`.
 #'     If `NULL`, tables are not saved.
 #' @param print_plot Logical; whether saved plots should also be printed by
-#'     [save_res()].
+#'     `save_res()`.
 #' @param verbose Logical; forwarded to compatibility and traversal helpers to control their detailed logging. `id_processing()` always prints its own workflow progress and result overview. Default is `FALSE`.
 #' @param path Optional path where results should be saved.
 #'

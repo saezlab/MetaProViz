@@ -39,14 +39,14 @@ cell are separated by semicolons or commas. Accepted values are \code{";"},
 \code{","}, \code{"semicolon"}, or \code{"comma"}.}
 
 \item{run_compatibility_check}{Logical; if \code{TRUE}, run
-\code{seed_id_compatibility_check()} before any expansion step. Default is
+\code{\link[=seed_id_compatibility_check]{seed_id_compatibility_check()}} before any expansion step. Default is
 \code{FALSE}.}
 
 \item{handle_partially_compatible}{Logical; forwarded to
-\code{seed_id_compatibility_check()}.}
+\code{\link[=seed_id_compatibility_check]{seed_id_compatibility_check()}}.}
 
 \item{handle_completely_incompatible}{Logical; forwarded to
-\code{seed_id_compatibility_check()}.}
+\code{\link[=seed_id_compatibility_check]{seed_id_compatibility_check()}}.}
 
 \item{completely_incompatible_priority}{Character vector defining the
 namespace priority for resolving completely incompatible features.}
@@ -54,15 +54,15 @@ namespace priority for resolving completely incompatible features.}
 \item{run_translation}{Logical; if \code{TRUE}, run a translation step after the
 compatibility step. Mutually exclusive with \code{run_traversal}.}
 
-\item{translation_from}{Source namespace for \code{translate_id()}. Required when
+\item{translation_from}{Source namespace for \code{\link[=translate_id]{translate_id()}}. Required when
 \code{run_translation = TRUE}.}
 
-\item{translation_to}{One or more target namespaces for \code{translate_id()}.
+\item{translation_to}{One or more target namespaces for \code{\link[=translate_id]{translate_id()}}.
 Required when \code{run_translation = TRUE}.}
 
-\item{translation_summary}{Logical; forwarded to \code{translate_id()}.}
+\item{translation_summary}{Logical; forwarded to \code{\link[=translate_id]{translate_id()}}.}
 
-\item{run_traversal}{Logical; if \code{TRUE}, run \code{traverse_ids()} after the
+\item{run_traversal}{Logical; if \code{TRUE}, run \code{\link[=traverse_ids]{traverse_ids()}} after the
 compatibility step. Mutually exclusive with \code{run_translation}. Default is
 \code{FALSE}.}
 
@@ -70,9 +70,9 @@ compatibility step. Mutually exclusive with \code{run_translation}. Default is
 \code{id1}, \code{type1}, \code{id2}, \code{type2}. If \code{NULL}, it is built internally when
 required for compatibility checking or traversal.}
 
-\item{compare_name_col}{Optional feature-name column passed to \code{compare_pk()}
+\item{compare_name_col}{Optional feature-name column passed to \code{\link[=compare_pk]{compare_pk()}}
 during stage-wise ID-space exploration. If missing from \code{data}, it is
-ignored automatically by \code{compare_pk()}.}
+ignored automatically by \code{\link[=compare_pk]{compare_pk()}}.}
 
 \item{save_plot}{Optional plot file type: \code{"svg"}, \code{"png"}, or \code{"pdf"}. If
 \code{NULL}, plots are not saved.}
@@ -89,19 +89,20 @@ If \code{NULL}, tables are not saved.}
 }
 \value{
 Named list with three top-level entries:
-\item{Data}{Feature-metadata tables for each workflow stage, the aggregated
-ID-count summary, stage-wise QC tables, and any raw compatibility, translation,
-or traversal tables produced by enabled steps.}
-\item{Plot}{Stage-wise \code{compare_pk()} and \code{count_id()} plots.}
+\item{Data}{Feature-metadata tables for each workflow stage, the
+aggregated ID-count summary, stage-wise QC tables, and any raw
+compatibility, translation, or traversal tables produced by enabled
+steps.}
+\item{Plot}{Stage-wise \code{\link[=compare_pk]{compare_pk()}} and \code{\link[=count_id]{count_id()}} plots.}
 \item{Workflow}{Chosen settings, steps run, collected stage messages, and a
 final result-overview text.}
 }
 \description{
 Runs an ID-space QC and expansion workflow on feature metadata using the
 exported MetaProViz ID helper functions. The workflow always starts with ID
-exploration using \code{compare_pk()} and \code{count_id()}, can optionally perform
+exploration using \code{\link[=compare_pk]{compare_pk()}} and \code{\link[=count_id]{count_id()}}, can optionally perform
 automatic seed-ID compatibility handling, and can then run either
-\code{translate_id()} or \code{traverse_ids()}.
+\code{\link[=translate_id]{translate_id()}} or \code{\link[=traverse_ids]{traverse_ids()}}.
 }
 \examples{
 data(tissue_meta)
@@ -113,4 +114,5 @@ qc_only <- id_processing(
     print_plot = FALSE,
     verbose = FALSE
 )
+
 }
