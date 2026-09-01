@@ -38,6 +38,9 @@ suppressPackageStartupMessages({
 if (!requireNamespace("ggbreak", quietly = TRUE)) stop("Package `ggbreak` is required to build this vignette.")
 png_dir <- file.path(tempdir(), "metsigdb-resource-composition-png")
 dir.create(png_dir, recursive = TRUE, showWarnings = FALSE)
+scrollable_table <- function(x, ...) {
+  kableExtra::scroll_box(knitr::kable(x, format = "html", ...), height = "400px", width = "100%")
+}
 ```
 
 ```{r retrieval-normalization}
@@ -104,7 +107,16 @@ as_edges <- function(x) bind_rows(
   transmute(x$chemicalclass, resource = "ClassyFire", group = "Annotation", type = "metabolite-annotation", term = ClassyFire_class, target = class_source_id),
   imap_dfr(x[c("receptor", "enzyme", "transporter")], ~transmute(.x, resource = paste("MetaLinks", .y), group = "Interaction", type = "metabolite-protein", term = gene_symbol, target = hmdb)),
   imap_dfr(x[c("gaude", "hallmarks")], ~transmute(.x, resource = .y, group = "Derived pathway", type = interaction_type, term = term, target = feature))
-) |> filter(!is.na(term), term != "", !is.na(target), target != "") |> distinct()
+) |>
+  mutate(resource = case_when(
+    resource == "gaude" & type == "pathway-metabolite" ~ "Gaude: metabolite-pathway",
+    resource == "gaude" & type == "pathway-metabolic_enzyme" ~ "Gaude: metabolite-enzyme",
+    resource == "hallmarks" & type == "pathway-metabolite" ~ "Hallmarks: metabolite-pathway",
+    resource == "hallmarks" & type == "pathway-metabolic_enzyme" ~ "Hallmarks: metabolite-enzyme",
+    TRUE ~ resource
+  )) |>
+  filter(!is.na(term), term != "", !is.na(target), target != "") |>
+  distinct()
 
 composition <- function(edges) {
   footprint <- edges |> group_by(resource, group, type) |> summarise(terms = n_distinct(term), targets = n_distinct(target), interactions = n(), mean_targets_per_term = interactions / terms, mean_terms_per_target = interactions / targets, .groups = "drop")
@@ -128,10 +140,9 @@ exclusion <- full_join(bench_none$footprint, bench$footprint, by = c("resource",
 ## Composition results
 
 ```{r benchmark-tables}
-kable(bench$footprint, digits = 2, caption = "Default-exclusion resource footprint")
-kable(bench$term_size, digits = 2, caption = "Term-size distribution")
-kable(bench$recurrence, digits = 3, caption = "Target recurrence across terms")
-kable(select(exclusion, resource, type, targets_none, targets_default, delta_targets, pct_delta_targets, interactions_none, interactions_default, delta_interactions, pct_delta_interactions), digits = 3, caption = "Effect of default exclusion")
+scrollable_table(bench$footprint, digits = 2, caption = "Default-exclusion resource footprint")
+scrollable_table(bench$term_size, digits = 2, caption = "Term-size distribution")
+scrollable_table(select(exclusion, resource, type, targets_none, targets_default, delta_targets, pct_delta_targets, interactions_none, interactions_default, delta_interactions, pct_delta_interactions), digits = 3, caption = "Effect of default exclusion")
 ```
 
 ```{r benchmark-figures, fig.width=13, fig.height=7}
@@ -224,7 +235,7 @@ derived <- function(x, kind) {
 }
 gaude_metabolite <- derived(default_raw$gaude, "pathway-metabolite"); gaude_enzyme <- derived(default_raw$gaude, "pathway-metabolic_enzyme")
 hallmarks_metabolite <- derived(default_raw$hallmarks, "pathway-metabolite"); hallmarks_enzyme <- derived(default_raw$hallmarks, "pathway-metabolic_enzyme")
-show_result <- function(x, name, threshold, degree) { set.seed(123); graph <- viz_graph(x$similarity_matrix, x$clusters, plot_threshold = threshold, min_degree = degree, node_sizes = x$node_sizes, show_density = TRUE, save_plot = "png", print_plot = FALSE, plot_name = name, path = png_dir); print(graph); kable(x$cluster_summary, digits = 2, caption = paste(name, "cluster summary")) }
+show_result <- function(x, name, threshold, degree) { set.seed(123); graph <- viz_graph(x$similarity_matrix, x$clusters, plot_threshold = threshold, min_degree = degree, node_sizes = x$node_sizes, show_density = TRUE, save_plot = "png", print_plot = FALSE, plot_name = name, path = png_dir); print(graph); scrollable_table(x$cluster_summary, digits = 2, caption = paste(name, "cluster summary")) }
 ```
 
 ## KEGG
@@ -233,11 +244,17 @@ set.seed(123); kegg_cluster <- cluster_pk(kegg, c(metabolite_column="MetaboliteI
 ```
 
 ## Reactome
+
+To keep the live network practical to render, this graph uses the fixed 44-pathway subset descended from Reactome's *Metabolism of amino acids and derivatives* pathway. The composition results above still use the complete Reactome resource.
+
 ```{r reactome, fig.width=12, fig.height=8}
-set.seed(123); reactome_cluster <- cluster_pk(reactome, c(metabolite_column="chebi_id", pathway_column="pathway_name"), similarity="jaccard", input_format="long", threshold=.4, plot_threshold=.4, clust="community", min=4, node_size_column="n_metabolites_in_pathway", show_density=TRUE, save_plot="png", print_plot=FALSE, plot_name="Reactome", path=png_dir); show_result(reactome_cluster, "Reactome", .8, 4)
+set.seed(123); reactome_cluster <- cluster_pk(reactome, c(metabolite_column="chebi_id", pathway_column="pathway_name"), similarity="jaccard", input_format="long", threshold=.3, plot_threshold=0, clust="community", min=4, node_size_column="n_metabolites_in_pathway", show_density=TRUE, save_plot="png", print_plot=FALSE, plot_name="Reactome", path=png_dir); show_result(reactome_cluster, "Reactome", 0, 4)
 ```
 
 ## WikiPathways
+
+This graph is limited by pathway name to the selected amino-acid metabolism routes and directly connected one-carbon, glutathione, urea-cycle, creatine, and amino-acid-derived neurotransmitter pathways. The composition results above still use the complete WikiPathways resource.
+
 ```{r wikipathways, fig.width=12, fig.height=8}
 set.seed(123); wikipathways_cluster <- cluster_pk(wikipathways, c(metabolite_column="hmdb", pathway_column="pathway_name"), similarity="jaccard", input_format="long", threshold=.3, clust="community", min=2, node_size_column="n_metabolites_in_pathway", show_density=TRUE, save_plot="png", print_plot=FALSE, plot_name="WikiPathways", path=png_dir); show_result(wikipathways_cluster, "WikiPathways", .2, 1)
 ```
@@ -288,7 +305,7 @@ For reference, the calls executed by the shared display helper for every analysi
 
 ```{r explicit-viz-graph-calls, eval=FALSE}
 viz_graph(kegg_cluster$similarity_matrix, kegg_cluster$clusters, plot_threshold=.5, min_degree=2, node_sizes=kegg_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
-viz_graph(reactome_cluster$similarity_matrix, reactome_cluster$clusters, plot_threshold=.8, min_degree=4, node_sizes=reactome_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
+viz_graph(reactome_cluster$similarity_matrix, reactome_cluster$clusters, plot_threshold=0, min_degree=4, node_sizes=reactome_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
 viz_graph(wikipathways_cluster$similarity_matrix, wikipathways_cluster$clusters, plot_threshold=.2, min_degree=1, node_sizes=wikipathways_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
 viz_graph(macdb_cluster$similarity_matrix, macdb_cluster$clusters, plot_threshold=.3, min_degree=2, node_sizes=macdb_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
 viz_graph(receptor_cluster$similarity_matrix, receptor_cluster$clusters, plot_threshold=.3, min_degree=2, node_sizes=receptor_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
