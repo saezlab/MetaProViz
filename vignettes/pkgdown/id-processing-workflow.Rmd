@@ -266,3 +266,9 @@ for (stage in stages) {
     }
 }
 ```
+
+## Session information
+
+```{r session-info}
+sessionInfo()
+```

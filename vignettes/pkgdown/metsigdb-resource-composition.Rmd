@@ -299,3 +299,9 @@ viz_graph(gaude_enzyme_cluster$similarity_matrix, gaude_enzyme_cluster$clusters,
 viz_graph(hallmarks_metabolite_cluster$similarity_matrix, hallmarks_metabolite_cluster$clusters, plot_threshold=.2, min_degree=1, node_sizes=hallmarks_metabolite_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
 viz_graph(hallmarks_enzyme_cluster$similarity_matrix, hallmarks_enzyme_cluster$clusters, plot_threshold=.1, min_degree=1, node_sizes=hallmarks_enzyme_cluster$node_sizes, show_density=TRUE, save_plot="png", path=png_dir)
 ```
+
+## Session information
+
+```{r session-info}
+sessionInfo()
+```
