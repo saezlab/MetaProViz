@@ -319,6 +319,11 @@ processing <- function(
     # Add metabolites that where removed as part of the feature filtering
     if (!is.null(featurefilt)) {
 
+        # Method actually applied by feature_filtering(): differs from
+        # featurefilt if a fallback (Manual -> Modified -> Standard) was
+        # triggered, so the exported table reports what really happened.
+        featurefilt_used <- data_Filtered[["featurefilt_used"]]
+
         RemovedMetabolites <-
             data_Filtered[["FilteredFeatures"]][["FeatureID"]][data_Filtered[["FilteredFeatures"]][["FilteredFeatures"]]]
 
@@ -327,7 +332,7 @@ processing <- function(
             DFList$Filtered_metabolites <-
                 as.data.frame(
                     list(
-                        feature_filtering = c(featurefilt),
+                        feature_filtering = c(featurefilt_used),
                         cutoff_featurefilt = c(cutoff_featurefilt),
                         RemovedMetabolites = c("None")
                     )
@@ -338,7 +343,7 @@ processing <- function(
             DFList$Filtered_metabolites <-
                 as.data.frame(
                     list(
-                        feature_filtering = rep(featurefilt, length(RemovedMetabolites)),
+                        feature_filtering = rep(featurefilt_used, length(RemovedMetabolites)),
                         cutoff_featurefilt = rep(cutoff_featurefilt, length(RemovedMetabolites)),
                         RemovedMetabolites = RemovedMetabolites
                     )
@@ -1062,10 +1067,14 @@ pool_estimation <- function(
 #'     "FilteredFeatures", or as configured via metadata_info.
 #'     \strong{Default = NULL}
 #'
-#' @return List with two elements: DF (filtered matrix) and FilteredFeatures (a
-#'     data frame with one row per input feature, columns FeatureID and
+#' @return List with elements: DF (filtered matrix); FilteredFeatures (a data
+#'     frame with one row per input feature, columns FeatureID and
 #'     FilteredFeatures containing TRUE or FALSE; this column is always named
-#'     "FilteredFeatures" regardless of what it was called in metadata_feature)
+#'     "FilteredFeatures" regardless of what it was called in metadata_feature);
+#'     featurefilt_used (the filtering method actually applied, which differs
+#'     from featurefilt if a fallback was triggered); and, for
+#'     SummarizedExperiment input, SE (the filtered data as a
+#'     SummarizedExperiment).
 #'
 #' This function can be used as a standalone preprocessing step on raw input
 #' data with matching sample metadata.
@@ -1288,7 +1297,8 @@ feature_filtering <- function(
     Filtered_results <-
         list(
             "DF" = filtered_matrix,
-            "FilteredFeatures" = FilteredFeatures
+            "FilteredFeatures" = FilteredFeatures,
+            "featurefilt_used" = mode
         )
     if (inherits(input_data, "SummarizedExperiment")) {
         Filtered_results[["SE"]] <- build_se_from_df(

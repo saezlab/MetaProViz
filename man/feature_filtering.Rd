@@ -63,10 +63,14 @@ a logical TRUE/FALSE column (TRUE = remove this feature) named
 \strong{Default = NULL}}
 }
 \value{
-List with two elements: DF (filtered matrix) and FilteredFeatures (a
-data frame with one row per input feature, columns FeatureID and
+List with elements: DF (filtered matrix); FilteredFeatures (a data
+frame with one row per input feature, columns FeatureID and
 FilteredFeatures containing TRUE or FALSE; this column is always named
-"FilteredFeatures" regardless of what it was called in metadata_feature)
+"FilteredFeatures" regardless of what it was called in metadata_feature);
+featurefilt_used (the filtering method actually applied, which differs
+from featurefilt if a fallback was triggered); and, for
+SummarizedExperiment input, SE (the filtered data as a
+SummarizedExperiment).
 
 This function can be used as a standalone preprocessing step on raw input
 data with matching sample metadata.
