@@ -10,7 +10,8 @@ feature_filtering(
   metadata_info,
   core = FALSE,
   featurefilt = "Modified",
-  cutoff_featurefilt = 0.8
+  cutoff_featurefilt = 0.8,
+  metadata_feature = NULL
 )
 }
 \arguments{
@@ -44,13 +45,28 @@ about control media sample names via metadata_info "core_media" samples.
 "Modified",filtering is done based on the different conditions, thus a
 column named "Conditions" must be provided in the Input_SettingsFile
 input file including the individual conditions you want to apply the
-filtering to (Yang, J et al., 2015). \strong{Default = Modified}}
+filtering to (Yang, J et al., 2015). If set to "Manual", the features to
+remove are taken directly from metadata_feature instead of being
+computed from a cutoff. If the expected column is missing from
+metadata_feature, a warning is raised and "Modified" is used instead; if
+"Modified" itself cannot be used because Conditions has fewer than 2
+levels, a further warning is raised and "Standard" is used.
+\strong{Default = Modified}}
 
-\item{cutoff_featurefilt}{\emph{Optional: } percentage of feature filtering. \strong{Default =
-0.8}}
+\item{cutoff_featurefilt}{\emph{Optional: } percentage of feature filtering. Ignored if
+featurefilt = "Manual". \strong{Default = 0.8}}
+
+\item{metadata_feature}{\emph{Optional: } Only used if featurefilt = "Manual". Data frame with
+feature identifiers matching the column names of data as row names, and
+a logical TRUE/FALSE column (TRUE = remove this feature) named
+"FilteredFeatures", or as configured via metadata_info.
+\strong{Default = NULL}}
 }
 \value{
-List with two elements: filtered matrix  and features filtered
+List with two elements: DF (filtered matrix) and FilteredFeatures (a
+data frame with one row per input feature, columns FeatureID and
+FilteredFeatures containing TRUE or FALSE; this column is always named
+"FilteredFeatures" regardless of what it was called in metadata_feature)
 
 This function can be used as a standalone preprocessing step on raw input
 data with matching sample metadata.
