@@ -563,7 +563,7 @@ check_param_feature_filtering <- function(
     featurefilt = "Modified",
     cutoff_featurefilt = 0.8
 ) {
-    Feature_Filtering_options <- c("Standard", "Modified")
+    Feature_Filtering_options <- c("Standard", "Modified", "Manual")
 
     if (!(is.null(featurefilt) || featurefilt %in% Feature_Filtering_options)) {
         message <-
