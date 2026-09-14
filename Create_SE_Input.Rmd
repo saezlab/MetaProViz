@@ -1,0 +1,218 @@
+---
+title: "Create_SE_Input"
+author: "Christina Schmidt, Jannik Franken, Giulia Roeth"
+date: "September 2026"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+editor_options:
+  chunk_output_type: console
+---
+```{r, warning=FALSE, message=FALSE}
+#load the needed:
+library(tidyverse) # used for data manipulation
+library(rmarkdown) # used for paged_table function
+library(dplyr)
+library(tibble)
+library(SummarizedExperiment)
+library(MetaProViz)
+```
+
+# Purpose
+This notebook documents how the three `SummarizedExperiment` (SE) example
+datasets are generated from the published `data()` objects, reusing
+`MetaProViz:::build_se_from_df()` to assemble the assay, sample metadata,
+and feature metadata into one object.\
+\
+`1.` `tissue_norm_se`: ccRCC tissue metabolomics, Hakimi et al.
+[@Hakimi2016].\
+`2.` `intracell_raw_se`: intracellular cell-line metabolomics,
+metabolomics workbench project PR001418, study ST002224
+[@Sciacovelli_Dugourd2022].\
+`3.` `medium_raw_se`: exometabolomics (CoRe) of the same cell lines,
+metabolomics workbench project PR001418, study ST002226.\
+\
+Full descriptions of each dataset, including download links, are given in
+the corresponding section below.
+```{r}
+#align_feature_metadata() works around build_se_from_df() erroring when
+#metadata_feature does not cover every feature in the assay: safe join,
+#NA-padding the ones without an annotation entry:
+align_feature_metadata <- function(assay_df, metadata_feature) {
+  all_features <- colnames(assay_df)
+  merge(
+    data.frame(FeatureID = all_features, stringsAsFactors = FALSE),
+    metadata_feature %>% tibble::rownames_to_column("FeatureID"),
+    by = "FeatureID", all.x = TRUE
+  ) %>%
+    tibble::column_to_rownames("FeatureID") %>%
+    .[all_features, , drop = FALSE]
+}
+```
+
+# 1. `tissue_norm_se`
+The [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial)
+"An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma" includes
+metabolomic profiling on 138 matched clear cell renal cell carcinoma
+(ccRCC)/normal tissue pairs [@Hakimi2016]. Metabolomics was done using the
+company Metabolon, so this is untargeted metabolomics. Here we use the
+median normalised data from supplementary table 2 of the paper.\
+\
+`1.` Sample information + median-normalised metabolite peaks **(tissue_norm)**\
+`2.` Metabolite IDs (CAS, HMDB, KEGG, PubChem), pathway assignment and
+measurement platform **(tissue_meta)**, built in `ccRCC_Hakimi-et-all.Rmd`.
+
+## Load Data
+```{r}
+data(tissue_norm)
+data(tissue_meta)
+
+Tissue_Norm <- tissue_norm %>% column_to_rownames("Code")
+
+sample_cols <- c("TISSUE_TYPE", "GENDER", "RACE", "STAGE", "AGE")
+metab_cols  <- setdiff(colnames(Tissue_Norm), colnames(tissue_norm)[2:14])
+
+assay_df    <- Tissue_Norm[, metab_cols]
+meta_sample <- Tissue_Norm[, sample_cols]
+meta_feat   <- tissue_meta %>%
+  column_to_rownames("Metabolite") %>%
+  align_feature_metadata(assay_df, .)
+```
+
+## Build the SE
+```{r}
+tissue_norm_se <- build_se_from_df(
+  assay_df = assay_df,
+  metadata_sample = meta_sample,
+  metadata_feature = meta_feat
+)
+
+tissue_norm_se
+```
+
+## Feature-metadata coverage
+```{r}
+rd <- rowData(tissue_norm_se)
+fully_na <- rownames(rd)[apply(as.data.frame(rd), 1, function(r) all(is.na(r)))]
+cat("features with no tissue_meta entry:", length(fully_na), "of", nrow(rd), "\n")
+```
+All 570 features have a `tissue_meta` entry.
+
+# 2. `intracell_raw_se`
+Publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418)
+including metabolic profiles of human renal epithelial cells HK2 and ccRCC
+cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022].
+The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1)
+were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A
+and 786-M2A were performed.\
+\
+`1.` Sample information + raw integrated metabolite peaks **(intracell_raw)**\
+`2.` Metabolite trivial name mapped to HMDB ID, KEGG ID and one main
+metabolic pathway **(cellular_meta)**, shared with `medium_raw` below (same
+project).
+
+## Load Data
+```{r}
+data(intracell_raw)
+data(cellular_meta)
+
+Intra <- intracell_raw %>% column_to_rownames("Code")
+
+sample_cols2 <- c("Conditions", "Analytical_Replicates", "Biological_Replicates")
+metab_cols2  <- setdiff(colnames(Intra), sample_cols2)
+
+assay_df2    <- Intra[, metab_cols2]
+meta_sample2 <- Intra[, sample_cols2]
+meta_feat2   <- cellular_meta %>%
+  column_to_rownames("Metabolite") %>%
+  align_feature_metadata(assay_df2, .)
+```
+
+## Build the SE
+```{r}
+intracell_raw_se <- build_se_from_df(
+  assay_df = assay_df2,
+  metadata_sample = meta_sample2,
+  metadata_feature = meta_feat2
+)
+
+intracell_raw_se
+```
+
+## Feature-metadata coverage
+```{r}
+rd2 <- rowData(intracell_raw_se)
+fully_na2 <- rownames(rd2)[apply(as.data.frame(rd2), 1, function(r) all(is.na(r)))]
+cat("features with no cellular_meta entry:", length(fully_na2), "of", nrow(rd2), "\n")
+cat("unmatched:", paste(fully_na2, collapse = ", "), "\n")
+```
+`valine-d8` and `hippuric acid-d5` are internal standards, 
+so their absence from a pathway/ID annotation table is expected.
+`hexanoylcarnitine C6` is a coverage gap in `cellular_meta` (left as `NA`)
+
+# 3. `medium_raw_se`
+Same project as above, [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418).
+The raw data are available via [metabolomics workbench study ST002226](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002226&StudyType=MS&ResultType=1)
+were exometabolomics (consumption-release, "CoRe") of HK2 and ccRCC cell
+lines 786-O, 786-M1A, 786-M2A, OS-RC-2, OS-LM1 and RFX-631 were performed.
+\
+`1.` Sample information + raw integrated metabolite peaks from the culture
+media **(medium_raw)**\
+`2.` Same feature metadata table as used for `intracell_raw_se` above
+**(cellular_meta)**.
+
+## Load Data
+```{r}
+data(medium_raw)
+#cellular_meta already loaded above
+
+Media <- medium_raw %>% column_to_rownames("Code")
+
+sample_cols3 <- c("Conditions", "Biological_Replicates", "GrowthFactor")
+metab_cols3  <- setdiff(colnames(Media), sample_cols3)
+
+assay_df3    <- Media[, metab_cols3]
+meta_sample3 <- Media[, sample_cols3]
+meta_feat3   <- cellular_meta %>%
+  column_to_rownames("Metabolite") %>%
+  align_feature_metadata(assay_df3, .)
+```
+
+## Build the SE
+```{r}
+medium_raw_se <- build_se_from_df(
+  assay_df = assay_df3,
+  metadata_sample = meta_sample3,
+  metadata_feature = meta_feat3
+)
+
+medium_raw_se
+```
+
+## Feature-metadata coverage
+```{r}
+rd3 <- rowData(medium_raw_se)
+fully_na3 <- rownames(rd3)[apply(as.data.frame(rd3), 1, function(r) all(is.na(r)))]
+cat("features with no cellular_meta entry:", length(fully_na3), "of", nrow(rd3), "\n")
+cat("unmatched:", paste(fully_na3, collapse = ", "), "\n")
+```
+`valine-d8` and `hipppuric acid-d5` are internal standards, 
+so their absence from a pathway/ID annotation table is expected.
+
+# Save
+Save as .rda files.
+```{r}
+save(tissue_norm_se, file = "tissue_norm_se.rda")
+save(intracell_raw_se, file = "intracell_raw_se.rda")
+save(medium_raw_se, file = "medium_raw_se.rda")
+```
+
+# Information about package used and versions
+```{r session_info, echo=FALSE}
+sessionInfo()
+```
