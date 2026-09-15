@@ -2433,6 +2433,23 @@ seed_id_compatibility_check <- function(
         result$handling_summary_text <- handling_summary$summary_text
         result$handling_summary_metrics <- handling_summary$summary_metrics
     }
+
+    message(paste(
+        "seed_id_compatibility_check() ID-handling choices:",
+        sprintf("- handle_partially_compatible: %s", handle_partially_compatible),
+        sprintf("- handle_completely_incompatible: %s", handle_completely_incompatible),
+        if (!isTRUE(handle_partially_compatible) && !isTRUE(handle_completely_incompatible)) {
+            paste(
+                "Automatic ID handling is disabled: results flag incompatibilities only;",
+                "no automated processing was performed. To process affected features, rerun with",
+                "handle_partially_compatible = TRUE and/or",
+                "handle_completely_incompatible = TRUE."
+            )
+        } else {
+            NULL
+        },
+        sep = "\n"
+    ))
     
     if (isTRUE(verbose) || isTRUE(handle_partially_compatible) || isTRUE(handle_completely_incompatible)) {
         message(paste(

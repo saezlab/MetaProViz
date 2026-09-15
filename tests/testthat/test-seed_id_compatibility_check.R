@@ -39,10 +39,17 @@ make_input_data <- function() {
 }
 
 test_that("seed_id_compatibility_check preserves raw compatibility behavior by default", {
-  res <- seed_id_compatibility_check(
-    data = make_input_data(),
-    edge_table = make_edge_table(),
-    delimiter = ";"
+  expect_message(
+    res <- seed_id_compatibility_check(
+      data = make_input_data(),
+      edge_table = make_edge_table(),
+      delimiter = ";"
+    ),
+    paste0(
+      "handle_partially_compatible: FALSE\\n",
+      "- handle_completely_incompatible: FALSE\\n",
+      "Automatic ID handling is disabled: results flag incompatibilities only"
+    )
   )
 
   expect_true(all(c(
