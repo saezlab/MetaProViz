@@ -729,6 +729,7 @@ Hence while having multiple IDs for a single detected peak may add complexity, w
 ## 4 Deeper investigation of MetalinksDB metabolite-protein interactions
 Now that we have investigated the coverage of metabolite ID annotations and their connections and matches to Prior Knowledge, we can go a step further and look into the interaction mechanisms of metabolite features with MetalinksDB transporter- and receptor proteins, as well as metabolic enzymes.
 For that, we will subset MetalinksDB by the "interaction_family" column, which is subset in one of the following categories: "Other protein-metabolite", "Transporter-metabolite", "Receptor-metabolite", and "Enzyme-metabolite", using the 'viz_metabolite_protein_network()' function.
+Due to the amount of all biocrates features and the amount of Prior Knowledge in MetalinksDB, these visualizations may become quite convoluted. Hence, to resemble a possible subset, we will investigate only the amino acid subset of all biocrates features with the listed MetalinksDB subsets.
 
 ```{r}
 # get metalinksdb subsets bsaed on interaction_family
@@ -736,61 +737,55 @@ metalinks_receptor <- MetaLinksDB %>% filter(interaction_family == "Receptor-met
 metalinks_transporter <- MetaLinksDB %>% filter(interaction_family == "Transporter-metabolite")
 metalinks_metabolic_enzyme <- MetaLinksDB %>% filter(interaction_family == "Enzyme-metabolite")
 
+# subset biocrated_features to amino acids
+biocrates_amino_acids <- biocrates_features %>%
+    filter(
+        Class %in% c("Aminoacids Related", "Aminoacids")
+    )
+```
+
+Plot the Metabolite Network interaction network of biocrates amino acids and MetalinksDB Receptors
+```{r}
 # receptor-network
 biocrates_metalinks_receptor <- viz_metabolite_protein_network(
-  feature_metadata = biocrates_features,
+  feature_metadata = biocrates_amino_acids,
   metalinks_df = metalinks_receptor,
   metabolite_col = "TrivialName",
   hmdb_col = "HMDB",
-  save_plot = NULL,
-  path = NULL,
-  plot_name = "biocrates_to_metalinks_receptor_network",
+  save_plot = "svg",
+  plot_name = "biocrates_aminoacids_to_metalinks_receptor_network",
   hmdb_sep = ",",  # biocrates_features has possibly multiple HMDB IDs per feature, separated by ", "
-  return_data = TRUE,
-  print_plot = TRUE,
-  full_labels = FALSE,
-  label_mode = "reduced",
-  label_max_chars = 20,
-  label_repel = TRUE,
-  label_degree_min = 2
+  label_mode = "reduced"
   )
+```
 
+Plot the Metabolite Network interaction network of biocrates amino acids and MetalinksDB Transporters
+```{r}
 # transporter-network
 biocrates_metalinks_transporter <- viz_metabolite_protein_network(
-  feature_metadata = biocrates_features,
+  feature_metadata = biocrates_amino_acids,
   metalinks_df = metalinks_transporter,
   metabolite_col = "TrivialName",
   hmdb_col = "HMDB",
-  save_plot = NULL,
-  path = NULL,
-  plot_name = "biocrates_to_metalinks_transporter_network",
+  save_plot = "svg",
+  plot_name = "biocrates_aminoacids_to_metalinks_transporter_network",
   hmdb_sep = ",",
-  return_data = TRUE,
-  print_plot = TRUE,
-  full_labels = FALSE,
-  label_mode = "reduced",
-  label_max_chars = 20,
-  label_repel = TRUE,
-  label_degree_min = 2
+  label_mode = "reduced"
   )
+```
 
+Plot the Metabolite Network interaction network of biocrates amino acids and MetalinksDB Metabolic Enzymes
+```{r}
 # metabolic-enzyme-network
 biocrates_metalinks_metabolic_enzyme <- viz_metabolite_protein_network(
-  feature_metadata = biocrates_features,
+  feature_metadata = biocrates_amino_acids,
   metalinks_df = metalinks_metabolic_enzyme,
   metabolite_col = "TrivialName",
   hmdb_col = "HMDB",
-  save_plot = NULL,
-  path = NULL,
-  plot_name = "biocrates_to_metalinks_metabolic_enzyme_network",
+  save_plot = "svg",
+  plot_name = "biocrates_aminoacids_to_metalinks_metabolic_enzyme_network",
   hmdb_sep = ",",
-  return_data = TRUE,
-  print_plot = TRUE,
-  full_labels = FALSE,
   label_mode = "reduced",
-  label_max_chars = 20,
-  label_repel = TRUE,
-  label_degree_min = 2
   )
 
 ```

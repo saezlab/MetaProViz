@@ -606,7 +606,7 @@ distinct(UniquePair, .keep_all = TRUE)
 Now we can use this information to understand if the metabolites that are consumed in the 786-M1A cells and Released in the HK2 cells are connected to specific receptors or transporters and are in the bioRCM cluster "Both_DOWN (Released/Consumed)\
 ```{r data-prep, echo=FALSE}
 MetaLinksDB_BothDOWN <-merge(x=MetaLinksDB_Select,
-y=MCA_res[,c(1,14,48)]%>% dplyr::filter(RG2_Significant=="Both_DOWN (Released/Consumed)") ,
+y=MCA_res[,c(1,14,48)]%>% dplyr::filter(RG2_Significant=="Both_DOWN (Released)") ,
 by.x="hmdb",
 by.y="core_DF_HMDB",
 all.y=TRUE)
@@ -633,21 +633,26 @@ metabolite-protein network with `viz_metabolite_protein_network()`. The
 metabolite name column is recommended, but only the HMDB column is required.
 
 ```{r metalinks-network}
-MetaLinks_Features <- MetaLinksDB_BothDOWN %>%
-    dplyr::filter(!is.na(hmdb)) %>%
-    dplyr::distinct(Metabolite, hmdb)
+MetaLinks_Features <- MCA_res %>%
+    dplyr::filter(RG2_Significant == "Both_DOWN (Released)") %>%
+    dplyr::filter(!is.na(core_DF_HMDB)) %>%
+    dplyr::distinct(Metabolite, core_DF_HMDB)
 
 MetaLinks_Network <- viz_metabolite_protein_network(
     feature_metadata = MetaLinks_Features,
     metalinks_df = MetaLinksDB_Select,
     metabolite_col = "Metabolite",
-    hmdb_col = "hmdb",
+    hmdb_col = "core_DF_HMDB",
     save_plot = NULL,
-    print_plot = FALSE
+    print_plot = TRUE,
+    label_mode = "all"
 )
 
 MetaLinks_Network$plot
 ```
+
+From this visualization, we gain insight into cellular mechanisms for metabolites of interest. In our case, we can see "betaine" and "asparagine" interactions with transporters, receptors and other metabolic enzymes which are curated in MetalinksDB. 
+
 
 ### ORA on each metabolite cluster
 As explained in detail above, Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method. As ORA is based on the Fishers exact test it is perfect to test if a set of features (=metabolic pathways) are over-represented in the selection of features (= clusters of metabolites) from the data in comparison to all measured features (all metabolites). In detail, `MC_ORA()` will perform ORA on each of the metabolite clusters using all metabolites as the background.
