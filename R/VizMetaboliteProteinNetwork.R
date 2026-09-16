@@ -618,8 +618,14 @@ viz_metabolite_protein_network <- function(
     reg_linetypes <- c(
         "Activating" = "solid",
         "Inhibiting" = "dashed",
-        "Binding" = "dotdash",
+        "Binding" = "solid",
         "Unknown" = "dotted"
+    )
+    reg_alphas <- c(
+        "Activating" = 0.9,
+        "Inhibiting" = 0.9,
+        "Binding" = 0.45,
+        "Unknown" = 0.3
     )
     node_shapes <- c("Metabolite" = 21, "Protein" = 22)
     node_fills <- c("Metabolite" = "#fdb863", "Protein" = "#80b1d3")
@@ -627,9 +633,13 @@ viz_metabolite_protein_network <- function(
     set.seed(123)
     plot_obj <- ggraph::ggraph(graph, layout = "fr") +
         ggraph::geom_edge_link(
-            ggplot2::aes(color = interaction, linetype = regulation, width = n_matches),
+            ggplot2::aes(
+                color = interaction,
+                linetype = regulation,
+                alpha = regulation,
+                width = n_matches
+            ),
             arrow = grid::arrow(length = grid::unit(2.5, "mm")),
-            alpha = 0.7,
             end_cap = ggraph::circle(2.5, "mm")
         ) +
         ggraph::geom_node_point(
@@ -647,6 +657,11 @@ viz_metabolite_protein_network <- function(
         ggraph::scale_edge_linetype_manual(
             name = "Regulation",
             values = reg_linetypes
+        ) +
+        ggraph::scale_edge_alpha_manual(
+            name = "Regulation",
+            values = reg_alphas,
+            guide = "legend"
         ) +
         ggraph::scale_edge_width_continuous(
             name = "Matched links",
