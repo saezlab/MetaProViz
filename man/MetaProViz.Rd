@@ -24,8 +24,8 @@ Useful links:
 
 }
 \author{
-Christina Schmidt \if{html}{\out{<\email{christina.schmidt@uni-heidelberg.de}>}}
-and Jannik Franken and Denes Turei \if{html}{\out{<\email{turei.denes@gmail.com}>}}
+Christina Schmidt <\email{christina.schmidt@uni-heidelberg.de}>
+and Jannik Franken and Denes Turei <\email{turei.denes@gmail.com}>
 and Dimitrios Prymidis and Macabe Daley and Julio Saez-Rodriguez
 and Christian Frezza
 }

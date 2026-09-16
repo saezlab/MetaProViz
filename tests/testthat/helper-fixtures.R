@@ -135,15 +135,15 @@ mpv_mock_translate_ids <- function(data, ...) {
 mpv_minimal_metalinks_tables <- function() {
   list(
     interactions = data.frame(
-      hmdb = "HMDB0000190",
-      uniprot = "P12345",
-      type = "lr",
-      mor = 1,
-      transport_direction = NA_character_,
-      protein_type = "gpcr",
-      source = "CellPhoneDB",
-      experiment_score = 1,
-      combined_score = 900,
+      hmdb = c("HMDB0000190", "HMDB0001544", "HMDB0000002"),
+      uniprot = c("P12345", "P23456", "P34567"),
+      type = c("lr", "lr", "lr"),
+      mor = c(1, 1, 1),
+      transport_direction = c(NA_character_, NA_character_, NA_character_),
+      protein_type = c("gpcr", "transporter", "enzyme"),
+      source = c("CellPhoneDB", "CellPhoneDB", "CellPhoneDB"),
+      experiment_score = c(1, 1, 1),
+      combined_score = c(900, 900, 900),
       stringsAsFactors = FALSE
     ),
     cell_location = data.frame(hmdb = "HMDB0000190", cell_location = "Extracellular", stringsAsFactors = FALSE),
@@ -151,7 +151,16 @@ mpv_minimal_metalinks_tables <- function() {
     biospecimen_location = data.frame(hmdb = "HMDB0000190", biospecimen_location = "Blood", stringsAsFactors = FALSE),
     disease = data.frame(hmdb = "HMDB0000190", disease = "Cancer", stringsAsFactors = FALSE),
     pathway = data.frame(hmdb = "HMDB0000190", pathway = "Glycolysis", stringsAsFactors = FALSE),
-    metabolites = data.frame(hmdb = "HMDB0000190", metabolite = "Lactate", stringsAsFactors = FALSE),
-    proteins = data.frame(uniprot = "P12345", gene_symbol = "HCAR1", protein_name = "Hydroxycarboxylic acid receptor 1", stringsAsFactors = FALSE)
+    metabolites = data.frame(
+      hmdb = c("HMDB0000190", "HMDB0001544", "HMDB0000002"),
+      metabolite = c("Lactate", "Succinate", "Acetate"),
+      stringsAsFactors = FALSE
+    ),
+    proteins = data.frame(
+      uniprot = c("P12345", "P23456", "P34567"),
+      gene_symbol = c("HCAR1", "SLC13A3", "ACSS2"),
+      protein_name = c("Hydroxycarboxylic acid receptor 1", "Solute carrier family 13 member 3", "Acyl-CoA synthetase short-chain family member 2"),
+      stringsAsFactors = FALSE
+    )
   )
 }

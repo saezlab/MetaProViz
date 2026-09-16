@@ -795,6 +795,11 @@ make_gene_metab_set <- function(
 #'     c("ions", "small_molecules", "xenobiotics", "atoms").
 #'
 #' @return A data frame of metabolite-protein interactions from MetalinksDB.
+#'     Source fields are retained and additional annotations are included.
+#'     `interaction_family` uses protein role (`protein_type` and
+#'     `transport_direction`) before falling back to edge `type`, while
+#'     `interaction_annotation_status` records mixed source annotations and
+#'     edge-type-based inferences.
 #'
 #' @examples
 #' metsigdb_metalinks()
@@ -1088,9 +1093,19 @@ metsigdb_metalinks <- function(
         ),
         interaction_family = case_when(
             protein_type_clean == "transporter" | !is.na(transport_direction) ~ "Transporter-metabolite",
-            type == "Ligand-Receptor" | !is.na(receptor_class) ~ "Receptor-metabolite",
+            !is.na(receptor_class) ~ "Receptor-metabolite",
             protein_type_clean == "enzyme" ~ "Enzyme-metabolite",
+            type == "Production-Degradation" ~ "Enzyme-metabolite",
+            type == "Ligand-Receptor" ~ "Receptor-metabolite",
             TRUE ~ "Other protein-metabolite"
+        ),
+        interaction_annotation_status = case_when(
+            interaction_family == "Transporter-metabolite" & type == "Ligand-Receptor" ~ "transporter_with_lr_edge",
+            interaction_family == "Transporter-metabolite" & type == "Production-Degradation" ~ "transporter_with_pd_edge",
+            interaction_family == "Enzyme-metabolite" & type == "Ligand-Receptor" ~ "enzyme_with_lr_edge",
+            interaction_family == "Receptor-metabolite" & type == "Production-Degradation" ~ "receptor_with_pd_edge",
+            is.na(protein_type_clean) & !is.na(type) ~ "inferred_from_edge_type",
+            TRUE ~ "source_annotations_concordant_or_incomplete"
         ),
         interaction_mechanism = case_when(
             interaction_family == "Transporter-metabolite" ~ "Transport",

@@ -71,6 +71,11 @@ c("ions", "small_molecules", "xenobiotics", "atoms").}
 }
 \value{
 A data frame of metabolite-protein interactions from MetalinksDB.
+Source fields are retained and additional annotations are included.
+\code{interaction_family} uses protein role (\code{protein_type} and
+\code{transport_direction}) before falling back to edge \code{type}, while
+\code{interaction_annotation_status} records mixed source annotations and
+edge-type-based inferences.
 }
 \description{
 Annotated metabolite-protein interactions from MetalinksDB

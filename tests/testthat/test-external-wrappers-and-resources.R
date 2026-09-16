@@ -163,5 +163,16 @@ test_that("metsigdb_chemicalclass and metsigdb_metalinks work with mocked backen
   expect_true(all(c("class_source_id", "common_name") %in% colnames(chemical_class)))
 
   metalinks <- metsigdb_metalinks(save_table = NULL, exclude_metabolites = NULL)
-  expect_true(all(c("hmdb", "gene_symbol", "type", "interaction_family") %in% colnames(metalinks)))
+  expect_true(all(c(
+    "hmdb", "gene_symbol", "type", "interaction_family",
+    "interaction_annotation_status"
+  ) %in% colnames(metalinks)))
+
+  transporter_lr <- metalinks[metalinks$gene_symbol == "SLC13A3", ]
+  expect_identical(transporter_lr$interaction_family, "Transporter-metabolite")
+  expect_identical(transporter_lr$interaction_annotation_status, "transporter_with_lr_edge")
+
+  enzyme_lr <- metalinks[metalinks$gene_symbol == "ACSS2", ]
+  expect_identical(enzyme_lr$interaction_family, "Enzyme-metabolite")
+  expect_identical(enzyme_lr$interaction_annotation_status, "enzyme_with_lr_edge")
 })

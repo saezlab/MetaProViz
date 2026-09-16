@@ -1,6 +1,13 @@
 library(testthat)
 library(MetaProViz)
 
+test_that("network regulation classes preserve binding and expose missing values", {
+    expect_identical(
+        MetaProViz:::.classify_regulation(c("Binding", NA_character_)),
+        c("Binding", "Unknown")
+    )
+})
+
 test_that("viz_metabolite_protein_network builds a network with metabolite names", {
     feature_metadata <- data.frame(
         Metabolite = c("Lactate", "Succinate"),
@@ -15,7 +22,7 @@ test_that("viz_metabolite_protein_network builds a network with metabolite names
         protein_type_clean = c("Receptor", "Transporter"),
         transport_direction = c(NA, "in"),
         type = c("Ligand-Receptor", "Production-Degradation"),
-        mode_of_regulation = c("Activating", NA),
+        mode_of_regulation = c("Activating", "Binding"),
         interaction_family = c("Receptor", "Transporter"),
         source = c("Example", "Example"),
         stringsAsFactors = FALSE
@@ -38,6 +45,7 @@ test_that("viz_metabolite_protein_network builds a network with metabolite names
     expect_s3_class(res$plot, "ggplot")
     expect_gt(nrow(res$edges), 0)
     expect_gt(nrow(res$nodes), 0)
+    expect_true(all(c("Activating", "Binding") %in% res$edges$regulation))
     expect_true(all(c("Lactate", "Succinate") %in% res$matched_features$metabolite))
     expect_length(res$saved_files, 0)
 })

@@ -479,7 +479,8 @@ viz_metabolite_protein_network <- function(
     dplyr::case_when(
         !is.na(mode_of_regulation) & mode_of_regulation == "Activating" ~ "Activating",
         !is.na(mode_of_regulation) & mode_of_regulation == "Inhibiting" ~ "Inhibiting",
-        TRUE ~ NA_character_
+        !is.na(mode_of_regulation) & mode_of_regulation == "Binding" ~ "Binding",
+        TRUE ~ "Unknown"
     )
 }
 
@@ -614,7 +615,12 @@ viz_metabolite_protein_network <- function(
         "Ligand-Receptor" = "#6a3d9a",
         "Unknown" = "grey50"
     )
-    reg_linetypes <- c("Activating" = "solid", "Inhibiting" = "dashed")
+    reg_linetypes <- c(
+        "Activating" = "solid",
+        "Inhibiting" = "dashed",
+        "Binding" = "dotdash",
+        "Unknown" = "dotted"
+    )
     node_shapes <- c("Metabolite" = 21, "Protein" = 22)
     node_fills <- c("Metabolite" = "#fdb863", "Protein" = "#80b1d3")
 
@@ -640,8 +646,7 @@ viz_metabolite_protein_network <- function(
         ) +
         ggraph::scale_edge_linetype_manual(
             name = "Regulation",
-            values = reg_linetypes,
-            na.value = "solid"
+            values = reg_linetypes
         ) +
         ggraph::scale_edge_width_continuous(
             name = "Matched links",
