@@ -50,6 +50,53 @@ test_that("viz_metabolite_protein_network builds a network with metabolite names
     expect_length(res$saved_files, 0)
 })
 
+test_that("viz_metabolite_protein_network returns metabolite interaction overlap", {
+    feature_metadata <- data.frame(
+        Metabolite = c("Alanine", "Glycine"),
+        hmdb = c("HMDB0000001", "HMDB0000002"),
+        stringsAsFactors = FALSE
+    )
+    metalinks_df <- data.frame(
+        hmdb = c("HMDB0000001", "HMDB0000002"),
+        gene_symbol = c("HCAR1", "HCAR1"),
+        type = c("Ligand-Receptor", "Ligand-Receptor"),
+        mode_of_regulation = c("Binding", "Binding"),
+        stringsAsFactors = FALSE
+    )
+
+    testthat::local_mocked_bindings(
+        .save_metalinks_network_plot = function(plot, save_plot, path, plot_name, width, height) {
+            paste0(plot_name, ".", save_plot)
+        },
+        .package = "MetaProViz"
+    )
+
+    res <- viz_metabolite_protein_network(
+        feature_metadata = feature_metadata,
+        metalinks_df = metalinks_df,
+        metabolite_col = "Metabolite",
+        hmdb_col = "hmdb",
+        save_plot = "png",
+        print_plot = FALSE,
+        plot_metabolite_interaction_overlap = TRUE
+    )
+
+    overlap <- res$metabolite_interaction_overlap
+    expect_true(is.list(overlap))
+    expect_s3_class(overlap$plot, "ggplot")
+    expect_equal(nrow(overlap$nodes), 2)
+    expect_equal(nrow(overlap$edges), 1)
+    expect_identical(overlap$edges$weight, 1L)
+    expect_true(all(overlap$nodes$protein_interaction_count == 1))
+    expect_identical(
+        res$saved_files,
+        c(
+            "metalinks_network.png",
+            "metalinks_network_metabolite_interaction_overlap.png"
+        )
+    )
+})
+
 test_that("viz_metabolite_protein_network uses HMDB identifiers as fallback labels", {
     feature_metadata <- data.frame(
         hmdb = c("HMDB0000190", "HMDB0000254; HMDB0000331"),

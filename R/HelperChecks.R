@@ -1964,6 +1964,8 @@ check_param_VizGraph <- function(
 #' @param label_max_chars Maximum label width before truncation.
 #' @param label_repel Logical flag for repelled labels.
 #' @param label_degree_min Minimum degree required when `label_mode = "reduced"`.
+#' @param plot_metabolite_interaction_overlap Logical flag for returning a
+#'     metabolite-only interaction-overlap graph.
 #'
 #' @return Invisible TRUE if checks pass.
 #'
@@ -1985,7 +1987,8 @@ check_param_VizMetaboliteProteinNetwork <- function(
     label_mode,
     label_max_chars,
     label_repel,
-    label_degree_min
+    label_degree_min,
+    plot_metabolite_interaction_overlap
 ) {
     if (!is.data.frame(feature_metadata)) {
         stop("`feature_metadata` must be a data.frame.")
@@ -2052,6 +2055,11 @@ check_param_VizMetaboliteProteinNetwork <- function(
         is.na(label_degree_min) || label_degree_min < 1) {
         stop("`label_degree_min` must be a single number greater than or equal to 1.")
     }
+    if (!is.logical(plot_metabolite_interaction_overlap) ||
+        length(plot_metabolite_interaction_overlap) != 1L ||
+        is.na(plot_metabolite_interaction_overlap)) {
+        stop("`plot_metabolite_interaction_overlap` must be TRUE or FALSE.")
+    }
 
     save_plot_options <- c("svg", "pdf", "png")
     if (!is.null(save_plot) && !all(save_plot %in% save_plot_options)) {
@@ -2064,5 +2072,4 @@ check_param_VizMetaboliteProteinNetwork <- function(
 
     invisible(TRUE)
 }
-
 

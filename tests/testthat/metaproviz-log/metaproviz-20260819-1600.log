@@ -1,0 +1,720 @@
+[2026-08-19 16:00:09] [INFO]    [MetaProViz] Welcome to MetaProViz!
+[2026-08-19 16:00:09] [INFO]    [MetaProViz] MetaProViz version: 4.1.1
+[2026-08-19 16:00:09] [INFO]    [MetaProViz] OmnipathR version: 4.1.0
+[2026-08-19 16:00:09] [INFO]    [MetaProViz] feature_filtering: Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values (REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004). Filtering value selected: 0.8
+[2026-08-19 16:00:09] [INFO]    [MetaProViz] 2 metabolites where removed: FAICAR, SAICAR
+[2026-08-19 16:00:10] [INFO]    [MetaProViz] Missing Value Imputation: Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0
+[2026-08-19 16:00:11] [INFO]    [MetaProViz] total Ion Count (tic) normalization: total Ion Count (tic) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022
+[2026-08-19 16:00:12] [INFO]    [MetaProViz] Outlier detection: Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val < 0.01) (REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360-378, doi:https://doi.org/10.1214/aoms/1177732979). hotellins_confidence value selected: 0.99
+[2026-08-19 16:00:13] [INFO]    [MetaProViz] viz_pca: PCA plot visualization
+[2026-08-19 16:00:13] [INFO]    [MetaProViz] character(0)
+[2026-08-19 16:00:13] [INFO]    [MetaProViz] viz_pca colour: #88CCEE, #DDCC77, #661100, #332288, #AA4499, #999933, #44AA99, #882215, #6699CC, #117733, #888888, #CC6677, black, gold1, darkorchid4, red, orange, blue
+[2026-08-19 16:00:13] [INFO]    [MetaProViz] viz_pca shape: 15, 17, 16, 18, 6, 7, 8, 11, 12
+[2026-08-19 16:00:14] [INFO]    [MetaProViz] viz_pca scale_color: discrete
+[2026-08-19 16:00:14] [TRACE]   [MetaProViz] The plot has legend, adjusting layout to accommodate it.
+[2026-08-19 16:00:14] [TRACE]   [MetaProViz] Sections: color, shape
+[2026-08-19 16:00:15] [TRACE]   [MetaProViz] Legend nchar: 2.50cm, Legend width: 2.50cm
+[2026-08-19 16:00:15] [TRACE]   [MetaProViz] Parsing unit from `2.50cm`
+[2026-08-19 16:00:15] [TRACE]   [MetaProViz] The plot has title, adjusting layout to accommodate it.
+[2026-08-19 16:00:15] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:16] [TRACE]   [MetaProViz] Parsing unit from `12`
+[2026-08-19 16:00:16] [TRACE]   [MetaProViz] Parsing unit from `11`
+[2026-08-19 16:00:16] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:00:16] [TRACE]   [MetaProViz] Setting widths[7] to 8cm [name=axis-b, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:00:16] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:16] [TRACE]   [MetaProViz] Setting widths[1] to 0cm [name=ylab-l, offset=-4, empty=FALSE, original=5.5points]
+[2026-08-19 16:00:16] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:16] [TRACE]   [MetaProViz] Setting widths[6] to 1cm [name=axis-l, offset=0, empty=FALSE, original=sum(0cm, 1null, 0.818154490106546cm, 0null, max(0points, -0.0966514459665145cm), 0.0966514459665145cm)]
+[2026-08-19 16:00:16] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:16] [TRACE]   [MetaProViz] Setting widths[5] to 1cm [name=ylab-l, offset=0, empty=FALSE, original=1grobwidth]
+[2026-08-19 16:00:16] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:16] [TRACE]   [MetaProViz] Setting widths[3] to 0cm [name=guide-box-left, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting widths[8] to 0cm [name=axis-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting widths[9] to 0cm [name=ylab-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting widths[4] to 1cm [name=ylab-l, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting widths[11] to 1cm [name=guide-box-right, offset=0, empty=FALSE, original=sum(0.5null, 0points, 2.45950867579909cm, 0points, 0.5null)]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting heights[9] to 8cm [name=axis-l, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting heights[10] to 1cm [name=axis-b, offset=0, empty=FALSE, original=sum(0.0966514459665145cm, max(0points, -0.0966514459665145cm), 0null, 0.394821156773212cm, 1null, 0cm)]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Parsing unit from `.5cm`
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting heights[11] to 0.5cm [name=xlab-b, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting heights[12] to 1cm [name=xlab-b, offset=1, empty=TRUE, original=0points]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting heights[1] to 0cm [name=title, offset=-2, empty=FALSE, original=5.5points]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting heights[2] to 0cm [name=title, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Parsing unit from `0.25cm`
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting heights[3] to 0.25cm [name=title, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting heights[4] to 0cm [name=subtitle, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting heights[5] to 0cm [name=guide-box-top, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting heights[6] to 0cm [name=xlab-t, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting heights[3] to 0.5cm [name=title, main, offset=0, empty=FALSE, original=0.25cm]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting heights[4] to 0.5cm [name=subtitle, main, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Parsing unit from `-2.45cm`
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting widths[11] to max(-2.45cm, 1cm) [name=guide-box-right, legend, offset=0, empty=FALSE, original=1cm]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Adding sum(max(2.5cm, -2.45cm, 1cm), -1*max(-2.45cm, 1cm)) to the total width of the gtable, growing it from 12cm to sum(12cm, max(2.5cm, -2.45cm, 1cm), -1*max(-2.45cm, 1cm)).
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Setting widths[11] to max(2.5cm, -2.45cm, 1cm) [name=guide-box-right, offset=0, empty=FALSE, original=max(-2.45cm, 1cm)]
+[2026-08-19 16:00:17] [TRACE]   [MetaProViz] Sum of heights: 12.00, sum of widths: 13.50
+[2026-08-19 16:00:19] [INFO]    [MetaProViz] No sample outliers were found
+[2026-08-19 16:00:19] [INFO]    [MetaProViz] viz_pca: PCA plot visualization
+[2026-08-19 16:00:19] [INFO]    [MetaProViz] character(0)
+[2026-08-19 16:00:19] [INFO]    [MetaProViz] viz_pca colour: #88CCEE, #DDCC77, #661100, #332288, #AA4499, #999933, #44AA99, #882215, #6699CC, #117733, #888888, #CC6677, black, gold1, darkorchid4, red, orange, blue
+[2026-08-19 16:00:19] [INFO]    [MetaProViz] viz_pca shape: 15, 17, 16, 18, 6, 7, 8, 11, 12
+[2026-08-19 16:00:20] [INFO]    [MetaProViz] viz_pca scale_color: discrete
+[2026-08-19 16:00:20] [TRACE]   [MetaProViz] The plot has legend, adjusting layout to accommodate it.
+[2026-08-19 16:00:20] [TRACE]   [MetaProViz] Sections: color, shape
+[2026-08-19 16:00:21] [TRACE]   [MetaProViz] Legend nchar: 5.25cm, Legend width: 5.25cm
+[2026-08-19 16:00:21] [TRACE]   [MetaProViz] Parsing unit from `5.25cm`
+[2026-08-19 16:00:21] [TRACE]   [MetaProViz] The plot has title, adjusting layout to accommodate it.
+[2026-08-19 16:00:21] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `12`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `11`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting widths[7] to 8cm [name=axis-b, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting widths[1] to 0cm [name=ylab-l, offset=-4, empty=FALSE, original=5.5points]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting widths[6] to 1cm [name=axis-l, offset=0, empty=FALSE, original=sum(0cm, 1null, 0.818154490106546cm, 0null, max(0points, -0.0966514459665145cm), 0.0966514459665145cm)]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting widths[5] to 1cm [name=ylab-l, offset=0, empty=FALSE, original=1grobwidth]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting widths[3] to 0cm [name=guide-box-left, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting widths[8] to 0cm [name=axis-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting widths[9] to 0cm [name=ylab-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting widths[4] to 1cm [name=ylab-l, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting widths[11] to 1cm [name=guide-box-right, offset=0, empty=FALSE, original=sum(0.5null, 0points, 4.06431411719939cm, 0points, 0.5null)]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting heights[9] to 8cm [name=axis-l, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting heights[10] to 1cm [name=axis-b, offset=0, empty=FALSE, original=sum(0.0966514459665145cm, max(0points, -0.0966514459665145cm), 0null, 0.394821156773212cm, 1null, 0cm)]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `.5cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting heights[11] to 0.5cm [name=xlab-b, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting heights[12] to 1cm [name=xlab-b, offset=1, empty=TRUE, original=0points]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting heights[1] to 0cm [name=title, offset=-2, empty=FALSE, original=5.5points]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting heights[2] to 0cm [name=title, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `0.25cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting heights[3] to 0.25cm [name=title, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting heights[4] to 0cm [name=subtitle, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting heights[5] to 0cm [name=guide-box-top, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting heights[6] to 0cm [name=xlab-t, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting heights[3] to 0.5cm [name=title, main, offset=0, empty=FALSE, original=0.25cm]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting heights[4] to 0.5cm [name=subtitle, main, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Parsing unit from `-0.70cm`
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting widths[11] to max(-0.7cm, 1cm) [name=guide-box-right, legend, offset=0, empty=FALSE, original=1cm]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Adding sum(max(5.25cm, -0.7cm, 1cm), -1*max(-0.7cm, 1cm)) to the total width of the gtable, growing it from 12cm to sum(12cm, max(5.25cm, -0.7cm, 1cm), -1*max(-0.7cm, 1cm)).
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Setting widths[11] to max(5.25cm, -0.7cm, 1cm) [name=guide-box-right, offset=0, empty=FALSE, original=max(-0.7cm, 1cm)]
+[2026-08-19 16:00:22] [TRACE]   [MetaProViz] Sum of heights: 12.00, sum of widths: 16.25
+[2026-08-19 16:00:24] [INFO]    [MetaProViz] Starting pool estimation.
+[2026-08-19 16:00:24] [INFO]    [MetaProViz] Processing input SummarizedExperiment object.
+[2026-08-19 16:00:25] [TRACE]   [MetaProViz] Calculating coefficient of variation.
+[2026-08-19 16:00:25] [TRACE]   [MetaProViz] Applying CV cut-off.
+[2026-08-19 16:00:25] [INFO]    [MetaProViz] Plotting QC plots.
+[2026-08-19 16:00:25] [TRACE]   [MetaProViz] Pool sample PCA.
+[2026-08-19 16:00:25] [INFO]    [MetaProViz] viz_pca: PCA plot visualization
+[2026-08-19 16:00:25] [INFO]    [MetaProViz] character(0)
+[2026-08-19 16:00:25] [INFO]    [MetaProViz] viz_pca colour: #88CCEE, #DDCC77, #661100, #332288, #AA4499, #999933, #44AA99, #882215, #6699CC, #117733, #888888, #CC6677, black, gold1, darkorchid4, red, orange, blue
+[2026-08-19 16:00:25] [INFO]    [MetaProViz] viz_pca shape: 15, 17, 16, 18, 6, 7, 8, 11, 12
+[2026-08-19 16:00:25] [INFO]    [MetaProViz] viz_pca scale_color: discrete
+[2026-08-19 16:00:26] [TRACE]   [MetaProViz] The plot has legend, adjusting layout to accommodate it.
+[2026-08-19 16:00:26] [TRACE]   [MetaProViz] Sections: color, shape
+[2026-08-19 16:00:27] [TRACE]   [MetaProViz] Legend nchar: 2.75cm, Legend width: 2.75cm
+[2026-08-19 16:00:27] [TRACE]   [MetaProViz] Parsing unit from `2.75cm`
+[2026-08-19 16:00:27] [TRACE]   [MetaProViz] The plot has title, adjusting layout to accommodate it.
+[2026-08-19 16:00:27] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:27] [TRACE]   [MetaProViz] Parsing unit from `12`
+[2026-08-19 16:00:27] [TRACE]   [MetaProViz] Parsing unit from `11`
+[2026-08-19 16:00:27] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:00:27] [TRACE]   [MetaProViz] Setting widths[7] to 8cm [name=axis-b, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:00:27] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:27] [TRACE]   [MetaProViz] Setting widths[1] to 0cm [name=ylab-l, offset=-4, empty=FALSE, original=5.5points]
+[2026-08-19 16:00:27] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:27] [TRACE]   [MetaProViz] Setting widths[6] to 1cm [name=axis-l, offset=0, empty=FALSE, original=sum(0cm, 1null, 0.632946156773212cm, 0null, max(0points, -0.0966514459665145cm), 0.0966514459665145cm)]
+[2026-08-19 16:00:27] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:27] [TRACE]   [MetaProViz] Setting widths[5] to 1cm [name=ylab-l, offset=0, empty=FALSE, original=1grobwidth]
+[2026-08-19 16:00:31] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:31] [TRACE]   [MetaProViz] Setting widths[3] to 0cm [name=guide-box-left, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:31] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:31] [TRACE]   [MetaProViz] Setting widths[8] to 0cm [name=axis-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:31] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:31] [TRACE]   [MetaProViz] Setting widths[9] to 0cm [name=ylab-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:31] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:31] [TRACE]   [MetaProViz] Setting widths[4] to 1cm [name=ylab-l, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:31] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:31] [TRACE]   [MetaProViz] Setting widths[11] to 1cm [name=guide-box-right, offset=0, empty=FALSE, original=sum(0.5null, 0points, 2.63556411719939cm, 0points, 0.5null)]
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Setting heights[9] to 8cm [name=axis-l, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Setting heights[10] to 1cm [name=axis-b, offset=0, empty=FALSE, original=sum(0.0966514459665145cm, max(0points, -0.0966514459665145cm), 0null, 0.394821156773212cm, 1null, 0cm)]
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Parsing unit from `.5cm`
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Setting heights[11] to 0.5cm [name=xlab-b, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Setting heights[12] to 1cm [name=xlab-b, offset=1, empty=TRUE, original=0points]
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Setting heights[1] to 0cm [name=title, offset=-2, empty=FALSE, original=5.5points]
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Setting heights[2] to 0cm [name=title, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Parsing unit from `0.25cm`
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Setting heights[3] to 0.25cm [name=title, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Setting heights[4] to 0cm [name=subtitle, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Setting heights[5] to 0cm [name=guide-box-top, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Setting heights[6] to 0cm [name=xlab-t, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Setting heights[3] to 0.5cm [name=title, main, offset=0, empty=FALSE, original=0.25cm]
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Setting heights[4] to 0.5cm [name=subtitle, main, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Parsing unit from `-7.45cm`
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Setting widths[11] to max(-7.45cm, 1cm) [name=guide-box-right, legend, offset=0, empty=FALSE, original=1cm]
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Adding sum(max(2.75cm, -7.45cm, 1cm), -1*max(-7.45cm, 1cm)) to the total width of the gtable, growing it from 12cm to sum(12cm, max(2.75cm, -7.45cm, 1cm), -1*max(-7.45cm, 1cm)).
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Setting widths[11] to max(2.75cm, -7.45cm, 1cm) [name=guide-box-right, offset=0, empty=FALSE, original=max(-7.45cm, 1cm)]
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] Sum of heights: 12.00, sum of widths: 13.75
+[2026-08-19 16:00:32] [TRACE]   [MetaProViz] CV histogram.
+[2026-08-19 16:00:35] [TRACE]   [MetaProViz] The plot has title, adjusting layout to accommodate it.
+[2026-08-19 16:00:35] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `12`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `11`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting widths[7] to 8cm [name=axis-b, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting widths[1] to 0cm [name=ylab-l, offset=-4, empty=FALSE, original=5.5points]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting widths[6] to 1cm [name=axis-l, offset=0, empty=FALSE, original=sum(0cm, 1null, 0.712321156773212cm, 0null, max(0points, -0.0966514459665145cm), 0.0966514459665145cm)]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting widths[5] to 1cm [name=ylab-l, offset=0, empty=FALSE, original=1grobwidth]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting widths[3] to 0cm [name=guide-box-left, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting widths[8] to 0cm [name=axis-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting widths[9] to 0cm [name=ylab-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting widths[4] to 1cm [name=ylab-l, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting widths[11] to 1cm [name=guide-box-right, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting heights[9] to 8cm [name=axis-l, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting heights[10] to 0.5cm [name=axis-b, offset=0, empty=FALSE, original=sum(0.0966514459665145cm, max(0points, -0.0966514459665145cm), 0null, 0.394821156773212cm, 1null, 0cm)]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `0.75cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting heights[11] to 0.75cm [name=xlab-b, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting heights[1] to 0cm [name=title, offset=-2, empty=FALSE, original=5.5points]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting heights[2] to 0cm [name=title, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `0.25cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting heights[3] to 0.25cm [name=title, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting heights[4] to 0cm [name=subtitle, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting heights[14] to 0.5cm [name=caption, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Setting heights[5] to 0cm [name=guide-box-top, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:36] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Setting heights[6] to 0cm [name=xlab-t, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Setting heights[3] to 0.5cm [name=title, main, offset=0, empty=FALSE, original=0.25cm]
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Setting heights[4] to 0.5cm [name=subtitle, main, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Parsing unit from `-2.70cm`
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Setting widths[11] to max(-2.7cm, 1cm) [name=guide-box-right, legend, offset=0, empty=FALSE, original=1cm]
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] CV violin plot.
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] The plot has title, adjusting layout to accommodate it.
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Parsing unit from `12`
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Parsing unit from `11`
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Setting widths[7] to 8cm [name=axis-b, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Setting widths[1] to 0cm [name=ylab-l, offset=-4, empty=FALSE, original=5.5points]
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Setting widths[6] to 1cm [name=axis-l, offset=0, empty=FALSE, original=sum(0cm, 1null, 0.447737823439878cm, 0null, max(0points, -0.0966514459665145cm), 0.0966514459665145cm)]
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Setting widths[5] to 1cm [name=ylab-l, offset=0, empty=FALSE, original=1grobwidth]
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Setting widths[3] to 0cm [name=guide-box-left, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:39] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Setting widths[8] to 0cm [name=axis-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Setting widths[9] to 0cm [name=ylab-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Setting widths[4] to 1cm [name=ylab-l, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Setting widths[11] to 1cm [name=guide-box-right, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Setting heights[9] to 8cm [name=axis-l, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Setting heights[10] to 0.5cm [name=axis-b, offset=0, empty=FALSE, original=sum(0.0966514459665145cm, max(0points, -0.0966514459665145cm), 0null, 0.394821156773212cm, 1null, 0cm)]
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Parsing unit from `0.75cm`
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Setting heights[11] to 0.75cm [name=xlab-b, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Setting heights[1] to 0cm [name=title, offset=-2, empty=FALSE, original=5.5points]
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Setting heights[2] to 0cm [name=title, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Parsing unit from `0.25cm`
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Setting heights[3] to 0.25cm [name=title, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Setting heights[4] to 0cm [name=subtitle, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Setting heights[14] to 0.5cm [name=caption, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Setting heights[5] to 0cm [name=guide-box-top, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:42] [TRACE]   [MetaProViz] Setting heights[6] to 0cm [name=xlab-t, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:43] [TRACE]   [MetaProViz] Setting heights[3] to 0.5cm [name=title, main, offset=0, empty=FALSE, original=0.25cm]
+[2026-08-19 16:00:43] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:43] [TRACE]   [MetaProViz] Setting heights[4] to 0.5cm [name=subtitle, main, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:43] [TRACE]   [MetaProViz] Parsing unit from `-2.70cm`
+[2026-08-19 16:00:43] [TRACE]   [MetaProViz] Setting widths[11] to max(-2.7cm, 1cm) [name=guide-box-right, legend, offset=0, empty=FALSE, original=1cm]
+[2026-08-19 16:00:43] [INFO]    [MetaProViz] Preparing saved and returned data.
+[2026-08-19 16:00:43] [INFO]    [MetaProViz] Saving results: [save_table=NULL, save_plot=NULL, path=NULL].
+[2026-08-19 16:00:43] [INFO]    [MetaProViz] Finished pool estimation.
+[2026-08-19 16:00:43] [INFO]    [MetaProViz] dma: Differential metabolite analysis.
+[2026-08-19 16:00:44] [INFO]    [MetaProViz] In `Numerator` HK2, 786-O, 786-M1A, NA/0 values exist in 2 Metabolite(s). and in `denominator`HK2, 786-O, 786-M1A 2 Metabolite(s
+).. Those metabolite(s) might return p.val = NA, p.adj.= NA, t.val = NA. The Log2FC = Inf, if all replicates are 0/NA.
+[2026-08-19 16:00:45] [INFO]    [MetaProViz] No conditions were specified as numerator or denumerator. Performing multiple testing `all-vs-all` using `lmFit`.
+[2026-08-19 16:00:46] [TRACE]   [MetaProViz] The plot has title, adjusting layout to accommodate it.
+[2026-08-19 16:00:46] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `12`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `11`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `6cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting widths[7] to 6cm [name=axis-b, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting widths[1] to 0cm [name=ylab-l, offset=-4, empty=FALSE, original=12points]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting widths[6] to 1cm [name=axis-l, offset=0, empty=FALSE, original=sum(0cm, 1null, 0.539117372353673cm, 0null, max(0points, -0.210875882108759cm), 0.210875882108759cm)]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting widths[5] to 1cm [name=ylab-l, offset=0, empty=FALSE, original=1grobwidth]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting widths[3] to 0cm [name=guide-box-left, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting widths[8] to 0cm [name=axis-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting widths[9] to 0cm [name=ylab-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting widths[4] to 1cm [name=ylab-l, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting widths[11] to 1cm [name=guide-box-right, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting heights[9] to 8cm [name=axis-l, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `0.75cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting heights[10] to 0.75cm [name=axis-b, offset=0, empty=FALSE, original=sum(0.210875882108759cm, max(0points, -0.210875882108759cm), 0null, 0.539117372353673cm, 1null, 0cm)]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `0.75cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting heights[11] to 0.75cm [name=xlab-b, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting heights[1] to 0cm [name=title, offset=-2, empty=FALSE, original=12points]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting heights[2] to 0cm [name=title, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `0.25cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting heights[3] to 0.25cm [name=title, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting heights[4] to 0cm [name=subtitle, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting heights[5] to 0cm [name=guide-box-top, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting heights[6] to 0cm [name=xlab-t, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting heights[3] to 0.5cm [name=title, main, offset=0, empty=FALSE, original=0.25cm]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting heights[4] to 0.5cm [name=subtitle, main, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Parsing unit from `-0.70cm`
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Setting widths[11] to max(-0.7cm, 1cm) [name=guide-box-right, legend, offset=0, empty=FALSE, original=1cm]
+[2026-08-19 16:00:48] [TRACE]   [MetaProViz] Sum of heights: 12.00, sum of widths: 12.00
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] The plot has title, adjusting layout to accommodate it.
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] Parsing unit from `12`
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] Parsing unit from `11`
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] Parsing unit from `6cm`
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] Setting widths[7] to 6cm [name=axis-b, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] Setting widths[1] to 0cm [name=ylab-l, offset=-4, empty=FALSE, original=12points]
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] Setting widths[6] to 1cm [name=axis-l, offset=0, empty=FALSE, original=sum(0cm, 1null, 0.830159039020341cm, 0null, max(0points, -0.210875882108759cm), 0.210875882108759cm)]
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] Setting widths[5] to 1cm [name=ylab-l, offset=0, empty=FALSE, original=1grobwidth]
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] Setting widths[3] to 0cm [name=guide-box-left, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] Setting widths[8] to 0cm [name=axis-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:49] [TRACE]   [MetaProViz] Setting widths[9] to 0cm [name=ylab-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Setting widths[4] to 1cm [name=ylab-l, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Setting widths[11] to 1cm [name=guide-box-right, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Setting heights[9] to 8cm [name=axis-l, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Parsing unit from `0.75cm`
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Setting heights[10] to 0.75cm [name=axis-b, offset=0, empty=FALSE, original=sum(0.210875882108759cm, max(0points, -0.210875882108759cm), 0null, 0.539117372353673cm, 1null, 0cm)]
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Parsing unit from `0.75cm`
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Setting heights[11] to 0.75cm [name=xlab-b, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Setting heights[1] to 0cm [name=title, offset=-2, empty=FALSE, original=12points]
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Setting heights[2] to 0cm [name=title, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Parsing unit from `0.25cm`
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Setting heights[3] to 0.25cm [name=title, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Setting heights[4] to 0cm [name=subtitle, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Setting heights[5] to 0cm [name=guide-box-top, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Setting heights[6] to 0cm [name=xlab-t, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Setting heights[3] to 0.5cm [name=title, main, offset=0, empty=FALSE, original=0.25cm]
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Setting heights[4] to 0.5cm [name=subtitle, main, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Parsing unit from `-0.70cm`
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Setting widths[11] to max(-0.7cm, 1cm) [name=guide-box-right, legend, offset=0, empty=FALSE, original=1cm]
+[2026-08-19 16:00:50] [TRACE]   [MetaProViz] Sum of heights: 12.00, sum of widths: 12.00
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] The plot has title, adjusting layout to accommodate it.
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Parsing unit from `12`
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Parsing unit from `11`
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Parsing unit from `6cm`
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Setting widths[7] to 6cm [name=axis-b, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Setting widths[1] to 0cm [name=ylab-l, offset=-4, empty=FALSE, original=12points]
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Setting widths[6] to 1cm [name=axis-l, offset=0, empty=FALSE, original=sum(0cm, 1null, 0.644950705687007cm, 0null, max(0points, -0.210875882108759cm), 0.210875882108759cm)]
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Setting widths[5] to 1cm [name=ylab-l, offset=0, empty=FALSE, original=1grobwidth]
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Setting widths[3] to 0cm [name=guide-box-left, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Setting widths[8] to 0cm [name=axis-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Setting widths[9] to 0cm [name=ylab-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Setting widths[4] to 1cm [name=ylab-l, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Setting widths[11] to 1cm [name=guide-box-right, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:00:58] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Setting heights[9] to 8cm [name=axis-l, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Parsing unit from `0.75cm`
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Setting heights[10] to 0.75cm [name=axis-b, offset=0, empty=FALSE, original=sum(0.210875882108759cm, max(0points, -0.210875882108759cm), 0null, 0.539117372353673cm, 1null, 0cm)]
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Parsing unit from `0.75cm`
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Setting heights[11] to 0.75cm [name=xlab-b, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Setting heights[1] to 0cm [name=title, offset=-2, empty=FALSE, original=12points]
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Setting heights[2] to 0cm [name=title, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Parsing unit from `0.25cm`
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Setting heights[3] to 0.25cm [name=title, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Setting heights[4] to 0cm [name=subtitle, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Setting heights[5] to 0cm [name=guide-box-top, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Setting heights[6] to 0cm [name=xlab-t, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Setting heights[3] to 0.5cm [name=title, main, offset=0, empty=FALSE, original=0.25cm]
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Setting heights[4] to 0.5cm [name=subtitle, main, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Parsing unit from `-0.70cm`
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Setting widths[11] to max(-0.7cm, 1cm) [name=guide-box-right, legend, offset=0, empty=FALSE, original=1cm]
+[2026-08-19 16:01:01] [TRACE]   [MetaProViz] Sum of heights: 12.00, sum of widths: 12.00
+[2026-08-19 16:01:02] [INFO]    [MetaProViz] The column names of the 'metadata_sample' contain special character that where removed.
+[2026-08-19 16:01:03] [INFO]    [MetaProViz] warning: cutoff_stat of 0.05 and cutoff_variance of 1 do only return <= 2L cases, hence no heatmap is plotted.
+[2026-08-19 16:01:04] [INFO]    [MetaProViz] feature_filtering: Here we apply the so-called 80%-filtering rule, which removes metabolites with missing values in more than 80% of samples (REF: Smilde et. al. (2005), Anal. Chem. 77, 6729-6736., doi:10.1021/ac051080y). Filtering value selected:0.8
+[2026-08-19 16:01:04] [INFO]    [MetaProViz] 1 metabolites where removed: SAICAR
+[2026-08-19 16:01:05] [INFO]    [MetaProViz] Missing Value Imputation: Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0
+[2026-08-19 16:01:06] [INFO]    [MetaProViz] total Ion Count (tic) normalization: total Ion Count (tic) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022
+[2026-08-19 16:01:08] [INFO]    [MetaProViz] Outlier detection: Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val < 0.01) (REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360-378, doi:https://doi.org/10.1214/aoms/1177732979). hotellins_confidence value selected: 0.99
+[2026-08-19 16:01:09] [INFO]    [MetaProViz] viz_pca: PCA plot visualization
+[2026-08-19 16:01:09] [INFO]    [MetaProViz] character(0)
+[2026-08-19 16:01:09] [INFO]    [MetaProViz] viz_pca colour: #88CCEE, #DDCC77, #661100, #332288, #AA4499, #999933, #44AA99, #882215, #6699CC, #117733, #888888, #CC6677, black, gold1, darkorchid4, red, orange, blue
+[2026-08-19 16:01:09] [INFO]    [MetaProViz] viz_pca shape: 15, 17, 16, 18, 6, 7, 8, 11, 12
+[2026-08-19 16:01:09] [INFO]    [MetaProViz] viz_pca scale_color: discrete
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] The plot has legend, adjusting layout to accommodate it.
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Sections: color, shape
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Legend nchar: 2.50cm, Legend width: 2.50cm
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `2.50cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] The plot has title, adjusting layout to accommodate it.
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `12`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `11`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting widths[7] to 8cm [name=axis-b, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting widths[1] to 0cm [name=ylab-l, offset=-4, empty=FALSE, original=5.5points]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting widths[6] to 1cm [name=axis-l, offset=0, empty=FALSE, original=sum(0cm, 1null, 0.818154490106546cm, 0null, max(0points, -0.0966514459665145cm), 0.0966514459665145cm)]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting widths[5] to 1cm [name=ylab-l, offset=0, empty=FALSE, original=1grobwidth]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting widths[3] to 0cm [name=guide-box-left, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting widths[8] to 0cm [name=axis-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting widths[9] to 0cm [name=ylab-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting widths[4] to 1cm [name=ylab-l, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting widths[11] to 1cm [name=guide-box-right, offset=0, empty=FALSE, original=sum(0.5null, 0points, 2.45950867579909cm, 0points, 0.5null)]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting heights[9] to 8cm [name=axis-l, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting heights[10] to 1cm [name=axis-b, offset=0, empty=FALSE, original=sum(0.0966514459665145cm, max(0points, -0.0966514459665145cm), 0null, 0.394821156773212cm, 1null, 0cm)]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `.5cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting heights[11] to 0.5cm [name=xlab-b, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting heights[12] to 1cm [name=xlab-b, offset=1, empty=TRUE, original=0points]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting heights[1] to 0cm [name=title, offset=-2, empty=FALSE, original=5.5points]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting heights[2] to 0cm [name=title, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `0.25cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting heights[3] to 0.25cm [name=title, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting heights[4] to 0cm [name=subtitle, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting heights[5] to 0cm [name=guide-box-top, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting heights[6] to 0cm [name=xlab-t, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting heights[3] to 0.5cm [name=title, main, offset=0, empty=FALSE, original=0.25cm]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Setting heights[4] to 0.5cm [name=subtitle, main, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:10] [TRACE]   [MetaProViz] Parsing unit from `-2.45cm`
+[2026-08-19 16:01:11] [TRACE]   [MetaProViz] Setting widths[11] to max(-2.45cm, 1cm) [name=guide-box-right, legend, offset=0, empty=FALSE, original=1cm]
+[2026-08-19 16:01:11] [TRACE]   [MetaProViz] Adding sum(max(2.5cm, -2.45cm, 1cm), -1*max(-2.45cm, 1cm)) to the total width of the gtable, growing it from 12cm to sum(12cm, max(2.5cm, -2.45cm, 1cm), -1*max(-2.45cm, 1cm)).
+[2026-08-19 16:01:11] [TRACE]   [MetaProViz] Setting widths[11] to max(2.5cm, -2.45cm, 1cm) [name=guide-box-right, offset=0, empty=FALSE, original=max(-2.45cm, 1cm)]
+[2026-08-19 16:01:11] [TRACE]   [MetaProViz] Sum of heights: 12.00, sum of widths: 13.50
+[2026-08-19 16:01:12] [INFO]    [MetaProViz] No sample outliers were found
+[2026-08-19 16:01:12] [INFO]    [MetaProViz] viz_pca: PCA plot visualization
+[2026-08-19 16:01:12] [INFO]    [MetaProViz] character(0)
+[2026-08-19 16:01:12] [INFO]    [MetaProViz] viz_pca colour: #88CCEE, #DDCC77, #661100, #332288, #AA4499, #999933, #44AA99, #882215, #6699CC, #117733, #888888, #CC6677, black, gold1, darkorchid4, red, orange, blue
+[2026-08-19 16:01:12] [INFO]    [MetaProViz] viz_pca shape: 15, 17, 16, 18, 6, 7, 8, 11, 12
+[2026-08-19 16:01:14] [INFO]    [MetaProViz] viz_pca scale_color: discrete
+[2026-08-19 16:01:14] [TRACE]   [MetaProViz] The plot has legend, adjusting layout to accommodate it.
+[2026-08-19 16:01:14] [TRACE]   [MetaProViz] Sections: color, shape
+[2026-08-19 16:01:15] [TRACE]   [MetaProViz] Legend nchar: 5.25cm, Legend width: 5.25cm
+[2026-08-19 16:01:15] [TRACE]   [MetaProViz] Parsing unit from `5.25cm`
+[2026-08-19 16:01:15] [TRACE]   [MetaProViz] The plot has title, adjusting layout to accommodate it.
+[2026-08-19 16:01:15] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:01:15] [TRACE]   [MetaProViz] Parsing unit from `12`
+[2026-08-19 16:01:15] [TRACE]   [MetaProViz] Parsing unit from `11`
+[2026-08-19 16:01:15] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:01:15] [TRACE]   [MetaProViz] Setting widths[7] to 8cm [name=axis-b, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:01:15] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:15] [TRACE]   [MetaProViz] Setting widths[1] to 0cm [name=ylab-l, offset=-4, empty=FALSE, original=5.5points]
+[2026-08-19 16:01:15] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:15] [TRACE]   [MetaProViz] Setting widths[6] to 1cm [name=axis-l, offset=0, empty=FALSE, original=sum(0cm, 1null, 0.818154490106546cm, 0null, max(0points, -0.0966514459665145cm), 0.0966514459665145cm)]
+[2026-08-19 16:01:15] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:15] [TRACE]   [MetaProViz] Setting widths[5] to 1cm [name=ylab-l, offset=0, empty=FALSE, original=1grobwidth]
+[2026-08-19 16:01:15] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:15] [TRACE]   [MetaProViz] Setting widths[3] to 0cm [name=guide-box-left, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Setting widths[8] to 0cm [name=axis-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Setting widths[9] to 0cm [name=ylab-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Setting widths[4] to 1cm [name=ylab-l, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Setting widths[11] to 1cm [name=guide-box-right, offset=0, empty=FALSE, original=sum(0.5null, 0points, 4.06431411719939cm, 0points, 0.5null)]
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Setting heights[9] to 8cm [name=axis-l, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Setting heights[10] to 1cm [name=axis-b, offset=0, empty=FALSE, original=sum(0.0966514459665145cm, max(0points, -0.0966514459665145cm), 0null, 0.394821156773212cm, 1null, 0cm)]
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Parsing unit from `.5cm`
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Setting heights[11] to 0.5cm [name=xlab-b, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Setting heights[12] to 1cm [name=xlab-b, offset=1, empty=TRUE, original=0points]
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Setting heights[1] to 0cm [name=title, offset=-2, empty=FALSE, original=5.5points]
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Setting heights[2] to 0cm [name=title, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Parsing unit from `0.25cm`
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Setting heights[3] to 0.25cm [name=title, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Setting heights[4] to 0cm [name=subtitle, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Setting heights[5] to 0cm [name=guide-box-top, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Setting heights[6] to 0cm [name=xlab-t, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:01:16] [TRACE]   [MetaProViz] Setting heights[3] to 0.5cm [name=title, main, offset=0, empty=FALSE, original=0.25cm]
+[2026-08-19 16:01:17] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:01:17] [TRACE]   [MetaProViz] Setting heights[4] to 0.5cm [name=subtitle, main, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:17] [TRACE]   [MetaProViz] Parsing unit from `-0.70cm`
+[2026-08-19 16:01:17] [TRACE]   [MetaProViz] Setting widths[11] to max(-0.7cm, 1cm) [name=guide-box-right, legend, offset=0, empty=FALSE, original=1cm]
+[2026-08-19 16:01:17] [TRACE]   [MetaProViz] Adding sum(max(5.25cm, -0.7cm, 1cm), -1*max(-0.7cm, 1cm)) to the total width of the gtable, growing it from 12cm to sum(12cm, max(5.25cm, -0.7cm, 1cm), -1*max(-0.7cm, 1cm)).
+[2026-08-19 16:01:17] [TRACE]   [MetaProViz] Setting widths[11] to max(5.25cm, -0.7cm, 1cm) [name=guide-box-right, offset=0, empty=FALSE, original=max(-0.7cm, 1cm)]
+[2026-08-19 16:01:17] [TRACE]   [MetaProViz] Sum of heights: 12.00, sum of widths: 16.25
+[2026-08-19 16:01:20] [TRACE]   [MetaProViz] Error Check input. The selected featurefilt option is not valid. Please set to NULL or select one of the folowwing: Standard, Modified.
+[2026-08-19 16:01:20] [TRACE]   [MetaProViz] Error Check input. The selected mvi_percentage value should be numeric and between 0 and 100.
+[2026-08-19 16:01:20] [TRACE]   [MetaProViz] Error Check input. The tic value should be either `TRUE` if tic normalization is to be performed or `FALSE` if no data normalization is to be applied.
+[2026-08-19 16:01:20] [TRACE]   [MetaProViz] Error Check input. The selected hotellins_confidence value should be numeric and between 0 and 1.
+[2026-08-19 16:01:20] [TRACE]   [MetaProViz] Message For Consumption Release experiment we are using the method from Jain M.  REF: Jain et. al, (2012), Science 336(6084):1040-4, doi: 10.1126/science.1218595.
+[2026-08-19 16:01:20] [INFO]    [MetaProViz] viz_pca: PCA plot visualization
+[2026-08-19 16:01:20] [INFO]    [MetaProViz] character(0)
+[2026-08-19 16:01:20] [INFO]    [MetaProViz] viz_pca colour: #88CCEE, #DDCC77, #661100, #332288, #AA4499, #999933, #44AA99, #882215, #6699CC, #117733, #888888, #CC6677, black, gold1, darkorchid4, red, orange, blue
+[2026-08-19 16:01:20] [INFO]    [MetaProViz] viz_pca shape: 15, 17, 16, 18, 6, 7, 8, 11, 12
+[2026-08-19 16:01:22] [INFO]    [MetaProViz] viz_pca scale_color: discrete
+[2026-08-19 16:01:23] [TRACE]   [MetaProViz] The plot has legend, adjusting layout to accommodate it.
+[2026-08-19 16:01:23] [TRACE]   [MetaProViz] Sections: color, shape
+[2026-08-19 16:01:23] [TRACE]   [MetaProViz] Legend nchar: 2.75cm, Legend width: 2.90cm
+[2026-08-19 16:01:23] [TRACE]   [MetaProViz] Parsing unit from `2.90cm`
+[2026-08-19 16:01:23] [TRACE]   [MetaProViz] The plot has title, adjusting layout to accommodate it.
+[2026-08-19 16:01:23] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Parsing unit from `12`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Parsing unit from `11`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Setting widths[7] to 8cm [name=axis-b, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Setting widths[1] to 0cm [name=ylab-l, offset=-4, empty=FALSE, original=5.5points]
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Setting widths[6] to 1cm [name=axis-l, offset=0, empty=FALSE, original=sum(0cm, 1null, 0.632946156773212cm, 0null, max(0points, -0.0966514459665145cm), 0.0966514459665145cm)]
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Setting widths[5] to 1cm [name=ylab-l, offset=0, empty=FALSE, original=1grobwidth]
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Setting widths[3] to 0cm [name=guide-box-left, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Setting widths[8] to 0cm [name=axis-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Setting widths[9] to 0cm [name=ylab-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Setting widths[4] to 1cm [name=ylab-l, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Setting widths[11] to 1cm [name=guide-box-right, offset=0, empty=FALSE, original=sum(0.5null, 0points, 2.93575867579909cm, 0points, 0.5null)]
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Setting heights[9] to 8cm [name=axis-l, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Setting heights[10] to 1cm [name=axis-b, offset=0, empty=FALSE, original=sum(0.0966514459665145cm, max(0points, -0.0966514459665145cm), 0null, 0.394821156773212cm, 1null, 0cm)]
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Parsing unit from `.5cm`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Setting heights[11] to 0.5cm [name=xlab-b, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Setting heights[12] to 1cm [name=xlab-b, offset=1, empty=TRUE, original=0points]
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Setting heights[1] to 0cm [name=title, offset=-2, empty=FALSE, original=5.5points]
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:24] [TRACE]   [MetaProViz] Setting heights[2] to 0cm [name=title, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:01:27] [TRACE]   [MetaProViz] Parsing unit from `0.25cm`
+[2026-08-19 16:01:27] [TRACE]   [MetaProViz] Setting heights[3] to 0.25cm [name=title, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:01:27] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:27] [TRACE]   [MetaProViz] Setting heights[4] to 0cm [name=subtitle, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:27] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:27] [TRACE]   [MetaProViz] Setting heights[5] to 0cm [name=guide-box-top, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:27] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:27] [TRACE]   [MetaProViz] Setting heights[6] to 0cm [name=xlab-t, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:01:27] [TRACE]   [MetaProViz] Setting heights[3] to 0.5cm [name=title, main, offset=0, empty=FALSE, original=0.25cm]
+[2026-08-19 16:01:27] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:01:27] [TRACE]   [MetaProViz] Setting heights[4] to 0.5cm [name=subtitle, main, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:27] [TRACE]   [MetaProViz] Parsing unit from `-7.20cm`
+[2026-08-19 16:01:27] [TRACE]   [MetaProViz] Setting widths[11] to max(-7.2cm, 1cm) [name=guide-box-right, legend, offset=0, empty=FALSE, original=1cm]
+[2026-08-19 16:01:27] [TRACE]   [MetaProViz] Adding sum(max(2.9cm, -7.2cm, 1cm), -1*max(-7.2cm, 1cm)) to the total width of the gtable, growing it from 12cm to sum(12cm, max(2.9cm, -7.2cm, 1cm), -1*max(-7.2cm, 1cm)).
+[2026-08-19 16:01:27] [TRACE]   [MetaProViz] Setting widths[11] to max(2.9cm, -7.2cm, 1cm) [name=guide-box-right, offset=0, empty=FALSE, original=max(-7.2cm, 1cm)]
+[2026-08-19 16:01:27] [TRACE]   [MetaProViz] Sum of heights: 12.00, sum of widths: 13.90
+[2026-08-19 16:01:27] [INFO]    [MetaProViz] 9 of variables have high variability (CV > 30) in the core_media control samples. Consider checking the pooled samples to decide whether to remove these metabolites or not.
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] The plot has title, adjusting layout to accommodate it.
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Parsing unit from `12`
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Parsing unit from `11`
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Setting widths[7] to 8cm [name=axis-b, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Setting widths[1] to 0cm [name=ylab-l, offset=-4, empty=FALSE, original=5.5points]
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Setting widths[6] to 1cm [name=axis-l, offset=0, empty=FALSE, original=sum(0cm, 1null, 0.712321156773212cm, 0null, max(0points, -0.0966514459665145cm), 0.0966514459665145cm)]
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Setting widths[5] to 1cm [name=ylab-l, offset=0, empty=FALSE, original=1grobwidth]
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Setting widths[3] to 0cm [name=guide-box-left, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Setting widths[8] to 0cm [name=axis-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Setting widths[9] to 0cm [name=ylab-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Setting widths[4] to 1cm [name=ylab-l, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Setting widths[11] to 1cm [name=guide-box-right, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Setting heights[9] to 8cm [name=axis-l, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:01:28] [TRACE]   [MetaProViz] Setting heights[10] to 0.5cm [name=axis-b, offset=0, empty=FALSE, original=sum(0.0966514459665145cm, max(0points, -0.0966514459665145cm), 0null, 0.394821156773212cm, 1null, 0cm)]
+[2026-08-19 16:01:30] [TRACE]   [MetaProViz] Parsing unit from `0.75cm`
+[2026-08-19 16:01:33] [TRACE]   [MetaProViz] Setting heights[11] to 0.75cm [name=xlab-b, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Setting heights[1] to 0cm [name=title, offset=-2, empty=FALSE, original=5.5points]
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Setting heights[2] to 0cm [name=title, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Parsing unit from `0.25cm`
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Setting heights[3] to 0.25cm [name=title, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Setting heights[4] to 0cm [name=subtitle, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Setting heights[14] to 0.5cm [name=caption, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Setting heights[5] to 0cm [name=guide-box-top, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Setting heights[6] to 0cm [name=xlab-t, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Setting heights[3] to 0.5cm [name=title, main, offset=0, empty=FALSE, original=0.25cm]
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Setting heights[4] to 0.5cm [name=subtitle, main, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Parsing unit from `2.30cm`
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Setting widths[11] to max(2.3cm, 1cm) [name=guide-box-right, legend, offset=0, empty=FALSE, original=1cm]
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] The plot has title, adjusting layout to accommodate it.
+[2026-08-19 16:01:34] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `12`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `11`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Setting widths[7] to 8cm [name=axis-b, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Setting widths[1] to 0cm [name=ylab-l, offset=-4, empty=FALSE, original=5.5points]
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Setting widths[6] to 1cm [name=axis-l, offset=0, empty=FALSE, original=sum(0cm, 1null, 0.632946156773212cm, 0null, max(0points, -0.0966514459665145cm), 0.0966514459665145cm)]
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Setting widths[5] to 1cm [name=ylab-l, offset=0, empty=FALSE, original=1grobwidth]
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Setting widths[3] to 0cm [name=guide-box-left, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Setting widths[8] to 0cm [name=axis-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Setting widths[9] to 0cm [name=ylab-r, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Setting widths[4] to 1cm [name=ylab-l, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `1cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Setting widths[11] to 1cm [name=guide-box-right, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `8cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Setting heights[9] to 8cm [name=axis-l, offset=0, empty=FALSE, original=1null]
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Setting heights[10] to 0.5cm [name=axis-b, offset=0, empty=FALSE, original=sum(0.0966514459665145cm, max(0points, -0.0966514459665145cm), 0null, 0.394821156773212cm, 1null, 0cm)]
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `0.75cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Setting heights[11] to 0.75cm [name=xlab-b, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Setting heights[1] to 0cm [name=title, offset=-2, empty=FALSE, original=5.5points]
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Setting heights[2] to 0cm [name=title, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `0.25cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Setting heights[3] to 0.25cm [name=title, offset=0, empty=FALSE, original=1grobheight]
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Setting heights[4] to 0cm [name=subtitle, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:01:35] [TRACE]   [MetaProViz] Setting heights[14] to 0.5cm [name=caption, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:36] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:36] [TRACE]   [MetaProViz] Setting heights[5] to 0cm [name=guide-box-top, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:36] [TRACE]   [MetaProViz] Parsing unit from `0cm`
+[2026-08-19 16:01:36] [TRACE]   [MetaProViz] Setting heights[6] to 0cm [name=xlab-t, offset=-1, empty=TRUE, original=0points]
+[2026-08-19 16:01:36] [TRACE]   [MetaProViz] Setting heights[3] to 0.5cm [name=title, main, offset=0, empty=FALSE, original=0.25cm]
+[2026-08-19 16:01:36] [TRACE]   [MetaProViz] Parsing unit from `0.5cm`
+[2026-08-19 16:01:36] [TRACE]   [MetaProViz] Setting heights[4] to 0.5cm [name=subtitle, main, offset=0, empty=FALSE, original=0cm]
+[2026-08-19 16:01:36] [TRACE]   [MetaProViz] Parsing unit from `2.30cm`
+[2026-08-19 16:01:36] [TRACE]   [MetaProViz] Setting widths[11] to max(2.3cm, 1cm) [name=guide-box-right, legend, offset=0, empty=FALSE, original=1cm]
+[2026-08-19 16:01:36] [TRACE]   [MetaProViz] Warning: The core_media samples  MS51-04  were found to be different from the rest. They will not be included in the sum of the core_media samples.
+[2026-08-19 16:01:36] [INFO]    [MetaProViz] core data are normalised by substracting mean (blank) from each sample and multiplying with the core_norm_factor

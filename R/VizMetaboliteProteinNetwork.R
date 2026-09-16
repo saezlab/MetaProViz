@@ -70,6 +70,9 @@
 #'     \strong{Default = TRUE}
 #' @param label_degree_min \emph{Optional: } Minimum node degree required for
 #'     labeling when `label_mode = "reduced"`. \strong{Default = 2}
+#' @param plot_metabolite_interaction_overlap \emph{Optional: } If `TRUE`,
+#'     additionally return a metabolite-only graph in which two metabolites are
+#'     linked when they share protein interaction partners. \strong{Default = FALSE}
 #'
 #' @return If `return_data = TRUE`, a list with the following elements:
 #' \describe{
@@ -81,8 +84,15 @@
 #'   that matched the Metalinks table.}
 #'   \item{unmatched_features}{Expanded and normalized feature-to-HMDB mappings
 #'   without a Metalinks match.}
-#'   \item{saved_files}{Character vector of written plot files.}
+#'   \item{saved_files}{Character vector of written plot files. When
+#'   `plot_metabolite_interaction_overlap = TRUE`, this includes files for both
+#'   plots if `save_plot` is enabled.}
 #' }
+#' If `plot_metabolite_interaction_overlap = TRUE`, the list additionally
+#' contains `metabolite_interaction_overlap`, with `plot`, `nodes`, `edges`,
+#' and `associations`. Node size and the integer beneath each node label reflect
+#' the total number of protein interactions; edge width and labels reflect the
+#' number of shared proteins.
 #' If `return_data = FALSE`, the plot is returned invisibly.
 #'
 #' @examples
@@ -131,7 +141,8 @@ viz_metabolite_protein_network <- function(
     label_mode = c("reduced", "all"),
     label_max_chars = 20,
     label_repel = TRUE,
-    label_degree_min = 2
+    label_degree_min = 2,
+    plot_metabolite_interaction_overlap = FALSE
 ) {
     check_param_VizMetaboliteProteinNetwork(
         feature_metadata = feature_metadata,
@@ -150,7 +161,8 @@ viz_metabolite_protein_network <- function(
         label_mode = label_mode,
         label_max_chars = label_max_chars,
         label_repel = label_repel,
-        label_degree_min = label_degree_min
+        label_degree_min = label_degree_min,
+        plot_metabolite_interaction_overlap = plot_metabolite_interaction_overlap
     )
 
     logger::log_info("viz_metabolite_protein_network: Metalinks metabolite-protein network")
@@ -210,6 +222,9 @@ viz_metabolite_protein_network <- function(
             unmatched_features = unmatched_features,
             saved_files = character(0)
         )
+        if (isTRUE(plot_metabolite_interaction_overlap)) {
+            result$metabolite_interaction_overlap <- .empty_metabolite_interaction_overlap()
+        }
         return(if (isTRUE(return_data)) result else invisible(NULL))
     }
 
@@ -250,6 +265,9 @@ viz_metabolite_protein_network <- function(
             unmatched_features = unmatched_features,
             saved_files = character(0)
         )
+        if (isTRUE(plot_metabolite_interaction_overlap)) {
+            result$metabolite_interaction_overlap <- .empty_metabolite_interaction_overlap()
+        }
         return(if (isTRUE(return_data)) result else invisible(NULL))
     }
 
@@ -272,6 +290,9 @@ viz_metabolite_protein_network <- function(
             unmatched_features = unmatched_features,
             saved_files = character(0)
         )
+        if (isTRUE(plot_metabolite_interaction_overlap)) {
+            result$metabolite_interaction_overlap <- .empty_metabolite_interaction_overlap()
+        }
         return(if (isTRUE(return_data)) result else invisible(NULL))
     }
 
@@ -286,6 +307,18 @@ viz_metabolite_protein_network <- function(
         print(plot_obj)
     }
 
+    metabolite_interaction_overlap <- NULL
+    if (isTRUE(plot_metabolite_interaction_overlap)) {
+        metabolite_interaction_overlap <- .make_metabolite_interaction_overlap(
+            nodes = nodes,
+            edges = edges,
+            plot_name = paste0(plot_name, ": metabolite interaction overlap")
+        )
+        if (isTRUE(print_plot) && !is.null(metabolite_interaction_overlap$plot)) {
+            print(metabolite_interaction_overlap$plot)
+        }
+    }
+
     saved_files <- .save_metalinks_network_plot(
         plot = plot_obj,
         save_plot = save_plot,
@@ -294,6 +327,20 @@ viz_metabolite_protein_network <- function(
         width = width,
         height = height
     )
+    if (isTRUE(plot_metabolite_interaction_overlap) &&
+        !is.null(metabolite_interaction_overlap$plot)) {
+        saved_files <- c(
+            saved_files,
+            .save_metalinks_network_plot(
+                plot = metabolite_interaction_overlap$plot,
+                save_plot = save_plot,
+                path = path,
+                plot_name = paste0(plot_name, "_metabolite_interaction_overlap"),
+                width = width,
+                height = height
+            )
+        )
+    }
 
     result <- list(
         plot = plot_obj,
@@ -303,6 +350,10 @@ viz_metabolite_protein_network <- function(
         unmatched_features = unmatched_features,
         saved_files = saved_files
     )
+
+    if (isTRUE(plot_metabolite_interaction_overlap)) {
+        result$metabolite_interaction_overlap <- metabolite_interaction_overlap
+    }
 
     if (isTRUE(return_data)) {
         return(result)
@@ -602,6 +653,130 @@ viz_metabolite_protein_network <- function(
 
     rendered[is.na(degrees) | degrees < label_degree_min] <- NA_character_
     rendered
+}
+
+#' @noRd
+.empty_metabolite_interaction_overlap <- function() {
+    list(
+        plot = NULL,
+        nodes = dplyr::tibble(),
+        edges = dplyr::tibble(),
+        associations = dplyr::tibble()
+    )
+}
+
+#' @noRd
+.make_metabolite_interaction_overlap <- function(nodes, edges, plot_name) {
+    node_types <- stats::setNames(nodes$node_type, nodes$name)
+    n_matches <- if ("n_matches" %in% colnames(edges)) {
+        suppressWarnings(as.numeric(edges$n_matches))
+    } else {
+        rep(1, nrow(edges))
+    }
+    n_matches[is.na(n_matches)] <- 1
+
+    associations <- edges |>
+        dplyr::mutate(
+            from_type = unname(node_types[.data$from]),
+            to_type = unname(node_types[.data$to]),
+            metabolite = dplyr::if_else(.data$from_type == "Metabolite", .data$from, .data$to),
+            protein = dplyr::if_else(.data$from_type == "Protein", .data$from, .data$to),
+            n_matches = n_matches
+        ) |>
+        dplyr::filter(
+            (.data$from_type == "Metabolite" & .data$to_type == "Protein") |
+                (.data$from_type == "Protein" & .data$to_type == "Metabolite")
+        ) |>
+        dplyr::group_by(.data$metabolite, .data$protein) |>
+        dplyr::summarise(n_matches = sum(.data$n_matches), .groups = "drop")
+
+    if (nrow(associations) == 0L) {
+        return(.empty_metabolite_interaction_overlap())
+    }
+
+    metabolite_nodes <- associations |>
+        dplyr::group_by(.data$metabolite) |>
+        dplyr::summarise(
+            protein_interaction_count = sum(.data$n_matches),
+            n_proteins = dplyr::n_distinct(.data$protein),
+            .groups = "drop"
+        ) |>
+        dplyr::rename(name = .data$metabolite) |>
+        dplyr::mutate(label = paste0(.data$name, "\n(", .data$protein_interaction_count, ")"))
+
+    shared_protein_edges <- associations |>
+        dplyr::transmute(protein = .data$protein, metabolite_1 = .data$metabolite) |>
+        dplyr::inner_join(
+            associations |>
+                dplyr::transmute(protein = .data$protein, metabolite_2 = .data$metabolite),
+            by = "protein"
+        ) |>
+        dplyr::filter(.data$metabolite_1 < .data$metabolite_2) |>
+        dplyr::group_by(.data$metabolite_1, .data$metabolite_2) |>
+        dplyr::summarise(shared_protein_count = dplyr::n_distinct(.data$protein), .groups = "drop") |>
+        dplyr::rename(from = .data$metabolite_1, to = .data$metabolite_2) |>
+        dplyr::mutate(weight = .data$shared_protein_count)
+
+    graph <- if (nrow(shared_protein_edges) == 0L) {
+        graph <- igraph::make_empty_graph(n = nrow(metabolite_nodes), directed = FALSE)
+        igraph::V(graph)$name <- metabolite_nodes$name
+        igraph::V(graph)$protein_interaction_count <- metabolite_nodes$protein_interaction_count
+        igraph::V(graph)$label <- metabolite_nodes$label
+        graph
+    } else {
+        igraph::graph_from_data_frame(
+            shared_protein_edges,
+            directed = FALSE,
+            vertices = metabolite_nodes
+        )
+    }
+
+    set.seed(123)
+    plot <- ggraph::ggraph(graph, layout = "fr") +
+        ggraph::geom_edge_link(
+            ggplot2::aes(width = .data$weight, label = .data$weight),
+            colour = "grey45",
+            alpha = 0.7,
+            label_colour = "black",
+            label_size = 3,
+            check_overlap = TRUE
+        ) +
+        ggraph::geom_node_point(
+            ggplot2::aes(size = .data$protein_interaction_count),
+            shape = 21,
+            fill = "#fdb863",
+            colour = "black"
+        ) +
+        ggraph::geom_node_text(
+            ggplot2::aes(label = .data$label),
+            repel = TRUE,
+            size = 3
+        ) +
+        ggraph::scale_edge_width_continuous(
+            name = "Shared proteins",
+            range = c(0.5, 2.5)
+        ) +
+        ggplot2::scale_size_continuous(
+            name = "Protein interactions",
+            range = c(4, 12)
+        ) +
+        ggplot2::labs(
+            title = plot_name,
+            subtitle = "Node labels: metabolite and total protein interactions; edge labels: shared proteins"
+        ) +
+        ggplot2::theme_void() +
+        ggplot2::theme(
+            plot.title = ggplot2::element_text(hjust = 0.5),
+            plot.subtitle = ggplot2::element_text(hjust = 0.5, size = 9),
+            legend.position = "right"
+        )
+
+    list(
+        plot = plot,
+        nodes = metabolite_nodes,
+        edges = shared_protein_edges,
+        associations = associations
+    )
 }
 
 #' @noRd

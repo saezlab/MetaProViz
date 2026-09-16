@@ -21,7 +21,8 @@ viz_metabolite_protein_network(
   label_mode = c("reduced", "all"),
   label_max_chars = 20,
   label_repel = TRUE,
-  label_degree_min = 2
+  label_degree_min = 2,
+  plot_metabolite_interaction_overlap = FALSE
 )
 }
 \arguments{
@@ -84,6 +85,10 @@ with \code{...}. \strong{Default = 20}}
 
 \item{label_degree_min}{\emph{Optional: } Minimum node degree required for
 labeling when \code{label_mode = "reduced"}. \strong{Default = 2}}
+
+\item{plot_metabolite_interaction_overlap}{\emph{Optional: } If \code{TRUE},
+additionally return a metabolite-only graph in which two metabolites are
+linked when they share protein interaction partners. \strong{Default = FALSE}}
 }
 \value{
 If \code{return_data = TRUE}, a list with the following elements:
@@ -96,8 +101,15 @@ could be built.}
 that matched the Metalinks table.}
 \item{unmatched_features}{Expanded and normalized feature-to-HMDB mappings
 without a Metalinks match.}
-\item{saved_files}{Character vector of written plot files.}
+\item{saved_files}{Character vector of written plot files. When
+\code{plot_metabolite_interaction_overlap = TRUE}, this includes files for both
+plots if \code{save_plot} is enabled.}
 }
+If \code{plot_metabolite_interaction_overlap = TRUE}, the list additionally
+contains \code{metabolite_interaction_overlap}, with \code{plot}, \code{nodes}, \code{edges},
+and \code{associations}. Node size and the integer beneath each node label reflect
+the total number of protein interactions; edge width and labels reflect the
+number of shared proteins.
 If \code{return_data = FALSE}, the plot is returned invisibly.
 }
 \description{
