@@ -651,7 +651,7 @@ MetaLinks_Network <- viz_metabolite_protein_network(
 MetaLinks_Network$plot
 ```
 
-From this visualization, we gain insight into cellular mechanisms for metabolites of interest. In our case, we can see "betaine" and "asparagine" interactions with transporters, receptors and other metabolic enzymes which are curated in MetalinksDB. 
+From this visualization, we gain insight into cellular mechanisms for metabolites of interest. In our case, we can see "betaine" and "asparagine" interactions with transporters, receptors and other metabolic enzymes which are curated in MetalinksDB.  
 
 
 ### ORA on each metabolite cluster
