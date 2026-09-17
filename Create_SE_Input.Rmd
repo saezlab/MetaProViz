@@ -151,9 +151,10 @@ fully_na2 <- rownames(rd2)[apply(as.data.frame(rd2), 1, function(r) all(is.na(r)
 cat("features with no cellular_meta entry:", length(fully_na2), "of", nrow(rd2), "\n")
 cat("unmatched:", paste(fully_na2, collapse = ", "), "\n")
 ```
-`valine-d8` and `hippuric acid-d5` are internal standards, 
+`valine-d8` and `hippuric acid-d5` are internal standards,
 so their absence from a pathway/ID annotation table is expected.
-`hexanoylcarnitine C6` is a coverage gap in `cellular_meta` (left as `NA`)
+`hexanoylcarnitine C6` is a coverage gap in `cellular_meta` (left as `NA`).
+See Create_cellular_meta.Rmd to fill in gaps.
 
 # 3. `medium_raw_se`
 Same project as above, [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418).

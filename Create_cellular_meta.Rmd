@@ -1,0 +1,180 @@
+---
+title: "Create_cellular_meta"
+author: "Giulia Roeth"
+date: "September 2026"
+output:
+  html_document:
+    toc: yes
+    toc_depth: 3
+    toc_float: yes
+  pdf_document:
+    toc: yes
+    toc_depth: '3'
+editor_options:
+  chunk_output_type: console
+---
+```{r, warning=FALSE, message=FALSE}
+#load the needed:
+library(tidyverse) # used for data manipulation
+library(rmarkdown) # used for paged_table function
+library(dplyr)
+library(tibble)
+library(SummarizedExperiment)
+library(MetaProViz)
+```
+
+# Purpose
+`cellular_meta` is missing an entry for `hexanoylcarnitine C6` entirely (only
+its unsaturated relative `hexenoylcarnitine C6:1` is present), which leaves
+it unmatched in `intracell_raw_se` (see `Create_SE_Input.Rmd`). Investigation
+into this gap found:\
+\
+`1.` The original source (metabolomics workbench study ST002224) lists this
+compound under a different name, `carnitine C6` (WorkBench ID `ME538459`),
+and it already has **no PubChem or KEGG ID** there either -- the original
+submission never carried these identifiers.\
+`2.` `cellular_meta` has no build script anywhere in this branch's history,
+so there is no processing step that could have caused the gap.\
+\
+Since the missingness does not stem from anything MetaProViz did, this
+notebook backfills `hexanoylcarnitine C6` into `cellular_meta`, using
+`MetaProViz::translate_id()` (the RaMP-based ID-processing workflow) to look
+up cross-referenced identifiers, and documents where those identifiers come
+from and why `KEGG` is left empty.
+
+# Keep the pre-backfill version
+```{r}
+data(cellular_meta)
+
+cellular_meta_original <- cellular_meta
+save(cellular_meta_original, file = "cellular_meta_original.rda")
+```
+`cellular_meta_original` is a fixed snapshot of `cellular_meta` as currently
+shipped, kept as a stable baseline to diff future changes against -- unlike
+an "_old" label, its meaning does not become ambiguous if `cellular_meta` is
+backfilled again later.
+
+# Look up IDs for `hexanoylcarnitine C6`
+Seed ID: `HMDB0000756`. Metabolomics Workbench's RefMet database assigns
+the standardized name `CAR 6:0` to this exact compound (the same identity
+behind `ME538459`/`carnitine C6` in the ST002224 source table), and its
+[RefMet entry](https://www.metabolomicsworkbench.org/databases/refmet/refmet_details.php?REFMET_NAME=CAR+6%3A0)
+lists `PubChem CID 3246938`, `ChEBI 84834`, and `HMDB0000756`. ChEBI:84834
+("O-hexanoyl-L-carnitine") independently confirms `HMDB0000756` as its own
+HMDB cross-reference -- so all three sources triangulate on the same ID.
+```{r}
+Hexanoylcarnitine_Seed <- data.frame(
+  MetaboliteID = "HMDB0000756",
+  term = "hexanoylcarnitine C6",
+  stringsAsFactors = FALSE
+)
+
+Hexanoylcarnitine_IDs <- translate_id(
+  data = Hexanoylcarnitine_Seed,
+  metadata_info = c(InputID = "MetaboliteID", grouping_variable = "term"),
+  from = "hmdb",
+  to = c("pubchem", "chebi"),
+  summary = TRUE,
+  save_table = NULL
+)
+
+Hexanoylcarnitine_IDs$TranslatedDF
+```
+Note: `to = "kegg"` was also attempted here, but `translate_id()` errors on
+this seed ID (`object 'as.NULL' not found`, inside `OmnipathR`) instead of
+returning an empty result -- this happens because RaMP has **no KEGG
+mapping at all** for `HMDB0000756` (or its closely-related achiral parent,
+`HMDB0000705` -- both give the same error). That failure is itself useful
+confirmation: neither RaMP nor a direct KEGG COMPOUND search (checked
+manually) has an entry for hexanoylcarnitine, so `KEGG.ID`/`KEGGCompound`
+are left as `NA` below -- consistent with several other acylcarnitines
+already in `cellular_meta` (e.g. `hexenoylcarnitine C6:1`,
+`tetradecenoylcarnitine C14:1`).\
+\
+RaMP's graph returns two linked PubChem/ChEBI candidates regardless of
+which of the two related HMDB IDs is used as seed: `3246938`/`84834` (the
+L-stereoisomer, matching RefMet `CAR 6:0`/`HMDB0000756` used here) and
+`6426853`/`70749` (its achiral parent compound, `HMDB0000705`). `cellular_meta`
+has no `PubChem`/`ChEBI` columns (only `HMDB` and `KEGG.ID`/`KEGGCompound`),
+so only `HMDB` is filled in below; both candidate pairs are documented here
+for reference should the schema be extended later.
+
+# Add the new row
+```{r}
+cellular_meta <- cellular_meta %>%
+  bind_rows(
+    data.frame(
+      Metabolite = "hexanoylcarnitine C6",
+      HMDB = "HMDB0000756",
+      KEGG.ID = NA_character_,
+      KEGGCompound = NA_character_,
+      Pathway = "Fatty acyl carnitines",
+      stringsAsFactors = FALSE
+    )
+  )
+
+save(cellular_meta, file = "cellular_meta.rda")
+```
+`Pathway` is set to `"Fatty acyl carnitines"`, matching every other
+acylcarnitine already in the table (e.g. `acetylcarnitine`,
+`propionylcarnitine`, `hexenoylcarnitine C6:1`).
+
+# Update `intracell_raw_se`
+Rebuilt from the updated `cellular_meta` above, the same way as in
+`Create_SE_Input.Rmd` (reusing `MetaProViz:::build_se_from_df()` and the
+same `align_feature_metadata()` NA-padding helper). `medium_raw_se` is not
+rebuilt here -- `medium_raw` does not measure `hexanoylcarnitine C6` at all,
+so this change does not affect it.
+```{r}
+align_feature_metadata <- function(assay_df, metadata_feature) {
+  all_features <- colnames(assay_df)
+  merge(
+    data.frame(FeatureID = all_features, stringsAsFactors = FALSE),
+    metadata_feature %>% tibble::rownames_to_column("FeatureID"),
+    by = "FeatureID", all.x = TRUE
+  ) %>%
+    tibble::column_to_rownames("FeatureID") %>%
+    .[all_features, , drop = FALSE]
+}
+
+data(intracell_raw)
+
+Intra <- intracell_raw %>% column_to_rownames("Code")
+
+sample_cols2 <- c("Conditions", "Analytical_Replicates", "Biological_Replicates")
+metab_cols2  <- setdiff(colnames(Intra), sample_cols2)
+
+assay_df2    <- Intra[, metab_cols2]
+meta_sample2 <- Intra[, sample_cols2]
+meta_feat2   <- cellular_meta %>%
+  column_to_rownames("Metabolite") %>%
+  align_feature_metadata(assay_df2, .)
+
+intracell_raw_se <- build_se_from_df(
+  assay_df = assay_df2,
+  metadata_sample = meta_sample2,
+  metadata_feature = meta_feat2
+)
+
+intracell_raw_se
+```
+
+## Feature-metadata coverage after backfill
+```{r}
+rd2 <- rowData(intracell_raw_se)
+fully_na2 <- rownames(rd2)[apply(as.data.frame(rd2), 1, function(r) all(is.na(r)))]
+cat("features with no cellular_meta entry:", length(fully_na2), "of", nrow(rd2), "\n")
+cat("unmatched:", paste(fully_na2, collapse = ", "), "\n")
+```
+`hexanoylcarnitine C6` is now matched; only `valine-d8` and
+`hippuric acid-d5` (internal standards) remain unmatched, as expected.
+
+## Save
+```{r}
+save(intracell_raw_se, file = "intracell_raw_se.rda")
+```
+
+# Information about package used and versions
+```{r session_info, echo=FALSE}
+sessionInfo()
+```

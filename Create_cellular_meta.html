@@ -9,10 +9,10 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
-<meta name="author" content="Christina Schmidt, Jannik Franken, Giulia Roeth" />
+<meta name="author" content="Giulia Roeth" />
 
 
-<title>Create_SE_Input</title>
+<title>Create_cellular_meta</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1478,8 +1478,8 @@ border-radius: 0px;
 
 
 
-<h1 class="title toc-ignore">Create_SE_Input</h1>
-<h4 class="author">Christina Schmidt, Jannik Franken, Giulia Roeth</h4>
+<h1 class="title toc-ignore">Create_cellular_meta</h1>
+<h4 class="author">Giulia Roeth</h4>
 <h4 class="date">September 2026</h4>
 
 </div>
@@ -1494,27 +1494,128 @@ library(SummarizedExperiment)
 library(MetaProViz)</code></pre>
 <div id="purpose" class="section level1">
 <h1>Purpose</h1>
-<p>This notebook documents how the three
-<code>SummarizedExperiment</code> (SE) example datasets are generated
-from the published <code>data()</code> objects, reusing
-<code>MetaProViz:::build_se_from_df()</code> to assemble the assay,
-sample metadata, and feature metadata into one object.<br />
+<p><code>cellular_meta</code> is missing an entry for
+<code>hexanoylcarnitine C6</code> entirely (only its unsaturated
+relative <code>hexenoylcarnitine C6:1</code> is present), which leaves
+it unmatched in <code>intracell_raw_se</code> (see
+<code>Create_SE_Input.Rmd</code>). Investigation into this gap
+found:<br />
 <br />
-<code>1.</code> <code>tissue_norm_se</code>: ccRCC tissue metabolomics,
-Hakimi et al. <span class="citation">[@Hakimi2016]</span>.<br />
-<code>2.</code> <code>intracell_raw_se</code>: intracellular cell-line
-metabolomics, metabolomics workbench project PR001418, study ST002224
-<span class="citation">[@Sciacovelli_Dugourd2022]</span>.<br />
-<code>3.</code> <code>medium_raw_se</code>: exometabolomics (CoRe) of
-the same cell lines, metabolomics workbench project PR001418, study
-ST002226.<br />
+<code>1.</code> The original source (metabolomics workbench study
+ST002224) lists this compound under a different name,
+<code>carnitine C6</code> (WorkBench ID <code>ME538459</code>), and it
+already has <strong>no PubChem or KEGG ID</strong> there either – the
+original submission never carried these identifiers.<br />
+<code>2.</code> <code>cellular_meta</code> has no build script anywhere
+in this branch’s history, so there is no processing step that could have
+caused the gap.<br />
 <br />
-Full descriptions of each dataset, including download links, are given
-in the corresponding section below.</p>
-<pre class="r"><code>#align_feature_metadata() works around build_se_from_df() erroring when
-#metadata_feature does not cover every feature in the assay: safe join,
-#NA-padding the ones without an annotation entry:
-align_feature_metadata &lt;- function(assay_df, metadata_feature) {
+Since the missingness does not stem from anything MetaProViz did, this
+notebook backfills <code>hexanoylcarnitine C6</code> into
+<code>cellular_meta</code>, using
+<code>MetaProViz::translate_id()</code> (the RaMP-based ID-processing
+workflow) to look up cross-referenced identifiers, and documents where
+those identifiers come from and why <code>KEGG</code> is left empty.</p>
+</div>
+<div id="keep-the-pre-backfill-version" class="section level1">
+<h1>Keep the pre-backfill version</h1>
+<pre class="r"><code>data(cellular_meta)
+
+cellular_meta_original &lt;- cellular_meta
+save(cellular_meta_original, file = &quot;cellular_meta_original.rda&quot;)</code></pre>
+<p><code>cellular_meta_original</code> is a fixed snapshot of
+<code>cellular_meta</code> as currently shipped, kept as a stable
+baseline to diff future changes against – unlike an “_old” label, its
+meaning does not become ambiguous if <code>cellular_meta</code> is
+backfilled again later.</p>
+</div>
+<div id="look-up-ids-for-hexanoylcarnitine-c6" class="section level1">
+<h1>Look up IDs for <code>hexanoylcarnitine C6</code></h1>
+<p>Seed ID: <code>HMDB0000756</code>. Metabolomics Workbench’s RefMet
+database assigns the standardized name <code>CAR 6:0</code> to this
+exact compound (the same identity behind
+<code>ME538459</code>/<code>carnitine C6</code> in the ST002224 source
+table), and its <a href="https://www.metabolomicsworkbench.org/databases/refmet/refmet_details.php?REFMET_NAME=CAR+6%3A0">RefMet
+entry</a> lists <code>PubChem CID 3246938</code>,
+<code>ChEBI 84834</code>, and <code>HMDB0000756</code>. ChEBI:84834
+(“O-hexanoyl-L-carnitine”) independently confirms
+<code>HMDB0000756</code> as its own HMDB cross-reference – so all three
+sources triangulate on the same ID.</p>
+<pre class="r"><code>Hexanoylcarnitine_Seed &lt;- data.frame(
+  MetaboliteID = &quot;HMDB0000756&quot;,
+  term = &quot;hexanoylcarnitine C6&quot;,
+  stringsAsFactors = FALSE
+)
+
+Hexanoylcarnitine_IDs &lt;- translate_id(
+  data = Hexanoylcarnitine_Seed,
+  metadata_info = c(InputID = &quot;MetaboliteID&quot;, grouping_variable = &quot;term&quot;),
+  from = &quot;hmdb&quot;,
+  to = c(&quot;pubchem&quot;, &quot;chebi&quot;),
+  summary = TRUE,
+  save_table = NULL
+)
+
+Hexanoylcarnitine_IDs$TranslatedDF</code></pre>
+<pre><code>## # A tibble: 1 x 4
+##   MetaboliteID term                 pubchem          chebi       
+## * &lt;chr&gt;        &lt;chr&gt;                &lt;chr&gt;            &lt;chr&gt;       
+## 1 HMDB0000756  hexanoylcarnitine C6 3246938, 6426853 84834, 70749</code></pre>
+<p>Note: <code>to = &quot;kegg&quot;</code> was also attempted here, but
+<code>translate_id()</code> errors on this seed ID
+(<code>object &#39;as.NULL&#39; not found</code>, inside <code>OmnipathR</code>)
+instead of returning an empty result – this happens because RaMP has
+<strong>no KEGG mapping at all</strong> for <code>HMDB0000756</code> (or
+its closely-related achiral parent, <code>HMDB0000705</code> – both give
+the same error). That failure is itself useful confirmation: neither
+RaMP nor a direct KEGG COMPOUND search (checked manually) has an entry
+for hexanoylcarnitine, so <code>KEGG.ID</code>/<code>KEGGCompound</code>
+are left as <code>NA</code> below – consistent with several other
+acylcarnitines already in <code>cellular_meta</code>
+(e.g. <code>hexenoylcarnitine C6:1</code>,
+<code>tetradecenoylcarnitine C14:1</code>).<br />
+<br />
+RaMP’s graph returns two linked PubChem/ChEBI candidates regardless of
+which of the two related HMDB IDs is used as seed:
+<code>3246938</code>/<code>84834</code> (the L-stereoisomer, matching
+RefMet <code>CAR 6:0</code>/<code>HMDB0000756</code> used here) and
+<code>6426853</code>/<code>70749</code> (its achiral parent compound,
+<code>HMDB0000705</code>). <code>cellular_meta</code> has no
+<code>PubChem</code>/<code>ChEBI</code> columns (only <code>HMDB</code>
+and <code>KEGG.ID</code>/<code>KEGGCompound</code>), so only
+<code>HMDB</code> is filled in below; both candidate pairs are
+documented here for reference should the schema be extended later.</p>
+</div>
+<div id="add-the-new-row" class="section level1">
+<h1>Add the new row</h1>
+<pre class="r"><code>cellular_meta &lt;- cellular_meta %&gt;%
+  bind_rows(
+    data.frame(
+      Metabolite = &quot;hexanoylcarnitine C6&quot;,
+      HMDB = &quot;HMDB0000756&quot;,
+      KEGG.ID = NA_character_,
+      KEGGCompound = NA_character_,
+      Pathway = &quot;Fatty acyl carnitines&quot;,
+      stringsAsFactors = FALSE
+    )
+  )
+
+save(cellular_meta, file = &quot;cellular_meta.rda&quot;)</code></pre>
+<p><code>Pathway</code> is set to <code>&quot;Fatty acyl carnitines&quot;</code>,
+matching every other acylcarnitine already in the table
+(e.g. <code>acetylcarnitine</code>, <code>propionylcarnitine</code>,
+<code>hexenoylcarnitine C6:1</code>).</p>
+</div>
+<div id="update-intracell_raw_se" class="section level1">
+<h1>Update <code>intracell_raw_se</code></h1>
+<p>Rebuilt from the updated <code>cellular_meta</code> above, the same
+way as in <code>Create_SE_Input.Rmd</code> (reusing
+<code>MetaProViz:::build_se_from_df()</code> and the same
+<code>align_feature_metadata()</code> NA-padding helper).
+<code>medium_raw_se</code> is not rebuilt here – <code>medium_raw</code>
+does not measure <code>hexanoylcarnitine C6</code> at all, so this
+change does not affect it.</p>
+<pre class="r"><code>align_feature_metadata &lt;- function(assay_df, metadata_feature) {
   all_features &lt;- colnames(assay_df)
   merge(
     data.frame(FeatureID = all_features, stringsAsFactors = FALSE),
@@ -1523,84 +1624,9 @@ align_feature_metadata &lt;- function(assay_df, metadata_feature) {
   ) %&gt;%
     tibble::column_to_rownames(&quot;FeatureID&quot;) %&gt;%
     .[all_features, , drop = FALSE]
-}</code></pre>
-</div>
-<div id="tissue_norm_se" class="section level1">
-<h1>1. <code>tissue_norm_se</code></h1>
-<p>The <a href="https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial">paper</a>
-“An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma”
-includes metabolomic profiling on 138 matched clear cell renal cell
-carcinoma (ccRCC)/normal tissue pairs <span class="citation">[@Hakimi2016]</span>. Metabolomics was done using the
-company Metabolon, so this is untargeted metabolomics. Here we use the
-median normalised data from supplementary table 2 of the paper.<br />
-<br />
-<code>1.</code> Sample information + median-normalised metabolite peaks
-<strong>(tissue_norm)</strong><br />
-<code>2.</code> Metabolite IDs (CAS, HMDB, KEGG, PubChem), pathway
-assignment and measurement platform <strong>(tissue_meta)</strong>,
-built in <code>ccRCC_Hakimi-et-all.Rmd</code>.</p>
-<div id="load-data" class="section level2">
-<h2>Load Data</h2>
-<pre class="r"><code>data(tissue_norm)
-data(tissue_meta)
+}
 
-Tissue_Norm &lt;- tissue_norm %&gt;% column_to_rownames(&quot;Code&quot;)
-
-sample_cols &lt;- c(&quot;TISSUE_TYPE&quot;, &quot;GENDER&quot;, &quot;RACE&quot;, &quot;STAGE&quot;, &quot;AGE&quot;)
-metab_cols  &lt;- setdiff(colnames(Tissue_Norm), colnames(tissue_norm)[2:14])
-
-assay_df    &lt;- Tissue_Norm[, metab_cols]
-meta_sample &lt;- Tissue_Norm[, sample_cols]
-meta_feat   &lt;- tissue_meta %&gt;%
-  column_to_rownames(&quot;Metabolite&quot;) %&gt;%
-  align_feature_metadata(assay_df, .)</code></pre>
-</div>
-<div id="build-the-se" class="section level2">
-<h2>Build the SE</h2>
-<pre class="r"><code>tissue_norm_se &lt;- build_se_from_df(
-  assay_df = assay_df,
-  metadata_sample = meta_sample,
-  metadata_feature = meta_feat
-)
-
-tissue_norm_se</code></pre>
-<pre><code>## class: SummarizedExperiment 
-## dim: 570 276 
-## metadata(0):
-## assays(1): data
-## rownames(570): 1,2-propanediol 1,3-dihydroxyacetone ... xylose xylulose
-## rowData names(10): CAS SUPER_PATHWAY ... KEGG HMDB
-## colnames(276): DIAG-16076 DIAG-16077 ... DIAG-16354 DIAG-16355
-## colData names(5): TISSUE_TYPE GENDER RACE STAGE AGE</code></pre>
-</div>
-<div id="feature-metadata-coverage" class="section level2">
-<h2>Feature-metadata coverage</h2>
-<pre class="r"><code>rd &lt;- rowData(tissue_norm_se)
-fully_na &lt;- rownames(rd)[apply(as.data.frame(rd), 1, function(r) all(is.na(r)))]
-cat(&quot;features with no tissue_meta entry:&quot;, length(fully_na), &quot;of&quot;, nrow(rd), &quot;\n&quot;)</code></pre>
-<pre><code>## features with no tissue_meta entry: 0 of 570</code></pre>
-<p>All 570 features have a <code>tissue_meta</code> entry.</p>
-</div>
-</div>
-<div id="intracell_raw_se" class="section level1">
-<h1>2. <code>intracell_raw_se</code></h1>
-<p>Publicly available on <a href="https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&amp;ProjectID=PR001418">metabolomics
-workbench project PR001418</a> including metabolic profiles of human
-renal epithelial cells HK2 and ccRCC cell lines cultured in Plasmax cell
-culture media <span class="citation">[@Sciacovelli_Dugourd2022]</span>.
-The raw data are available via <a href="https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&amp;StudyID=ST002224&amp;StudyType=MS&amp;ResultType=1">metabolomics
-workbench study ST002224</a> were intracellular metabolomics of HK2 and
-ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.<br />
-<br />
-<code>1.</code> Sample information + raw integrated metabolite peaks
-<strong>(intracell_raw)</strong><br />
-<code>2.</code> Metabolite trivial name mapped to HMDB ID, KEGG ID and
-one main metabolic pathway <strong>(cellular_meta)</strong>, shared with
-<code>medium_raw</code> below (same project).</p>
-<div id="load-data-1" class="section level2">
-<h2>Load Data</h2>
-<pre class="r"><code>data(intracell_raw)
-data(cellular_meta)
+data(intracell_raw)
 
 Intra &lt;- intracell_raw %&gt;% column_to_rownames(&quot;Code&quot;)
 
@@ -1611,11 +1637,9 @@ assay_df2    &lt;- Intra[, metab_cols2]
 meta_sample2 &lt;- Intra[, sample_cols2]
 meta_feat2   &lt;- cellular_meta %&gt;%
   column_to_rownames(&quot;Metabolite&quot;) %&gt;%
-  align_feature_metadata(assay_df2, .)</code></pre>
-</div>
-<div id="build-the-se-1" class="section level2">
-<h2>Build the SE</h2>
-<pre class="r"><code>intracell_raw_se &lt;- build_se_from_df(
+  align_feature_metadata(assay_df2, .)
+
+intracell_raw_se &lt;- build_se_from_df(
   assay_df = assay_df2,
   metadata_sample = meta_sample2,
   metadata_feature = meta_feat2
@@ -1631,87 +1655,22 @@ intracell_raw_se</code></pre>
 ## colnames(58): MS55_01 MS55_02 ... POOL8 POOL9
 ## colData names(3): Conditions Analytical_Replicates
 ##   Biological_Replicates</code></pre>
-</div>
-<div id="feature-metadata-coverage-1" class="section level2">
-<h2>Feature-metadata coverage</h2>
+<div id="feature-metadata-coverage-after-backfill" class="section level2">
+<h2>Feature-metadata coverage after backfill</h2>
 <pre class="r"><code>rd2 &lt;- rowData(intracell_raw_se)
 fully_na2 &lt;- rownames(rd2)[apply(as.data.frame(rd2), 1, function(r) all(is.na(r)))]
 cat(&quot;features with no cellular_meta entry:&quot;, length(fully_na2), &quot;of&quot;, nrow(rd2), &quot;\n&quot;)</code></pre>
-<pre><code>## features with no cellular_meta entry: 3 of 182</code></pre>
+<pre><code>## features with no cellular_meta entry: 2 of 182</code></pre>
 <pre class="r"><code>cat(&quot;unmatched:&quot;, paste(fully_na2, collapse = &quot;, &quot;), &quot;\n&quot;)</code></pre>
-<pre><code>## unmatched: valine-d8, hippuric acid-d5, hexanoylcarnitine C6</code></pre>
-<p><code>valine-d8</code> and <code>hippuric acid-d5</code> are internal
-standards, so their absence from a pathway/ID annotation table is
-expected. <code>hexanoylcarnitine C6</code> is a coverage gap in
-<code>cellular_meta</code> (left as <code>NA</code>). See
-Create_cellular_meta.Rmd to fill in gaps.</p>
+<pre><code>## unmatched: valine-d8, hippuric acid-d5</code></pre>
+<p><code>hexanoylcarnitine C6</code> is now matched; only
+<code>valine-d8</code> and <code>hippuric acid-d5</code> (internal
+standards) remain unmatched, as expected.</p>
 </div>
+<div id="save" class="section level2">
+<h2>Save</h2>
+<pre class="r"><code>save(intracell_raw_se, file = &quot;intracell_raw_se.rda&quot;)</code></pre>
 </div>
-<div id="medium_raw_se" class="section level1">
-<h1>3. <code>medium_raw_se</code></h1>
-<p>Same project as above, <a href="https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&amp;ProjectID=PR001418">metabolomics
-workbench project PR001418</a>. The raw data are available via <a href="https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&amp;StudyID=ST002226&amp;StudyType=MS&amp;ResultType=1">metabolomics
-workbench study ST002226</a> were exometabolomics (consumption-release,
-“CoRe”) of HK2 and ccRCC cell lines 786-O, 786-M1A, 786-M2A, OS-RC-2,
-OS-LM1 and RFX-631 were performed.<br />
-<code>1.</code> Sample information + raw integrated metabolite peaks
-from the culture media <strong>(medium_raw)</strong><br />
-<code>2.</code> Same feature metadata table as used for
-<code>intracell_raw_se</code> above
-<strong>(cellular_meta)</strong>.</p>
-<div id="load-data-2" class="section level2">
-<h2>Load Data</h2>
-<pre class="r"><code>data(medium_raw)
-#cellular_meta already loaded above
-
-Media &lt;- medium_raw %&gt;% column_to_rownames(&quot;Code&quot;)
-
-sample_cols3 &lt;- c(&quot;Conditions&quot;, &quot;Biological_Replicates&quot;, &quot;GrowthFactor&quot;)
-metab_cols3  &lt;- setdiff(colnames(Media), sample_cols3)
-
-assay_df3    &lt;- Media[, metab_cols3]
-meta_sample3 &lt;- Media[, sample_cols3]
-meta_feat3   &lt;- cellular_meta %&gt;%
-  column_to_rownames(&quot;Metabolite&quot;) %&gt;%
-  align_feature_metadata(assay_df3, .)</code></pre>
-</div>
-<div id="build-the-se-2" class="section level2">
-<h2>Build the SE</h2>
-<pre class="r"><code>medium_raw_se &lt;- build_se_from_df(
-  assay_df = assay_df3,
-  metadata_sample = meta_sample3,
-  metadata_feature = meta_feat3
-)
-
-medium_raw_se</code></pre>
-<pre><code>## class: SummarizedExperiment 
-## dim: 73 44 
-## metadata(0):
-## assays(1): data
-## rownames(73): valine-d8 hipppuric acid-d5 ... valine xanthine
-## rowData names(4): HMDB KEGG.ID KEGGCompound Pathway
-## colnames(44): MS51-01 MS51-02 ... POOL5 POOL6
-## colData names(3): Conditions Biological_Replicates GrowthFactor</code></pre>
-</div>
-<div id="feature-metadata-coverage-2" class="section level2">
-<h2>Feature-metadata coverage</h2>
-<pre class="r"><code>rd3 &lt;- rowData(medium_raw_se)
-fully_na3 &lt;- rownames(rd3)[apply(as.data.frame(rd3), 1, function(r) all(is.na(r)))]
-cat(&quot;features with no cellular_meta entry:&quot;, length(fully_na3), &quot;of&quot;, nrow(rd3), &quot;\n&quot;)</code></pre>
-<pre><code>## features with no cellular_meta entry: 2 of 73</code></pre>
-<pre class="r"><code>cat(&quot;unmatched:&quot;, paste(fully_na3, collapse = &quot;, &quot;), &quot;\n&quot;)</code></pre>
-<pre><code>## unmatched: valine-d8, hipppuric acid-d5</code></pre>
-<p><code>valine-d8</code> and <code>hipppuric acid-d5</code> are
-internal standards, so their absence from a pathway/ID annotation table
-is expected.</p>
-</div>
-</div>
-<div id="save" class="section level1">
-<h1>Save</h1>
-<p>Save as .rda files.</p>
-<pre class="r"><code>save(tissue_norm_se, file = &quot;tissue_norm_se.rda&quot;)
-save(intracell_raw_se, file = &quot;intracell_raw_se.rda&quot;)
-save(medium_raw_se, file = &quot;medium_raw_se.rda&quot;)</code></pre>
 </div>
 <div id="information-about-package-used-and-versions" class="section level1">
 <h1>Information about package used and versions</h1>
@@ -1751,47 +1710,47 @@ save(medium_raw_se, file = &quot;medium_raw_se.rda&quot;)</code></pre>
 ##   [1] splines_4.5.2          later_1.4.8            R.oo_1.27.1           
 ##   [4] cellranger_1.1.0       polyclip_1.10-7        XML_3.99-0.23         
 ##   [7] factoextra_2.0.0       lifecycle_1.0.5        httr2_1.2.2           
-##  [10] rstatix_0.7.3          rprojroot_2.1.1        lattice_0.22-7        
-##  [13] MASS_7.3-65            backports_1.5.1        magrittr_2.0.5        
-##  [16] limma_3.66.0           sass_0.4.10            jquerylib_0.1.4       
-##  [19] yaml_2.3.12            otel_0.2.0             zip_2.3.3             
-##  [22] sessioninfo_1.2.3      pkgbuild_1.4.8         EnhancedVolcano_1.28.2
-##  [25] qcc_2.7                DBI_1.3.0              RColorBrewer_1.1-3    
-##  [28] abind_1.4-8            pkgload_1.5.2          rvest_1.0.5           
-##  [31] R.utils_2.13.0         ggraph_2.2.2           hash_2.2.6.4          
-##  [34] tweenr_2.0.3           rappdirs_0.3.4         ggrepel_0.9.8         
-##  [37] pheatmap_1.0.13        parallelly_1.47.0      codetools_0.2-20      
-##  [40] DelayedArray_0.36.1    xml2_1.5.2             ggforce_0.5.0         
-##  [43] tidyselect_1.2.1       farver_2.1.2           viridis_0.6.5         
-##  [46] ComplexUpset_1.3.3     jsonlite_2.0.0         ellipsis_0.3.3        
-##  [49] tidygraph_1.3.1        Formula_1.2-5          tools_4.5.2           
-##  [52] progress_1.2.3         Rcpp_1.1.1-1.1         glue_1.8.1            
-##  [55] gridExtra_2.3          SparseArray_1.10.10    xfun_0.57             
-##  [58] decoupleR_2.16.0       qvalue_2.42.0          usethis_3.2.1         
-##  [61] ggfortify_0.4.19       withr_3.0.2            fastmap_1.2.0         
-##  [64] digest_0.6.39          timechange_0.4.0       R6_2.6.1              
-##  [67] colorspace_2.1-3       gtools_3.9.5           RSQLite_2.4.6         
-##  [70] R.methodsS3_1.8.2      prettyunits_1.2.0      graphlayouts_1.2.3    
-##  [73] httr_1.4.8             S4Arrays_1.10.1        scatterplot3d_0.3-45  
-##  [76] inflection_1.3.7       pkgconfig_2.0.3        gtable_0.3.6          
-##  [79] blob_1.3.0             S7_0.2.2               XVector_0.50.0        
-##  [82] brio_1.1.5             OmnipathR_4.1.0        htmltools_0.5.9       
-##  [85] carData_3.0-6          scales_1.4.0           knitr_1.51            
-##  [88] rstudioapi_0.18.0      tzdb_0.5.0             reshape2_1.4.5        
-##  [91] checkmate_2.3.4        curl_7.1.0             cachem_1.1.0          
-##  [94] Polychrome_1.5.1       parallel_4.5.2         vipor_0.4.7           
-##  [97] cosmosR_1.18.1         desc_1.4.3             pillar_1.11.1         
-## [100] grid_4.5.2             logger_0.4.1           vctrs_0.7.3           
-## [103] ggpubr_0.6.3           car_3.1-5              beeswarm_0.4.0        
-## [106] evaluate_1.0.5         cli_3.6.6              compiler_4.5.2        
-## [109] rlang_1.2.0            crayon_1.5.3           ggsignif_0.6.4        
-## [112] plyr_1.8.9             fs_2.1.0               ggbeeswarm_0.7.3      
-## [115] writexl_1.5.4          stringi_1.8.7          viridisLite_0.4.3     
-## [118] BiocParallel_1.44.0    devtools_2.5.1         Matrix_1.7-4          
-## [121] hms_1.1.4              patchwork_1.3.2        bit64_4.8.0           
-## [124] statmod_1.5.1          igraph_2.3.0           broom_1.0.12          
-## [127] memoise_2.0.1          bslib_0.10.0           bit_4.6.0             
-## [130] readxl_1.4.5</code></pre>
+##  [10] rstatix_0.7.3          rprojroot_2.1.1        vroom_1.7.1           
+##  [13] lattice_0.22-7         MASS_7.3-65            backports_1.5.1       
+##  [16] magrittr_2.0.5         limma_3.66.0           sass_0.4.10           
+##  [19] jquerylib_0.1.4        yaml_2.3.12            otel_0.2.0            
+##  [22] zip_2.3.3              sessioninfo_1.2.3      pkgbuild_1.4.8        
+##  [25] EnhancedVolcano_1.28.2 qcc_2.7                DBI_1.3.0             
+##  [28] RColorBrewer_1.1-3     abind_1.4-8            pkgload_1.5.2         
+##  [31] rvest_1.0.5            R.utils_2.13.0         ggraph_2.2.2          
+##  [34] hash_2.2.6.4           tweenr_2.0.3           rappdirs_0.3.4        
+##  [37] ggrepel_0.9.8          pheatmap_1.0.13        parallelly_1.47.0     
+##  [40] codetools_0.2-20       DelayedArray_0.36.1    xml2_1.5.2            
+##  [43] ggforce_0.5.0          tidyselect_1.2.1       farver_2.1.2          
+##  [46] viridis_0.6.5          ComplexUpset_1.3.3     jsonlite_2.0.0        
+##  [49] ellipsis_0.3.3         tidygraph_1.3.1        Formula_1.2-5         
+##  [52] tools_4.5.2            progress_1.2.3         Rcpp_1.1.1-1.1        
+##  [55] glue_1.8.1             gridExtra_2.3          SparseArray_1.10.10   
+##  [58] xfun_0.57              decoupleR_2.16.0       qvalue_2.42.0         
+##  [61] usethis_3.2.1          ggfortify_0.4.19       withr_3.0.2           
+##  [64] fastmap_1.2.0          digest_0.6.39          timechange_0.4.0      
+##  [67] R6_2.6.1               colorspace_2.1-3       gtools_3.9.5          
+##  [70] RSQLite_2.4.6          R.methodsS3_1.8.2      utf8_1.2.6            
+##  [73] prettyunits_1.2.0      graphlayouts_1.2.3     httr_1.4.8            
+##  [76] S4Arrays_1.10.1        scatterplot3d_0.3-45   inflection_1.3.7      
+##  [79] pkgconfig_2.0.3        gtable_0.3.6           blob_1.3.0            
+##  [82] S7_0.2.2               XVector_0.50.0         brio_1.1.5            
+##  [85] OmnipathR_4.1.0        htmltools_0.5.9        carData_3.0-6         
+##  [88] scales_1.4.0           knitr_1.51             rstudioapi_0.18.0     
+##  [91] tzdb_0.5.0             reshape2_1.4.5         checkmate_2.3.4       
+##  [94] curl_7.1.0             cachem_1.1.0           Polychrome_1.5.1      
+##  [97] parallel_4.5.2         vipor_0.4.7            cosmosR_1.18.1        
+## [100] desc_1.4.3             pillar_1.11.1          grid_4.5.2            
+## [103] logger_0.4.1           vctrs_0.7.3            ggpubr_0.6.3          
+## [106] car_3.1-5              beeswarm_0.4.0         evaluate_1.0.5        
+## [109] cli_3.6.6              compiler_4.5.2         rlang_1.2.0           
+## [112] crayon_1.5.3           ggsignif_0.6.4         plyr_1.8.9            
+## [115] fs_2.1.0               ggbeeswarm_0.7.3       writexl_1.5.4         
+## [118] stringi_1.8.7          viridisLite_0.4.3      BiocParallel_1.44.0   
+## [121] devtools_2.5.1         Matrix_1.7-4           hms_1.1.4             
+## [124] patchwork_1.3.2        bit64_4.8.0            statmod_1.5.1         
+## [127] igraph_2.3.0           broom_1.0.12           memoise_2.0.1         
+## [130] bslib_0.10.0           bit_4.6.0              readxl_1.4.5</code></pre>
 </div>
 
 
