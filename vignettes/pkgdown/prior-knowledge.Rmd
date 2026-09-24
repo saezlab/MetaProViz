@@ -501,7 +501,7 @@ Gaude = as.data.frame(Gaude_GeneMetab[["GeneMetabSet"]]),
 MetalinksDB = as.data.frame(MetaLinksDB))
 )
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, results="asis"}
 cat(sprintf(
     '<img src="%s" width="100%%" style="display:block; margin:0 auto;"/>',
     "prior-knowledge.Rmd_compare-pk.svg"
@@ -563,10 +563,11 @@ This helps us to understand what to expect, when linking the data to prior knowl
 ```{r compare-pk-2, eval=TRUE, echo=FALSE}
 pk_comp_res_biocft <- compare_pk(data = list(Biocft = FeatureMetadata_Biocrates),
 metadata_info = list(Biocft = c("CHEBI", "HMDB", "LIMID")),
-plot_name = "Overlap of BioCrates Columns")
+plot_name = "Overlap of BioCrates Columns",
+print_plot = FALSE)
 
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, results="asis"}
 cat(sprintf(
     '<img src="%s" width="100%%" style="display:block; margin:0 auto;"/>',
     "prior-knowledge.Rmd_compare-pk-2.svg"#
@@ -619,9 +620,9 @@ Noteworthy, in some cases the Biocrates metabolites have multiple HMDB IDs liste
 
 ```{r code-11, fig.width=8, fig.height=6}
 # Count entries and record NA information
-result_bioc_hmdb_count <- count_id(FeatureMetadata_Biocrates, "HMDB")
+result_bioc_hmdb_count <- count_id(FeatureMetadata_Biocrates, "HMDB", delimiter=", ")
 # Access the processed data:
-processed_df_bioc_hmdb_count <- result_bioc_hmdb_count$result
+processed_df_bioc_hmdb_count <- result_bioc_hmdb_count$Table
 
 ```
 
@@ -729,7 +730,7 @@ kableExtra::kable_classic(full_width = FALSE, html_font = "Cambria", font_size =
 This shows using Multi HMDBs has resulted in more metabolites from Biocrates being able to be linked to MetalinksDB than what would have been possible if we only used the first HMDB available to us.
 Hence while having multiple IDs for a single detected peak may add complexity, we would recommend against prematurely dropping any IDs until you map to the PK or have thoroughly assessed what impact the removal may have.
 
-## 4 Deeper investigation of MetalinksDB metabolite-protein interactions
+## 4. Deeper investigation of MetalinksDB metabolite-protein interactions
 Now that we have investigated the coverage of metabolite ID annotations and their connections and matches to Prior Knowledge, we can go a step further and look into the interaction mechanisms of metabolite features with MetalinksDB transporter- and receptor proteins, as well as metabolic enzymes.
 For that, we will subset MetalinksDB by the "interaction_family" column, which is subset in one of the following categories: "Other protein-metabolite", "Transporter-metabolite", "Receptor-metabolite", and "Enzyme-metabolite", using the 'viz_metabolite_protein_network()' function.
 
@@ -803,13 +804,6 @@ While the metabolite-protein network plots show specific interactions of metabol
 For example, in the receptor subset of MetalinksDB, we observe many interactions for Glutamic acid (Glu) and Glycine (Gly). Indeed, the corresponding overlap plot shows that Gly and Glu share 6 proteins which they interact with. Additionally, we see that Glu and Asp (Aspartic acid) share 13 receptors, while Asp has 17 in total and Glu has 110 in total, hinting at a possibly higher receptor specificity of Aspartic acid in comparison to a more versatile interaction of Glutamic acid.
 Note however, that metabolite-protein interactions have various interaction properties, binding mechanisms and the Prior Knowledge resources are always biased by over-representation of well-studies small molecules or proteins. Therefore, the overlap graph hints at shared protein interactions, but does not necessarily show that two metabolites have n exact same interactions.
 
-For a better overview, see both these plots again below:
-```{r}
-print(biocrates_metalinks_receptor$plot)
-print(biocrates_metalinks_receptor$metabolite_interaction_overlap$plot)
-```
-
-
 :::: {.progress .progress-striped .active}
 ::: {.progress-bar .progress-bar-success style="width: 100%"}
 :::
@@ -826,7 +820,7 @@ print(biocrates_metalinks_receptor$metabolite_interaction_overlap$plot)
 ::: {style="border: 1px solid red; padding: 10px; background-color: #ffe6e6;"}
 We just saw an example of how we can connect experimental data to prior knowledge. We observed shared patterns between metabolites, having overlapping protein interactions.
 We have the possibility to go into even more depth and investigate the metabolite-overlap of prior knowledge resources.
-<strong>See the metsigdb-resouces-composition vignette for an in-depth investigation of all MetSigDB resources </strong>
+<strong>See the [metsigdb-resouces-composition vignette](https://saezlab.github.io/MetaProViz/articles/pkgdown/metsigdb-resouces-composition) for an in-depth investigation of all MetSigDB resources </strong>
 :::
 
 <br>
@@ -923,7 +917,7 @@ pk_comp_res_keggtrans <- compare_pk(data = list(kegg_translated = KEGG_Pathways_
                                                 metadata_info = list(kegg_translated = c("hmdb", "pubchem")),
                                                 plot_name = "IDs available after KEGG ID Translation")
 ```
-```{r, echo=FALSE}
+```{r, echo=FALSE, results="asis"}
 cat(sprintf(
     '<img src="%s" width="100%%" style="display:block; margin:0 auto;"/>',
     "prior-knowledge.Rmd_compare-pk-3.svg"
@@ -942,7 +936,7 @@ For enrichment analysis the translation from KEGG IDs to HMDB IDs increases the 
 
 <center>
 
-![Fig. 2: Mapping problems in prior knowledge metabolite-sets when translating metabolite IDs.](../Fig.2.png){width="50%"}
+![Fig. 2: Mapping problems in prior knowledge metabolite-sets when translating metabolite IDs.](../Fig.2.png){width="80%"}
 
 </center>
 
@@ -1068,7 +1062,7 @@ This is something we are currently working on and hope to provide within the nex
 
 <center>
 
-![Fig. 3: Mapping problems in prior knowledge metabolite-sets when translating metabolite IDs and the connection to detected (measured input metabolites).](../Fig.3.png){width="50%"}
+![Fig. 3: Mapping problems in prior knowledge metabolite-sets when translating metabolite IDs and the connection to detected (measured input metabolites).](../Fig.3.png){width="80%"}
 
 </center>
 
