@@ -2489,6 +2489,10 @@ seed_id_compatibility_check <- function(
 #'     at. \strong{Default = NULL}
 #' @param verbose Logical; if `TRUE`, prints pairwise mapping and edge
 #'     construction diagnostics to the console.
+#' @param run_compatibility_check Logical; if `TRUE`, run
+#'     [seed_id_compatibility_check()] on the input before traversal and warn
+#'     about incompatible seed IDs. Set to `FALSE` if the input has already been
+#'     checked, e.g. within [id_processing()]. \strong{Default = TRUE}
 #' @importFrom dplyr arrange bind_cols bind_rows count distinct filter inner_join mutate pull rename row_number select transmute
 #' @importFrom logger log_warn
 #' @importFrom purrr pmap
@@ -2500,7 +2504,7 @@ seed_id_compatibility_check <- function(
 #' \item{ExpandedDF}{Input data with appended expanded ID columns and QC
 #' summary columns, including `all_seed_ids_compatible` (logical flag indicating
 #' whether all seed-ID pairs in each row are compatible).}
-#' \item{ID_pair_compatibility}{Long-format table with one unique unordered seed-ID pair per input row. The first column `original_row_id` stores the original input row name. The table also includes `pair_compatible`, `compatibility_path`, and `all_seed_ids_compatible`.}
+#' \item{ID_pair_compatibility}{Long-format table with one unique unordered seed-ID pair per input row. The first column `original_row_id` stores the original input row name. The table also includes `pair_compatible`, `compatibility_path`, and `all_seed_ids_compatible`. Only returned if `run_compatibility_check = TRUE`.}
 #' \item{ID_Edges_prior_knowledge}{Bidirectional ID edge table used for
 #' traversal and compatibility checks.}
 #' 
@@ -2547,9 +2551,10 @@ traverse_ids <- function(
     delimiter = c(";", ","),
     save_table = "csv",
     path = NULL,
-    verbose = FALSE
+    verbose = FALSE,
+    run_compatibility_check = TRUE
 ) {
-    
+
     # NSE vs. R CMD check workaround
     row_id <- NULL
     
@@ -2589,26 +2594,33 @@ traverse_ids <- function(
     
     edge_table <- build_id_edges_bidirectional(selected_types, verbose = verbose)
     
-    compatibility <- seed_id_compatibility_check(
-        data = prep$data_output,
-        id_types = selected_types,
-        delimiter = delimiter_value,
-        verbose = verbose,
-        edge_table = edge_table
-    )
-    
+    compatibility <- NULL
+    if (isTRUE(run_compatibility_check)) {
+        compatibility <- seed_id_compatibility_check(
+            data = prep$data_output,
+            id_types = selected_types,
+            delimiter = delimiter_value,
+            verbose = verbose,
+            edge_table = edge_table
+        )
+    }
+
     expansion <- traverse_all_rows(
         data_prepared = prep$data_prepared,
         edge_table = edge_table,
         selected_types = selected_types,
         split_pattern = split_pattern
     )
-    
+
     expanded_df <-
-        compatibility$data_with_compatibility %>%
+        (if (is.null(compatibility)) {
+            tibble::as_tibble(prep$data_output)
+        } else {
+            compatibility$data_with_compatibility
+        }) %>%
         dplyr::mutate(row_id = dplyr::row_number()) %>%
         dplyr::bind_cols(expansion$summary)
-    
+
     incompatible_rows <- expanded_df$row_id[expanded_df$all_seed_ids_compatible %in% FALSE]
     
     if (length(incompatible_rows) > 0L) {
@@ -2638,13 +2650,14 @@ traverse_ids <- function(
         ID_pair_compatibility = compatibility$ID_pair_compatibility,
         ID_Edges_prior_knowledge = edge_table
     )
-    
+    result <- Filter(Negate(is.null), result)
+
     if (isTRUE(verbose)) {
         cat(sprintf("[traverse_ids] selected_types: %s\n", paste(selected_types, collapse = ", ")))
         cat(sprintf(
-            "[traverse_ids] ExpandedDF rows: %d | ID_pair_compatibility rows: %d | ID_Edges_prior_knowledge rows: %d\n",
+            "[traverse_ids] ExpandedDF rows: %d | ID_pair_compatibility rows: %s | ID_Edges_prior_knowledge rows: %d\n",
             nrow(result$ExpandedDF),
-            nrow(result$ID_pair_compatibility),
+            if (is.null(result$ID_pair_compatibility)) "skipped" else nrow(result$ID_pair_compatibility),
             nrow(result$ID_Edges_prior_knowledge)
         ))
     }
@@ -2698,8 +2711,10 @@ traverse_ids <- function(
 #'     Required when `run_translation = TRUE`.
 #' @param translation_summary Logical; forwarded to [translate_id()].
 #' @param run_traversal Logical; if `TRUE`, run [traverse_ids()] after the
-#'     compatibility step. Mutually exclusive with `run_translation`. Default is
-#'     `FALSE`.
+#'     compatibility step. Mutually exclusive with `run_translation`. The
+#'     seed-ID compatibility check inside [traverse_ids()] is always skipped
+#'     here; use `run_compatibility_check` to check seed IDs before traversal.
+#'     Default is `FALSE`.
 #' @param edge_table Optional precomputed bidirectional edge table with columns
 #'     `id1`, `type1`, `id2`, `type2`. If `NULL`, it is built internally when
 #'     required for compatibility checking or traversal.
@@ -2921,6 +2936,17 @@ id_processing <- function(
 
     if (isTRUE(run_traversal)) {
         steps_run <- c(steps_run, "traversal")
+        if (!isTRUE(run_compatibility_check)) {
+            no_qc_message <- paste(
+                "Traversal is run without a prior seed-ID compatibility check.",
+                "Incompatible seed IDs within a feature (IDs that map to different molecules)",
+                "can overexpand the ID space during traversal.",
+                "Consider rerunning with run_compatibility_check = TRUE to check and",
+                "automatically handle incompatible seed IDs before traversal."
+            )
+            stage_messages <- c(stage_messages, no_qc_message)
+            cat(sprintf("[id_processing] Note: %s\n", no_qc_message))
+        }
         {
             cat("[id_processing] Running traverse_ids().\n")
         }
@@ -2931,7 +2957,8 @@ id_processing <- function(
             delimiter = delimiter_value,
             save_table = save_table,
             path = subfolder,
-            verbose = verbose
+            verbose = verbose,
+            run_compatibility_check = FALSE
         )
         step_results$traversal_result <- traversal_result
         current_data <- materialize_traversed_ids(
@@ -2993,7 +3020,6 @@ id_processing <- function(
             },
             traversal = if (!is.null(step_results$traversal_result)) {
                 list(
-                    pair_compatibility = step_results$traversal_result$ID_pair_compatibility,
                     prior_knowledge_edges = step_results$traversal_result$ID_Edges_prior_knowledge
                 )
             } else {
@@ -3153,6 +3179,7 @@ check_param_id_processing <- function(
 strip_seed_handling_qc_columns <- function(data) {
     data %>%
         dplyr::select(-dplyr::any_of(c(
+            "row_id",
             "original_row_id",
             "n_seed_ids",
             "n_pairs",
@@ -3565,7 +3592,6 @@ save_id_processing_outputs <- function(result, save_table, save_plot, print_plot
 
     if (!is.null(result$Data$traversal)) {
         trav <- result$Data$traversal
-        df_list$traversal_pairs <- trav$pair_compatibility
         df_list$traversal_edges <- trav$prior_knowledge_edges
     }
 

@@ -63,8 +63,10 @@ Required when \code{run_translation = TRUE}.}
 \item{translation_summary}{Logical; forwarded to \code{\link[=translate_id]{translate_id()}}.}
 
 \item{run_traversal}{Logical; if \code{TRUE}, run \code{\link[=traverse_ids]{traverse_ids()}} after the
-compatibility step. Mutually exclusive with \code{run_translation}. Default is
-\code{FALSE}.}
+compatibility step. Mutually exclusive with \code{run_translation}. The
+seed-ID compatibility check inside \code{\link[=traverse_ids]{traverse_ids()}} is always skipped
+here; use \code{run_compatibility_check} to check seed IDs before traversal.
+Default is \code{FALSE}.}
 
 \item{edge_table}{Optional precomputed bidirectional edge table with columns
 \code{id1}, \code{type1}, \code{id2}, \code{type2}. If \code{NULL}, it is built internally when

@@ -10,7 +10,8 @@ traverse_ids(
   delimiter = c(";", ","),
   save_table = "csv",
   path = NULL,
-  verbose = FALSE
+  verbose = FALSE,
+  run_compatibility_check = TRUE
 )
 }
 \arguments{
@@ -34,13 +35,18 @@ at. \strong{Default = NULL}}
 
 \item{verbose}{Logical; if \code{TRUE}, prints pairwise mapping and edge
 construction diagnostics to the console.}
+
+\item{run_compatibility_check}{Logical; if \code{TRUE}, run
+\code{\link[=seed_id_compatibility_check]{seed_id_compatibility_check()}} on the input before traversal and warn
+about incompatible seed IDs. Set to \code{FALSE} if the input has already been
+checked, e.g. within \code{\link[=id_processing]{id_processing()}}. \strong{Default = TRUE}}
 }
 \value{
 Named list with three data frames:
 \item{ExpandedDF}{Input data with appended expanded ID columns and QC
 summary columns, including \code{all_seed_ids_compatible} (logical flag indicating
 whether all seed-ID pairs in each row are compatible).}
-\item{ID_pair_compatibility}{Long-format table with one unique unordered seed-ID pair per input row. The first column \code{original_row_id} stores the original input row name. The table also includes \code{pair_compatible}, \code{compatibility_path}, and \code{all_seed_ids_compatible}.}
+\item{ID_pair_compatibility}{Long-format table with one unique unordered seed-ID pair per input row. The first column \code{original_row_id} stores the original input row name. The table also includes \code{pair_compatible}, \code{compatibility_path}, and \code{all_seed_ids_compatible}. Only returned if \code{run_compatibility_check = TRUE}.}
 \item{ID_Edges_prior_knowledge}{Bidirectional ID edge table used for
 traversal and compatibility checks.}
 }
