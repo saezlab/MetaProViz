@@ -115,7 +115,7 @@ library(tibble)
 
 \
 
-[As part of the **MetaProViz** package you can load the example feature metadata using the function `toy_data()`]{style="text-decoration:underline"}:\
+[As part of the **MetaProViz** package you can load the example feature metadata using `data()`]{style="text-decoration:underline"}:\
 `1.` Metadata of cell line experiment **(CellLine)**\
 Example datasets is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022].\
 
@@ -1215,7 +1215,7 @@ The full scope of different methods is beyond the scope of MetaProViz, but are a
 
 \
 \
-[As part of the **MetaProViz** package you can load the example data using the function `toy_data()`]{style="text-decoration:underline"} to test the enrichment analysis:\
+[As part of the **MetaProViz** package you can load the example data using `data()`]{style="text-decoration:underline"} to test the enrichment analysis:\
 `1.`Cell line experiment **(CellLine)**\
 Here we choose an example datasets, which is publicly available on [metabolomics workbench project PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418) including metabolic profiles of human renal epithelial cells HK2 and cell renal cell carcinoma (ccRCC) cell lines cultured in Plasmax cell culture media [@Sciacovelli_Dugourd2022].
 The raw data are available via [metabolomics workbench study ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1) were intracellular metabolomics of HK2 and ccRCC cell lines 786-O, 786-M1A and 786-M2A were performed.\

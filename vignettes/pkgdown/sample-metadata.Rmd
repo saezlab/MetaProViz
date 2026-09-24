@@ -86,7 +86,7 @@ library(stringr)
 \
 Here we choose an example datasets, which is publicly available in the [paper](https://www.cell.com/cancer-cell/comments/S1535-6108(15)00468-7#supplementaryMaterial) "An Integrated Metabolic Atlas of Clear Cell Renal Cell Carcinoma", which includes metabolomic profiling on 138 matched clear cell renal cell carcinoma (ccRCC)/normal tissue pairs [@Hakimi2016]. Metabolomics was done using The company Metabolon, so this is untargeted metabolomics. Here we use the median normalised data from the supplementary table 2 of the paper. We have combined the metainformation about the patients with the metabolite measurements and removed unidentified metabolites. Lastly, we have added a column "Stage" where Stage1 and Stage2 patients are summarised to "EARLY-STAGE" and Stage3 and Stage4 patients to "LATE-STAGE". Moreover, we have added a column "Age", where patients with "AGE AT SURGERY" <42 are defined as "Young" and patients with AGE AT SURGERY >58 as "Old" and the remaining patients as "Middle".\
 
-#<span style="text-decoration:underline">As part of the **MetaProViz** package you can load the example data into your global environment using the function `toy_data()`</span>:\
+<span style="text-decoration:underline">As part of the **MetaProViz** package you can load the example data into your global environment using `data()`</span>:\
 `1.` Tissue experiment **(Intra)** \
 We can access the built-in dataset `tissue_norm`, which includes columns with Sample information and columns with the median normalised measured metabolite integrated peaks.\
 ```{r load-data}
