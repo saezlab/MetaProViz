@@ -50,12 +50,8 @@ save_path <- function(
         }
     } else {
         if (!dir.exists(path)) {
-            path <- getwd()
-            message(
-                "Provided `path` does not exist and hence results are saved here: ",
-                path,
-                sep = ""
-            )
+            dir.create(path, recursive = TRUE)
+            message("Provided `path` did not exist and was created: ", path)
         }
     }
 
@@ -89,6 +85,45 @@ results_dir <- function(
                 .
             )
         }
+}
+
+
+#' Build the file path (without extension) for a saved table or plot
+#'
+#' Combines `file_name`, the item name and the date. The item name is dropped
+#' if it is identical to `file_name` (e.g. "Heatmap_X" + "Heatmap_X"), and overly long
+#' names are shortened with a hash suffix to stay within Windows path limits.
+#'
+#' @param path Folder the file is saved in.
+#' @param file_name File name prefix passed by the calling function.
+#' @param item Name of the table or plot, or `NULL`.
+#' @param core Logical; if `TRUE`, prefix the file name with "core_".
+#' @param max_chars Maximum number of characters of the name before the date.
+#'
+#' @noRd
+save_file_name <- function(
+    path,
+    file_name,
+    item = NULL,
+    core = FALSE,
+    max_chars = 120L
+) {
+    stem <-
+        if (is.null(item) || item == "" || item == file_name) {
+            file_name
+        } else {
+            paste(file_name, item, sep = "_")
+        }
+
+    if (isTRUE(core)) {
+        stem <- paste0("core_", stem)
+    }
+
+    if (nchar(stem) > max_chars) {
+        stem <- paste0(substr(stem, 1L, max_chars - 9L), "_", substr(rlang::hash(stem), 1L, 8L))
+    }
+
+    paste0(path, "/", stem, "_", Sys.Date())
 }
 
 
@@ -143,62 +178,15 @@ save_res <- function(
     if (!is.null(save_table)) {
         # Excel File: One file with multiple sheets:
         if (save_table == "xlsx") {
-            # Make file_name
-            if (!core | is.null(core)) {
-                file_name <-
-                    paste0(
-                        path,
-                        "/",
-                        file_name,
-                        "_",
-                        Sys.Date(),
-                        sep = ""
-                    )
-            } else {
-                file_name <-
-                    paste0(
-                        path,
-                        "/core_",
-                        file_name,
-                        "_",
-                        Sys.Date(),
-                        sep = ""
-                    )
-            }
             # Save Excel
             write_xlsx(
                 inputlist_df,
-                paste0(file_name, ".xlsx", sep = ""),
+                paste0(save_file_name(path, file_name, core = core), ".xlsx"),
                 col_names = TRUE
             )
         } else {
             for (DF in names(inputlist_df)) {
-                # Make file_name
-                if (!core | is.null(core)) {
-                    file_name_Save <-
-                        paste0(
-                            path,
-                            "/",
-                            file_name,
-                            "_",
-                            DF,
-                            "_",
-                            Sys.Date(),
-                            sep = ""
-                        )
-                } else {
-                    file_name_Save <-
-                        paste0(
-                            path,
-                            "/core_",
-                            file_name,
-                            "_",
-                            DF,
-                            "_",
-                            Sys.Date(),
-                            sep = ""
-                        )
-                }
+                file_name_Save <- save_file_name(path, file_name, DF, core)
 
                 # unlist DF columns if needed
                 inputlist_df[[DF]] <- inputlist_df[[DF]] %>%
@@ -223,32 +211,7 @@ save_res <- function(
     # ############### Save Plots:
     if (!is.null(save_plot)) {
         for (Plot in names(inputlist_plot)) {
-            # Make file_name
-            if (!core | is.null(core)) {
-                file_name_Save <-
-                    paste0(
-                        path,
-                        "/",
-                        file_name,
-                        "_",
-                        Plot,
-                        "_",
-                        Sys.Date(),
-                        sep = ""
-                    )
-            } else {
-                file_name_Save <-
-                    paste0(
-                        path,
-                        "/core_",
-                        file_name,
-                        "_",
-                        Plot,
-                        "_",
-                        Sys.Date(),
-                        sep = ""
-                    )
-            }
+            file_name_Save <- save_file_name(path, file_name, Plot, core)
 
             # Save
             if (is.null(plot_height)) {
