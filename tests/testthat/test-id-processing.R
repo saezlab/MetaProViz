@@ -1,4 +1,4 @@
-test_that("id_processing default run returns staged QC object with automatic compatibility handling", {
+test_that("id_processing with compatibility check returns staged QC object with automatic handling", {
   testthat::local_mocked_bindings(
     compare_pk = function(data, ...) {
       list(
@@ -15,7 +15,7 @@ test_that("id_processing default run returns staged QC object with automatic com
         } else {
           length(strsplit(as.character(cell), split_pattern)[[1]])
         }
-      }, integer(1))
+      }, integer(1), USE.NAMES = FALSE)
       id_label <- ifelse(entry_count == 0L, "No ID", ifelse(entry_count == 1L, "Single ID", "Multiple IDs"))
       list(
         Table = data.frame(entry_count = entry_count, id_label = id_label, stringsAsFactors = FALSE),
@@ -29,6 +29,7 @@ test_that("id_processing default run returns staged QC object with automatic com
   result <- id_processing(
     data = mpv_seed_input_data(),
     delimiter = ";",
+    run_compatibility_check = TRUE,
     edge_table = mpv_seed_edge_table(),
     save_plot = NULL,
     save_table = NULL,
@@ -82,7 +83,7 @@ test_that("id_processing wraps translate_id and merges translated IDs back into 
         } else {
           length(strsplit(as.character(cell), split_pattern)[[1]])
         }
-      }, integer(1))
+      }, integer(1), USE.NAMES = FALSE)
       id_label <- ifelse(entry_count == 0L, "No ID", ifelse(entry_count == 1L, "Single ID", "Multiple IDs"))
       list(
         Table = data.frame(entry_count = entry_count, id_label = id_label, stringsAsFactors = FALSE),
@@ -143,7 +144,7 @@ test_that("id_processing wraps traverse_ids and keeps traversal artifacts", {
         } else {
           length(strsplit(as.character(cell), split_pattern)[[1]])
         }
-      }, integer(1))
+      }, integer(1), USE.NAMES = FALSE)
       id_label <- ifelse(entry_count == 0L, "No ID", ifelse(entry_count == 1L, "Single ID", "Multiple IDs"))
       list(
         Table = data.frame(entry_count = entry_count, id_label = id_label, stringsAsFactors = FALSE),
@@ -151,7 +152,7 @@ test_that("id_processing wraps traverse_ids and keeps traversal artifacts", {
         Plot_Sized = ggplot2::ggplot()
       )
     },
-    traverse_ids = function(data, id_types, delimiter, save_table = "csv", path = NULL, verbose = FALSE) {
+    traverse_ids = function(data, id_types, delimiter, save_table = "csv", path = NULL, verbose = FALSE, ...) {
       expanded <- data
       expanded$HMDB <- NA_character_
       expanded$HMDB_translated <- c("HMDB0000001", "HMDB0000002")
@@ -186,5 +187,6 @@ test_that("id_processing wraps traverse_ids and keeps traversal artifacts", {
   expect_true(is.list(result$Data$traversal))
   expect_null(result$Workflow$traversal_result)
   expect_identical(result$Data$after_traversal$HMDB[[2]], "HMDB0000002")
-  expect_true(all(c("pair_compatibility", "prior_knowledge_edges") %in% names(result$Data$traversal)))
+  expect_true("prior_knowledge_edges" %in% names(result$Data$traversal))
+  expect_false("pair_compatibility" %in% names(result$Data$traversal))
 })

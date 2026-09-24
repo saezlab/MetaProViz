@@ -307,7 +307,7 @@ test_that("standalone preprocessing stages support SummarizedExperiment input", 
   expect_true("Outliers" %in% colnames(SummarizedExperiment::colData(outlier_res$SE)))
   expect_equal(
     t(as.matrix(SummarizedExperiment::assay(outlier_res$SE))),
-    as.matrix(outlier_res$DF$data_outliers[, colnames(se), drop = FALSE]),
+    as.matrix(outlier_res$DF$data_outliers[, rownames(se), drop = FALSE]),
     tolerance = 1e-8
   )
 })
