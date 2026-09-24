@@ -9,7 +9,8 @@ checkmatch_pk_to_data(
   input_pk,
   metadata_info = c(InputID = "HMDB", PriorID = "HMDB", grouping_variable = "term"),
   save_table = "csv",
-  path = NULL
+  path = NULL,
+  delimiter = ", "
 )
 }
 \arguments{
@@ -33,6 +34,12 @@ PriorID="HMDB", grouping_variable="term")}}
 
 \item{path}{{Optional:} Path to the folder the results should be saved at.
 \strong{Default = NULL}}
+
+\item{delimiter}{\emph{Optional: } Character string separating multiple IDs
+within one cell of the \code{InputID} column in \code{data}, e.g. \code{", "} or \code{";"}.
+Whitespace after the delimiter is ignored. Only applies to \code{data};
+multiple IDs in \code{input_pk} are expected to be separated by \code{", "}.
+\strong{Default = ", "}}
 }
 \value{
 A \code{list} with three elements: \itemize{ \item \code{data_summary} —

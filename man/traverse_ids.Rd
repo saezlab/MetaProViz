@@ -11,7 +11,8 @@ traverse_ids(
   save_table = "csv",
   path = NULL,
   verbose = FALSE,
-  run_compatibility_check = TRUE
+  run_compatibility_check = TRUE,
+  edge_table = NULL
 )
 }
 \arguments{
@@ -40,6 +41,10 @@ construction diagnostics to the console.}
 \code{\link[=seed_id_compatibility_check]{seed_id_compatibility_check()}} on the input before traversal and warn
 about incompatible seed IDs. Set to \code{FALSE} if the input has already been
 checked, e.g. within \code{\link[=id_processing]{id_processing()}}. \strong{Default = TRUE}}
+
+\item{edge_table}{Optional precomputed bidirectional edge table with columns
+\code{id1}, \code{type1}, \code{id2}, \code{type2} (as returned in \code{ID_Edges_prior_knowledge}).
+If \code{NULL}, it is built from RaMP. \strong{Default = NULL}}
 }
 \value{
 Named list with three data frames:

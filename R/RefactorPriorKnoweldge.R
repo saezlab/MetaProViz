@@ -376,7 +376,9 @@ translate_id <- function(
 #' @param metadata_info \emph{Optional: } Column name of metabolite IDs. \strong{Default =
 #'     list(InputID="MetaboliteID")}
 #' @param from ID type that is present in your data. Choose between "kegg", "pubchem",
-#'     "chebi", "hmdb". \strong{Default = "hmdb"}
+#'     "chebi", "hmdb". ChEBI and PubChem IDs can be given with or without
+#'     prefix ("CHEBI:16016" or "16016", "CID670" or "670"); if the input is
+#'     prefixed, the output IDs are prefixed as well. \strong{Default = "hmdb"}
 #' @param save_table \emph{Optional: } File types for the analysis results are: "csv",
 #'     "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} Path to the folder the results should be saved at.
@@ -466,6 +468,19 @@ equivalent_id <- function(
                 paste("Error ", message, sep = "")
             )
             stop(message)
+        }
+    }
+
+    # Prefixed ChEBI/PubChem IDs (e.g. "CHEBI:16016", "CID670", as returned by
+    # id_processing()) are matched without prefix and get it back in the output
+    id_prefix <- switch(from, chebi = "CHEBI:", pubchem = "CID", NULL)
+    if (!is.null(id_prefix)) {
+        input_ids <- as.character(data[[metadata_info[["InputID"]]]])
+        if (any(startsWith(input_ids, id_prefix), na.rm = TRUE)) {
+            data[[metadata_info[["InputID"]]]] <-
+                sub(paste0("^", id_prefix), "", input_ids)
+        } else {
+            id_prefix <- NULL
         }
     }
 
@@ -662,7 +677,8 @@ equivalent_id <- function(
         ) %>%
         rowwise() %>%
         mutate(
-            fromList = list(str_split(!!sym(from), ", \\s*")[[1]]),
+            # unlist() instead of [[1]]: also works if no additional IDs were found (0 rows)
+            fromList = list(unlist(str_split(!!sym(from), ", \\s*"))),
             # Wrap in list
             SameAsInput = ifelse(
                 any(fromList == InputID),
@@ -785,6 +801,26 @@ equivalent_id <- function(
                 AllIDs
             )
         )
+
+    # # ------------------- Restore ID prefix -------------- ##
+    if (!is.null(id_prefix)) {
+        add_prefix <- function(x) {
+            ifelse(
+                is.na(x),
+                NA_character_,
+                gsub("(^|,\\s*)(?!\\s)", paste0("\\1", id_prefix), as.character(x), perl = TRUE)
+            )
+        }
+        OtherIDs <-
+            OtherIDs %>%
+            mutate(
+                across(
+                    all_of(c(metadata_info[["InputID"]], "PotentialAdditionalIDs", "AllIDs")),
+                    add_prefix
+                )
+            )
+        data[[metadata_info[["InputID"]]]] <- add_prefix(data[[metadata_info[["InputID"]]]])
+    }
 
     # # ------------------ Create count_id plot ------------------- ##
     # QC plot of before and after
@@ -1489,6 +1525,11 @@ path = NULL
 #'     "xlsx", "txt". \strong{Default = "csv"}
 #' @param path {Optional:} Path to the folder the results should be saved at.
 #'     \strong{Default = NULL}
+#' @param delimiter \emph{Optional: } Character string separating multiple IDs
+#'     within one cell of the `InputID` column in `data`, e.g. `", "` or `";"`.
+#'     Whitespace after the delimiter is ignored. Only applies to `data`;
+#'     multiple IDs in `input_pk` are expected to be separated by `", "`.
+#'     \strong{Default = ", "}
 #'
 #' @return A \code{list} with three elements: \itemize{ \item \code{data_summary} —
 #'     a data frame summarising matching results per input ID, including
@@ -1542,7 +1583,8 @@ checkmatch_pk_to_data <- function(
         grouping_variable = "term"
         ),
     save_table = "csv",
-    path = NULL
+    path = NULL,
+    delimiter = ", "
 ) {
     # NSE vs. R CMD check workaround
     .data <- OriginalGroup_PK <- OriginalGroup_data <-
@@ -1554,6 +1596,15 @@ checkmatch_pk_to_data <- function(
     metaproviz_init()
 
     # # ------------ Check Input files ----------- ##
+
+    # # delimiter:
+    if (!is.character(delimiter) || length(delimiter) != 1L || is.na(delimiter) ||
+        trimws(delimiter) == "") {
+        stop("`delimiter` must be a single non-empty character string, e.g. \", \" or \";\".")
+    }
+    # Regex splitting multiple IDs in one data cell; the default ", " gives ", \\s*"
+    data_split_pattern <-
+        paste0(gsub("([][{}()+*^$|\\\\?.])", "\\\\\\1", delimiter), "\\s*")
 
     # # data:
     if ("InputID" %in% names(metadata_info)) {
@@ -1633,9 +1684,9 @@ checkmatch_pk_to_data <- function(
     data_MultipleIDs <-
         any(
             grepl(
-                ", \\s*",
+                data_split_pattern,
                 data[[metadata_info[["InputID"]]]]
-            ) |  # Comma-separated
+            ) |  # Delimiter-separated
                 map_lgl(
                     data[[metadata_info[["InputID"]]]],
                     function(x) {
@@ -1833,7 +1884,8 @@ checkmatch_pk_to_data <- function(
     function(
         df,
         id_col,
-        df_name
+        df_name,
+        split_pattern = ", \\s*"
     ) {
             df %>%
             mutate(
@@ -1845,7 +1897,7 @@ checkmatch_pk_to_data <- function(
             ) %>%
             separate_rows(
                 !!sym(id_col),
-                sep = ", \\s*"
+                sep = split_pattern
             ) %>%
             group_by(
                 row_id
@@ -1862,7 +1914,8 @@ checkmatch_pk_to_data <- function(
             create_long_df(
                 data,
                 metadata_info[["InputID"]],
-                "data"
+                "data",
+                split_pattern = data_split_pattern
             ) %>%
             select(
                 metadata_info[["InputID"]],
@@ -1963,11 +2016,10 @@ checkmatch_pk_to_data <- function(
                     unlist(
                         strsplit(
                             as.character(Values_data[i]),
-                            ", \\s*"
+                            data_split_pattern
                         )
                     )
                 )
-            # delimiter = "," or ", "
 
             # Identify which entries are in the lookup set
             matched <- entries[entries %in% Values_PK]
@@ -1991,6 +2043,29 @@ checkmatch_pk_to_data <- function(
             }
         }
     }
+
+    # Suggested ID per feature. Computed before merging with the PK, where the
+    # data ID column can clash with the PK ID column of the same name.
+    summary_df <-
+        summary_df %>%
+        mutate(
+            InputID_select = case_when(
+                original_count == 1L &
+                matches_count <= 1L
+                    ~as.character(.data[[metadata_info[["InputID"]]]]),
+                original_count >= 2L &
+                matches_count == 0L
+                    ~map_chr(
+                        str_split(.data[[metadata_info[["InputID"]]]], data_split_pattern),
+                        first
+                    ),
+                original_count >= 2L &
+                matches_count == 1L
+                    ~matches,
+                TRUE
+                    ~NA_character_
+            )
+        )
 
     summary_df <-
         merge(
@@ -2097,20 +2172,6 @@ checkmatch_pk_to_data <- function(
                 )
         ) %>%
         mutate(
-            InputID_select = case_when(
-                original_count == 1L &
-                matches_count <= 1L
-                    ~metadata_info[["InputID"]],
-                original_count >= 2L &
-                matches_count == 0L
-                    ~str_split(metadata_info[["InputID"]], ", \\s*") %>%
-                    map_chr(first),
-                original_count >= 2L &
-                matches_count == 1L
-                    ~matches,
-                TRUE
-                    ~NA_character_
-            ),
             Action_Specific = case_when(
                 matches_count >= 2L &
                 Group_Conflict_Notes == "None"
@@ -2121,7 +2182,8 @@ checkmatch_pk_to_data <- function(
                 TRUE
                     ~"None"
             )
-        )
+        ) %>%
+        relocate(InputID_select, .before = Action_Specific)
 
     # 4. Messages and summarise
     message0 <-
@@ -2308,22 +2370,7 @@ seed_id_compatibility_check <- function(
     if (is.null(edge_table)) {
         edge_table <- build_id_edges_bidirectional(selected_types, verbose = verbose)
     } else {
-        required_cols <- c("id1", "type1", "id2", "type2")
-        if (!all(required_cols %in% colnames(edge_table))) {
-            stop(
-                "edge_table must contain columns: id1, type1, id2, type2.",
-                call. = FALSE
-            )
-        }
-        
-        edge_table <- edge_table %>%
-            dplyr::transmute(
-                id1 = as.character(id1),
-                type1 = as.character(type1),
-                id2 = as.character(id2),
-                type2 = as.character(type2)
-            ) %>%
-            dplyr::distinct()
+        edge_table <- normalize_edge_table(edge_table)
     }
     
     priority_types <- normalize_id_types(completely_incompatible_priority)
@@ -2493,6 +2540,9 @@ seed_id_compatibility_check <- function(
 #'     [seed_id_compatibility_check()] on the input before traversal and warn
 #'     about incompatible seed IDs. Set to `FALSE` if the input has already been
 #'     checked, e.g. within [id_processing()]. \strong{Default = TRUE}
+#' @param edge_table Optional precomputed bidirectional edge table with columns
+#'     `id1`, `type1`, `id2`, `type2` (as returned in `ID_Edges_prior_knowledge`).
+#'     If `NULL`, it is built from RaMP. \strong{Default = NULL}
 #' @importFrom dplyr arrange bind_cols bind_rows count distinct filter inner_join mutate pull rename row_number select transmute
 #' @importFrom logger log_warn
 #' @importFrom purrr pmap
@@ -2552,7 +2602,8 @@ traverse_ids <- function(
     save_table = "csv",
     path = NULL,
     verbose = FALSE,
-    run_compatibility_check = TRUE
+    run_compatibility_check = TRUE,
+    edge_table = NULL
 ) {
 
     # NSE vs. R CMD check workaround
@@ -2592,8 +2643,12 @@ traverse_ids <- function(
         }
     }
     
-    edge_table <- build_id_edges_bidirectional(selected_types, verbose = verbose)
-    
+    edge_table <- if (is.null(edge_table)) {
+        build_id_edges_bidirectional(selected_types, verbose = verbose)
+    } else {
+        normalize_edge_table(edge_table)
+    }
+
     compatibility <- NULL
     if (isTRUE(run_compatibility_check)) {
         compatibility <- seed_id_compatibility_check(
@@ -2861,6 +2916,16 @@ id_processing <- function(
     )
     stage_messages <- c(stage_messages, qc_by_stage$input$message)
 
+    # Build (or validate) the RaMP ID edge table once and reuse it for the
+    # compatibility check and the traversal
+    if (isTRUE(run_compatibility_check) || isTRUE(run_traversal)) {
+        edge_table <- if (is.null(edge_table)) {
+            build_id_edges_bidirectional(selected_types, verbose = verbose)
+        } else {
+            normalize_edge_table(edge_table)
+        }
+    }
+
     if (isTRUE(run_compatibility_check)) {
         steps_run <- c(steps_run, "compatibility_check")
         {
@@ -2958,7 +3023,8 @@ id_processing <- function(
             save_table = save_table,
             path = subfolder,
             verbose = verbose,
-            run_compatibility_check = FALSE
+            run_compatibility_check = FALSE,
+            edge_table = edge_table
         )
         step_results$traversal_result <- traversal_result
         current_data <- materialize_traversed_ids(
@@ -3172,6 +3238,32 @@ check_param_id_processing <- function(
         translation_from = translation_from,
         translation_to = translation_to
     )
+}
+
+
+#' Validate a user-supplied ID edge table and coerce it to the internal format
+#'
+#' @noRd
+normalize_edge_table <- function(edge_table) {
+    # NSE vs. R CMD check workaround
+    id1 <- type1 <- id2 <- type2 <- NULL
+
+    required_cols <- c("id1", "type1", "id2", "type2")
+    if (!all(required_cols %in% colnames(edge_table))) {
+        stop(
+            "edge_table must contain columns: id1, type1, id2, type2.",
+            call. = FALSE
+        )
+    }
+
+    edge_table %>%
+        dplyr::transmute(
+            id1 = as.character(id1),
+            type1 = as.character(type1),
+            id2 = as.character(id2),
+            type2 = as.character(type2)
+        ) %>%
+        dplyr::distinct()
 }
 
 
