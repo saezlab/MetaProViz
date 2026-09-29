@@ -37,7 +37,7 @@ jobs:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       R_KEEP_PKG_SOURCE: yes
       R_LIBS_USER: ${{ github.workspace }}/.Rlibrary
-      R_BIOC_VERSION: "3.22"
+      R_BIOC_VERSION: "3.23"
 
     # Only run on push to main/development or scheduled run
     if: |
@@ -92,10 +92,13 @@ jobs:
       # R CMD build doesn't know about Bioconductor by default, so it can't
       # find packages like cosmosR, S4Vectors, or SummarizedExperiment. Writing
       # a .Rprofile here fixes that for every R step in this job, including R CMD build.
+      # R_BIOC_VERSION is pinned explicitly rather than left to auto-detection,
+      # since a cached, older BiocManager can otherwise pick a Bioconductor
+      # version with no binaries for the current R yet.
       - name: Persist Bioconductor repos via .Rprofile
         run: |
           Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")'
-          Rscript -e 'writeLines("options(repos = BiocManager::repositories())", ".Rprofile")'
+          Rscript -e 'writeLines(sprintf("options(repos = BiocManager::repositories(version = \"%s\"))", Sys.getenv("R_BIOC_VERSION")), ".Rprofile")'
 
       # Install knitr to user library (required for vignette building; fixes missing knitr error)
       - name: Install knitr
