@@ -2213,7 +2213,6 @@ core_norm <- function(
 #' @importFrom factoextra fviz_screeplot
 #' @importFrom ggplot2 ggplot theme_classic theme geom_vline annotate geom_line element_text
 #' @importFrom ggplot2 geom_point geom_hline scale_y_continuous ggtitle scale_linetype_discrete
-#' @importFrom qcc mqcc
 #' @importFrom magrittr %>% %<>%
 #' @importFrom tibble rownames_to_column
 #' @importFrom hash values keys hash
@@ -2378,15 +2377,7 @@ outlier_detection <- function(
 
         # # --- HotellingT2 test for outliers
         data_hot <- as.matrix(PCA.res$x[, seq_len(npcs)])
-        hotelling_qcc <-
-            mqcc(
-                data_hot,
-                type = "T2.single",
-                labels = rownames(data_hot),
-                confidence.level = hotellins_confidence,
-                title = paste("Outlier filtering via HotellingT2 test filtering round ", loop, ", with ", hotellins_confidence, "% Confidence", sep = ""),
-                plot = FALSE
-            )
+        hotelling_qcc <- .hotelling_t2_single(data_hot, confidence.level = hotellins_confidence)
         HotellingT2plot_data <- as.data.frame(hotelling_qcc$statistics)
         HotellingT2plot_data <-
             rownames_to_column(
