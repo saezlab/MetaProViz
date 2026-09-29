@@ -89,6 +89,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-r-${{ env.R_VERSION }}
 
+      # R CMD build doesn't know about Bioconductor by default, so it can't
+      # find packages like cosmosR, S4Vectors, or SummarizedExperiment. Writing
+      # a .Rprofile here fixes that for every R step in this job, including R CMD build.
+      - name: Persist Bioconductor repos via .Rprofile
+        run: |
+          Rscript -e 'if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")'
+          Rscript -e 'writeLines("options(repos = BiocManager::repositories())", ".Rprofile")'
+
       # Install knitr to user library (required for vignette building; fixes missing knitr error)
       - name: Install knitr
         run: Rscript -e 'install.packages("knitr", lib = Sys.getenv("R_LIBS_USER"))'
