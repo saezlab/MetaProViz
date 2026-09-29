@@ -1777,6 +1777,7 @@ tic_norm <- function(
 #' control-media metadata available via `metadata_info`.
 #'
 #' @examples
+#' data(medium_raw)
 #' Media <-
 #'     medium_raw %>%
 #'     tibble::column_to_rownames("Code") %>%

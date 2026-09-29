@@ -34,6 +34,7 @@ control-media metadata available via \code{metadata_info}.
 Normalize consumption release data
 }
 \examples{
+data(medium_raw)
 Media <-
     medium_raw \%>\%
     tibble::column_to_rownames("Code") \%>\%
