@@ -2624,7 +2624,14 @@ outlier_detection <- function(
     # # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## # ## #
     # # --- Add final QC PCA data
     # Compute PCA on original data with zero-variance metabolites removed (matches viz_pca plots)
-    qc_pca_final <- prcomp(as.data.frame(data) %>% dplyr::select(-zero_var_metab_export_df$Metabolite), center = TRUE, scale. = TRUE)
+    data_no_na <- data
+    if (any(is.na(data_no_na))) {
+        data_no_na[is.na(data_no_na)] <- 0  # replace NA with 0
+        na_message <- paste("NA values are included in data that were set to 0 prior to performing PCA.")
+        log_info(na_message)
+        message(na_message)
+    }
+    qc_pca_final <- prcomp(as.data.frame(data_no_na) %>% dplyr::select(-zero_var_metab_export_df$Metabolite), center = TRUE, scale. = TRUE)
     DF_list[["QC_PCA_scores_Final"]] <- as.data.frame(qc_pca_final$x) %>% rownames_to_column("Sample")
     DF_list[["QC_PCA_loadings_Final"]] <- as.data.frame(qc_pca_final$rotation) %>% rownames_to_column("Metabolite")
     DF_list[["QC_PCA_variance_Final"]] <- data.frame(
