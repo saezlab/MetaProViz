@@ -145,9 +145,14 @@ jobs:
       - name: Install ComplexUpset from source
         run: Rscript -e 'install.packages("ComplexUpset", type="source")'
 
-      # Re-install OmnipathR devel last to guarantee this is the version used for build/check
+      # Re-install OmnipathR devel last to guarantee this is the version used for build/check.
+      # dependencies=FALSE assumes OmnipathR's own deps are already installed from the
+      # earlier devel-install step; if any of those silently failed to install there,
+      # this step has no fallback and errors with "dependencies ... are not available".
+      # Installing them explicitly here first guards against that.
       - name: Reinstall OmnipathR from devel (final)
         run: |
+          Rscript -e 'install.packages(c("curl", "fs", "httr2", "rmarkdown", "rvest"))'
           Rscript -e 'remotes::install_github("saezlab/OmnipathR@devel", force=TRUE, upgrade="never", dependencies=FALSE)'
           Rscript -e 'cat("OmnipathR version used: ", as.character(packageVersion("OmnipathR")), "\n", sep = "")'
 
