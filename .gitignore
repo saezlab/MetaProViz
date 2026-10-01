@@ -2,3 +2,13 @@
 MetaProViz.Rproj
 /doc/
 /Meta/
+
+# R session files
+.RData
+.Rhistory
+
+# Output and logs written when running functions or knitting vignettes
+MetaProViz_Results/
+metaproviz-log*/
+omnipathr-log*/
+vignettes/**/*_files/
