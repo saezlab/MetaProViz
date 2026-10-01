@@ -64,7 +64,7 @@ Imports:
     OmnipathR (>= 3.19.12),
     patchwork,
     pheatmap,
-    Polychrome (< 1.5.4),
+    Polychrome,
     purrr,
     qvalue,
     rappdirs,
