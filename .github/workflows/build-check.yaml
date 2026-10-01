@@ -52,10 +52,14 @@ jobs:
       # Setup Pandoc (required for vignette and markdown rendering)
       - uses: r-lib/actions/setup-pandoc@v2
 
-      # Install system dependency for glpk (required by some R packages on Ubuntu)
-      - name: Install libglpk40
+      # Install system dependencies for Ubuntu. libglpk40 for igraph/CARNIVAL;
+      # libcurl4-openssl-dev for the curl R package (needed by httr/httr2/rvest/
+      # rmarkdown transitively); libuv1-dev for the fs R package (needed by
+      # OmnipathR). Without these, those R packages fail to compile from source
+      # with "fatal error: curl/curl.h" / "fatal error: uv.h" respectively.
+      - name: Install system dependencies (Ubuntu)
         if: ${{ matrix.config.os == 'ubuntu-latest' }}
-        run: sudo apt-get install -y libglpk40
+        run: sudo apt-get install -y libglpk40 libcurl4-openssl-dev libuv1-dev
 
       # Install XQuartz for graphics on macOS (required by some R packages)
       - name: Install xquartz (Mac OS)
@@ -145,14 +149,9 @@ jobs:
       - name: Install ComplexUpset from source
         run: Rscript -e 'install.packages("ComplexUpset", type="source")'
 
-      # Re-install OmnipathR devel last to guarantee this is the version used for build/check.
-      # dependencies=FALSE assumes OmnipathR's own deps are already installed from the
-      # earlier devel-install step; if any of those silently failed to install there,
-      # this step has no fallback and errors with "dependencies ... are not available".
-      # Installing them explicitly here first guards against that.
+      # Re-install OmnipathR devel last to guarantee this is the version used for build/check
       - name: Reinstall OmnipathR from devel (final)
         run: |
-          Rscript -e 'install.packages(c("curl", "fs", "httr2", "rmarkdown", "rvest"))'
           Rscript -e 'remotes::install_github("saezlab/OmnipathR@devel", force=TRUE, upgrade="never", dependencies=FALSE)'
           Rscript -e 'cat("OmnipathR version used: ", as.character(packageVersion("OmnipathR")), "\n", sep = "")'
 
