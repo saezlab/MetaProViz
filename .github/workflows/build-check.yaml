@@ -55,11 +55,14 @@ jobs:
       # Install system dependencies for Ubuntu. libglpk40 for igraph/CARNIVAL;
       # libcurl4-openssl-dev for the curl R package (needed by httr/httr2/rvest/
       # rmarkdown transitively); libuv1-dev for the fs R package (needed by
-      # OmnipathR). Without these, those R packages fail to compile from source
-      # with "fatal error: curl/curl.h" / "fatal error: uv.h" respectively.
+      # OmnipathR); libpng-dev for the sysfonts R package (needed by showtext,
+      # pulled in transitively by ggraph/factoextra's plotting stack). Without
+      # these, those R packages fail to compile from source with
+      # "fatal error: curl/curl.h" / "fatal error: uv.h" / "libpng not found"
+      # respectively.
       - name: Install system dependencies (Ubuntu)
         if: ${{ matrix.config.os == 'ubuntu-latest' }}
-        run: sudo apt-get install -y libglpk40 libcurl4-openssl-dev libuv1-dev
+        run: sudo apt-get install -y libglpk40 libcurl4-openssl-dev libuv1-dev libpng-dev
 
       # Install XQuartz for graphics on macOS (required by some R packages)
       - name: Install xquartz (Mac OS)
