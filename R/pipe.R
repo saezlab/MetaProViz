@@ -28,6 +28,9 @@
 #' @param rhs A function call using the magrittr semantics.
 #' @return The result of calling \code{rhs(lhs)}.
 #'
+#' @examples
+#' c(1, 4, 9) %>% sqrt()
+#'
 #' @importFrom magrittr %>%
 #' @export
 NULL
