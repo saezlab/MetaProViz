@@ -90,57 +90,14 @@ via the \code{class_col} attribute in \code{metadata_info}) that is used for
 grouping in the UpSet plot.
 }
 \examples{
-\dontrun{
-## Example 1: Within-Resource Comparison
-## (Comparing Columns Within a Single data Frame)
-
-# biocrates_features is a data frame with columns:
-# "TrivialName", "CHEBI", "HMDB", "LIMID", and "Class".
-# Here the "Class" column is used as the grouping variable
-# in the UpSet plot.
+## Within-resource comparison of the ID columns of the Biocrates kit
 data(biocrates_features)
-data_single <- list(Biocft = biocrates_features)
-metadata_info_single <- list(Biocft = c("CHEBI", "HMDB", "LIMID"))
-
-res_single <-
-compare_pk(
-data = data_single, metadata_info = metadata_info_single,
-plot_name = "Overlap of BioCrates Columns"
+res_single <- compare_pk(
+    data = list(Biocft = biocrates_features),
+    metadata_info = list(Biocft = c("CHEBI", "HMDB", "LIMID")),
+    plot_name = "Overlap of BioCrates Columns",
+    save_plot = NULL,
+    save_table = NULL
 )
-
-## Example 2: Custom data Frames with Custom Column Names
-
-# Example with preloaded data frames and custom column names:
-hallmarks_df <- data.frame(
-feature = c("HMDB0001", "GENE1", "GENE2"),
-stringsAsFactors = FALSE
-)
-gaude_df <- data.frame(
-feature = c("GENE2", "GENE3"),
-stringsAsFactors = FALSE
-)
-metalinks_df <- data.frame(
-hmdb = c("HMDB0001", "HMDB0002"),
-gene_symbol = c("GENE1", "GENE4"),
-stringsAsFactors = FALSE
-)
-ramp_df <- data.frame(
-class_source_id = c("HMDB0001", "HMDB0003"),
-stringsAsFactors = FALSE
-)
-data <- list(
-Hallmarks = hallmarks_df, Gaude = gaude_df,
-MetalinksDB = metalinks_df, RAMP = ramp_df
-)
-metadata_info <- list(
-Hallmarks = "feature", Gaude = "feature",
-MetalinksDB = c("hmdb", "gene_symbol"),
-RAMP = "class_source_id"
-)
-res <- compare_pk(
-data = data, metadata_info = metadata_info,
-filter_by = "metabolite"
-)
-}
 
 }

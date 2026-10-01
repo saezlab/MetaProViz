@@ -125,30 +125,28 @@ before matching. Metabolite names are encouraged but not required. If
 corresponding normalized HMDB identifiers are used as metabolite labels.
 }
 \examples{
-\dontrun{
-metalinks_transporters <- metsigdb_metalinks(
-    cell_location = c("Extracellular"),
-    tissue_location = c("Kidney", "All Tissues"),
-    biospecimen_location = c("Blood", "Urine")
-) |>
-    dplyr::filter(stringr::str_detect(tolower(protein_type_clean), "transporter")) |>
-    dplyr::distinct(hmdb, .keep_all = TRUE) |>
-    dplyr::slice_head(n = 10)
+# Biocrates amino acids, matched to MetaLinks transporters via HMDB
+data(biocrates_features)
+amino_acids <- biocrates_features |>
+    dplyr::filter(Class == "Aminoacids") |>
+    dplyr::select(TrivialName, HMDB)
+aa_hmdb <- trimws(unlist(strsplit(amino_acids$HMDB, ",")))
 
-feature_metadata <- metalinks_transporters |>
-    dplyr::transmute(
-        Metabolite = dplyr::coalesce(.data$metabolite, .data$hmdb),
-        hmdb = .data$hmdb
+transporters <- metsigdb_metalinks(
+    hmdb_ids = aa_hmdb,
+    save_table = NULL,
+    exclude_metabolites = NULL
+) |>
+    dplyr::filter(
+        stringr::str_detect(tolower(protein_type_clean), "transporter")
     )
 
-viz_metabolite_protein_network(
-    feature_metadata = feature_metadata,
-    metalinks_df = metalinks_transporters,
-    metabolite_col = "Metabolite",
-    hmdb_col = "hmdb",
-    save_plot = NULL,
-    print_plot = FALSE
+network <- viz_metabolite_protein_network(
+    feature_metadata = amino_acids,
+    metalinks_df = transporters,
+    metabolite_col = "TrivialName",
+    hmdb_col = "HMDB",
+    hmdb_sep = ", "
 )
-}
 
 }

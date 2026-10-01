@@ -96,31 +96,29 @@
 #' If `return_data = FALSE`, the plot is returned invisibly.
 #'
 #' @examples
-#' \dontrun{
-#' metalinks_transporters <- metsigdb_metalinks(
-#'     cell_location = c("Extracellular"),
-#'     tissue_location = c("Kidney", "All Tissues"),
-#'     biospecimen_location = c("Blood", "Urine")
-#' ) |>
-#'     dplyr::filter(stringr::str_detect(tolower(protein_type_clean), "transporter")) |>
-#'     dplyr::distinct(hmdb, .keep_all = TRUE) |>
-#'     dplyr::slice_head(n = 10)
+#' # Biocrates amino acids, matched to MetaLinks transporters via HMDB
+#' data(biocrates_features)
+#' amino_acids <- biocrates_features |>
+#'     dplyr::filter(Class == "Aminoacids") |>
+#'     dplyr::select(TrivialName, HMDB)
+#' aa_hmdb <- trimws(unlist(strsplit(amino_acids$HMDB, ",")))
 #'
-#' feature_metadata <- metalinks_transporters |>
-#'     dplyr::transmute(
-#'         Metabolite = dplyr::coalesce(.data$metabolite, .data$hmdb),
-#'         hmdb = .data$hmdb
+#' transporters <- metsigdb_metalinks(
+#'     hmdb_ids = aa_hmdb,
+#'     save_table = NULL,
+#'     exclude_metabolites = NULL
+#' ) |>
+#'     dplyr::filter(
+#'         stringr::str_detect(tolower(protein_type_clean), "transporter")
 #'     )
 #'
-#' viz_metabolite_protein_network(
-#'     feature_metadata = feature_metadata,
-#'     metalinks_df = metalinks_transporters,
-#'     metabolite_col = "Metabolite",
-#'     hmdb_col = "hmdb",
-#'     save_plot = NULL,
-#'     print_plot = FALSE
+#' network <- viz_metabolite_protein_network(
+#'     feature_metadata = amino_acids,
+#'     metalinks_df = transporters,
+#'     metabolite_col = "TrivialName",
+#'     hmdb_col = "HMDB",
+#'     hmdb_sep = ", "
 #' )
-#' }
 #'
 #' @importFrom logger log_info
 #' @export
@@ -459,6 +457,9 @@ viz_metabolite_protein_network <- function(
 
 #' @noRd
 .expand_feature_hmdb <- function(feature_input, hmdb_sep) {
+    # NSE vs. R CMD check workaround
+    hmdb_input <- NULL
+
     feature_input |>
         dplyr::transmute(
             .feature_row_id = .data$.feature_row_id,
@@ -781,6 +782,9 @@ viz_metabolite_protein_network <- function(
 
 #' @noRd
 .make_metalinks_network_plot <- function(nodes, edges, plot_name, label_repel) {
+    # NSE vs. R CMD check workaround
+    regulation <- n_matches <- node_type <- label <- NULL
+
     graph <- igraph::graph_from_data_frame(edges, directed = TRUE, vertices = nodes)
 
     edge_colors <- c(

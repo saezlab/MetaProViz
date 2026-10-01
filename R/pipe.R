@@ -16,10 +16,18 @@
 #  Git repo: https://github.com/saezlab/MetaProViz
 #
 
+#' Pipe operator
 #'
-#' @return The left-hand side object, passed into the function on the right-hand
-#'     side.
+#' See \code{magrittr::\link[magrittr:\%>\%]{\%>\%}} for details.
+#'
+#' @name %>%
+#' @rdname pipe
+#' @keywords internal
+#' @usage lhs \%>\% rhs
+#' @param lhs A value or the magrittr placeholder.
+#' @param rhs A function call using the magrittr semantics.
+#' @return The result of calling \code{rhs(lhs)}.
 #'
 #' @importFrom magrittr %>%
 #' @export
-magrittr::`%>%`
+NULL

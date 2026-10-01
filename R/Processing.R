@@ -1615,6 +1615,7 @@ tic_norm <- function(
 
     # NSE vs. R CMD check workaround
     median <- NULL
+    Samples <- Intensity <- NULL
     ## ------------------ Prepare the data ------------------- ##
     NA_removed_matrix <- data
     NA_removed_matrix[is.na(NA_removed_matrix)] <- 0  # replace NA with 0
