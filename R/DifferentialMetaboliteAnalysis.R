@@ -3002,11 +3002,13 @@ mpv_shapiro <- function(
                     select = -c(1)
                 )
             all_data <- unlist(subset_data)
+            hist_bins <- histogram_bins(all_data)
 
             plot <- ggplot(data.frame(x = all_data), aes(x = x)) +
                 geom_histogram(
                     aes(y = after_stat(density)),
-                    binwidth = .5,
+                    binwidth = hist_bins$binwidth,
+                    bins = hist_bins$bins,
                     colour = "black",
                     fill = "white"
                 ) +
@@ -3019,7 +3021,8 @@ mpv_shapiro <- function(
             ) +
                 geom_histogram(
                     aes(y = after_stat(density)),
-                    binwidth = .5,
+                    binwidth = hist_bins$binwidth,
+                    bins = hist_bins$bins,
                     colour = "black",
                     fill = "white"
                 ) +
@@ -3043,7 +3046,8 @@ mpv_shapiro <- function(
                 ) +
                 geom_histogram(
                     aes(y = after_stat(density)),
-                    binwidth = .5,
+                    binwidth = hist_bins$binwidth,
+                    bins = hist_bins$bins,
                     colour = "black",
                     fill = "white"
                 ) +

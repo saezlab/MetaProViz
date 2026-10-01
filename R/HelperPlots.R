@@ -28,6 +28,43 @@ if_null <- function(
 }
 
 
+#' Histogram bin settings with a standard binwidth
+#'
+#' Keeps the standard MetaProViz binwidth, unless the range of the data would
+#' need more than `max_bins` bins (e.g. raw intensities). In that case a fixed
+#' number of bins is used instead. The result can be passed to the `binwidth`
+#' and `bins` arguments of `ggplot2::geom_histogram()`.
+#'
+#' @param x Numeric vector of the values to plot.
+#' @param binwidth Standard binwidth.
+#' @param max_bins Maximum number of bins before falling back to `bins`.
+#' @param bins Number of bins used for the fallback.
+#'
+#' @return List with elements `binwidth` and `bins`, one of them NULL.
+#'
+#' @importFrom logger log_info
+#' @noRd
+histogram_bins <- function(
+    x,
+    binwidth = 0.5,
+    max_bins = 1000L,
+    bins = 30L
+) {
+    x <- x[is.finite(x)]
+    n_bins <- if (length(x)) diff(range(x)) / binwidth else 0
+
+    if (n_bins > max_bins) {
+        log_info(sprintf(
+            "Histogram: binwidth %s would need %.0f bins, using %i bins instead.",
+            binwidth, n_bins, bins
+        ))
+        return(list(binwidth = NULL, bins = bins))
+    }
+
+    list(binwidth = binwidth, bins = NULL)
+}
+
+
 #' Convert string lengths to centimeters
 #'
 #' @noRd
