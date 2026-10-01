@@ -132,8 +132,8 @@ Plot_Sized %<>%
 
 Plot_Sized_Media <- Plot_Sized
 
-# Combine all three plots into one figure and save to vignettes/
-output_file <- "vignettes/readme-example-data.png"
+# Combine all three plots into one figure and save to man/figures/ (used by the README)
+output_file <- "man/figures/readme-example-data.png"
 
 # Create the combined plot and save it
 png(output_file, width = 2400, height = 800, res = 150)
