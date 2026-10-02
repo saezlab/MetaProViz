@@ -80,7 +80,7 @@ Computer Configuration > Administrative Templates > System > Filesystem > Enable
 
 ## License
 
-GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
+BSD 3-Clause License, see [LICENSE.md](LICENSE.md).
 
 ## Contributors
 

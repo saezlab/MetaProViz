@@ -8,9 +8,9 @@
 #
 #  Authors: see the file `README.md`
 #
-#  Distributed under the GNU GPLv3 License.
-#  See accompanying file `LICENSE` or copy at
-#      https://www.gnu.org/licenses/gpl-3.0.html
+#  Distributed under the BSD 3-Clause License.
+#  See accompanying file `LICENSE.md` or copy at
+#      https://opensource.org/license/bsd-3-clause
 #
 #  Website: https://saezlab.github.io/MetaProViz
 #  Git repo: https://github.com/saezlab/MetaProViz
