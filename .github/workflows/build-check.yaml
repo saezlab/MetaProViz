@@ -65,12 +65,14 @@ jobs:
       #   (SystemRequirements: freetype2, harfbuzz, fribidi)
       # - libtiff-dev, libjpeg-dev, libwebp-dev: ragg
       #   (SystemRequirements: freetype2, libpng, libtiff, libjpeg, libwebp)
+      # - libmagick++-dev: magick (suggested; crops plots in the pkgdown
+      #   vignettes) (SystemRequirements: ImageMagick++)
       - name: Install system dependencies (Ubuntu)
         if: ${{ matrix.config.os == 'ubuntu-latest' }}
         run: |
           sudo apt-get install -y libglpk40 libcurl4-openssl-dev libuv1-dev \
             libpng-dev libfreetype6-dev libfontconfig1-dev libharfbuzz-dev \
-            libfribidi-dev libtiff-dev libjpeg-dev libwebp-dev
+            libfribidi-dev libtiff-dev libjpeg-dev libwebp-dev libmagick++-dev
 
       # Install XQuartz for graphics on macOS (required by some R packages)
       - name: Install xquartz (Mac OS)
