@@ -1966,6 +1966,7 @@ check_param_VizGraph <- function(
 #' @param label_degree_min Minimum degree required when `label_mode = "reduced"`.
 #' @param plot_metabolite_interaction_overlap Logical flag for returning a
 #'     metabolite-only interaction-overlap graph.
+#' @param seed NULL or a single number used as seed for the graph layout.
 #'
 #' @return Invisible TRUE if checks pass.
 #'
@@ -1988,7 +1989,8 @@ check_param_VizMetaboliteProteinNetwork <- function(
     label_max_chars,
     label_repel,
     label_degree_min,
-    plot_metabolite_interaction_overlap
+    plot_metabolite_interaction_overlap,
+    seed = NULL
 ) {
     if (!is.data.frame(feature_metadata)) {
         stop("`feature_metadata` must be a data.frame.")
@@ -2059,6 +2061,9 @@ check_param_VizMetaboliteProteinNetwork <- function(
         length(plot_metabolite_interaction_overlap) != 1L ||
         is.na(plot_metabolite_interaction_overlap)) {
         stop("`plot_metabolite_interaction_overlap` must be TRUE or FALSE.")
+    }
+    if (!is.null(seed) && (!is.numeric(seed) || length(seed) != 1L || is.na(seed))) {
+        stop("`seed` must be NULL or a single number.")
     }
 
     save_plot_options <- c("svg", "pdf", "png")

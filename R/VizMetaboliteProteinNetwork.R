@@ -73,6 +73,10 @@
 #' @param plot_metabolite_interaction_overlap \emph{Optional: } If `TRUE`,
 #'     additionally return a metabolite-only graph in which two metabolites are
 #'     linked when they share protein interaction partners. \strong{Default = FALSE}
+#' @param seed \emph{Optional: } Integer seed for the force-directed graph
+#'     layout. With `NULL`, the layout changes between calls; set a seed to get
+#'     a reproducible layout. The global random seed is not changed.
+#'     \strong{Default = NULL}
 #'
 #' @return If `return_data = TRUE`, a list with the following elements:
 #' \describe{
@@ -140,7 +144,8 @@ viz_metabolite_protein_network <- function(
     label_max_chars = 20,
     label_repel = TRUE,
     label_degree_min = 2,
-    plot_metabolite_interaction_overlap = FALSE
+    plot_metabolite_interaction_overlap = FALSE,
+    seed = NULL
 ) {
     check_param_VizMetaboliteProteinNetwork(
         feature_metadata = feature_metadata,
@@ -160,7 +165,8 @@ viz_metabolite_protein_network <- function(
         label_max_chars = label_max_chars,
         label_repel = label_repel,
         label_degree_min = label_degree_min,
-        plot_metabolite_interaction_overlap = plot_metabolite_interaction_overlap
+        plot_metabolite_interaction_overlap = plot_metabolite_interaction_overlap,
+        seed = seed
     )
 
     logger::log_info("viz_metabolite_protein_network: Metalinks metabolite-protein network")
@@ -298,7 +304,8 @@ viz_metabolite_protein_network <- function(
         nodes = nodes,
         edges = edges,
         plot_name = plot_name,
-        label_repel = label_repel
+        label_repel = label_repel,
+        seed = seed
     )
 
     if (isTRUE(print_plot)) {
@@ -310,7 +317,8 @@ viz_metabolite_protein_network <- function(
         metabolite_interaction_overlap <- .make_metabolite_interaction_overlap(
             nodes = nodes,
             edges = edges,
-            plot_name = paste0(plot_name, ": metabolite interaction overlap")
+            plot_name = paste0(plot_name, ": metabolite interaction overlap"),
+            seed = seed
         )
         if (isTRUE(print_plot) && !is.null(metabolite_interaction_overlap$plot)) {
             print(metabolite_interaction_overlap$plot)
@@ -667,7 +675,7 @@ viz_metabolite_protein_network <- function(
 }
 
 #' @noRd
-.make_metabolite_interaction_overlap <- function(nodes, edges, plot_name) {
+.make_metabolite_interaction_overlap <- function(nodes, edges, plot_name, seed = NULL) {
     node_types <- stats::setNames(nodes$node_type, nodes$name)
     n_matches <- if ("n_matches" %in% colnames(edges)) {
         suppressWarnings(as.numeric(edges$n_matches))
@@ -732,8 +740,7 @@ viz_metabolite_protein_network <- function(
         )
     }
 
-    set.seed(123)
-    plot <- ggraph::ggraph(graph, layout = "fr") +
+    plot <- .network_layout(graph, seed) +
         ggraph::geom_edge_link(
             ggplot2::aes(width = .data$weight, label = .data$weight),
             colour = "grey45",
@@ -781,7 +788,7 @@ viz_metabolite_protein_network <- function(
 }
 
 #' @noRd
-.make_metalinks_network_plot <- function(nodes, edges, plot_name, label_repel) {
+.make_metalinks_network_plot <- function(nodes, edges, plot_name, label_repel, seed = NULL) {
     # NSE vs. R CMD check workaround
     regulation <- n_matches <- node_type <- label <- NULL
 
@@ -809,8 +816,7 @@ viz_metabolite_protein_network <- function(
     node_shapes <- c("Metabolite" = 21, "Protein" = 22)
     node_fills <- c("Metabolite" = "#fdb863", "Protein" = "#80b1d3")
 
-    set.seed(123)
-    plot_obj <- ggraph::ggraph(graph, layout = "fr") +
+    plot_obj <- .network_layout(graph, seed) +
         ggraph::geom_edge_link(
             ggplot2::aes(
                 color = interaction,
@@ -870,6 +876,15 @@ viz_metabolite_protein_network <- function(
 }
 
 #' @noRd
+# Force-directed (Fruchterman-Reingold) layout of the graph. The layout is
+# random; with a seed it is reproducible, without changing the global seed.
+.network_layout <- function(graph, seed = NULL) {
+    if (is.null(seed)) {
+        return(ggraph::ggraph(graph, layout = "fr"))
+    }
+    withr::with_seed(seed, ggraph::ggraph(graph, layout = "fr"))
+}
+
 .save_metalinks_network_plot <- function(plot, save_plot, path, plot_name, width, height) {
     if (is.null(save_plot)) {
         return(character(0))

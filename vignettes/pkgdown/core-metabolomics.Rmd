@@ -693,7 +693,8 @@ MetaLinks_Network <- viz_metabolite_protein_network(
     hmdb_col = "core_DF_HMDB",
     save_plot = NULL,
     print_plot = TRUE,
-    label_mode = "all"
+    label_mode = "all",
+    seed = 123
 )
 ```
 

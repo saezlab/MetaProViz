@@ -22,7 +22,8 @@ viz_metabolite_protein_network(
   label_max_chars = 20,
   label_repel = TRUE,
   label_degree_min = 2,
-  plot_metabolite_interaction_overlap = FALSE
+  plot_metabolite_interaction_overlap = FALSE,
+  seed = NULL
 )
 }
 \arguments{
@@ -89,6 +90,11 @@ labeling when \code{label_mode = "reduced"}. \strong{Default = 2}}
 \item{plot_metabolite_interaction_overlap}{\emph{Optional: } If \code{TRUE},
 additionally return a metabolite-only graph in which two metabolites are
 linked when they share protein interaction partners. \strong{Default = FALSE}}
+
+\item{seed}{\emph{Optional: } Integer seed for the force-directed graph
+layout. With \code{NULL}, the layout changes between calls; set a seed to get
+a reproducible layout. The global random seed is not changed.
+\strong{Default = NULL}}
 }
 \value{
 If \code{return_data = TRUE}, a list with the following elements:
