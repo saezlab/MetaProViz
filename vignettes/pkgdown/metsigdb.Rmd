@@ -14,7 +14,6 @@ vignette: >
 bibliography: metsigdb.bib
 link-citations: true
 resource_files:
-    - figures/Hexagon_MetaProViz.png
     - figures/MetSigDB.svg
 editor_options:
   chunk_output_type: console
@@ -25,8 +24,6 @@ editor_options:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", message = FALSE, warning = FALSE)
 ```
-
-# <img src="figures/Hexagon_MetaProViz.png" align="right" width="200"/> {-}
 
 \
 [In this tutorial we take a closer look at the prior knowledge resources collected in **MetSigDB**]{style="text-decoration:underline"}:\
