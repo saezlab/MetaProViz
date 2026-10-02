@@ -17,7 +17,6 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 bibliography: bibliography.bib
 resource_files:
-  - figures/Hexagon_MetaProViz.png
   - figures/id-processing-workflow-scheme.svg
 editor_options:
   chunk_output_type: console
@@ -39,8 +38,6 @@ preview_table <- function(x, ...) {
     )
 }
 ```
-
-# <img src="figures/Hexagon_MetaProViz.png" align="right" width="200" /> {-}
 
 This vignette demonstrates the `id_processing()` workflow for feature metadata in **MetaProViz**. The function can quantify the current ID space, perform automatic seed-ID compatibility handling, and expand the ID space through graph traversal.
 
@@ -223,61 +220,100 @@ id_traversal <- id_processing(
 
 ## Inspecting traversal results
 
-The traversal return object retains the data, summaries, and traversal artifacts needed to inspect each stage of the workflow.
+`id_processing()` returns a list with three parts:
 
-```{r id-processing-traversal-structure, eval=TRUE}
-names(id_traversal)
-names(id_traversal$Data)
-names(id_traversal$Plot)
-names(id_traversal$Workflow)
-names(id_traversal$Data$traversal)
-```
+- **`Data`**: the result tables.
+    - `input`, `after_compatibility` and `after_traversal`: the feature metadata after each stage. They keep all rows and columns of the input (here plus the `CHEBI` column, which was added because `tissue_meta` has none); only the ID columns change.
+    - `id_count_summary`: one row per stage and ID type with the number of features without, with one and with several IDs.
+    - `compare_pk_summary_by_stage`: for each stage, one row per feature with a flag for every ID type it has. These are the data behind the overlap plots below.
+    - `count_id_tables_by_stage`: for each stage and ID type, the feature metadata with the number of IDs per feature (`entry_count`, `id_label`). These are the data behind the IDs-per-feature plots below.
+    - `compatibility`: the quality control (QC) of the compatibility check. `feature_summary` has one row per feature, `pairs_before_handling` and `pairs_after_handling` one row per pair of seed IDs of a feature.
+    - `traversal`: `prior_knowledge_edges`, the ID mapping graph that was used for the traversal (one row per mapping between two IDs).
+- **`Plot`**: the overlap (`compare_pk()`) and IDs-per-feature (`count_id()`) plots of each stage.
+- **`Workflow`**: the settings, the steps that were run, and a message per stage.
 
-The `Data` section contains the input metadata and the metadata produced by the compatibility and traversal stages:
+In most cases, the feature metadata after traversal is what you continue with, and the other tables explain how it was created. As examples, we compare three of these tables between the input and the end of the workflow (after traversal): the feature metadata, the ID coverage per feature, and the ID counts per ID type.
 
-```{r id-processing-traversal-data-1, eval=TRUE}
-preview_table(utils::head(id_traversal$Data$input[, c("Metabolite", "HMDB", "KEGG", "CHEBI", "PUBCHEM")], 10L))
-preview_table(utils::head(id_traversal$Data$after_compatibility[, c("Metabolite", "HMDB", "KEGG", "CHEBI", "PUBCHEM")], 10L))
-preview_table(utils::head(id_traversal$Data$after_traversal[, c("Metabolite", "HMDB", "KEGG", "CHEBI", "PUBCHEM")], 10L))
-```
+### Feature metadata
 
-```{r id-processing-traversal-data-2, eval=TRUE}
-preview_table(id_traversal$Data$id_count_summary, caption = "ID-count summary across traversal stages")
-```
+We pick four features that show the typical outcomes:
 
-The `compare_pk()` summaries and `count_id()` tables are retained for every stage and namespace:
-
-```{r id-processing-traversal-data-3, eval=TRUE}
-preview_table(utils::head(id_traversal$Data$compare_pk_summary_by_stage$input, 10L))
-preview_table(utils::head(id_traversal$Data$compare_pk_summary_by_stage$after_compatibility, 10L))
-preview_table(utils::head(id_traversal$Data$compare_pk_summary_by_stage$after_traversal, 10L))
-```
-
-```{r id-processing-traversal-data-4, eval=TRUE}
-preview_table(utils::head(id_traversal$Data$count_id_tables_by_stage$input$HMDB, 10L))
-preview_table(utils::head(id_traversal$Data$count_id_tables_by_stage$after_traversal$HMDB, 10L))
-preview_table(utils::head(id_traversal$Data$count_id_tables_by_stage$after_traversal$KEGG, 10L))
-preview_table(utils::head(id_traversal$Data$count_id_tables_by_stage$after_traversal$CHEBI, 10L))
-preview_table(utils::head(id_traversal$Data$count_id_tables_by_stage$after_traversal$PUBCHEM, 10L))
-```
-
-The traversal-specific pair-compatibility and edge tables provide the underlying mapping information:
-
-```{r id-processing-traversal-raw, eval=TRUE}
-preview_table(utils::head(id_traversal$Data$traversal$pair_compatibility, 10L))
-preview_table(utils::head(id_traversal$Data$traversal$prior_knowledge_edges, 10L))
-```
-
-```{r id-processing-traversal-workflow, eval=TRUE}
-preview_table(
-    tibble::enframe(id_traversal$Workflow$settings, name = "Setting", value = "Value") |>
-        mutate(Value = vapply(Value, function(x) paste(unlist(x), collapse = ", "), character(1)), .keep = "unused"),
-    caption = "Workflow settings"
+```{r id-processing-example-features}
+example_features <- c(
+    "1,2-propanediol",
+    "1-arachidonoylglycerophosphoethanolamine*",
+    "1,3-dihydroxyacetone",
+    "1-oleoylglycerophosphoinositol*"
 )
-preview_table(tibble::tibble(Order = seq_along(id_traversal$Workflow$steps_run), Step = id_traversal$Workflow$steps_run), caption = "Enabled workflow steps")
-preview_table(tibble::enframe(id_traversal$Workflow$stage_messages, name = "Stage", value = "Message"), caption = "Stage messages")
-preview_table(tibble::tibble(Result = id_traversal$Workflow$result_overview_text), caption = "Workflow result overview")
+id_columns <- c("Metabolite", "HMDB", "KEGG", "CHEBI", "PUBCHEM")
+
+preview_table(
+    id_traversal$Data$input %>%
+        filter(Metabolite %in% example_features) %>%
+        select(all_of(id_columns)),
+    caption = "Input: IDs of the example features."
+)
+preview_table(
+    id_traversal$Data$after_traversal %>%
+        filter(Metabolite %in% example_features) %>%
+        select(all_of(id_columns)),
+    caption = "After traversal: IDs of the same features."
+)
 ```
+
+The traversal follows the mappings between ID types and adds every ID it reaches from the seed IDs of a feature. All IDs are also written in a standard format, e.g. HMDB IDs with seven digits (`HMDB01881` becomes `HMDB0001881`), ChEBI IDs with the `CHEBI:` prefix and PubChem IDs with the `CID` prefix.
+
+- *1-arachidonoylglycerophosphoethanolamine\** only had an HMDB ID; the traversal adds a ChEBI and a PubChem ID.
+- *1,3-dihydroxyacetone* had HMDB, KEGG and PubChem IDs that all describe the same molecule, and it gains a ChEBI ID.
+- *1-oleoylglycerophosphoinositol\** has no ID at all, so there is nothing to start the traversal from, and it stays without IDs.
+- *1,2-propanediol* gets a different KEGG ID than it had in the input. This is the result of the compatibility check, which is the QC step before the traversal. Its HMDB and KEGG IDs could not be linked to each other, so they likely describe different molecules:
+
+```{r id-processing-qc-example}
+preview_table(
+    id_traversal$Data$compatibility$pairs_before_handling %>%
+        filter(Metabolite == "1,2-propanediol") %>%
+        select(Metabolite, seed1_type, seed1_id, seed2_type, seed2_id,
+               pair_compatible, compatibility_path, n_seed_ids, all_seed_ids_compatible),
+    caption = "Compatibility check of the seed IDs of 1,2-propanediol."
+)
+```
+
+Each row is one pair of seed IDs of a feature. `pair_compatible` tells whether the two IDs could be linked through the mapping graph, and `compatibility_path` how: `direct` (one ID maps to the other), `secondary` (via a third ID) or `no_match`. `all_seed_ids_compatible` is `TRUE` if all pairs of the feature are compatible. Features where no pair is compatible are *completely incompatible*. For those, `id_processing()` keeps only the ID type that comes first in `completely_incompatible_priority` (here HMDB) and removes the others. The traversal then starts from the HMDB ID alone and adds the KEGG ID that belongs to it.
+
+### ID coverage per feature
+
+The table returned by `compare_pk()` flags for each feature which ID types it has (`1`) or lacks (`0`). The column `None` is `1` for features without any ID:
+
+```{r id-processing-compare-pk-example}
+preview_table(
+    id_traversal$Data$compare_pk_summary_by_stage$input %>%
+        filter(Metabolite %in% example_features),
+    caption = "Input: ID types per feature."
+)
+preview_table(
+    id_traversal$Data$compare_pk_summary_by_stage$after_traversal %>%
+        filter(Metabolite %in% example_features),
+    caption = "After traversal: ID types per feature."
+)
+```
+
+Here the gain is easier to see than in the ID columns: two of the example features now have all four ID types and one has three, so they can be linked to resources that use any of them.
+
+### ID counts per ID type
+
+`id_count_summary` adds this up over all features. For every ID type, `n_no_id`, `n_single_id` and `n_multiple_ids` count the features without, with one and with several IDs, and `n_total_ids` counts all IDs. The table also has `delta_*` columns with the change compared to the previous stage and to the input, which we leave out here:
+
+```{r id-processing-id-count-example}
+preview_table(
+    id_traversal$Data$id_count_summary %>%
+        filter(stage %in% c("input", "after_traversal")) %>%
+        select(namespace, stage, n_features, n_no_id, n_single_id, n_multiple_ids, n_total_ids) %>%
+        arrange(namespace, desc(stage == "input")),
+    caption = "Input and after traversal: number of features without, with one and with several IDs per ID type."
+)
+```
+
+For every ID type, the rows *input* and *after_traversal* are directly below each other. The traversal reduces the number of features without ID for every ID type and adds many IDs, most of all for ChEBI, which was not in the input at all. At the same time, more features have several IDs of one type, e.g. IDs of stereoisomers or other closely related molecules that the mapping graph links to the same feature. The next section shows the same numbers for every stage as plots.
 
 # Traversal workflow: comparison across stages
 
@@ -302,13 +338,55 @@ for (stage in names(id_traversal$Plot$compare_pk_by_stage)) {
 
 ## IDs per feature
 
-`count_id()` shows the number of IDs per feature. `id_processing()` returns the plain `count_id()` plots, so we call `count_id()` on the metadata of each stage to show its standard MetaProViz figure (`Plot_Sized`):
+`count_id()` shows the number of IDs per feature. `id_processing()` returns the plain `count_id()` plots, so we call `count_id()` on the metadata of each stage to show its standard MetaProViz figure (`Plot_Sized`). For each ID type, the three stages are shown next to each other: input, after compatibility check and after traversal.
 
-```{r traversal-stage-count-id, results='asis', fig.width=5.67, fig.height=4.72}
+```{r traversal-stage-count-id, results='asis', fig.width=17, fig.height=4.72, out.width='100%'}
+id_counts <- id_traversal$Data$id_count_summary
+
+# Short description of the ID counts of one ID type across the stages
+count_text <- function(id_type) {
+    x <- id_counts %>% filter(namespace == id_type)
+    n <- function(stage, column) x[[column]][x$stage == stage]
+    with_id <- function(stage) n(stage, "n_single_id") + n(stage, "n_multiple_ids")
+    describe <- function(stage) {
+        sprintf(
+            "%i without, %i with one and %i with several %s IDs",
+            n(stage, "n_no_id"), n(stage, "n_single_id"), n(stage, "n_multiple_ids"), id_type
+        )
+    }
+
+    text <- if (with_id("input") == 0L) {
+        sprintf(
+            "The input has no %s IDs, so the compatibility check has nothing to check and does not change them either. All %s IDs are added by the traversal: afterwards there are %s.",
+            id_type, id_type, describe("after_traversal")
+        )
+    } else {
+        removed <- with_id("input") - with_id("after_compatibility")
+        sprintf(
+            "In the input there are %s. %s After traversal there are %s.",
+            describe("input"),
+            if (removed > 0L) {
+                sprintf(
+                    "The compatibility check removes the %s IDs of %i feature(s), because they did not match the other IDs of the feature.",
+                    id_type, removed
+                )
+            } else {
+                "The compatibility check does not remove any of them."
+            },
+            describe("after_traversal")
+        )
+    }
+
+    sprintf(
+        "%s In total, %i of %i features have at least one %s ID after traversal, compared to %i in the input.\n\n",
+        text, with_id("after_traversal"), n("input", "n_features"), id_type, with_id("input")
+    )
+}
+
 for (id_type in c("HMDB", "KEGG", "CHEBI", "PUBCHEM")) {
     cat("\n\n### ", id_type, "\n\n", sep = "")
-    for (stage in names(id_traversal$Plot$count_id_by_stage)) {
-        stage_count <- count_id(
+    stage_plots <- lapply(names(id_traversal$Plot$count_id_by_stage), function(stage) {
+        count_id(
             data = id_traversal$Data[[stage]],
             column = id_type,
             delimiter = ";",
@@ -316,11 +394,38 @@ for (id_type in c("HMDB", "KEGG", "CHEBI", "PUBCHEM")) {
             save_plot = NULL,
             save_table = NULL,
             print_plot = FALSE
-        )
-        print(stage_count$Plot_Sized)
-    }
+        )$Plot_Sized
+    })
+    gridExtra::grid.arrange(grobs = stage_plots, ncol = 3)
+    cat("\n\n", count_text(id_type), sep = "")
 }
 ```
+
+# Summary
+
+```{r id-processing-summary}
+coverage <- id_counts %>%
+    filter(stage %in% c("input", "after_traversal")) %>%
+    mutate(n_with_id = n_single_id + n_multiple_ids) %>%
+    select(namespace, stage, n_with_id, n_total_ids) %>%
+    tidyr::pivot_wider(names_from = stage, values_from = c(n_with_id, n_total_ids)) %>%
+    transmute(
+        `ID type` = namespace,
+        `Features with ID (input)` = n_with_id_input,
+        `Features with ID (after traversal)` = n_with_id_after_traversal,
+        `IDs (input)` = n_total_ids_input,
+        `IDs (after traversal)` = n_total_ids_after_traversal
+    )
+
+no_id_input <- sum(id_traversal$Data$compare_pk_summary_by_stage$input$None)
+no_id_after <- sum(id_traversal$Data$compare_pk_summary_by_stage$after_traversal$None)
+
+preview_table(coverage, caption = "ID coverage of the input and after traversal.")
+```
+
+Starting from `r nrow(Tissue_MetaData)` features, the workflow increased the number of IDs over all four ID types from `r sum(coverage[["IDs (input)"]])` to `r sum(coverage[["IDs (after traversal)"]])`. The largest gains are for ChEBI, which was not in the input, and for HMDB and PubChem. KEGG gains the least. `r if (no_id_input == no_id_after) sprintf('The number of features without any ID stays at %i', no_id_input) else sprintf('The number of features without any ID only changes from %i to %i', no_id_input, no_id_after)`: the traversal can only start from an existing ID, so features without any ID need manual annotation.
+
+This matters when the data are linked to prior knowledge. Every resource uses its own ID type, e.g. KEGG pathways use KEGG IDs and many metabolite-protein resources use HMDB or ChEBI IDs. A feature can only be found in a resource if it has an ID of the right type, so the more features carry each ID type, the more features can be mapped, and the more complete the pathway or metabolite sets that are tested in an enrichment analysis. At the same time, features with several IDs of one type can map to several entries of the same resource and inflate an enrichment analysis. How to check and resolve this is shown in the [Prior Knowledge vignette](https://saezlab.github.io/MetaProViz/articles/pkgdown/prior-knowledge.html).
 
 # Session information
 
