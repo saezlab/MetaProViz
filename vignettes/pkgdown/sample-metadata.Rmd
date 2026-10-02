@@ -87,7 +87,7 @@ Tissue metabolomics experiment is a standard metabolomics experiment using tissu
 * to perform differential metabolite analysis (dma) to generate Log2FC and statistics and perform pathway analysis using Over Representation Analysis (ORA) on the results.\
 * to do metabolite clustering analysis (MCA) to find clusters of metabolites with similar behaviors based on patients demographics like age, gender and tumour stage.\
 * Find the main metabolite drivers that separate patients based on their demographics like age, gender and tumour stage.\
-\
+
 First if you have not done yet, install the required dependencies and load the libraries:
 ```{r load-packages, message=FALSE, warning=FALSE}
 # 1. Install MetaProViz from Bioconductor devel:
