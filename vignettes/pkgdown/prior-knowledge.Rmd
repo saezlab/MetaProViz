@@ -23,7 +23,6 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
 bibliography: bibliography.bib
 resource_files:
-    - figures/Hexagon_MetaProViz.png
     - figures/Fig.2.png
     - figures/Fig.3.png
     - prior-knowledge.Rmd_compare-pk.svg
@@ -63,8 +62,6 @@ preview_table <- function(x, ...) {
     )
 }
 ```
-
-# <img src="figures/Hexagon_MetaProViz.png" align="right" width="200"/> {-}
 
 \
 [In this tutorial we showcase how to use **MetaProViz** prior knowledge]{style="text-decoration:underline"}:\
