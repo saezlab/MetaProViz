@@ -51,6 +51,8 @@ Fig. 1 gives an overview of the steps `id_processing()` runs. Each of the workfl
 
 </center>
 
+The step *Equivalent ID* in Fig. 1, which adds the IDs of stereoisomers (e.g. D- next to L-amino acids), is not part of `id_processing()` yet. It is currently run separately with `equivalent_id()` on the result of `id_processing()`, as shown in the [Sample Metadata Analysis vignette](https://saezlab.github.io/MetaProViz/articles/pkgdown/sample-metadata.html#metabolite-id-qc).
+
 <br>
 
 ```{r load-packages, message=FALSE, warning=FALSE}
