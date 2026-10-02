@@ -1,5 +1,5 @@
 #https://pkgdown.r-lib.org/articles/customise.html
-#url: https://ChristinaSchmidt1.github.io/MetaProViz/
+url: https://saezlab.github.io/MetaProViz/
 name: My Website
 
 output_dir: docs
@@ -21,19 +21,31 @@ navbar:
   components:
     #Customize articles:
     articles:
+      text: Tutorials
       title: Tutorials
+      aria-label: Tutorials
       icon: fa-book-open
       menu:
+        - text: "All tutorials"
+          href: articles/pkgdown/tutorials.html
+        - text: -------
+        - text: "Get started"
         - text: "Getting started"
           href: articles/quick-start.html
+        - text: -------
+        - text: "Analysis workflows"
         - text: "Standard Metabolomics"
           href: articles/pkgdown/standard-metabolomics.html
         - text: "CoRe Metabolomics"
           href: articles/pkgdown/core-metabolomics.html
-        - text: "Prior Knowledge"
-          href: articles/pkgdown/prior-knowledge.html
         - text: "Sample Metadata Analysis"
           href: articles/pkgdown/sample-metadata.html
+        - text: -------
+        - text: "Prior knowledge and metabolite IDs"
+        - text: "Prior Knowledge - Access & Integration"
+          href: articles/pkgdown/prior-knowledge.html
+        - text: "ID Processing Workflow"
+          href: articles/pkgdown/id-processing-workflow.html
         - text: "MetSigDB"
           href: articles/pkgdown/metsigdb.html
     #customize intro:
@@ -44,13 +56,16 @@ navbar:
     #Customize github:
     github:
       icon: "fa-brands fa-github"
+      aria-label: GitHub
       href: https://github.com/saezlab/MetaProViz
     #Customize homepage:
     homepage:
       icon: "fas fa-university"
+      aria-label: Saez lab
       href: https://saezlab.org/
     homepage2:
       icon: "fas fa-university" # Add the icon you want
+      aria-label: Frezza lab
       href: https://frezza.cecad-labs.uni-koeln.de/home
 
 home:

@@ -83,6 +83,7 @@ Suggests:
     ggupset,
     ggVennDiagram,
     kableExtra,
+    magick,
     knitr,
     pkgdown,
     rmarkdown,

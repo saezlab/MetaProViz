@@ -24,4 +24,4 @@
 ^inst/scripts$
 ^README\.Rmd\.bak$
 ^README\.md\.bak$
-^CLAUDE.md$
+^\.claude$

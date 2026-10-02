@@ -5,7 +5,6 @@ body {
 text-align: justify!important;
 /*font-family: Arial;*/
 color: black;
-width: 40cm;
 }
 
 p.caption {
@@ -56,3 +55,30 @@ nav#toc: before {
 }
 
 
+
+/*---------- MetaProViz hexagon on article pages ----------*/
+/* Narrower screens: above "On this page" in the right sidebar */
+.template-article aside::before {
+  content: "";
+  display: block;
+  width: 130px;
+  height: 150px;
+  margin: 1.5rem 0 1rem 0;
+  background: url("reference/figures/Hexagon_MetaProViz.png") no-repeat left top / contain;
+}
+
+/* Wide screens: fixed in the empty space left of the text column */
+@media (min-width: 1720px) {
+  .template-article aside::before {
+    display: none;
+  }
+  .template-article::before {
+    content: "";
+    position: fixed;
+    top: 6rem;
+    left: calc((100vw - 1320px) / 2 - 190px);
+    width: 160px;
+    height: 185px;
+    background: url("reference/figures/Hexagon_MetaProViz.png") no-repeat center / contain;
+  }
+}
