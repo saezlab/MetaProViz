@@ -5305,33 +5305,11 @@ cluster_pk <- function(
     }
 
     # ---- Similarity matrix ----------------------------------------------
-    similarity_matrix <-
-        matrix(
-            1,
-            nrow = n_terms,
-            ncol = n_terms,
-            dimnames = list(terms, terms)
-        )
-
     if (similarity %in% c("jaccard", "overlap_coefficient")) {
-        combs <- combn(seq_len(n_terms), 2L)
-        for (j in seq_len(ncol(combs))) {
-            i1 <- combs[1, j]
-            i2 <- combs[2, j]
-            set1 <- term_metabolites$MetaboliteIDs[[i1]]
-            set2 <- term_metabolites$MetaboliteIDs[[i2]]
-            inter <- length(intersect(set1, set2))
-            if (similarity == "jaccard") {
-                denom <- length(union(set1, set2))
-            } else { # overlap coefficient
-                denom <- min(length(set1), length(set2))
-            }
-            sim <- if (denom == 0) 0 else inter / denom
-            t1 <- terms[i1]
-            t2 <- terms[i2]
-            similarity_matrix[t1, t2] <- sim
-            similarity_matrix[t2, t1] <- sim
-        }
+        similarity_matrix <- .set_similarity(
+            sets = stats::setNames(term_metabolites$MetaboliteIDs, terms),
+            method = similarity
+        )
     } else { # correlation
         metabolites <- unique(unlist(term_metabolites$MetaboliteIDs))
         metabolites <- metabolites[!is.na(metabolites) & metabolites != ""]

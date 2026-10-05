@@ -153,3 +153,44 @@ test_that("get_exclusion_metabolites and make_gene_metab_set return expected str
   expect_type(result, "list")
   expect_true(all(c("GeneMetabSet", "MetabSet") %in% names(result)))
 })
+
+test_that("cluster_pk similarity matches the pairwise set definitions", {
+    toy_pw <- data.frame(
+        MetaboliteID = c("C1", "C2", "C3", "C1", "C2", "C4", "C3", "C4", "C5", "C6"),
+        term = c("pA", "pA", "pA", "pB", "pB", "pB", "pC", "pC", "pC", "pD")
+    )
+    sets <- split(toy_pw$MetaboliteID, toy_pw$term)
+
+    for (method in c("jaccard", "overlap_coefficient")) {
+        res <- cluster_pk(
+            toy_pw,
+            similarity = method,
+            threshold = 0.1,
+            min = 1,
+            save_plot = NULL,
+            print_plot = FALSE
+        )
+        expected <- outer(names(sets), names(sets), Vectorize(function(a, b) {
+            if (a == b) return(1)
+            inter <- length(intersect(sets[[a]], sets[[b]]))
+            denom <- if (method == "jaccard") {
+                length(union(sets[[a]], sets[[b]]))
+            } else {
+                min(length(sets[[a]]), length(sets[[b]]))
+            }
+            inter / denom
+        }))
+        dimnames(expected) <- list(names(sets), names(sets))
+        expect_equal(res$similarity_matrix[names(sets), names(sets)], expected)
+    }
+})
+
+test_that("cluster_pk works with a single term", {
+    res <- cluster_pk(
+        data.frame(MetaboliteID = c("C1", "C2"), term = c("pA", "pA")),
+        min = 1,
+        save_plot = NULL,
+        print_plot = FALSE
+    )
+    expect_equal(dim(res$similarity_matrix), c(1L, 1L))
+})

@@ -1946,136 +1946,183 @@ check_param_VizGraph <- function(
 }
 
 
-#' Check input parameters for viz_metabolite_protein_network
+#' Check input parameters for viz_pk_network and viz_shared_pk_network
 #'
-#' @param feature_metadata Data frame with HMDB identifiers and optional metabolite labels.
-#' @param metalinks_df MetalinksDB table or subset thereof.
-#' @param metabolite_col Optional metabolite label column name.
-#' @param hmdb_col HMDB column name in `feature_metadata`.
-#' @param save_plot File extension(s) or NULL.
-#' @param path Output path or NULL.
-#' @param plot_name Plot title and basename.
-#' @param width Plot width in inches.
-#' @param height Plot height in inches.
-#' @param hmdb_sep Separator for multiple HMDB IDs in a single cell.
-#' @param return_data Logical flag for list return.
-#' @param print_plot Logical flag for printing.
-#' @param full_labels Logical shortcut for labeling all nodes.
-#' @param label_mode Labeling mode.
+#' @param feature_metadata Data frame with the measured features.
+#' @param input_pk Prior knowledge table.
+#' @param metadata_info Named character vector mapping roles to columns.
+#' @param term_metadata NULL or data frame with one row per term.
+#' @param id_type Single string.
+#' @param id_sep Separator for multiple IDs in one cell.
 #' @param label_max_chars Maximum label width before truncation.
+#' @param label_degree_min Minimum degree of labelled nodes.
 #' @param label_repel Logical flag for repelled labels.
-#' @param label_degree_min Minimum degree required when `label_mode = "reduced"`.
-#' @param plot_metabolite_interaction_overlap Logical flag for returning a
-#'     metabolite-only interaction-overlap graph.
 #' @param seed NULL or a single number used as seed for the graph layout.
+#' @param plot_name Plot title and basename.
+#' @param save_plot NULL or one of "svg", "pdf", "png".
+#' @param save_table NULL or one of "csv", "xlsx", "txt".
+#' @param print_plot Logical flag for printing.
+#' @param path NULL or output path.
 #'
 #' @return Invisible TRUE if checks pass.
 #'
 #' @noRd
-check_param_VizMetaboliteProteinNetwork <- function(
+check_param_pk_network <- function(
     feature_metadata,
-    metalinks_df,
-    metabolite_col,
-    hmdb_col,
-    save_plot,
-    path,
-    plot_name,
-    width,
-    height,
-    hmdb_sep,
-    return_data,
-    print_plot,
-    full_labels,
-    label_mode,
+    input_pk,
+    metadata_info,
+    term_metadata,
+    id_type,
+    id_sep,
     label_max_chars,
-    label_repel,
     label_degree_min,
-    plot_metabolite_interaction_overlap,
-    seed = NULL
+    label_repel,
+    seed,
+    plot_name,
+    save_plot,
+    save_table,
+    print_plot,
+    path
 ) {
     if (!is.data.frame(feature_metadata)) {
         stop("`feature_metadata` must be a data.frame.")
     }
-    if (!is.data.frame(metalinks_df)) {
-        stop("`metalinks_df` must be a data.frame.")
+    if (!is.data.frame(input_pk)) {
+        stop("`input_pk` must be a data.frame.")
     }
-    if (!is.null(metabolite_col)) {
-        if (!is.character(metabolite_col) || length(metabolite_col) != 1L ||
-            is.na(metabolite_col) || metabolite_col == "") {
-            stop("`metabolite_col` must be NULL or a single non-empty column name.")
+    if (!is.null(term_metadata) && !is.data.frame(term_metadata)) {
+        stop("`term_metadata` must be NULL or a data.frame.")
+    }
+
+    # ---- metadata_info ---------------------------------------------------
+    valid_keys <- c(
+        "InputID", "InputLabel", "PriorID", "PriorTerm",
+        "MetaboliteColor", "MetaboliteSize", "TermColor", "TermSize",
+        "EdgeColor", "EdgeLinetype", "EdgeWidth", "EdgeDirection"
+    )
+    if (!is.character(metadata_info) || is.null(names(metadata_info)) ||
+        any(names(metadata_info) == "") || anyNA(metadata_info) ||
+        anyDuplicated(names(metadata_info)) > 0L) {
+        stop("`metadata_info` must be a named character vector with unique names.")
+    }
+    unknown <- setdiff(names(metadata_info), valid_keys)
+    if (length(unknown) > 0L) {
+        stop(
+            "Unknown `metadata_info` entries: ", paste(unknown, collapse = ", "),
+            ". Valid entries are: ", paste(valid_keys, collapse = ", "), "."
+        )
+    }
+    missing_keys <- setdiff(c("InputID", "PriorID", "PriorTerm"), names(metadata_info))
+    if (length(missing_keys) > 0L) {
+        stop("`metadata_info` must contain: ", paste(missing_keys, collapse = ", "), ".")
+    }
+
+    .check_columns <- function(keys, df, df_name) {
+        for (key in intersect(keys, names(metadata_info))) {
+            if (!metadata_info[[key]] %in% colnames(df)) {
+                stop(
+                    "Column `", metadata_info[[key]], "` (metadata_info[[\"", key,
+                    "\"]]) not found in `", df_name, "`."
+                )
+            }
         }
-        if (!metabolite_col %in% colnames(feature_metadata)) {
-            stop("`metabolite_col` not found in `feature_metadata`: ", metabolite_col)
+    }
+    .check_columns(
+        c("InputID", "InputLabel", "MetaboliteColor", "MetaboliteSize"),
+        feature_metadata,
+        "feature_metadata"
+    )
+    .check_columns(
+        c("PriorID", "PriorTerm", "EdgeColor", "EdgeLinetype", "EdgeWidth", "EdgeDirection"),
+        input_pk,
+        "input_pk"
+    )
+    for (key in intersect(c("TermColor", "TermSize"), names(metadata_info))) {
+        column <- metadata_info[[key]]
+        in_term_metadata <- !is.null(term_metadata) && column %in% colnames(term_metadata)
+        if (!in_term_metadata && !column %in% colnames(input_pk)) {
+            stop(
+                "Column `", column, "` (metadata_info[[\"", key,
+                "\"]]) not found in `term_metadata` or `input_pk`."
+            )
         }
     }
-    if (!is.character(hmdb_col) || length(hmdb_col) != 1L || is.na(hmdb_col) || hmdb_col == "") {
-        stop("`hmdb_col` must be a single non-empty column name.")
+    if (!is.null(term_metadata) && !metadata_info[["PriorTerm"]] %in% colnames(term_metadata)) {
+        stop(
+            "`term_metadata` must contain the PriorTerm column `",
+            metadata_info[["PriorTerm"]], "`."
+        )
     }
-    if (!hmdb_col %in% colnames(feature_metadata)) {
-        stop("`hmdb_col` not found in `feature_metadata`: ", hmdb_col)
+
+    if ("MetaboliteSize" %in% names(metadata_info) &&
+        !is.numeric(feature_metadata[[metadata_info[["MetaboliteSize"]]]])) {
+        stop("metadata_info[[\"MetaboliteSize\"]] must name a numeric column.")
     }
-    if (!"hmdb" %in% colnames(metalinks_df)) {
-        stop("`metalinks_df` must contain a `hmdb` column.")
+    if ("TermSize" %in% names(metadata_info)) {
+        column <- metadata_info[["TermSize"]]
+        values <- if (!is.null(term_metadata) && column %in% colnames(term_metadata)) {
+            term_metadata[[column]]
+        } else {
+            input_pk[[column]]
+        }
+        if (!is.numeric(values)) {
+            stop("metadata_info[[\"TermSize\"]] must name a numeric column.")
+        }
     }
-    if (!"gene_symbol" %in% colnames(metalinks_df)) {
-        stop("`metalinks_df` must contain a `gene_symbol` column.")
+    if ("EdgeWidth" %in% names(metadata_info) &&
+        !is.numeric(input_pk[[metadata_info[["EdgeWidth"]]]])) {
+        stop("metadata_info[[\"EdgeWidth\"]] must name a numeric column.")
     }
-    if (!is.null(path) && (!is.character(path) || length(path) != 1L || is.na(path) || path == "")) {
-        stop("`path` must be NULL or a single non-empty character string.")
+    if ("EdgeLinetype" %in% names(metadata_info) &&
+        is.numeric(input_pk[[metadata_info[["EdgeLinetype"]]]])) {
+        stop("metadata_info[[\"EdgeLinetype\"]] must name a non-numeric column.")
     }
-    if (!is.character(plot_name) || length(plot_name) != 1L || is.na(plot_name) || plot_name == "") {
-        stop("`plot_name` must be a single non-empty character string.")
+    if ("EdgeDirection" %in% names(metadata_info)) {
+        direction <- input_pk[[metadata_info[["EdgeDirection"]]]]
+        if (!any(direction %in% c("to_term", "to_metabolite"))) {
+            warning(
+                "metadata_info[[\"EdgeDirection\"]] contains neither \"to_term\" ",
+                "nor \"to_metabolite\"; all edges are drawn undirected."
+            )
+        }
     }
-    if (!is.numeric(width) || length(width) != 1L || is.na(width) || width <= 0) {
-        stop("`width` must be a single positive number.")
+
+    # ---- Other parameters ------------------------------------------------
+    if (!is.character(id_type) || length(id_type) != 1L || is.na(id_type) || id_type == "") {
+        stop("`id_type` must be a single non-empty string.")
     }
-    if (!is.numeric(height) || length(height) != 1L || is.na(height) || height <= 0) {
-        stop("`height` must be a single positive number.")
-    }
-    if (!is.character(hmdb_sep) || length(hmdb_sep) != 1L || is.na(hmdb_sep) || hmdb_sep == "") {
-        stop("`hmdb_sep` must be a single non-empty separator string.")
-    }
-    if (!is.logical(return_data) || length(return_data) != 1L || is.na(return_data)) {
-        stop("`return_data` must be TRUE or FALSE.")
-    }
-    if (!is.logical(print_plot) || length(print_plot) != 1L || is.na(print_plot)) {
-        stop("`print_plot` must be TRUE or FALSE.")
-    }
-    if (!is.logical(full_labels) || length(full_labels) != 1L || is.na(full_labels)) {
-        stop("`full_labels` must be TRUE or FALSE.")
-    }
-    if (!is.character(label_mode) || length(label_mode) < 1L) {
-        stop("`label_mode` must be one of \"reduced\" or \"all\".")
+    if (!is.character(id_sep) || length(id_sep) != 1L || is.na(id_sep) || id_sep == "") {
+        stop("`id_sep` must be a single non-empty separator string.")
     }
     if (!is.numeric(label_max_chars) || length(label_max_chars) != 1L ||
         is.na(label_max_chars) || label_max_chars < 4) {
         stop("`label_max_chars` must be a single number greater than or equal to 4.")
     }
+    if (!is.numeric(label_degree_min) || length(label_degree_min) != 1L ||
+        is.na(label_degree_min) || label_degree_min < 0) {
+        stop("`label_degree_min` must be a single number greater than or equal to 0.")
+    }
     if (!is.logical(label_repel) || length(label_repel) != 1L || is.na(label_repel)) {
         stop("`label_repel` must be TRUE or FALSE.")
-    }
-    if (!is.numeric(label_degree_min) || length(label_degree_min) != 1L ||
-        is.na(label_degree_min) || label_degree_min < 1) {
-        stop("`label_degree_min` must be a single number greater than or equal to 1.")
-    }
-    if (!is.logical(plot_metabolite_interaction_overlap) ||
-        length(plot_metabolite_interaction_overlap) != 1L ||
-        is.na(plot_metabolite_interaction_overlap)) {
-        stop("`plot_metabolite_interaction_overlap` must be TRUE or FALSE.")
     }
     if (!is.null(seed) && (!is.numeric(seed) || length(seed) != 1L || is.na(seed))) {
         stop("`seed` must be NULL or a single number.")
     }
-
-    save_plot_options <- c("svg", "pdf", "png")
-    if (!is.null(save_plot) && !all(save_plot %in% save_plot_options)) {
-        stop(
-            "save_plot must be one of: ",
-            paste(save_plot_options, collapse = ", "),
-            ", or NULL."
-        )
+    if (!is.character(plot_name) || length(plot_name) != 1L || is.na(plot_name) || plot_name == "") {
+        stop("`plot_name` must be a single non-empty character string.")
+    }
+    if (!is.null(save_plot) && !(length(save_plot) == 1L && save_plot %in% c("svg", "pdf", "png"))) {
+        stop("`save_plot` must be one of \"svg\", \"pdf\", \"png\" or NULL.")
+    }
+    if (!is.null(save_table) && !(length(save_table) == 1L && save_table %in% c("csv", "xlsx", "txt"))) {
+        stop("`save_table` must be one of \"csv\", \"xlsx\", \"txt\" or NULL.")
+    }
+    if (!is.logical(print_plot) || length(print_plot) != 1L || is.na(print_plot)) {
+        stop("`print_plot` must be TRUE or FALSE.")
+    }
+    if (!is.null(path) && (!is.character(path) || length(path) != 1L || is.na(path) || path == "")) {
+        stop("`path` must be NULL or a single non-empty character string.")
     }
 
     invisible(TRUE)
 }
-
