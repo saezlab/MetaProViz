@@ -142,19 +142,6 @@ jobs:
         run: |
           Rscript -e 'remotes::install_deps(dependencies = TRUE)'
 
-      # DESCRIPTION pins Polychrome (< 1.5.4) to stay installable on older R
-      # (see git blame on that line), but remotes::install_deps() above
-      # ignores that upper bound and always grabs the latest Polychrome --
-      # which then fails to load, since R enforces DESCRIPTION version
-      # constraints at load time, not install time. Reinstalling the newest
-      # version that still satisfies the pin, after install_deps, fixes it;
-      # doing this before install_deps doesn't work, since install_deps
-      # overwrites it with the latest version regardless.
-      - name: Install compatible Polychrome version
-        run: |
-          Rscript -e 'if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")'
-          Rscript -e 'remotes::install_version("Polychrome", version = "1.5.1")'
-
       # ComplexUpset should be installed after ggplot2 to ensure compatibility, especially on Linux/Ubuntu.
       - name: Install latest ggplot2
         run: Rscript -e 'install.packages("ggplot2", type="source")'
