@@ -690,7 +690,7 @@ Hence, while having multiple IDs for a single detected peak may add complexity, 
 ## Deeper investigation of MetaLinksDB metabolite-protein interactions
 
 Now that we have investigated the coverage of metabolite ID annotations and their matches to prior knowledge, we can go a step further and look into the interactions of the measured metabolites with transporters, receptors and metabolic enzymes.
-For that, we subset MetaLinksDB by the "interaction_family" column, which contains one of the following categories: "Other protein-metabolite", "Transporter-metabolite", "Receptor-metabolite", and "Enzyme-metabolite", and visualise each subset using the `viz_metabolite_protein_network()` function.
+For that, we subset MetaLinksDB by the "interaction_family" column, which contains one of the following categories: "Other protein-metabolite", "Transporter-metabolite", "Receptor-metabolite", and "Enzyme-metabolite", and visualise each subset using the `viz_pk_network()` function.
 
 Due to the number of Biocrates features and the size of MetaLinksDB, these visualisations quickly become convoluted. Hence, we only investigate the amino acid subset of the Biocrates features.
 
@@ -705,63 +705,99 @@ biocrates_amino_acids <- biocrates_features %>%
     filter(
         Class %in% c("Aminoacids Related", "Aminoacids")
     )
+
+# Columns to match the Biocrates features to MetaLinksDB and to style the network:
+metalinks_info <- c(
+    InputID = "HMDB",
+    InputLabel = "TrivialName",
+    PriorID = "hmdb",
+    PriorTerm = "gene_symbol",
+    EdgeColor = "interaction",
+    EdgeLinetype = "mode_of_regulation",
+    EdgeDirection = "direction"
+)
 ```
 
 Plot the metabolite-protein interaction network of the Biocrates amino acids and MetaLinksDB receptors:
 
 ```{r}
 # receptor-network
-biocrates_metalinks_receptor <- viz_metabolite_protein_network(
+biocrates_metalinks_receptor <- viz_pk_network(
     feature_metadata = biocrates_amino_acids,
-    metalinks_df = metalinks_receptor,
-    metabolite_col = "TrivialName",
-    hmdb_col = "HMDB",
-    save_plot = NULL,
-    plot_name = "biocrates_aminoacids_to_metalinks_receptor_network",
-    hmdb_sep = ",",  # biocrates_features has possibly multiple HMDB IDs per feature, separated by ", "
+    input_pk = metalinks_receptor,
+    metadata_info = metalinks_info,
+    id_sep = ",",  # biocrates_features has possibly multiple HMDB IDs per feature, separated by ", "
     label_mode = "reduced",
-    plot_metabolite_interaction_overlap = TRUE
+    plot_name = "biocrates_aminoacids_to_metalinks_receptor_network",
+    save_plot = NULL
 )
 ```
 
-Plot the metabolite-protein interaction network of the Biocrates amino acids and MetaLinksDB transporters:
+While the network above shows the specific interactions of metabolites with proteins, `viz_shared_pk_network()` shows how the metabolites share interactions with the same proteins. It takes the same inputs:
+
+```{r}
+# receptor-sharing
+biocrates_metalinks_receptor_shared <- viz_shared_pk_network(
+    feature_metadata = biocrates_amino_acids,
+    input_pk = metalinks_receptor,
+    metadata_info = metalinks_info,
+    id_sep = ",",
+    plot_name = "biocrates_aminoacids_sharing_metalinks_receptors",
+    save_plot = NULL
+)
+```
+
+Plot the metabolite-protein interaction network of the Biocrates amino acids and MetaLinksDB transporters, and how the amino acids share transporters:
 
 ```{r}
 # transporter-network
-biocrates_metalinks_transporter <- viz_metabolite_protein_network(
+biocrates_metalinks_transporter <- viz_pk_network(
     feature_metadata = biocrates_amino_acids,
-    metalinks_df = metalinks_transporter,
-    metabolite_col = "TrivialName",
-    hmdb_col = "HMDB",
-    save_plot = NULL,
-    plot_name = "biocrates_aminoacids_to_metalinks_transporter_network",
-    hmdb_sep = ",",
+    input_pk = metalinks_transporter,
+    metadata_info = metalinks_info,
+    id_sep = ",",
     label_mode = "reduced",
-    plot_metabolite_interaction_overlap = TRUE
+    plot_name = "biocrates_aminoacids_to_metalinks_transporter_network",
+    save_plot = NULL
+)
+
+biocrates_metalinks_transporter_shared <- viz_shared_pk_network(
+    feature_metadata = biocrates_amino_acids,
+    input_pk = metalinks_transporter,
+    metadata_info = metalinks_info,
+    id_sep = ",",
+    plot_name = "biocrates_aminoacids_sharing_metalinks_transporters",
+    save_plot = NULL
 )
 ```
 
-Plot the metabolite-protein interaction network of the Biocrates amino acids and MetaLinksDB metabolic enzymes:
+Plot the metabolite-protein interaction network of the Biocrates amino acids and MetaLinksDB metabolic enzymes, and how the amino acids share metabolic enzymes:
 
 ```{r}
 # metabolic-enzyme-network
-biocrates_metalinks_metabolic_enzyme <- viz_metabolite_protein_network(
+biocrates_metalinks_metabolic_enzyme <- viz_pk_network(
     feature_metadata = biocrates_amino_acids,
-    metalinks_df = metalinks_metabolic_enzyme,
-    metabolite_col = "TrivialName",
-    hmdb_col = "HMDB",
-    save_plot = NULL,
-    plot_name = "biocrates_aminoacids_to_metalinks_metabolic_enzyme_network",
-    hmdb_sep = ",",
+    input_pk = metalinks_metabolic_enzyme,
+    metadata_info = metalinks_info,
+    id_sep = ",",
     label_mode = "reduced",
-    plot_metabolite_interaction_overlap = TRUE
+    plot_name = "biocrates_aminoacids_to_metalinks_metabolic_enzyme_network",
+    save_plot = NULL
+)
+
+biocrates_metalinks_metabolic_enzyme_shared <- viz_shared_pk_network(
+    feature_metadata = biocrates_amino_acids,
+    input_pk = metalinks_metabolic_enzyme,
+    metadata_info = metalinks_info,
+    id_sep = ",",
+    plot_name = "biocrates_aminoacids_sharing_metalinks_metabolic_enzymes",
+    save_plot = NULL
 )
 ```
 
-Note that we enabled the parameter `plot_metabolite_interaction_overlap`, which additionally plots a graph of the interaction overlap on the metabolite level.
-While the metabolite-protein network plots show the specific interactions of metabolites with proteins, the overlap graph shows how metabolites share interactions with the same proteins.
-
-For example, in the receptor subset of MetaLinksDB, we observe many interactions for Glutamic acid (Glu) and Glycine (Gly). Indeed, the corresponding overlap plot shows that Gly and Glu share 6 proteins which they interact with. Additionally, we see that Glu and Asp (Aspartic acid) share 13 receptors, while Asp has 17 in total and Glu has 110 in total, hinting at a possibly higher receptor specificity of Aspartic acid in comparison to a more versatile interaction profile of Glutamic acid.
+In the sharing networks, the number beneath each metabolite is its total number of interacting proteins and the edge labels show the number of shared proteins.
+For example, in the receptor subset of MetaLinksDB, we observe many interactions for Glutamic acid (Glu) and Glycine (Gly). Indeed, the corresponding sharing plot shows that Gly and Glu share 6 proteins which they interact with. Additionally, we see that Glu and Asp (Aspartic acid) share 13 receptors, which are all 13 receptors of Asp, while Glu interacts with 29 receptors, hinting at a possibly higher receptor specificity of Aspartic acid in comparison to a more versatile interaction profile of Glutamic acid.
+As the raw number of shared proteins favours metabolites with many interactions, `viz_shared_pk_network()` can also use the Jaccard index or the overlap coefficient as edge weight (parameter `similarity`); examples are shown in the [CoRe Metabolomics vignette](https://saezlab.github.io/MetaProViz/articles/pkgdown/core-metabolomics.html).
 Note, however, that metabolite-protein interactions have various interaction properties and binding mechanisms, and that prior knowledge resources are always biased towards well-studied small molecules and proteins. Therefore, the overlap graph hints at shared protein interactions, but does not show that two metabolites interact with those proteins in the same way.
 
 :::: {.progress .progress-striped .active}

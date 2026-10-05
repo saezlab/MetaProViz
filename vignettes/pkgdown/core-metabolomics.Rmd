@@ -677,8 +677,7 @@ message("The following metabolites are connected to at least one receptor or tra
 ```
 
 The same filtered `MetaLinksDB` table can be visualized directly as a
-metabolite-protein network with `viz_metabolite_protein_network()`. The
-metabolite name column is recommended, but only the HMDB column is required.
+metabolite-protein network with `viz_pk_network()`. Via `metadata_info` we tell the function which columns hold the metabolite IDs and names in our data and the IDs and proteins in MetalinksDB. The metabolite name column is recommended, but only the ID columns are required. We additionally colour the edges by the interaction type, use the line type for the mode of regulation and draw the edges in the direction provided by `metsigdb_metalinks()`.
 
 ```{r metalinks-network, fig.width=8, fig.height=7}
 MetaLinks_Features <- MCA_res %>%
@@ -686,11 +685,18 @@ MetaLinks_Features <- MCA_res %>%
     dplyr::filter(!is.na(core_DF_HMDB)) %>%
     dplyr::distinct(Metabolite, core_DF_HMDB)
 
-MetaLinks_Network <- viz_metabolite_protein_network(
+MetaLinks_Network <- viz_pk_network(
     feature_metadata = MetaLinks_Features,
-    metalinks_df = MetaLinksDB_Select,
-    metabolite_col = "Metabolite",
-    hmdb_col = "core_DF_HMDB",
+    input_pk = MetaLinksDB_Select,
+    metadata_info = c(
+        InputID = "core_DF_HMDB",
+        InputLabel = "Metabolite",
+        PriorID = "hmdb",
+        PriorTerm = "gene_symbol",
+        EdgeColor = "interaction",
+        EdgeLinetype = "mode_of_regulation",
+        EdgeDirection = "direction"
+    ),
     save_plot = NULL,
     print_plot = TRUE,
     label_mode = "all",
@@ -1179,6 +1185,199 @@ select_label = NULL)
   <div class="progress-bar progress-bar-success" style="width: 100%"></div>
 </div>
 
+
+# Going deeper with prior knowledge networks
+
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
+
+With the analyses above we have found metabolites that change between 786-M1A and HK2 cells (`dma()`), grouped them by their consumption and release behaviour (`mca_core()`) and tested them for enriched pathways (`cluster_ora()`). The results are lists of metabolites and pathways. To understand them, it helps to look at how these metabolites are connected through prior knowledge (PK): Which proteins can transport them? Which metabolites drive an enriched pathway? Have they been reported in kidney cancer before?\
+\
+`MetaProViz` offers two network plots for this, which work with any PK table in long format, such as the MetSigDB resources loaded by the `metsigdb_*()` functions:
+
+-   `viz_pk_network()` plots the measured metabolites together with the PK terms they are linked to (e.g. proteins, pathways or cancer types). It shows *which* terms connect the metabolites.
+-   `viz_shared_pk_network()` only plots the metabolites and connects two metabolites if they are linked to the same terms. It shows *how similar* the metabolites are in the PK, and the edge weight can be the number of shared terms (`similarity = "shared"`), the Jaccard index (`"jaccard"`) or the overlap coefficient (`"overlap_coefficient"`).
+
+Both functions use the same `metadata_info`: `InputID` and `PriorID` name the ID columns used to match the metabolites in our data to the PK, `PriorTerm` the PK column that holds the terms and `InputLabel` the metabolite names. Further entries map columns to the node colours and sizes and the edge colours, line types, widths and directions (see `?viz_pk_network`). Hence, the same `metadata_info` can be passed to both functions.\
+\
+Here we use the metabolites that change significantly between 786-M1A and HK2 cells and colour them by their `Log2(Distance)`:
+```{r pk-network-features}
+DMA_Significant <- DMA_HK2_vs_786M1A %>%
+    filter(p.adj < 0.05)
+```
+
+\
+
+## Transporters of the changed metabolites (MetalinksDB)
+As we look at metabolites consumed from or released into the medium, transporters are the obvious proteins to start with. We select the transporter-metabolite interactions from the `MetaLinksDB_Select` table we created above. `metsigdb_metalinks()` provides the columns `interaction` (e.g. "Transport_In" or "Transport_Out") and `direction`, which we use to colour and orient the edges.
+```{r pk-network-metalinks, fig.width=10, fig.height=8}
+MetaLinks_Transporters <- MetaLinksDB_Select %>%
+    filter(interaction_family == "Transporter-metabolite")
+
+MetaLinks_Info <- c(
+    InputID = "HMDB",
+    InputLabel = "Metabolite",
+    PriorID = "hmdb",
+    PriorTerm = "gene_symbol",
+    MetaboliteColor = "Log2(Distance)",
+    EdgeColor = "interaction",
+    EdgeDirection = "direction"
+)
+
+Transporter_Network <- viz_pk_network(
+    feature_metadata = DMA_Significant,
+    input_pk = MetaLinks_Transporters,
+    metadata_info = MetaLinks_Info,
+    plot_name = "Transporters of changed metabolites",
+    seed = 123,
+    save_plot = NULL
+)
+```
+
+The amino acids alanine, serine, asparagine, glutamine, threonine, methionine, phenylalanine and tyrosine form one dense cluster, as they are transported by the same solute carriers, such as SLC1A5 (ASCT2), SLC7A5 (LAT1) and SLC38A2 (SNAT2). The fatty acids palmitate and linoleic acid are linked to fatty acid transporters and binding proteins of the SLC27A and FABP families, and pyruvate to monocarboxylate transporters such as SLC16A1. Metabolites without an HMDB ID or without a transporter in MetalinksDB are listed in `Transporter_Network[["DF"]][["unmatched_features"]]`.
+
+With `viz_shared_pk_network()` we can summarise this network on the metabolite level: two metabolites are connected if they share transporters, and the edge label shows how many. The number beneath each metabolite is its total number of transporters.
+```{r pk-network-metalinks-shared, fig.width=9, fig.height=7}
+Transporter_Shared <- viz_shared_pk_network(
+    feature_metadata = DMA_Significant,
+    input_pk = MetaLinks_Transporters,
+    metadata_info = MetaLinks_Info,
+    similarity = "shared",
+    plot_name = "Metabolites sharing transporters",
+    seed = 123,
+    save_plot = NULL
+)
+```
+
+Alanine and serine share 31 transporters and asparagine and glutamine 26 of their 27 transporters, so these amino acids are hardly distinguishable by their transporters. Palmitate and linoleic acid share 18 transporters with each other, but only single ones with the amino acids. Pyruvate, succinate and hypoxanthine have transporters, but none in common with the other changed metabolites. Changes in the consumption or release of the amino acid cluster may hence point to a change in the activity of the same transporters.
+
+\
+
+## Metabolites behind the pathway enrichment (KEGG)
+In the ORA of the metabolites consumed by both cell lines above, many KEGG pathways have a similar, non-significant p-value. `viz_pk_network()` shows which metabolites these pathways are based on. We only plot the pathways with at least three metabolites in the cluster and use the ORA results as `term_metadata` to colour the pathways by their adjusted p-value and size them by the number of cluster metabolites. For this, the pathway column of the ORA results needs to have the same name as `PriorTerm`.
+```{r pk-network-kegg, fig.width=11, fig.height=8}
+ORA_Consumed <- MC_ORA_HK2_vs_786M1A_Consumed %>%
+    dplyr::rename("term" = "ID") %>%
+    filter(Count >= 3)
+
+DMA_Consumed <- DMA_HK2_vs_786M1A %>%
+    filter(core_specific == "Consumed")
+
+KEGG_Info <- c(
+    InputID = "KEGG.ID",
+    InputLabel = "Metabolite",
+    PriorID = "MetaboliteID",
+    PriorTerm = "term",
+    MetaboliteColor = "Log2(Distance)",
+    TermColor = "p.adjust",
+    TermSize = "Count"
+)
+
+KEGG_Network <- viz_pk_network(
+    feature_metadata = DMA_Consumed,
+    input_pk = KEGG_Pathways %>% filter(term %in% ORA_Consumed$term),
+    metadata_info = KEGG_Info,
+    term_metadata = ORA_Consumed,
+    id_type = "KEGG",
+    label_mode = "all",
+    label_max_chars = 30,
+    plot_name = "Pathways of consumed metabolites",
+    seed = 123,
+    save_plot = NULL
+)
+```
+
+Aspartate is linked to 19 and glycine to 15 of the 23 pathways, so most pathways in the ORA results are based on the same few metabolites and do not carry independent information. The two pathways with the lowest adjusted p-value stand out: Fatty acid biosynthesis is based on palmitate, stearic acid and oleic acid, and beta-Alanine metabolism on aspartate, histidine and pantothenate.
+
+Next, we use all KEGG pathways to see which of the significantly changed metabolites take part in the same pathways. As some metabolites, like amino acids, are part of many pathways, the raw number of shared pathways would mainly connect these hubs. The Jaccard index instead divides the shared pathways by all pathways of both metabolites, and with `threshold = 0.3` we only keep metabolite pairs that share at least 30% of their pathways.
+```{r pk-network-kegg-shared, fig.width=9, fig.height=7}
+KEGG_Shared <- viz_shared_pk_network(
+    feature_metadata = DMA_Significant,
+    input_pk = KEGG_Pathways,
+    metadata_info = KEGG_Info,
+    similarity = "jaccard",
+    threshold = 0.3,
+    id_type = "KEGG",
+    plot_name = "Metabolites sharing KEGG pathways",
+    seed = 123,
+    save_plot = NULL
+)
+```
+
+The metabolites split into modules that correspond to known parts of metabolism: the fatty acids (palmitate, stearic acid, oleic acid and linoleic acid), the urea cycle (ornithine, citrulline, N-acetylglutamate and acetylornithine), pyrimidine synthesis (orotate and dihydroorotate) and a large module of amino acids that is connected to the TCA cycle intermediates, pyruvate and glucose.
+
+Note that this connects *metabolites* by the pathways they share. To connect *pathways* by the metabolites they share, use `cluster_pk()` (see the [Prior Knowledge vignette](https://saezlab.github.io/MetaProViz/articles/pkgdown/prior-knowledge.html)), which also accepts ORA results and then only uses the metabolites in the cluster.
+
+\
+
+## Previous reports in kidney cancer (MACdb)
+MACdb collects metabolite-cancer associations reported in published studies and identifies metabolites by PubChem IDs. Our data has HMDB and KEGG IDs, so we first translate the KEGG IDs into PubChem IDs with `translate_id()`. One KEGG ID can map to several PubChem IDs, which are then separated by ", " in the `pubchem` column; `id_sep = ","` makes the network functions use all of them.
+```{r pk-network-macdb-ids}
+DMA_Significant_PubChem <- translate_id(
+    data = DMA_Significant %>% filter(!is.na(KEGG.ID)),
+    metadata_info = c(InputID = "KEGG.ID", grouping_variable = "Metabolite"),
+    from = "kegg",
+    to = "pubchem",
+    save_table = NULL
+)[["TranslatedDF"]]
+
+MACdb <- metsigdb_macdb()
+```
+
+As our cells are a model of clear cell renal cell carcinoma, we plot the associations with kidney cancers:
+```{r pk-network-macdb, fig.width=11, fig.height=8}
+MACdb_Kidney <- MACdb %>%
+    filter(grepl("renal|kidney|RCC", term, ignore.case = TRUE))
+
+MACdb_Info <- c(
+    InputID = "pubchem",
+    InputLabel = "Metabolite",
+    PriorID = "Metabolite_PubchemID",
+    PriorTerm = "term",
+    MetaboliteColor = "Log2(Distance)"
+)
+
+MACdb_Network <- viz_pk_network(
+    feature_metadata = DMA_Significant_PubChem,
+    input_pk = MACdb_Kidney,
+    metadata_info = MACdb_Info,
+    id_type = "PubChem",
+    id_sep = ",",
+    label_max_chars = 30,
+    plot_name = "Changed metabolites reported in kidney cancer",
+    seed = 123,
+    save_plot = NULL
+)
+```
+
+Almost all of the 35 changed metabolites with a PubChem ID (32) have been associated with kidney cancers before, most often glutamine (8 of the 11 kidney cancer terms), succinate and tryptophan (7 each). Note that the MACdb terms are the cancer types as named in each study, so similar cancer types appear several times.
+
+Across all cancer types in MACdb, metabolites that are often reported together may form a panel of markers. We again use the Jaccard index and keep the metabolite pairs that share at least 40% of their cancer types:
+```{r pk-network-macdb-shared, fig.width=9, fig.height=7}
+MACdb_Shared <- viz_shared_pk_network(
+    feature_metadata = DMA_Significant_PubChem,
+    input_pk = MACdb,
+    metadata_info = MACdb_Info,
+    similarity = "jaccard",
+    threshold = 0.4,
+    id_type = "PubChem",
+    id_sep = ",",
+    plot_name = "Metabolites reported in the same cancer types",
+    seed = 123,
+    save_plot = NULL
+)
+```
+
+The fatty acids together with the acylcarnitines butyryl-carnitine and propionylcarnitine form a group that is separate from the amino acids and central carbon metabolites. The most similar pairs are phenylalanine and tyrosine (Jaccard index 0.73) and alanine and valine (0.71). As amino acids are measured in many studies, they share many cancer types, which illustrates how the coverage of the prior knowledge shapes these networks.
+
+Keep in mind that prior knowledge is biased towards well-studied metabolites and proteins: a metabolite without links is not necessarily unconnected, and metabolites with many links appear more central. The networks therefore point to connections worth following up, but do not show that they are active in our cells. All tables behind the plots, including the metabolites that could not be matched, are returned in the `DF` element of the results.
+
+\
+\
+<div class="progress progress-striped active">
+  <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+</div>
 
 
 # Session information
