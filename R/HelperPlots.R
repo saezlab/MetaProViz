@@ -2,8 +2,9 @@
 #
 #  This file is part of the `MetaProViz` R package
 #
-#  Copyright 2022-2025
-#  Saez Lab, Heidelberg University
+#  Copyright 2023-2026
+#  Saez Lab, Heidelberg University, University Hospital Heidelberg,
+#  European Bioinformatics Institute (EMBL-EBI), University of Cologne
 #
 #  Authors: see the file `README.md`
 #

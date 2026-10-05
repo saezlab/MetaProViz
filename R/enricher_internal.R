@@ -3,14 +3,19 @@
 #
 #  This file is part of the `MetaProViz` R package
 #
-#  Copyright 2022-2025
-#  Saez Lab, Heidelberg University
+#  Copyright 2023-2026
+#  Saez Lab, Heidelberg University, University Hospital Heidelberg,
+#  European Bioinformatics Institute (EMBL-EBI), University of Cologne
 #
 #  Authors: see the file `README.md`
 #
-#  Distributed under the BSD 3-Clause License.
-#  See accompanying file `LICENSE.md` or copy at
-#      https://opensource.org/license/bsd-3-clause
+#  This file contains code adapted from the DOSE package
+#  (https://github.com/YuLab-SMU/DOSE, author: Guangchuang Yu), which is
+#  distributed under the Artistic License 2.0. The code in this file
+#  remains under the Artistic License 2.0; it is not covered by the
+#  BSD 3-Clause License of the rest of MetaProViz. See the section
+#  "Third-party code" in `LICENSE.md`, or
+#      https://opensource.org/license/artistic-2-0
 #
 #  Website: https://saezlab.github.io/MetaProViz
 #  Git repo: https://github.com/saezlab/MetaProViz
@@ -23,7 +28,7 @@
 #
 # Author: Guangchuang Yu
 # Updated: 2024-06-13
-# License: Artistic 2.0 (GPL compatible)
+# License: Artistic 2.0
 #
 
 #' interal method for enrichment analysis
@@ -390,7 +395,7 @@ get_geneSet_index <- function(
 #
 # Author: Guangchuang Yu
 # Updated: 2024-06-13
-# License: Artistic 2.0 (GPL compatible)
+# License: Artistic 2.0
 #
 ##' interal method for enrichment analysis
 ##'
