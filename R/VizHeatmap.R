@@ -157,7 +157,7 @@ viz_heatmap <- function(
                 all.y = TRUE
             ) %>%
             column_to_rownames("Row.names")
-        metadata_feature <- metadata_feature[, -c((ncol(metadata_feature) - nrow(data) + 1):ncol(metadata_feature))]
+        metadata_feature <- metadata_feature[, -c((ncol(metadata_feature) - nrow(data) + 1):ncol(metadata_feature)), drop = FALSE]
     }
 
     # removes information about samples that are not included in the data
@@ -165,13 +165,13 @@ viz_heatmap <- function(
         metadata_sample <-
             merge(x = metadata_sample, y = data, by = 0, all.y = TRUE) %>%
             column_to_rownames("Row.names")
-        metadata_sample <- metadata_sample[, -c((ncol(metadata_sample) - ncol(data) + 1):ncol(metadata_sample))]
+        metadata_sample <- metadata_sample[, -c((ncol(metadata_sample) - ncol(data) + 1):ncol(metadata_sample)), drop = FALSE]
     }
 
     # # -------------- Plot --------------- ##
     if (
-        !("individual_Metab" %in% names(metadata_info)) &
-        "individual_Sample" %in% names(metadata_info)
+        "individual_Metab" %in% names(metadata_info) &
+        !("individual_Sample" %in% names(metadata_info))
     ) {
         # Ensure that groups that are assigned NAs do not cause problems:
         metadata_feature[[metadata_info[["individual_Metab"]]]] <- ifelse(is.na(metadata_feature[[metadata_info[["individual_Metab"]]]]), "NA", metadata_feature[[metadata_info[["individual_Metab"]]]])
@@ -331,7 +331,7 @@ viz_heatmap <- function(
                 # ----- Save
                 save_res(
                     inputlist_df = NULL,
-                    inputlist_plot = PlotList_adaptedGrid,
+                    inputlist_plot = PlotList_adaptedGrid[cleaned_i],
                     save_table = NULL,
                     save_plot = save_plot,
                     path = folder,
@@ -542,7 +542,7 @@ viz_heatmap <- function(
                 # ----- Save
                 save_res(
                     inputlist_df = NULL,
-                    inputlist_plot = PlotList_adaptedGrid,
+                    inputlist_plot = PlotList_adaptedGrid[cleaned_i],
                     save_table = NULL,
                     save_plot = save_plot,
                     path = folder,
@@ -791,7 +791,7 @@ viz_heatmap <- function(
                     # ----- Save
                     save_res(
                         inputlist_df = NULL,
-                        inputlist_plot = PlotList_adaptedGrid,
+                        inputlist_plot = PlotList_adaptedGrid[paste(cleaned_i, cleaned_s, sep = "_")],
                         save_table = NULL,
                         save_plot = save_plot,
                         path = folder,

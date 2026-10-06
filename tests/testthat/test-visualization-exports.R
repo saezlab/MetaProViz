@@ -22,6 +22,37 @@ test_that("viz_pca and viz_heatmap return plot containers", {
   expect_true(all(c("Plot", "Plot_Sized") %in% names(heatmap_res)))
 })
 
+test_that("viz_heatmap makes one heatmap per individual_Metab group", {
+  fx <- mpv_intracell_fixture(10)
+  data <- fx$data[, 1:9, drop = FALSE]
+  metadata_feature <- data.frame(
+    Pathway = rep(c("A", "B"), c(4, 5)),
+    row.names = colnames(data)
+  )
+
+  # Record which plots are handed over for saving/printing
+  saved <- list()
+  testthat::local_mocked_bindings(
+    save_res = function(inputlist_plot = NULL, ...) {
+      saved[[length(saved) + 1L]] <<- names(inputlist_plot)
+      invisible(NULL)
+    },
+    .package = "MetaProViz"
+  )
+
+  res <- viz_heatmap(
+    data = data,
+    metadata_feature = metadata_feature,
+    metadata_info = c(individual_Metab = "Pathway"),
+    save_plot = NULL,
+    print_plot = FALSE
+  )
+
+  expect_setequal(names(res$Plot), c("A", "B"))
+  # Each heatmap is saved/printed once, not again with every later group
+  expect_equal(saved, list("A", "B"))
+})
+
 test_that("viz_superplot returns boxplot output for one metabolite", {
   fx <- mpv_intracell_fixture(10)
 
