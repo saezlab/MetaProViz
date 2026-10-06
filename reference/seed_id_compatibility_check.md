@@ -13,7 +13,10 @@ seed_id_compatibility_check(
   id_types = c("HMDB", "KEGG", "CHEBI", "PUBCHEM"),
   delimiter = c(";", ","),
   verbose = FALSE,
-  edge_table = NULL
+  edge_table = NULL,
+  handle_partially_compatible = FALSE,
+  handle_completely_incompatible = FALSE,
+  completely_incompatible_priority = c("HMDB", "CHEBI", "PUBCHEM", "KEGG")
 )
 ```
 
@@ -46,9 +49,26 @@ seed_id_compatibility_check(
   Optional precomputed bidirectional edge table with columns `id1`,
   `type1`, `id2`, `type2`. If `NULL`, the table is built internally.
 
+- handle_partially_compatible:
+
+  Logical; if `TRUE`, partially compatible features are cleaned by
+  retaining only IDs from compatible pairs.
+
+- handle_completely_incompatible:
+
+  Logical; if `TRUE`, completely incompatible features are cleaned by
+  retaining a single ID according to `completely_incompatible_priority`.
+
+- completely_incompatible_priority:
+
+  Character vector defining the namespace priority for resolving
+  completely incompatible features. Supported values are `HMDB`, `KEGG`,
+  `CHEBI`, and `PUBCHEM`. The default priority is
+  `c("HMDB", "CHEBI", "PUBCHEM", "KEGG")`.
+
 ## Value
 
-Named list with two data frames:
+Named list with at least five data frames:
 
 - ID_pair_compatibility:
 
@@ -62,3 +82,22 @@ Named list with two data frames:
 
   Original input data with appended `all_seed_ids_compatible` per input
   row (rows with fewer than two seed IDs are `TRUE`).
+
+- feature_compatibility_summary:
+
+  One row per input feature summarizing compatibility counts and
+  assigning `fully_compatible`, `partially_compatible`, or
+  `completely_incompatible`.
+
+- data_after_handling:
+
+  Feature-level table after optional automatic handling. If no handling
+  is enabled, this matches the raw feature-level output aside from added
+  summary columns.
+
+- ID_pair_compatibility_after_handling:
+
+  Pair-level compatibility table recomputed from `data_after_handling`.
+
+If either handling option is enabled, the return object also includes
+`handling_summary_text` and `handling_summary_metrics`.

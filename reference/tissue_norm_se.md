@@ -27,7 +27,7 @@ head(tissue_norm_se)
 #> assays(1): data
 #> rownames(6): 1,2-propanediol 1,3-dihydroxyacetone ... 10-nonadecenoate
 #>   (19:1n9) 13-HODE + 9-HODE
-#> rowData names(0):
+#> rowData names(10): CAS SUPER_PATHWAY ... KEGG HMDB
 #> colnames(276): DIAG-16076 DIAG-16077 ... DIAG-16354 DIAG-16355
 #> colData names(5): TISSUE_TYPE GENDER RACE STAGE AGE
 ```

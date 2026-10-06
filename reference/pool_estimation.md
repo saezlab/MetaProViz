@@ -85,24 +85,9 @@ Res <- pool_estimation(
     data = intracell_raw_se,
     metadata_info = c(PoolSamples = "Pool", Conditions = "Conditions")
 )
-#> Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
-#> ℹ Please use tidy evaluation idioms with `aes()`.
-#> ℹ See also `vignette("ggplot2-in-packages")` for more information.
-#> ℹ The deprecated feature was likely used in the ggfortify package.
-#>   Please report the issue at <https://github.com/sinhrks/ggfortify/issues>.
 #> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.
-#> Warning: The following aesthetics were dropped during statistical transformation: label.
-#> ℹ This can happen when ggplot fails to infer the correct grouping structure in
-#>   the data.
-#> ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
-#>   variable into a factor?
 #> Bin width defaults to 1/30 of the range of the data. Pick better value with
 #> `binwidth`.
-#> Warning: The following aesthetics were dropped during statistical transformation: label.
-#> ℹ This can happen when ggplot fails to infer the correct grouping structure in
-#>   the data.
-#> ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
-#>   variable into a factor?
 
 
 
@@ -115,18 +100,8 @@ Res <- pool_estimation(
     metadata_info = c(PoolSamples = "Pool", Conditions = "Conditions")
 )
 #> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.
-#> Warning: The following aesthetics were dropped during statistical transformation: label.
-#> ℹ This can happen when ggplot fails to infer the correct grouping structure in
-#>   the data.
-#> ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
-#>   variable into a factor?
 #> Bin width defaults to 1/30 of the range of the data. Pick better value with
 #> `binwidth`.
-#> Warning: The following aesthetics were dropped during statistical transformation: label.
-#> ℹ This can happen when ggplot fails to infer the correct grouping structure in
-#>   the data.
-#> ℹ Did you forget to specify a `group` aesthetic or to convert a numerical
-#>   variable into a factor?
 
 
 

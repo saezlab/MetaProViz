@@ -7,7 +7,7 @@ and **Vi**suali**z**ation), a free open-source R-package that provides
 mechanistic hypotheses from metabolomics data by integrating prior
 knowledge from literature with metabolomics. MetaProViz offers an
 interactive framework consisting of five modules: Processing,
-differential analysis, prior knwoledge access and refactoring,
+differential analysis, prior knowledge access and refactoring,
 functional analysis and visualization of both intracellular and
 exometabolomics (=consumption-release (CoRe) data). Those modules and
 their functions can be used independently from each other or in
@@ -23,7 +23,7 @@ processing of raw peak metabolomics data from different experimental
 setups, including options to perform feature filtering due to
 missingness, Total Ion Count (TIC) normalisation, Missing Value
 Imputation (MVI) based on half-minimum and outlier detection based on
-Hotellin’s T2. All of these pre-processing parameters can be customized
+Hotelling’s T2. All of these pre-processing parameters can be customized
 and combined as needed.
 
 The second module of **MetaProViz**,
@@ -31,7 +31,7 @@ The second module of **MetaProViz**,
 differential analysis between two conditions (e.g. Tumour versus
 Healthy) calculating the Log2FC, p-value, adjusted p-value and t-value,
 whereby the user can choose all the test statistics. The input can
-either be the output of the `Preprocessing` module or any DF including
+either be the output of the `Processing` module or any DF including
 metabolite values and information about the conditions that should be
 compared.
 
@@ -50,36 +50,34 @@ customized visualizations of the output results of each of the other
 plots such as PCA, heatmap, Volcano plot, but also individual graphs of
 each metabolite as bar graphs, box plots or violin plots. Moreover, the
 user can provide additional information such as pathways the metabolites
-correspond to, the clusters the metabolites where assigned to or any
+correspond to, the clusters the metabolites were assigned to or any
 other meta-information to customize the plots for color, shape or
 selections, thus enabling biological interpretation of the results
 otherwise missed in the data.
 
 ## Tutorials
 
-We have generated several tutorials showcasing the different
-functionalities MetaProViz offers using publicly available datasets,
-which are included as example data within **MetaProViz**. You can find
-those tutorial on the top under the “Tutorials” button, where you can
-follow specific user case examples for different analysis. Otherwise,
-you can also follow the links below:
+We have written several tutorials that showcase what MetaProViz offers,
+using publicly available datasets that are included as example data in
+**MetaProViz**. You find all of them on the **[tutorials
+page](https://saezlab.github.io/MetaProViz/articles/pkgdown/tutorials.html)**
+and under “Tutorials” at the top of the website. They are grouped into:
 
-- [Standard metabolomics
-  data](https://saezlab.github.io/MetaProViz/articles/standard-metabolomics.html)
-- [Consumption-Release (CoRe) metabolomics data from cell culture
-  media](https://saezlab.github.io/MetaProViz/articles/core-metabolomics.html)
-- [Prior Knowledge Access &
-  Integration](https://saezlab.github.io/MetaProViz/articles/prior-knowledge.html)
-- [Sample Metadata
-  Analysis](https://saezlab.github.io/MetaProViz/articles/sample-metadata.html)
+- **Get started**: a short tour through the main steps.
+- **Analysis workflows**: standard (intracellular) metabolomics,
+  consumption-release (CoRe) metabolomics from cell culture media, and
+  patient sample metadata.
+- **Prior knowledge and metabolite IDs**: accessing and integrating
+  prior knowledge, processing metabolite IDs, and the MetSigDB
+  resources.
 
 Here you will find a brief overview and information about the
 installation of the package and its dependencies.
 
 ## Example Data
 
-clear cell Renal Cell Carcinoma (ccRCC) patients data from Hakimi et. al
-including 138 matched tumour and normal tissue pairs (Hakimi et
+Clear cell renal cell carcinoma (ccRCC) patients data from Hakimi et
+al. including 138 matched tumour and normal tissue pairs (Hakimi et
 al. 2016). Cell-lines data from intra- and extracellular metabolomics
 data from cell culture media from [metabolomics workbench project
 PR001418](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Project&ProjectID=PR001418).
@@ -93,23 +91,25 @@ patients processed with SiRCle (Mora et al. 2024), originally from
 
 ## Installation
 
-**MetaProViz** is an Bioconductor R package. To install the package,
+**MetaProViz** is a Bioconductor R package. To install the package,
 start R and enter:
 
 ``` r
+
 # 1. Install MetaProViz from Bioconductor devel:
 if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
 BiocManager::install(version = "devel")
 BiocManager::install("MetaProViz")
 
 # 2. Install the latest development version from GitHub using devtools
-# Install Rtools if you haven’t done this yet, using the appropriate version (e.g.windows or macOS).
+# Install Rtools if you haven’t done this yet, using the appropriate version (e.g. Windows or macOS).
 # remotes::install_github("saezlab/MetaProViz")
 ```
 
 Now **MetaProViz** can be imported as:
 
 ``` r
+
 library(MetaProViz)
 ```
 
@@ -120,6 +120,7 @@ available in your Bioconductor release, you can install it from
 Bioconductor devel with:
 
 ``` r
+
 if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
 BiocManager::install(version = "devel")
 BiocManager::install("OmnipathR")
@@ -133,26 +134,27 @@ Configuration \> Administrative Templates \> System \> Filesystem \>
 Enable Win32 long paths (If you have a different version of Windows,
 just google “Long paths fix” and your Windows version)
 
-## Liscence
+## License
 
-GNU GENERAL PUBLIC LICENSE, Version 3, 29 June 2007
+BSD 3-Clause License, see
+[LICENSE.md](https://saezlab.github.io/MetaProViz/LICENSE.md).
 
 ## Contributors
 
-Christina Schmidt, Denes Turei, Dimitrios Prymidis, Macabe Daley, Jannik
-Franken, Christian Frezza, Julio Saez-Rodriguez
+Christina Schmidt, Jannik Franken, Denes Turei, Dimitrios Prymidis,
+Macabe Daley, Christian Frezza, Julio Saez-Rodriguez
 
 ## Citation
 
-Please cite our bioRxiv preprint:
-<https://www.biorxiv.org/content/10.1101/2025.08.18.670781v1.full>
+Please cite our published article:
+<https://link.springer.com/article/10.1038/s44320-026-00231-8>
 
-    @article{Schmidt_Turei_Prymidis_Daley_Frezza_Saez-Rodriguez_2025,
+    @article{Schmidt_Franken_Turei_Prymidis_Daley_Frezza_Saez-Rodriguez_2026,
              title={Integrated metabolomics data analysis to generate mechanistic hypotheses with MetaProViz},
-             DOI={10.1101/2025.08.18.670781},
-             journal={BioRxiv},
-             author={Schmidt, Christina and Turei, Denes and Prymidis, Dimitrios and Daley, Macabe and Frezza, Christian and Saez-Rodriguez, Julio},
-             year={2025},
+             DOI={10.1038/s44320-026-00231-8},
+             journal={Molecular Systems Biology},
+             author={Schmidt, Christina and Franken, Jannik and Turei, Denes and Prymidis, Dimitrios and Daley, Macabe and Frezza, Christian and Saez-Rodriguez, Julio},
+             year={2026},
              month={Aug}}
 
 ## References
@@ -178,109 +180,178 @@ Integration Reveals Mechanisms of Phenotype Regulation in Renal Cancer.”
 
 ## All functions
 
-- [`MetaProViz-package`](MetaProViz.md) [`MetaProViz`](MetaProViz.md) :
-  The MetaProViz package
-- [`alanine_pathways`](alanine_pathways.md) : alanine_pathways
-- [`biocrates_features`](biocrates_features.md) : biocrates_features
-- [`cellular_meta`](cellular_meta.md) : cellular_meta
-- [`checkmatch_pk_to_data()`](checkmatch_pk_to_data.md) : Check and
-  summarize relationship between prixor knowledge to measured
-- [`cluster_ora()`](cluster_ora.md) : Overrepresentation analysis by
-  cluster
-- [`cluster_pk()`](cluster_pk.md) : Cluster terms in prior knowledge by
-  set overlap
-- [`compare_pk()`](compare_pk.md) : Compare Prior Knowledge Resources
-  and/or Columns within a Single Resource
-- [`count_id()`](count_id.md) : Count Entries and Generate a Histogram
-  Plot for a Specified Column
-- [`dma()`](dma.md) : Differential metabolite analysis
-- [`equivalent_features`](equivalent_features.md) : equivalent_features
-- [`equivalent_id()`](equivalent_id.md) : Find additional potential IDs
-  for "kegg", "pubchem", "chebi", "hmdb"
-- [`gaude_pathways`](gaude_pathways.md) : gaude_pathways
-- [`get_exclusion_metabolites()`](get_exclusion_metabolites.md) :
-  Metabolites excluded from prior knowledge resources
-- [`hallmarks`](hallmarks.md) : hallmarks
-- [`intracell_dma`](intracell_dma.md) : intracell_dma
-- [`intracell_raw`](intracell_raw.md) : intracell_raw
-- [`intracell_raw_se`](intracell_raw_se.md) : intracell_raw_se
-- [`make_gene_metab_set()`](make_gene_metab_set.md) : Create metabolite
-  sets from existing genesets
-- [`mapping_ambiguity()`](mapping_ambiguity.md) : Create Mapping
-  Ambiguities between two ID types
-- [`mca_2cond()`](mca_2cond.md) : Metabolite clustering analysis for two
-  conditions
-- [`mca_core()`](mca_core.md) : Metabolite clustering analysis for core
-  experiments
-- [`mca_core_rules`](mca_core_rules.md) : mca_core_rules
-- [`mca_twocond_rules`](mca_twocond_rules.md) : mca_twocond_rules
-- [`medium_raw`](medium_raw.md) : medium_raw
-- [`meta_pk()`](meta_pk.md) : Meta prior-knowledge
-- [`metadata_analysis()`](metadata_analysis.md) : PCA-based metadata
-  analysis
-- [`metaproviz_config_path()`](metaproviz_config_path.md) : Current
-  config file path of MetaProViz
-- [`metaproviz_load_config()`](metaproviz_load_config.md) : Load the
-  package configuration from a config file
-- [`metaproviz_log()`](metaproviz_log.md) : Browse the current
-  MetaProViz log file
-- [`metaproviz_logfile()`](metaproviz_logfile.md) : Path to the current
-  MetaProViz log file
-- [`metaproviz_reset_config()`](metaproviz_reset_config.md) : Restore
-  the built-in default values of all config parameters of MetaProViz
-- [`metaproviz_save_config()`](metaproviz_save_config.md) : Save the
-  current package configuration
-- [`metaproviz_set_loglevel()`](metaproviz_set_loglevel.md) : Sets the
-  log level for the package logger
-- [`metsigdb_chemicalclass()`](metsigdb_chemicalclass.md) : Metabolite
-  chemical classes from RaMP DB
-- [`metsigdb_kegg()`](metsigdb_kegg.md) : KEGG pathways
-- [`metsigdb_macdb()`](metsigdb_macdb.md) : Retrieve MACDB
-  metabolite-cancer associations.
-- [`metsigdb_metalinks()`](metsigdb_metalinks.md) : Annotated
-  metabolite-protein interactions from MetalinksDB
-- [`metsigdb_reactome()`](metsigdb_reactome.md) : Retrieve Reactome
-  metabolite sets suitable for ORA.
-- [`metsigdb_wikipathways()`](metsigdb_wikipathways.md) : Retrieve
-  WikiPathways metabolite mapping suitable for ORA.
-- [`pool_estimation()`](pool_estimation.md) : Find metabolites with high
-  variability across total pool samples
-- [`processing()`](processing.md) : Data preprocessing and normalization
-- [`replicate_sum()`](replicate_sum.md) : Merges the analytical
-  replicates of an experiment
-- [`seed_id_compatibility_check()`](seed_id_compatibility_check.md) :
-  Check compatibility of seed ID pairs in input rows
-- [`standard_ora()`](standard_ora.md) : Overrepresentation analysis of
-  metabolite sets in pathways
-- [`tissue_dma`](tissue_dma.md) : tissue_dma
-- [`tissue_dma_old`](tissue_dma_old.md) : tissue_dma_old
-- [`tissue_dma_young`](tissue_dma_young.md) : tissue_dma_young
-- [`tissue_meta`](tissue_meta.md) : Tissue_Metadata
-- [`tissue_norm`](tissue_norm.md) : tissue_norm
-- [`tissue_norm_se`](tissue_norm_se.md) : tissue_norm_se
-- [`tissue_tvn_proteomics`](tissue_tvn_proteomics.md) :
-  tissue_tvn_proteomics
-- [`tissue_tvn_rnaseq`](tissue_tvn_rnaseq.md) : tissue_tvn_rnaseq
-- [`translate_id()`](translate_id.md) : Translate IDs to/from KEGG,
-  PubChem, Chebi, HMDB
-- [`traverse_ids()`](traverse_ids.md) : Expand metabolite IDs by
-  traversing RaMP ID mappings
-- [`viz_graph()`](viz_graph.md) : Graph visualization for clustered
-  terms
-- [`viz_heatmap()`](viz_heatmap.md) : Heatmap visualization
-- [`viz_pca()`](viz_pca.md) : This script allows you to perform PCA plot
-  visualization using the results of the MetaProViz analysis
-- [`viz_superplot()`](viz_superplot.md) : This script allows you to
-  perform different visualizations (bar, box, violin plots) using the
+- [`MetaProViz-package`](https://saezlab.github.io/MetaProViz/reference/MetaProViz.md)
+  [`MetaProViz`](https://saezlab.github.io/MetaProViz/reference/MetaProViz.md)
+  : The MetaProViz package
+- [`alanine_pathways`](https://saezlab.github.io/MetaProViz/reference/alanine_pathways.md)
+  : alanine_pathways
+- [`biocrates_features`](https://saezlab.github.io/MetaProViz/reference/biocrates_features.md)
+  : biocrates_features
+- [`cellular_meta`](https://saezlab.github.io/MetaProViz/reference/cellular_meta.md)
+  : cellular_meta
+- [`checkmatch_pk_to_data()`](https://saezlab.github.io/MetaProViz/reference/checkmatch_pk_to_data.md)
+  : Check and summarize relationship between prixor knowledge to
+  measured
+- [`cluster_ora()`](https://saezlab.github.io/MetaProViz/reference/cluster_ora.md)
+  : Overrepresentation analysis by cluster
+- [`cluster_pk()`](https://saezlab.github.io/MetaProViz/reference/cluster_pk.md)
+  : Cluster terms in prior knowledge by set overlap
+- [`compare_pk()`](https://saezlab.github.io/MetaProViz/reference/compare_pk.md)
+  : Compare Prior Knowledge Resources and/or Columns within a Single
+  Resource
+- [`core_norm()`](https://saezlab.github.io/MetaProViz/reference/core_norm.md)
+  : Normalize consumption release data
+- [`count_id()`](https://saezlab.github.io/MetaProViz/reference/count_id.md)
+  : Count Entries and Generate a Histogram Plot for a Specified Column
+- [`dma()`](https://saezlab.github.io/MetaProViz/reference/dma.md) :
+  Differential metabolite analysis
+- [`equivalent_features`](https://saezlab.github.io/MetaProViz/reference/equivalent_features.md)
+  : equivalent_features
+- [`equivalent_id()`](https://saezlab.github.io/MetaProViz/reference/equivalent_id.md)
+  : Find additional potential IDs for "kegg", "pubchem", "chebi", "hmdb"
+- [`feature_filtering()`](https://saezlab.github.io/MetaProViz/reference/feature_filtering.md)
+  : Filter features
+- [`gaude_pathways`](https://saezlab.github.io/MetaProViz/reference/gaude_pathways.md)
+  : gaude_pathways
+- [`get_exclusion_metabolites()`](https://saezlab.github.io/MetaProViz/reference/get_exclusion_metabolites.md)
+  : Metabolites excluded from prior knowledge resources
+- [`hallmarks`](https://saezlab.github.io/MetaProViz/reference/hallmarks.md)
+  : hallmarks
+- [`id_processing()`](https://saezlab.github.io/MetaProViz/reference/id_processing.md)
+  : Process feature-metadata metabolite IDs in a staged workflow
+- [`intracell_dma`](https://saezlab.github.io/MetaProViz/reference/intracell_dma.md)
+  : intracell_dma
+- [`intracell_raw`](https://saezlab.github.io/MetaProViz/reference/intracell_raw.md)
+  : intracell_raw
+- [`intracell_raw_se`](https://saezlab.github.io/MetaProViz/reference/intracell_raw_se.md)
+  : intracell_raw_se
+- [`make_gene_metab_set()`](https://saezlab.github.io/MetaProViz/reference/make_gene_metab_set.md)
+  : Create metabolite sets from existing genesets
+- [`mapping_ambiguity()`](https://saezlab.github.io/MetaProViz/reference/mapping_ambiguity.md)
+  : Create Mapping Ambiguities between two ID types
+- [`mca_2cond()`](https://saezlab.github.io/MetaProViz/reference/mca_2cond.md)
+  : Metabolite clustering analysis for two conditions
+- [`mca_core()`](https://saezlab.github.io/MetaProViz/reference/mca_core.md)
+  : Metabolite clustering analysis for core experiments
+- [`mca_core_rules`](https://saezlab.github.io/MetaProViz/reference/mca_core_rules.md)
+  : mca_core_rules
+- [`mca_twocond_rules`](https://saezlab.github.io/MetaProViz/reference/mca_twocond_rules.md)
+  : mca_twocond_rules
+- [`medium_raw`](https://saezlab.github.io/MetaProViz/reference/medium_raw.md)
+  : medium_raw
+- [`medium_raw_se`](https://saezlab.github.io/MetaProViz/reference/medium_raw_se.md)
+  : medium_raw_se
+- [`meta_pk()`](https://saezlab.github.io/MetaProViz/reference/meta_pk.md)
+  : Meta prior-knowledge
+- [`metadata_analysis()`](https://saezlab.github.io/MetaProViz/reference/metadata_analysis.md)
+  : PCA-based metadata analysis
+- [`metaproviz_config_path()`](https://saezlab.github.io/MetaProViz/reference/metaproviz_config_path.md)
+  : Current config file path of MetaProViz
+- [`metaproviz_load_config()`](https://saezlab.github.io/MetaProViz/reference/metaproviz_load_config.md)
+  : Load the package configuration from a config file
+- [`metaproviz_log()`](https://saezlab.github.io/MetaProViz/reference/metaproviz_log.md)
+  : Browse the current MetaProViz log file
+- [`metaproviz_logfile()`](https://saezlab.github.io/MetaProViz/reference/metaproviz_logfile.md)
+  : Path to the current MetaProViz log file
+- [`metaproviz_reset_config()`](https://saezlab.github.io/MetaProViz/reference/metaproviz_reset_config.md)
+  : Restore the built-in default values of all config parameters of
+  MetaProViz
+- [`metaproviz_save_config()`](https://saezlab.github.io/MetaProViz/reference/metaproviz_save_config.md)
+  : Save the current package configuration
+- [`metaproviz_set_loglevel()`](https://saezlab.github.io/MetaProViz/reference/metaproviz_set_loglevel.md)
+  : Sets the log level for the package logger
+- [`metsigdb_chemicalclass()`](https://saezlab.github.io/MetaProViz/reference/metsigdb_chemicalclass.md)
+  : Metabolite chemical classes from RaMP DB
+- [`metsigdb_kegg()`](https://saezlab.github.io/MetaProViz/reference/metsigdb_kegg.md)
+  : KEGG pathways
+- [`metsigdb_macdb()`](https://saezlab.github.io/MetaProViz/reference/metsigdb_macdb.md)
+  : Retrieve MACDB metabolite-cancer associations.
+- [`metsigdb_metalinks()`](https://saezlab.github.io/MetaProViz/reference/metsigdb_metalinks.md)
+  : Annotated metabolite-protein interactions from MetalinksDB
+- [`metsigdb_reactome()`](https://saezlab.github.io/MetaProViz/reference/metsigdb_reactome.md)
+  : Retrieve Reactome metabolite sets suitable for ORA.
+- [`metsigdb_wikipathways()`](https://saezlab.github.io/MetaProViz/reference/metsigdb_wikipathways.md)
+  : Retrieve WikiPathways metabolite mapping suitable for ORA.
+- [`mvi_imputation()`](https://saezlab.github.io/MetaProViz/reference/mvi_imputation.md)
+  : Missing Value Imputation using half minimum value
+- [`outlier_detection()`](https://saezlab.github.io/MetaProViz/reference/outlier_detection.md)
+  : outlier_detection
+- [`pool_estimation()`](https://saezlab.github.io/MetaProViz/reference/pool_estimation.md)
+  : Find metabolites with high variability across total pool samples
+- [`processing()`](https://saezlab.github.io/MetaProViz/reference/processing.md)
+  : Data preprocessing and normalization
+- [`replicate_sum()`](https://saezlab.github.io/MetaProViz/reference/replicate_sum.md)
+  : Merges the analytical replicates of an experiment
+- [`seed_id_compatibility_check()`](https://saezlab.github.io/MetaProViz/reference/seed_id_compatibility_check.md)
+  : Check compatibility of seed ID pairs in input rows
+- [`standard_ora()`](https://saezlab.github.io/MetaProViz/reference/standard_ora.md)
+  : Overrepresentation analysis of metabolite sets in pathways
+- [`tic_norm()`](https://saezlab.github.io/MetaProViz/reference/tic_norm.md)
+  : Total ion count normalization
+- [`tissue_dma`](https://saezlab.github.io/MetaProViz/reference/tissue_dma.md)
+  : tissue_dma
+- [`tissue_dma_old`](https://saezlab.github.io/MetaProViz/reference/tissue_dma_old.md)
+  : tissue_dma_old
+- [`tissue_dma_young`](https://saezlab.github.io/MetaProViz/reference/tissue_dma_young.md)
+  : tissue_dma_young
+- [`tissue_meta`](https://saezlab.github.io/MetaProViz/reference/tissue_meta.md)
+  : Tissue_Metadata
+- [`tissue_norm`](https://saezlab.github.io/MetaProViz/reference/tissue_norm.md)
+  : tissue_norm
+- [`tissue_norm_se`](https://saezlab.github.io/MetaProViz/reference/tissue_norm_se.md)
+  : tissue_norm_se
+- [`tissue_tvn_proteomics`](https://saezlab.github.io/MetaProViz/reference/tissue_tvn_proteomics.md)
+  : tissue_tvn_proteomics
+- [`tissue_tvn_rnaseq`](https://saezlab.github.io/MetaProViz/reference/tissue_tvn_rnaseq.md)
+  : tissue_tvn_rnaseq
+- [`translate_id()`](https://saezlab.github.io/MetaProViz/reference/translate_id.md)
+  : Translate IDs to/from KEGG, PubChem, Chebi, HMDB
+- [`traverse_ids()`](https://saezlab.github.io/MetaProViz/reference/traverse_ids.md)
+  : Expand metabolite IDs by traversing RaMP ID mappings
+- [`viz_graph()`](https://saezlab.github.io/MetaProViz/reference/viz_graph.md)
+  : Graph visualization for clustered terms
+- [`viz_heatmap()`](https://saezlab.github.io/MetaProViz/reference/viz_heatmap.md)
+  : Heatmap visualization
+- [`viz_pca()`](https://saezlab.github.io/MetaProViz/reference/viz_pca.md)
+  : This script allows you to perform PCA plot visualization using the
   results of the MetaProViz analysis
-- [`viz_volcano()`](viz_volcano.md) : Volcano plot
+- [`viz_pk_network()`](https://saezlab.github.io/MetaProViz/reference/viz_pk_network.md)
+  : Network of metabolites and their prior knowledge terms
+- [`viz_shared_pk_network()`](https://saezlab.github.io/MetaProViz/reference/viz_shared_pk_network.md)
+  : Network of metabolites connected by shared prior knowledge terms
+- [`viz_superplot()`](https://saezlab.github.io/MetaProViz/reference/viz_superplot.md)
+  : This script allows you to perform different visualizations (bar,
+  box, violin plots) using the results of the MetaProViz analysis
+- [`viz_volcano()`](https://saezlab.github.io/MetaProViz/reference/viz_volcano.md)
+  : Volcano plot
 
 # Articles
 
 ### All vignettes
 
-- [core Metabolomics](pkgdown/core-metabolomics.md):
-- [Prior Knowledge - Access & Integration](pkgdown/prior-knowledge.md):
-- [Getting started with MetaProViz](quick-start.md):
-- [Sample Metadata Analysis](pkgdown/sample-metadata.md):
-- [Standard Metabolomics](pkgdown/standard-metabolomics.md):
+- [CoRe
+  Metabolomics](https://saezlab.github.io/MetaProViz/articles/pkgdown/core-metabolomics.md):
+
+- [ID Processing
+  Workflow](https://saezlab.github.io/MetaProViz/articles/pkgdown/id-processing-workflow.md):
+
+- [MetSigDB](https://saezlab.github.io/MetaProViz/articles/pkgdown/metsigdb.md):
+
+- [Prior Knowledge
+  Networks](https://saezlab.github.io/MetaProViz/articles/pkgdown/pk-networks.md):
+
+- [Prior Knowledge - Access &
+  Integration](https://saezlab.github.io/MetaProViz/articles/pkgdown/prior-knowledge.md):
+
+- [Getting started with
+  MetaProViz](https://saezlab.github.io/MetaProViz/articles/quick-start.md):
+
+- [Sample Metadata
+  Analysis](https://saezlab.github.io/MetaProViz/articles/pkgdown/sample-metadata.md):
+
+- [Standard
+  Metabolomics](https://saezlab.github.io/MetaProViz/articles/pkgdown/standard-metabolomics.md):
+
+- [Tutorials](https://saezlab.github.io/MetaProViz/articles/pkgdown/tutorials.md):
+
+  Overview of all MetaProViz tutorials, grouped by topic.

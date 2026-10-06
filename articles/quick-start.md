@@ -4,6 +4,7 @@ First if you have not done yet, install the required dependencies and
 load the libraries:
 
 ``` r
+
 # 1. Install MetaProViz from Bioconductor devel:
 # if (!requireNamespace("BiocManager", quietly = TRUE)) install.packages("BiocManager")
 # BiocManager::install(version = "devel")
@@ -24,11 +25,7 @@ library(tibble)
   
   
 
-    <div class="progress-bar progress-bar-success" style="width: 100%"></div>
-
-## 1. Loading the example data
-
-    <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+## Loading the example data
 
   
 Here we choose an example datasets, which is publicly available on
@@ -41,7 +38,8 @@ peak data as example data using the trivial metabolite name in
 combination with the KEGG ID as the metabolite identifiers.  
   
 As part of the **MetaProViz** package you can load the example data into
-your global environment using the function `toy_data()`:  
+your global environment using
+[`data()`](https://rdrr.io/r/utils/data.html):  
 Intracellular experiment **(Intra)**  
 The raw data are available via [metabolomics workbench study
 ST002224](https://www.metabolomicsworkbench.org/data/DRCCMetadata.php?Mode=Study&StudyID=ST002224&StudyType=MS&ResultType=1)
@@ -52,54 +50,52 @@ columns with Sample information and columns with the measured metabolite
 integrated peaks.  
 
 ``` r
+
 data(intracell_raw)
 
 Intra <- intracell_raw%>%
 column_to_rownames("Code")
 ```
 
-|         | Conditions | Analytical_Replicates | Biological_Replicates |  valine-d8 | ADP-ribose | citrulline |
-|:--------|:-----------|----------------------:|----------------------:|-----------:|-----------:|-----------:|
-| MS55_01 | HK2        |                     1 |                     1 | 1910140239 |    2417484 |  514024322 |
-| MS55_02 | HK2        |                     2 |                     1 | 2030901280 |    2159520 |  507001076 |
-| MS55_03 | HK2        |                     3 |                     1 | 2001950756 |    2427805 |  551503662 |
-| MS55_04 | HK2        |                     4 |                     1 | 1971520079 |    1988317 |  483751307 |
-| MS55_05 | 786-O      |                     1 |                     1 | 2150817213 |    1732016 |  272896668 |
+|  | Conditions | Analytical_Replicates | Biological_Replicates | valine-d8 | ADP-ribose | citrulline |
+|:---|:---|---:|---:|---:|---:|---:|
+| MS55_01 | HK2 | 1 | 1 | 1910140239 | 2417484 | 514024322 |
+| MS55_02 | HK2 | 2 | 1 | 2030901280 | 2159520 | 507001076 |
+| MS55_03 | HK2 | 3 | 1 | 2001950756 | 2427805 | 551503662 |
+| MS55_04 | HK2 | 4 | 1 | 1971520079 | 1988317 | 483751307 |
+| MS55_05 | 786-O | 1 | 1 | 2150817213 | 1732016 | 272896668 |
 
 Preview of the DF `Intra` including columns with sample information and
-metabolite ids with their measured values.
+metabolite ids with their measured values. {.table .lightable-classic
+style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;"}
 
   
   
 
-    <div class="progress-bar progress-bar-success" style="width: 550%"></div>
-
-## 2. Pre-processing
-
-    <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+## Pre-processing
 
 **MetaProViz** includes a pre-processing module with the function
-[`processing()`](../reference/processing.md) that has multiple
-parameters to perform customize data processing.  
-`Feature_Filtering` applies the 80%-filtering rule on the metabolite
-features either on the whole dataset (=“Standard”) (Bijlsma et al. 2006)
-or per condition (=“Modified”) (Wei et al. 2018). This means that
-metabolites are removed were more than 20% of the samples (all or per
-condition) have no detection. With the parameter `cutoff_featurefilt` we
-enable the adaptation of the stringency of the filtering based on the
-experimental context. For instance, patient tumour samples can contain
-many unknown subgroups due to gender, age, stage etc., which leads to a
-metabolite being detected in only 50% (or even less) of the tumour
-samples, hence in this context it could be considered to change the
-`cutoff_featurefilt` from the default (=0.8). If `featurefilt = "None"`,
+[`processing()`](https://saezlab.github.io/MetaProViz/reference/processing.md)
+that has multiple parameters to perform customize data processing.  
+`featurefilt` applies the 80%-filtering rule on the metabolite features
+either on the whole dataset (=“Standard”) (Bijlsma et al. 2006) or per
+condition (=“Modified”) (Wei et al. 2018). This means that metabolites
+are removed were more than 20% of the samples (all or per condition)
+have no detection. With the parameter `cutoff_featurefilt` we enable the
+adaptation of the stringency of the filtering based on the experimental
+context. For instance, patient tumour samples can contain many unknown
+subgroups due to gender, age, stage etc., which leads to a metabolite
+being detected in only 50% (or even less) of the tumour samples, hence
+in this context it could be considered to change the
+`cutoff_featurefilt` from the default (=0.8). If `featurefilt = NULL`,
 no feature filtering is performed. In the context of `featurefilt` it is
 also noteworthy that the function
-[`pool_estimation()`](../reference/pool_estimation.md) can be used to
-estimate the quality of the metabolite detection and will return a list
-of metabolites that are variable across the different pool measurements
-(pool = mixture of all experimental samples measured several times
-during the LC-MS run) . Variable metabolite in the pool sample should be
-removed from the data.  
+[`pool_estimation()`](https://saezlab.github.io/MetaProViz/reference/pool_estimation.md)
+can be used to estimate the quality of the metabolite detection and will
+return a list of metabolites that are variable across the different pool
+measurements (pool = mixture of all experimental samples measured
+several times during the LC-MS run) . Variable metabolite in the pool
+sample should be removed from the data.  
 The parameter `tic` refers to total Ion Count (tic) normalisation, which
 is often used with LC-MS derived metabolomics data. If `tic = TRUE`,
 each feature (=metabolite) in a sample is divided by the sum of all
@@ -114,7 +110,8 @@ The parameter `mvi` refers to Missing Value Imputation (mvi) and if
 feature (= per metabolite). Here it is important to mention that HM has
 been shown to perform well for missing vales that are missing not at
 random (MNAR) (Wei et al. 2018).  
-Lastly, the function [`processing()`](../reference/processing.md)
+Lastly, the function
+[`processing()`](https://saezlab.github.io/MetaProViz/reference/processing.md)
 performs outlier detection and adds a column “Outliers” into the DF,
 which can be used to remove outliers. The parameter
 `hotellins_confidence` can be used to choose the confidence interval
@@ -122,28 +119,32 @@ that should be used for the Hotellins T2 outlier test (Hotelling
 1931).  
   
 If your data contain pool samples, you can do
-[`pool_estimation()`](../reference/pool_estimation.md) before applying
-the [`processing()`](../reference/processing.md) function. This is
-important, since one should remove the features (=metabolites) that are
-too variable prior to performing any data transformations such as tic as
-part of the [`processing()`](../reference/processing.md) function. If
-there is a high variability (high CVs), you should consider to remove
-those features from the data. If you have used internal standard in your
-experiment you should specifically check their CV as this would indicate
-technical issues.You can find details on this in the extended
-vignettes:  
+[`pool_estimation()`](https://saezlab.github.io/MetaProViz/reference/pool_estimation.md)
+before applying the
+[`processing()`](https://saezlab.github.io/MetaProViz/reference/processing.md)
+function. This is important, since one should remove the features
+(=metabolites) that are too variable prior to performing any data
+transformations such as tic as part of the
+[`processing()`](https://saezlab.github.io/MetaProViz/reference/processing.md)
+function. If there is a high variability (high CVs), you should consider
+to remove those features from the data. If you have used internal
+standard in your experiment you should specifically check their CV as
+this would indicate technical issues.You can find details on this in the
+extended vignettes:  
 - [Standard metabolomics
-data](https://saezlab.github.io/MetaProViz/articles/standard-metabolomics.html)  
+data](https://saezlab.github.io/MetaProViz/articles/pkgdown/standard-metabolomics.html)  
 - [Consumption-Release (CoRe) metabolomics data from cell culture
-media](https://saezlab.github.io/MetaProViz/articles/core-metabolomics.html)  
+media](https://saezlab.github.io/MetaProViz/articles/pkgdown/core-metabolomics.html)  
   
-Now we will apply the [`processing()`](../reference/processing.md)
+Now we will apply the
+[`processing()`](https://saezlab.github.io/MetaProViz/reference/processing.md)
 function to example data and have a look at the output produced. You
 will notice that all the chosen parameters and results are documented in
 messages. All the results data tables, the Quality Control (QC) plots
 and outlier detection plots are returned and can be easily viewed.  
 
 ``` r
+
 PreprocessingResults <- processing(data=Intra[-c(49:58) ,-c(1:3)], #remove pool samples and columns with sample information
 metadata_sample=Intra[-c(49:58) , c(1:3)], #remove pool samples and columns with metabolite measurements
 metadata_info = c(Conditions = "Conditions",
@@ -161,14 +162,6 @@ path = NULL)
 #> feature_filtering: Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values (REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004). Filtering value selected: 0.8
 #> 3 metabolites where removed: AICAR, FAICAR, SAICAR
 #> Missing Value Imputation: Missing value imputation is performed, as a complementary approach to address the missing value problem, where the missing values are imputing using the `half minimum value`. REF: Wei et. al., (2018), Reports, 8, 663, doi:https://doi.org/10.1038/s41598-017-19120-0
-#> Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
-#> ℹ Please use tidy evaluation idioms with `aes()`.
-#> ℹ See also `vignette("ggplot2-in-packages")` for more information.
-#> ℹ The deprecated feature was likely used in the MetaProViz package.
-#>   Please report the issue at <https://github.com/saezlab/MetaProViz/issues>.
-#> This warning is displayed once per session.
-#> Call `lifecycle::last_lifecycle_warnings()` to see where this warning was
-#> generated.
 #> total Ion Count (tic) normalization: total Ion Count (tic) normalization is used to reduce the variation from non-biological sources, while maintaining the biological variation. REF: Wulff et. al., (2018), Advances in Bioscience and Biotechnology, 9, 339-351, doi:https://doi.org/10.4236/abb.2018.98022
 #> Outlier detection: Identification of outlier samples is performed using Hotellin's T2 test to define sample outliers in a mathematical way (Confidence = 0.99 ~ p.val < 0.01) (REF: Hotelling, H. (1931), Annals of Mathematical Statistics. 2 (3), 360-378, doi:https://doi.org/10.1214/aoms/1177732979). hotellins_confidence value selected: 0.99
 #> There are possible outlier samples in the data
@@ -180,6 +173,7 @@ path = NULL)
 ``` r
 
 
+
 # This is the results table:
 Intra_Preprocessed <- PreprocessingResults[["DF"]][["Preprocessing_output"]]
 ```
@@ -188,29 +182,33 @@ Intra_Preprocessed <- PreprocessingResults[["DF"]][["Preprocessing_output"]]
   
   
 
-|         | Conditions | Analytical_Replicates | Biological_Replicates | Outliers                  |  valine-d8 | hippuric acid-d5 | 2/3-phosphoglycerate | 2-aminoadipic acid | 2-hydroxyglutarate |
-|:--------|:-----------|----------------------:|----------------------:|:--------------------------|-----------:|-----------------:|---------------------:|-------------------:|-------------------:|
-| MS55_29 | 786-M2A    |                     1 |                     2 | Outlier_filtering_round_1 | 2387588900 |       4569088590 |             40184147 |            6064712 |          447702444 |
-| MS55_30 | 786-M2A    |                     2 |                     2 | no                        | 2129509827 |       3909434732 |             40901362 |            5928248 |          438592007 |
-| MS55_31 | 786-M2A    |                     3 |                     2 | no                        | 2008257641 |       3820133317 |             45656317 |            6122422 |          423960574 |
-| MS55_32 | 786-M2A    |                     4 |                     2 | no                        | 2023353119 |       3808913048 |             46166031 |            6633984 |          434158266 |
+|  | Conditions | Analytical_Replicates | Biological_Replicates | Outliers | valine-d8 | hippuric acid-d5 | 2/3-phosphoglycerate | 2-aminoadipic acid | 2-hydroxyglutarate |
+|:---|:---|---:|---:|:---|---:|---:|---:|---:|---:|
+| MS55_29 | 786-M2A | 1 | 2 | Outlier_filtering_round_1 | 2387588900 | 4569088590 | 40184147 | 6064712 | 447702444 |
+| MS55_30 | 786-M2A | 2 | 2 | no | 2129509827 | 3909434732 | 40901362 | 5928248 | 438592007 |
+| MS55_31 | 786-M2A | 3 | 2 | no | 2008257641 | 3820133317 | 45656317 | 6122422 | 423960574 |
+| MS55_32 | 786-M2A | 4 | 2 | no | 2023353119 | 3808913048 | 46166031 | 6633984 | 434158266 |
 
 Preview of the pre-processing results, which has an additional column
-`Outlier` including the results of Hotellins T2.
+`Outlier` including the results of Hotellins T2. {.table
+.lightable-classic
+style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;"}
 
   
 In the output table you can now see the column “Outliers” and for the
 Condition 786-M2A, we can see that based on Hotellin’s T2 test, one
 sample was detected as an outlier in the first round of filtering.  
-As part of the [`processing()`](../reference/processing.md) function
-several plots are generated and saved. Additionally, the ggplots are
-returned into the list to enable further modifiaction using the ggplot
-syntax. These plots include plots showing the outliers for each
-filtering round and other QC plots.  
+As part of the
+[`processing()`](https://saezlab.github.io/MetaProViz/reference/processing.md)
+function several plots are generated and saved. Additionally, the
+ggplots are returned into the list to enable further modifiaction using
+the ggplot syntax. These plots include plots showing the outliers for
+each filtering round and other QC plots.  
   
 Before we proceed, we will remove the outlier:  
 
 ``` r
+
 Intra_Preprocessed <- Intra_Preprocessed%>%
 filter(Outliers=="no")#remove MS55_29
 ```
@@ -220,10 +218,11 @@ As you may have noticed, in this example dataset we have several
 biological replicates that were injected (=measured) several times,
 which can be termed as analytical replicates. The **MetaProViz**
 pre-processing module includes the function
-[`replicate_sum()`](../reference/replicate_sum.md), which will do this
-task and save the results:  
+[`replicate_sum()`](https://saezlab.github.io/MetaProViz/reference/replicate_sum.md),
+which will do this task and save the results:  
 
 ``` r
+
 Intra_Preprocessed <- replicate_sum(data=Intra_Preprocessed[,-c(1:4)],
 metadata_sample=Intra_Preprocessed[,c(1:4)],
 metadata_info = c(Conditions="Conditions", Biological_Replicates="Biological_Replicates", Analytical_Replicates="Analytical_Replicates"))
@@ -235,14 +234,14 @@ In case you have performed a Consumption-Release (core) metabolomics
 experiment, which usually refers to a cell culture experiment where
 metabolomics is performed on the cell culture media, you will also need
 to set the parameter `core=TRUE` in the
-[`processing()`](../reference/processing.md) function. Now additional
-data processing steps are applied:  
+[`processing()`](https://saezlab.github.io/MetaProViz/reference/processing.md)
+function. Now additional data processing steps are applied:  
 1. Blank sample: This refers to media samples where no cells have been
 cultured in, which will be used as blank. In detail, the mean of the
 blank sample of a feature (= metabolite) will be substracted from the
 values measured in each sample for the same feature. In the column
-“Condition” of the Experimental_design DF, you will need to label your
-blank samples with “blank”.  
+“Conditions” of `metadata_sample`, you will need to label your blank
+samples with “blank”.  
 2. Growth factor or growth rate: This refers to the different conditions
 and is either based on cell count or protein quantification at the start
 of the experiment (t0) and at the end of the experiment (t1) resulting
@@ -254,14 +253,16 @@ to account for this. If you do not have this information, this will be
 set to 1, yet be aware that this may affect the results.  
 For details see extensive vignette [Consumption-Release (CoRe)
 metabolomics data from cell culture
-media](https://saezlab.github.io/MetaProViz/articles/core-metabolomics.html).
+media](https://saezlab.github.io/MetaProViz/articles/pkgdown/core-metabolomics.html).
 
 ### PCA plot and Heatmap
 
 Using the processed data, we can now use the **MetaProViz**
 visualization module and generate some overview Heatmaps
-[`viz_heatmap()`](../reference/viz_heatmap.md) or PCA plots
-[`viz_pca()`](../reference/viz_pca.md). 1. PCA  
+[`viz_heatmap()`](https://saezlab.github.io/MetaProViz/reference/viz_heatmap.md)
+or PCA plots
+[`viz_pca()`](https://saezlab.github.io/MetaProViz/reference/viz_pca.md). 1.
+PCA  
 Principal component analysis (PCA) is a dimensionality reduction method
 that reduces all the measured features (=metabolites) of one sample into
 a few features in the different principal components, whereby each
@@ -280,6 +281,7 @@ variance.Here is becomes apparent that the cell status is responsible
 for 64% of the variance (x-axis).  
 
 ``` r
+
 #Create the metadata file:
 MetaData_Sample <- Intra_Preprocessed[,c(1:2)]%>%
 mutate(Celltype = case_when(Conditions=="HK2" ~ 'Healthy',
@@ -294,16 +296,17 @@ viz_pca(metadata_info= c(color="Celltype", shape="Status"),
                     plot_name = "Cell type")
 ```
 
-![Figure: Do the samples cluster for the Cell
+![Do the samples cluster for the Cell
 type?](quick-start_files/figure-html/pca_plot-1.png)
 
-Figure: Do the samples cluster for the Cell type?
+Do the samples cluster for the Cell type?
 
   
 Similarly, we can use the data and sample information to make a
 heatmap:  
 
 ``` r
+
 viz_heatmap(data = Intra_Preprocessed[,-c(1:4)],
                         metadata_sample = MetaData_Sample,
                         metadata_info = c(color_Sample = list("Conditions","Biological_Replicates", "Celltype", "Status")))
@@ -314,11 +317,7 @@ metadata.](quick-start_files/figure-html/heatmap_plot-1.png)
 
 Colour for sample metadata.
 
-    <div class="progress-bar progress-bar-success" style="width: 550%"></div>
-
-## 3. Differential Metabolite Analysis
-
-    <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+## Differential Metabolite Analysis
 
 Differential Metabolite Analysis (`dma`) is used to compare two
 conditions (e.g. Tumour versus Healthy) by calculating the Log2FC,
@@ -343,7 +342,9 @@ denominator =“Condition2”
   
 Noteworthy, if you have not performed missing value imputation and hence
 your data includes NAs or 0 values for some features, this is how we
-deal with this in the [`dma()`](../reference/dma.md) function:  
+deal with this in the
+[`dma()`](https://saezlab.github.io/MetaProViz/reference/dma.md)
+function:  
 1. If you use the parameter `pval="lmFit"`, limma is performed. Limma
 does a baesian fit of the data and substracts Mean(Condition1 fit) -
 Mean(Condition2 fit). As such, unless all values of a feature are NA,
@@ -363,39 +364,25 @@ Here, the example data we have four different cell lines, healthy (HK2)
 and cancer (ccRCC: 786-M1A, 786-M2A and 786-O), hence we can perform
 multiple different comparisons. For simplicity, we will compare 786-M1A
 versus HK2. The results can be automatically saved and all the results
-are returned in a list with the different data frames. If parameter
-plot=TRUE, an overview Volcano plot is generated and saved.  
+are returned in a list with the different data frames. With
+`print_plot = TRUE` and `save_plot = "svg"` (the defaults), an overview
+volcano plot is printed and saved.  
 
 ``` r
-# Perform multiple comparison All_vs_One using annova:
+
+# Compare 786-M1A versus HK2 using a t-test:
 DMA_Res <- dma(data=Intra_Preprocessed[,-c(1:3)], #we need to remove columns that do not include metabolite measurements
 metadata_sample=Intra_Preprocessed[,c(1:3)],#only maintain the information about condition and replicates
 metadata_info = c(Conditions="Conditions", Numerator="786-M1A" , Denominator = "HK2"),# we compare 786-M1A_vs_HK2
 pval ="t.test",
 padj="fdr")
 #> There are no NA/0 values
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 142 rows containing non-finite outside the scale range
 #> (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 142 rows containing non-finite outside the scale range
 #> (`stat_density()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 137 rows containing non-finite outside the scale range
 #> (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 137 rows containing non-finite outside the scale range
 #> (`stat_density()`).
 #> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
@@ -414,44 +401,37 @@ padj="fdr")
 #> generated.
 #> Warning: Removed 142 rows containing non-finite outside the scale range
 #> (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 142 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 #> Warning: Removed 142 rows containing non-finite outside the scale range
 #> (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 142 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 #> Warning: Removed 137 rows containing non-finite outside the scale range
 #> (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 137 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 ```
 
 ![](quick-start_files/figure-html/dma-1.png)
 
     #> Warning: Removed 137 rows containing non-finite outside the scale range
     #> (`stat_bin()`).
-    #> Warning: Computation failed in `stat_bin()`.
-    #> Caused by error in `bin_breaks_width()`:
-    #> ! The number of histogram bins must be less than 1,000,000.
-    #> ℹ Did you make `binwidth` too small?
     #> Warning: Removed 137 rows containing non-finite outside the scale range
     #> (`stat_density()`).
+    #> Warning: Removed 2 rows containing missing values or values outside the scale range
+    #> (`geom_bar()`).
 
 ![](quick-start_files/figure-html/dma-2.png)![](quick-start_files/figure-html/dma-3.png)
 
 ``` r
+
 
 # Inspect the dma results tables:
 DMA_786M1A_vs_HK2 <- DMA_Res[["dma"]][["786-M1A _vs_ HK2"]]
@@ -461,22 +441,24 @@ DMA_786M1A_vs_HK2 <- DMA_Res[["dma"]][["786-M1A _vs_ HK2"]]
   
   
 
-| Metabolite          |    Log2FC |  786-M1A_1 |  786-M1A_2 |  786-M1A_3 |      HK2_1 |      HK2_2 |      HK2_3 |     p.val |     p.adj | t.val             |
-|:--------------------|----------:|-----------:|-----------:|-----------:|-----------:|-----------:|-----------:|----------:|----------:|:------------------|
-| isovalerylcarnitine | 0.9170474 |   29656656 |   30619594 |   32262097 |   19753215 |   15537391 |   13716941 | 0.0070624 | 0.0234206 | -7.4689200974348  |
-| lactate             | 0.3015843 |  721790170 |  654376727 |  761914317 |  565048879 |  499136450 |  670570164 | 0.0973061 | 0.1662329 | -2.27995828643078 |
-| lysine              | 0.4006104 |   39846551 |   37827659 |   40500396 |   27919226 |   25870671 |   35731826 | 0.0775608 | 0.1388337 | -3.07082976561226 |
-| malate              | 0.0981352 | 2244208988 | 2276823115 | 2058245048 | 1940397414 | 2064435997 | 2141789027 | 0.1853322 | 0.2764539 | -1.6049019168411  |
-| malonate            | 0.1701143 |    7457170 |    8327513 |    6230908 |    5918003 |    6198577 |    7450266 | 0.3518985 | 0.4700734 | -1.06115449290904 |
+| Metabolite | Log2FC | 786-M1A_1 | 786-M1A_2 | 786-M1A_3 | HK2_1 | HK2_2 | HK2_3 | p.val | p.adj | t.val |
+|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|:---|
+| isovalerylcarnitine | 0.9170474 | 29656656 | 30619594 | 32262097 | 19753215 | 15537391 | 13716941 | 0.0070624 | 0.0234206 | -7.4689200974348 |
+| lactate | 0.3015843 | 721790170 | 654376727 | 761914317 | 565048879 | 499136450 | 670570164 | 0.0973061 | 0.1662329 | -2.27995828643078 |
+| lysine | 0.4006104 | 39846551 | 37827659 | 40500396 | 27919226 | 25870671 | 35731826 | 0.0775608 | 0.1388337 | -3.07082976561226 |
+| malate | 0.0981352 | 2244208988 | 2276823115 | 2058245048 | 1940397414 | 2064435997 | 2141789027 | 0.1853322 | 0.2764539 | -1.6049019168411 |
+| malonate | 0.1701143 | 7457170 | 8327513 | 6230908 | 5918003 | 6198577 | 7450266 | 0.3518985 | 0.4700734 | -1.06115449290904 |
 
 Preview of the dma results for the comparison of 786-M1A versus HK2
-cells.
+cells. {.table .lightable-classic
+style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;"}
 
   
 In case you have performed a Consumption-Release (core) metabolomics
 experiment, which usually refers to a cell culture experiment where
 metabolomics is performed on the cell culture media, you will also need
-to set the parameter `core=TRUE` in the [`dma()`](../reference/dma.md)
+to set the parameter `core=TRUE` in the
+[`dma()`](https://saezlab.github.io/MetaProViz/reference/dma.md)
 function. In a core experiment the normalized metabolite values can be
 either a negative value, if the metabolite has been consumed from the
 media, or a positive value, if the metabolite has been released from the
@@ -491,15 +473,17 @@ between the two conditions we multiply with -1 if C1 \< C2. By setting
 the paramteter core = TRUE, instead of calclulating the Log2FC, the Log2
 Distance is calculated. For details see extensive vignette
 [Consumption-Release (CoRe) metabolomics data from cell culture
-media](https://saezlab.github.io/MetaProViz/articles/core-metabolomics.html#dma).
+media](https://saezlab.github.io/MetaProViz/articles/pkgdown/core-metabolomics.html#dma).
 
 ### Volcano Plots
 
-In general,we have three different `Plot_Settings`, which will also be
-used for other plot types such as lollipop graphs.  
+In general,
+[`viz_volcano()`](https://saezlab.github.io/MetaProViz/reference/viz_volcano.md)
+has three different plot types, which are set with the parameter
+`plot_types`:  
 `1.` `"Standard"` is the standard version of the plot, with one dataset
 being plotted.  
-`2.` `"Conditions"` here two or more datasets will be plotted
+`2.` `"Compare"` here two datasets (`data` and `data2`) will be plotted
 together.  
 `3.` `"PEA"` stands for Pathway Enrichment Analysis, and is used if the
 results of an GSE analysis should be plotted as here the figure legends
@@ -507,7 +491,7 @@ will be adapted.
   
 Using the dma results, we can now use the **MetaProViz** visualization
 module and generate further customized Volcano plots
-[`viz_volcano()`](../reference/viz_volcano.md):  
+[`viz_volcano()`](https://saezlab.github.io/MetaProViz/reference/viz_volcano.md):  
 - To plot the metabolite names you can change the paramter
 `select_label` from its default (`select_label=""`) to NULL and the
 metabolite names will be plotted randomly or you can also pass a vector
@@ -516,17 +500,13 @@ with Metabolite names that should be labeled.
 code and/or shape the dots on the volcano plot.  
 - Based on feature information (i.e. pathways), you can also create
 individual plots, one for each pathway.  
-For detailed exaples check out `3. Run MetaProViz Visualisation` in the
-vignettes [Standard metabolomics
-data](https://saezlab.github.io/MetaProViz/articles/standard-metabolomics.html#run-metaproviz-visualisation)
+For detailed examples check out the section *Run MetaProViz
+Visualisation* in the vignettes [Standard metabolomics
+data](https://saezlab.github.io/MetaProViz/articles/pkgdown/standard-metabolomics.html#run-metaproviz-visualisation)
 or [Consumption-Release (CoRe) metabolomics data from cell culture
-media](https://saezlab.github.io/MetaProViz/articles/core-metabolomics.html#run-metaproviz-visualisation)  
+media](https://saezlab.github.io/MetaProViz/articles/pkgdown/core-metabolomics.html#run-metaproviz-visualisation)  
 
-    <div class="progress-bar progress-bar-success" style="width: 550%"></div>
-
-## 3. Enrichment Analysis and Prior knowledge
-
-    <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+## Enrichment Analysis and Prior knowledge
 
 Over Representation Analysis (ORA) is a enrichment method that
 determines if a set of features (i.e. metabolic pathways) are
@@ -553,13 +533,14 @@ mapping problem. If you want to know more on how to translate ids,
 quantify the mapping of your data to the prior knwoeldge resource,
 increase the mapping, etc. have a look at our dedicated vignette, [Prior
 Knowledge Access &
-Integration](https://saezlab.github.io/MetaProViz/articles/prior-knowledge.html).  
+Integration](https://saezlab.github.io/MetaProViz/articles/pkgdown/prior-knowledge.html).  
   
 Here we will use the KEGG pathways (Kanehisa and Goto 2000), hence we
 have to ensure that the metabolite names match with the KEGG IDs or KEGG
 trivial names.
 
 ``` r
+
 #--------Add metabolite IDs to our example data:
 # 1. Load Feature metainformation of our example data
 data(cellular_meta)
@@ -586,10 +567,11 @@ In general, the `input_pathway` requirements are column “term”,
 “t.val” and column “Metabolite”.  
 
 ``` r
+
 #Perform ORA
 DM_ORA_res <- standard_ora(data= ORA_Input , #Input data requirements: column `t.val` and column `Metabolite`
 metadata_info=c(pvalColumn="p.adj", percentageColumn="t.val", PathwayTerm= "term", PathwayFeature= "Metabolite"),
-input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the Kegg_Pathways using Load_KEGG()
+input_pathway=KEGG_Pathways,#Pathway file requirements: column `term`, `Metabolite` and `Description`. Above we loaded the KEGG_Pathways using metsigdb_kegg()
 pathway_name="KEGG")
 
 
@@ -597,16 +579,17 @@ pathway_name="KEGG")
 DM_ORA_786M1A_vs_HK2 <- DM_ORA_res[["ClusterGosummary"]]
 ```
 
-| GeneRatio | BgRatio | RichFactor | FoldEnrichment |     zScore |    pvalue |  p.adjust |    qvalue | Metabolites_in_pathway                                                            | Count | Metabolites_in_Pathway | percentage_of_Pathway_detected |
-|:----------|:--------|-----------:|---------------:|-----------:|----------:|----------:|----------:|:----------------------------------------------------------------------------------|------:|-----------------------:|-------------------------------:|
-| 2/14      | 18/130  |  0.1111111 |      1.0317460 |  0.0502165 | 0.6103571 | 0.9360814 | 0.9360814 | L-Alanine/L-Tryptophan                                                            |     2 |                    144 |                           1.39 |
-| 6/14      | 33/130  |  0.1818182 |      1.6883117 |  1.5841129 | 0.1058932 | 0.9360814 | 0.9360814 | Glutathione/Hydroxyproline/L-Alanine/L-Threonine/sn-Glycerol 3-phosphate/Thiamine |     6 |                    130 |                           4.62 |
-| 1/14      | 14/130  |  0.0714286 |      0.6632653 | -0.4615861 | 0.8148272 | 0.9360814 | 0.9360814 | L-Alanine                                                                         |     1 |                     27 |                           3.70 |
-| 3/14      | 19/130  |  0.1578947 |      1.4661654 |  0.7610010 | 0.3343601 | 0.9360814 | 0.9360814 | L-Alanine/L-Threonine/L-Tryptophan                                                |     3 |                     52 |                           5.77 |
-| 1/14      | 11/130  |  0.0909091 |      0.8441558 | -0.1869577 | 0.7295219 | 0.9360814 | 0.9360814 | Hydroxyproline                                                                    |     1 |                     70 |                           1.43 |
+| GeneRatio | BgRatio | RichFactor | FoldEnrichment | zScore | pvalue | p.adjust | qvalue | Metabolites_in_pathway | Count | Metabolites_in_Pathway | percentage_of_Pathway_detected |
+|:---|:---|---:|---:|---:|---:|---:|---:|:---|---:|---:|---:|
+| 2/14 | 18/130 | 0.1111111 | 1.0317460 | 0.0502165 | 0.6103571 | 0.9360814 | 0.9360814 | L-Alanine/L-Tryptophan | 2 | 144 | 1.39 |
+| 6/14 | 33/130 | 0.1818182 | 1.6883117 | 1.5841129 | 0.1058932 | 0.9360814 | 0.9360814 | Glutathione/Hydroxyproline/L-Alanine/L-Threonine/sn-Glycerol 3-phosphate/Thiamine | 6 | 130 | 4.62 |
+| 1/14 | 14/130 | 0.0714286 | 0.6632653 | -0.4615861 | 0.8148272 | 0.9360814 | 0.9360814 | L-Alanine | 1 | 27 | 3.70 |
+| 3/14 | 19/130 | 0.1578947 | 1.4661654 | 0.7610010 | 0.3343601 | 0.9360814 | 0.9360814 | L-Alanine/L-Threonine/L-Tryptophan | 3 | 52 | 5.77 |
+| 1/14 | 11/130 | 0.0909091 | 0.8441558 | -0.1869577 | 0.7295219 | 0.9360814 | 0.9360814 | Hydroxyproline | 1 | 70 | 1.43 |
 
 Preview of the ORA results for the comparison of 786-M1A versus HK2
-cells.
+cells. {.table .lightable-classic
+style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;"}
 
 ### Volcano plot
 
@@ -619,6 +602,7 @@ data used as input for the pathway analysis and the results of the
 pathway analysis:
 
 ``` r
+
 #Here we select only a few pathways to make only the most important plots:
 InputPEA2 <- DM_ORA_786M1A_vs_HK2 %>%
 filter(!is.na(GeneRatio)) %>%
@@ -639,11 +623,7 @@ viz_volcano(plot_types="PEA",
 
 ![](quick-start_files/figure-html/volcano_pea-1.png)![](quick-start_files/figure-html/volcano_pea-2.png)
 
-    <div class="progress-bar progress-bar-success" style="width: 550%"></div>
-
-## 4. Metabolite Clustering Analysis
-
-    <div class="progress-bar progress-bar-success" style="width: 550%"></div>
+## Metabolite Clustering Analysis
 
 Metabolite Clustering Analysis (`MCA`) is a module, which includes
 different functions to enable clustering of metabolites into groups
@@ -715,57 +695,60 @@ significant changes (UP, DOWN).
   
 
 ``` r
+
 # Example of all possible flows:
 data(mca_twocond_rules)
 
 MCA2Cond_Rules <- mca_twocond_rules
 ```
 
-| Cond1                | Cond2                | RG1_All                                                 | RG2_Significant | RG3_SignificantChange |
-|:---------------------|:---------------------|:--------------------------------------------------------|:----------------|:----------------------|
-| DOWN                 | DOWN                 | Cond1 DOWN + Cond2 DOWN                                 | Core_DOWN       | Core_DOWN             |
-| DOWN                 | Not Detected         | Cond1 DOWN + Cond2 Not Detected                         | Cond1_DOWN      | Cond1_DOWN            |
-| DOWN                 | Not Significant      | Cond1 DOWN + Cond2 Not Significant                      | Cond1_DOWN      | Cond1_DOWN            |
-| DOWN                 | Significant Negative | Cond1 DOWN + Cond2 Significant Negative                 | Core_DOWN       | Cond1_DOWN            |
-| DOWN                 | Significant Positive | Cond1 DOWN + Cond2 Significant Positive                 | Opposite        | Cond1_DOWN            |
-| DOWN                 | UP                   | Cond1 DOWN + Cond2 UP                                   | Opposite        | Opposite              |
-| UP                   | DOWN                 | Cond1 UP + Cond2 DOWN                                   | Opposite        | Opposite              |
-| UP                   | Not Detected         | Cond1 UP + Cond2 Not Detected                           | Cond1_UP        | Cond1_UP              |
-| UP                   | Not Significant      | Cond1 UP + Cond2 Not Significant                        | Cond1_UP        | Cond1_UP              |
-| UP                   | Significant Negative | Cond1 UP + Cond2 Significant Negative                   | Opposite        | Cond1_UP              |
-| UP                   | Significant Positive | Cond1 UP + Cond2 Significant Positive                   | Core_UP         | Cond1_UP              |
-| UP                   | UP                   | Cond1 UP + Cond2 UP                                     | Core_UP         | Core_UP               |
-| Not Detected         | DOWN                 | Cond1 Not Detected + Cond2 DOWN                         | Cond2_DOWN      | Cond2_DOWN            |
-| Not Detected         | Not Detected         | Cond1 Not Detected + Cond2 Not Detected                 | None            | None                  |
-| Not Detected         | Not Significant      | Cond1 Not Detected + Cond2 Not Significant              | None            | None                  |
-| Not Detected         | Significant Negative | Cond1 Not Detected + Cond2 Significant Negative         | None            | None                  |
-| Not Detected         | Significant Positive | Cond1 Not Detected + Cond2 Significant Positive         | None            | None                  |
-| Not Detected         | UP                   | Cond1 Not Detected + Cond2 UP                           | Cond2_UP        | Cond2_UP              |
-| Significant Negative | DOWN                 | Cond1 Significant Negative + Cond2 DOWN                 | Core_DOWN       | Cond2_DOWN            |
-| Significant Negative | Not Detected         | Cond1 Significant Negative + Cond2 Not Detected         | None            | None                  |
-| Significant Negative | Not Significant      | Cond1 Significant Negative + Cond2 Not Significant      | None            | None                  |
-| Significant Negative | Significant Negative | Cond1 Significant Negative + Cond2 Significant Negative | None            | None                  |
-| Significant Negative | Significant Positive | Cond1 Significant Negative + Cond2 Significant Positive | None            | None                  |
-| Significant Negative | UP                   | Cond1 Significant Negative + Cond2 UP                   | Opposite        | Cond2_UP              |
-| Significant Positive | DOWN                 | Cond1 Significant Positive + Cond2 DOWN                 | Opposite        | Cond2_DOWN            |
-| Significant Positive | Not Detected         | Cond1 Significant Positive + Cond2 Not Detected         | None            | None                  |
-| Significant Positive | Not Significant      | Cond1 Significant Positive + Cond2 Not Significant      | None            | None                  |
-| Significant Positive | Significant Negative | Cond1 Significant Positive + Cond2 Significant Negative | None            | None                  |
-| Significant Positive | Significant Positive | Cond1 Significant Positive + Cond2 Significant Positive | None            | None                  |
-| Significant Positive | UP                   | Cond1 Significant Positive + Cond2 UP                   | Core_UP         | Cond2_UP              |
-| Not Significant      | DOWN                 | Cond1 Not Significant + Cond2 DOWN                      | Cond2_DOWN      | Cond2_DOWN            |
-| Not Significant      | Not Detected         | Cond1 Not Significant + Cond2 Not Detected              | None            | None                  |
-| Not Significant      | Not Significant      | Cond1 Not Significant + Cond2 Not Significant           | None            | None                  |
-| Not Significant      | Significant Negative | Cond1 Not Significant + Cond2 Significant Negative      | None            | None                  |
-| Not Significant      | Significant Positive | Cond1 Not Significant + Cond2 Significant Positive      | None            | None                  |
-| Not Significant      | UP                   | Cond1 Not Significant + Cond2 UP                        | Cond1_UP        | Cond1_UP              |
+| Cond1 | Cond2 | RG1_All | RG2_Significant | RG3_SignificantChange |
+|:---|:---|:---|:---|:---|
+| DOWN | DOWN | Cond1 DOWN + Cond2 DOWN | Core_DOWN | Core_DOWN |
+| DOWN | Not Detected | Cond1 DOWN + Cond2 Not Detected | Cond1_DOWN | Cond1_DOWN |
+| DOWN | Not Significant | Cond1 DOWN + Cond2 Not Significant | Cond1_DOWN | Cond1_DOWN |
+| DOWN | Significant Negative | Cond1 DOWN + Cond2 Significant Negative | Core_DOWN | Cond1_DOWN |
+| DOWN | Significant Positive | Cond1 DOWN + Cond2 Significant Positive | Opposite | Cond1_DOWN |
+| DOWN | UP | Cond1 DOWN + Cond2 UP | Opposite | Opposite |
+| UP | DOWN | Cond1 UP + Cond2 DOWN | Opposite | Opposite |
+| UP | Not Detected | Cond1 UP + Cond2 Not Detected | Cond1_UP | Cond1_UP |
+| UP | Not Significant | Cond1 UP + Cond2 Not Significant | Cond1_UP | Cond1_UP |
+| UP | Significant Negative | Cond1 UP + Cond2 Significant Negative | Opposite | Cond1_UP |
+| UP | Significant Positive | Cond1 UP + Cond2 Significant Positive | Core_UP | Cond1_UP |
+| UP | UP | Cond1 UP + Cond2 UP | Core_UP | Core_UP |
+| Not Detected | DOWN | Cond1 Not Detected + Cond2 DOWN | Cond2_DOWN | Cond2_DOWN |
+| Not Detected | Not Detected | Cond1 Not Detected + Cond2 Not Detected | None | None |
+| Not Detected | Not Significant | Cond1 Not Detected + Cond2 Not Significant | None | None |
+| Not Detected | Significant Negative | Cond1 Not Detected + Cond2 Significant Negative | None | None |
+| Not Detected | Significant Positive | Cond1 Not Detected + Cond2 Significant Positive | None | None |
+| Not Detected | UP | Cond1 Not Detected + Cond2 UP | Cond2_UP | Cond2_UP |
+| Significant Negative | DOWN | Cond1 Significant Negative + Cond2 DOWN | Core_DOWN | Cond2_DOWN |
+| Significant Negative | Not Detected | Cond1 Significant Negative + Cond2 Not Detected | None | None |
+| Significant Negative | Not Significant | Cond1 Significant Negative + Cond2 Not Significant | None | None |
+| Significant Negative | Significant Negative | Cond1 Significant Negative + Cond2 Significant Negative | None | None |
+| Significant Negative | Significant Positive | Cond1 Significant Negative + Cond2 Significant Positive | None | None |
+| Significant Negative | UP | Cond1 Significant Negative + Cond2 UP | Opposite | Cond2_UP |
+| Significant Positive | DOWN | Cond1 Significant Positive + Cond2 DOWN | Opposite | Cond2_DOWN |
+| Significant Positive | Not Detected | Cond1 Significant Positive + Cond2 Not Detected | None | None |
+| Significant Positive | Not Significant | Cond1 Significant Positive + Cond2 Not Significant | None | None |
+| Significant Positive | Significant Negative | Cond1 Significant Positive + Cond2 Significant Negative | None | None |
+| Significant Positive | Significant Positive | Cond1 Significant Positive + Cond2 Significant Positive | None | None |
+| Significant Positive | UP | Cond1 Significant Positive + Cond2 UP | Core_UP | Cond2_UP |
+| Not Significant | DOWN | Cond1 Not Significant + Cond2 DOWN | Cond2_DOWN | Cond2_DOWN |
+| Not Significant | Not Detected | Cond1 Not Significant + Cond2 Not Detected | None | None |
+| Not Significant | Not Significant | Cond1 Not Significant + Cond2 Not Significant | None | None |
+| Not Significant | Significant Negative | Cond1 Not Significant + Cond2 Significant Negative | None | None |
+| Not Significant | Significant Positive | Cond1 Not Significant + Cond2 Significant Positive | None | None |
+| Not Significant | UP | Cond1 Not Significant + Cond2 UP | Cond1_UP | Cond1_UP |
 
-Metabolite Clustering Analysis: 2 Conditions.
+Metabolite Clustering Analysis: 2 Conditions. {.table .lightable-classic
+style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;"}
 
   
-For a detailed example of the [`mca_2cond()`](../reference/mca_2cond.md)
+For a detailed example of the
+[`mca_2cond()`](https://saezlab.github.io/MetaProViz/reference/mca_2cond.md)
 function visit the extended vignette [Standard metabolomics
-data](https://saezlab.github.io/MetaProViz/articles/standard-metabolomics.html#mca).
+data](https://saezlab.github.io/MetaProViz/articles/pkgdown/standard-metabolomics.html#mca).
 
 ### MCA-CoRe
 
@@ -848,133 +831,136 @@ Regulatory rules:
   
 
 ``` r
+
 # Example of all possible flows:
 data(mca_core_rules)
 
 MCA_CoRe_Rule <- mca_core_rules
 ```
 
-| Intra                | CoRe                 | Core_Direction    | RG1_All                                                                  | R2_Significant                    | RG3_Change                        |
-|:---------------------|:---------------------|:------------------|:-------------------------------------------------------------------------|:----------------------------------|:----------------------------------|
-| DOWN                 | DOWN                 | Released          | Intra DOWN+ CoRe DOWN_Released                                           | Both_DOWN (Released)              | Both_DOWN (Released)              |
-| DOWN                 | Not Detected         | Not Detected      | Intra DOWN+ CoRe Not Detected                                            | None                              | None                              |
-| DOWN                 | Not Significant      | Released          | Intra DOWN+ CoRe Not Significant_Released                                | None                              | None                              |
-| DOWN                 | Significant Negative | Released          | Intra DOWN+ CoRe Significant Negative_Released                           | Both_DOWN (Released)              | None                              |
-| DOWN                 | Significant Positive | Released          | Intra DOWN+ CoRe Significant Positive_Released                           | Opposite (Released UP)            | None                              |
-| DOWN                 | UP                   | Released          | Intra DOWN+ CoRe UP_Released                                             | Opposite (Released UP)            | Opposite (Released UP)            |
-| UP                   | DOWN                 | Released          | Intra UP+ CoRe DOWN_Released                                             | Opposite (Released DOWN)          | Opposite (Released DOWN)          |
-| UP                   | Not Detected         | Not Detected      | Intra UP+ CoRe Not Detected                                              | None                              | None                              |
-| UP                   | Not Significant      | Released          | Intra UP+ CoRe Not Significant_Released                                  | None                              | None                              |
-| UP                   | Significant Negative | Released          | Intra UP+ CoRe Significant Negative_Released                             | Opposite (Released UP)            | None                              |
-| UP                   | Significant Positive | Released          | Intra UP+ CoRe Significant Positive_Released                             | Both_UP (Released)                | None                              |
-| UP                   | UP                   | Released          | Intra UP+ CoRe UP_Released                                               | Both_UP (Released)                | Both_UP (Released)                |
-| Not Detected         | DOWN                 | Released          | Intra Not Detected+ CoRe DOWN_Released                                   | CoRe_DOWN (Released)              | CoRe_DOWN (Released)              |
-| Not Detected         | Not Detected         | Not Detected      | Intra Not Detected+ CoRe Not Detected                                    | None                              | None                              |
-| Not Detected         | Not Significant      | Released          | Intra Not Detected+ CoRe Not Significant_Released                        | None                              | None                              |
-| Not Detected         | Significant Negative | Released          | Intra Not Detected+ CoRe Significant Negative_Released                   | None                              | None                              |
-| Not Detected         | Significant Positive | Released          | Intra Not Detected+ CoRe Significant Positive_Released                   | None                              | None                              |
-| Not Detected         | UP                   | Released          | Intra Not Detected+ CoRe UP_Released                                     | CoRe_UP (Released)                | CoRe_UP (Released)                |
-| Significant Negative | DOWN                 | Released          | Intra Significant Negative+ CoRe DOWN_Released                           | Both_DOWN (Released)              | CoRe_DOWN (Released)              |
-| Significant Negative | Not Detected         | Not Detected      | Intra Significant Negative+ CoRe Not Detected                            | None                              | None                              |
-| Significant Negative | Not Significant      | Released          | Intra Significant Negative+ CoRe Not Significant_Released                | None                              | None                              |
-| Significant Negative | Significant Negative | Released          | Intra Significant Negative+ CoRe Significant Negative_Released           | None                              | None                              |
-| Significant Negative | Significant Positive | Released          | Intra Significant Negative+ CoRe Significant Positive_Released           | None                              | None                              |
-| Significant Negative | UP                   | Released          | Intra Significant Negative+ CoRe UP_Released                             | Opposite (Released UP)            | CoRe_UP (Released)                |
-| Significant Positive | DOWN                 | Released          | Intra Significant Positive+ CoRe DOWN_Released                           | Opposite (Released DOWN)          | CoRe_DOWN (Released)              |
-| Significant Positive | Not Detected         | Not Detected      | Intra Significant Positive+ CoRe Not Detected                            | None                              | None                              |
-| Significant Positive | Not Significant      | Released          | Intra Significant Positive+ CoRe Not Significant_Released                | None                              | None                              |
-| Significant Positive | Significant Negative | Released          | Intra Significant Positive+ CoRe Significant Negative_Released           | None                              | None                              |
-| Significant Positive | Significant Positive | Released          | Intra Significant Positive+ CoRe Significant Positive_Released           | None                              | None                              |
-| Significant Positive | UP                   | Released          | Intra Significant Positive+ CoRe UP_Released                             | Both_UP (Released)                | CoRe_UP (Released)                |
-| Not Significant      | DOWN                 | Released          | Intra Not Significant+ CoRe DOWN_Released                                | CoRe_DOWN (Released)              | CoRe_DOWN (Released)              |
-| Not Significant      | Not Detected         | Not Detected      | Intra Not Significant+ CoRe Not Detected                                 | None                              | None                              |
-| Not Significant      | Not Significant      | Released          | Intra Not Significant+ CoRe Not Significant_Released                     | None                              | None                              |
-| Not Significant      | Significant Negative | Released          | Intra Not Significant+ CoRe Significant Negative_Released                | None                              | None                              |
-| Not Significant      | Significant Positive | Released          | Intra Not Significant+ CoRe Significant Positive_Released                | None                              | None                              |
-| Not Significant      | UP                   | Released          | Intra Not Significant+ CoRe UP_Released                                  | CoRe_UP (Released)                | CoRe_UP (Released)                |
-| DOWN                 | DOWN                 | Consumed          | Intra DOWN+ CoRe DOWN_Consumed                                           | Both_DOWN (Consumed)              | Both_DOWN (Consumed)              |
-| DOWN                 | Not Detected         | Not Detected      | Intra DOWN+ CoRe Not Detected                                            | None                              | None                              |
-| DOWN                 | Not Significant      | Consumed          | Intra DOWN+ CoRe Not Significant_Consumed                                | None                              | None                              |
-| DOWN                 | Significant Negative | Consumed          | Intra DOWN+ CoRe Significant Negative_Consumed                           | Both_DOWN (Consumed)              | None                              |
-| DOWN                 | Significant Positive | Consumed          | Intra DOWN+ CoRe Significant Positive_Consumed                           | Opposite (Consumed UP)            | None                              |
-| DOWN                 | UP                   | Consumed          | Intra DOWN+ CoRe UP_Consumed                                             | Opposite (Consumed UP)            | Opposite (Consumed UP)            |
-| UP                   | DOWN                 | Consumed          | Intra UP+ CoRe DOWN_Consumed                                             | Opposite (Consumed DOWN)          | Opposite (Consumed DOWN)          |
-| UP                   | Not Detected         | Not Detected      | Intra UP+ CoRe Not Detected                                              | None                              | None                              |
-| UP                   | Not Significant      | Consumed          | Intra UP+ CoRe Not Significant_Consumed                                  | None                              | None                              |
-| UP                   | Significant Negative | Consumed          | Intra UP+ CoRe Significant Negative_Consumed                             | Opposite (Consumed UP)            | None                              |
-| UP                   | Significant Positive | Consumed          | Intra UP+ CoRe Significant Positive_Consumed                             | Both_UP (Consumed)                | None                              |
-| UP                   | UP                   | Consumed          | Intra UP+ CoRe UP_Consumed                                               | Both_UP (Consumed)                | Both_UP (Consumed)                |
-| Not Detected         | DOWN                 | Consumed          | Intra Not Detected+ CoRe DOWN_Consumed                                   | CoRe_DOWN (Consumed)              | CoRe_DOWN (Consumed)              |
-| Not Detected         | Not Detected         | Not Detected      | Intra Not Detected+ CoRe Not Detected                                    | None                              | None                              |
-| Not Detected         | Not Significant      | Consumed          | Intra Not Detected+ CoRe Not Significant_Consumed                        | None                              | None                              |
-| Not Detected         | Significant Negative | Consumed          | Intra Not Detected+ CoRe Significant Negative_Consumed                   | None                              | None                              |
-| Not Detected         | Significant Positive | Consumed          | Intra Not Detected+ CoRe Significant Positive_Consumed                   | None                              | None                              |
-| Not Detected         | UP                   | Consumed          | Intra Not Detected+ CoRe UP_Consumed                                     | CoRe_UP (Consumed)                | CoRe_UP (Consumed)                |
-| Significant Negative | DOWN                 | Consumed          | Intra Significant Negative+ CoRe DOWN_Consumed                           | Both_DOWN (Consumed)              | CoRe_DOWN (Consumed)              |
-| Significant Negative | Not Detected         | Not Detected      | Intra Significant Negative+ CoRe Not Detected                            | None                              | None                              |
-| Significant Negative | Not Significant      | Consumed          | Intra Significant Negative+ CoRe Not Significant_Consumed                | None                              | None                              |
-| Significant Negative | Significant Negative | Consumed          | Intra Significant Negative+ CoRe Significant Negative_Consumed           | None                              | None                              |
-| Significant Negative | Significant Positive | Consumed          | Intra Significant Negative+ CoRe Significant Positive_Consumed           | None                              | None                              |
-| Significant Negative | UP                   | Consumed          | Intra Significant Negative+ CoRe UP_Consumed                             | Opposite (Consumed UP)            | CoRe_UP (Consumed)                |
-| Significant Positive | DOWN                 | Consumed          | Intra Significant Positive+ CoRe DOWN_Consumed                           | Opposite (Consumed DOWN)          | CoRe_DOWN (Consumed)              |
-| Significant Positive | Not Detected         | Not Detected      | Intra Significant Positive+ CoRe Not Detected                            | None                              | None                              |
-| Significant Positive | Not Significant      | Consumed          | Intra Significant Positive+ CoRe Not Significant_Consumed                | None                              | None                              |
-| Significant Positive | Significant Negative | Consumed          | Intra Significant Positive+ CoRe Significant Negative_Consumed           | None                              | None                              |
-| Significant Positive | Significant Positive | Consumed          | Intra Significant Positive+ CoRe Significant Positive_Consumed           | None                              | None                              |
-| Significant Positive | UP                   | Consumed          | Intra Significant Positive+ CoRe UP_Consumed                             | Both_UP (Consumed)                | CoRe_UP (Consumed)                |
-| Not Significant      | DOWN                 | Consumed          | Intra Not Significant+ CoRe DOWN_Consumed                                | CoRe_DOWN (Consumed)              | CoRe_DOWN (Consumed)              |
-| Not Significant      | Not Detected         | Not Detected      | Intra Not Significant+ CoRe Not Detected                                 | None                              | None                              |
-| Not Significant      | Not Significant      | Consumed          | Intra Not Significant+ CoRe Not Significant_Consumed                     | None                              | None                              |
-| Not Significant      | Significant Negative | Consumed          | Intra Not Significant+ CoRe Significant Negative_Consumed                | None                              | None                              |
-| Not Significant      | Significant Positive | Consumed          | Intra Not Significant+ CoRe Significant Positive_Consumed                | None                              | None                              |
-| Not Significant      | UP                   | Consumed          | Intra Not Significant+ CoRe UP_Consumed                                  | CoRe_UP (Consumed)                | CoRe_UP (Consumed)                |
-| DOWN                 | DOWN                 | Released/Consumed | Intra DOWN + CoRe DOWN_Released/Consumed                                 | Both_DOWN (Released/Consumed)     | Both_DOWN (Released/Consumed)     |
-| DOWN                 | Not Detected         | Not Detected      | Intra DOWN + CoRe Not Detected                                           | None                              | None                              |
-| DOWN                 | Not Significant      | Released/Consumed | Intra DOWN + CoRe Not Significant_Released/Consumed                      | None                              | None                              |
-| DOWN                 | Significant Negative | Released/Consumed | Intra DOWN + CoRe Significant Negative_Released/Consumed                 | Both_DOWN (Released/Consumed)     | None                              |
-| DOWN                 | Significant Positive | Released/Consumed | Intra DOWN + CoRe Significant Positive_Released/Consumed                 | Opposite (Released/Consumed UP)   | None                              |
-| DOWN                 | UP                   | Released/Consumed | Intra DOWN + CoRe UP_Released/Consumed                                   | Opposite (Released/Consumed UP)   | Opposite (Released/Consumed UP)   |
-| UP                   | DOWN                 | Released/Consumed | Intra UP + CoRe DOWN_Released/Consumed                                   | Opposite (Released/Consumed DOWN) | Opposite (Released/Consumed DOWN) |
-| UP                   | Not Detected         | Not Detected      | Intra UP + CoRe Not Detected                                             | None                              | None                              |
-| UP                   | Not Significant      | Released/Consumed | Intra UP + CoRe Not Significant_Released/Consumed                        | None                              | None                              |
-| UP                   | Significant Negative | Released/Consumed | Intra UP + CoRe Significant Negative_Released/Consumed                   | Opposite (Released/Consumed UP)   | None                              |
-| UP                   | Significant Positive | Released/Consumed | Intra UP + CoRe Significant Positive_Released/Consumed                   | Both_UP (Released/Consumed)       | None                              |
-| UP                   | UP                   | Released/Consumed | Intra UP + CoRe UP_Released/Consumed                                     | Both_UP (Released/Consumed)       | Both_UP (Released/Consumed)       |
-| Not Detected         | DOWN                 | Released/Consumed | Intra Not Detected + CoRe DOWN_Released/Consumed                         | CoRe_DOWN (Released/Consumed)     | CoRe_DOWN (Released/Consumed)     |
-| Not Detected         | Not Detected         | Not Detected      | Intra Not Detected + CoRe Not Detected                                   | None                              | None                              |
-| Not Detected         | Not Significant      | Released/Consumed | Intra Not Detected + CoRe Not Significant_Released/Consumed              | None                              | None                              |
-| Not Detected         | Significant Negative | Released/Consumed | Intra Not Detected + CoRe Significant Negative_Released/Consumed         | None                              | None                              |
-| Not Detected         | Significant Positive | Released/Consumed | Intra Not Detected + CoRe Significant Positive_Released/Consumed         | None                              | None                              |
-| Not Detected         | UP                   | Released/Consumed | Intra Not Detected + CoRe UP_Released/Consumed                           | CoRe_UP (Released/Consumed)       | CoRe_UP (Released/Consumed)       |
-| Significant Negative | DOWN                 | Released/Consumed | Intra Significant Negative + CoRe DOWN_Released/Consumed                 | Both_DOWN (Released/Consumed)     | CoRe_DOWN (Released/Consumed)     |
-| Significant Negative | Not Detected         | Not Detected      | Intra Significant Negative + CoRe Not Detected                           | None                              | None                              |
-| Significant Negative | Not Significant      | Released/Consumed | Intra Significant Negative + CoRe Not Significant_Released/Consumed      | None                              | None                              |
-| Significant Negative | Significant Negative | Released/Consumed | Intra Significant Negative + CoRe Significant Negative_Released/Consumed | None                              | None                              |
-| Significant Negative | Significant Positive | Released/Consumed | Intra Significant Negative + CoRe Significant Positive_Released/Consumed | None                              | None                              |
-| Significant Negative | UP                   | Released/Consumed | Intra Significant Negative + CoRe UP_Released/Consumed                   | Opposite (Released/Consumed UP)   | CoRe_UP (Released/Consumed)       |
-| Significant Positive | DOWN                 | Released/Consumed | Intra Significant Positive + CoRe DOWN_Released/Consumed                 | Opposite (Released/Consumed DOWN) | CoRe_DOWN (Released/Consumed)     |
-| Significant Positive | Not Detected         | Not Detected      | Intra Significant Positive + CoRe Not Detected                           | None                              | None                              |
-| Significant Positive | Not Significant      | Released/Consumed | Intra Significant Positive + CoRe Not Significant_Released/Consumed      | None                              | None                              |
-| Significant Positive | Significant Negative | Released/Consumed | Intra Significant Positive + CoRe Significant Negative_Released/Consumed | None                              | None                              |
-| Significant Positive | Significant Positive | Released/Consumed | Intra Significant Positive + CoRe Significant Positive_Released/Consumed | None                              | None                              |
-| Significant Positive | UP                   | Released/Consumed | Intra Significant Positive + CoRe UP_Released/Consumed                   | Both_UP (Released/Consumed)       | CoRe_UP (Released/Consumed)       |
-| Not Significant      | DOWN                 | Released/Consumed | Intra Not Significant + CoRe DOWN_Released/Consumed                      | CoRe_DOWN (Released/Consumed)     | CoRe_DOWN (Released/Consumed)     |
-| Not Significant      | Not Detected         | Not Detected      | Intra Not Significant + CoRe Not Detected                                | None                              | None                              |
-| Not Significant      | Not Significant      | Released/Consumed | Intra Not Significant + CoRe Not Significant_Released/Consumed           | None                              | None                              |
-| Not Significant      | Significant Negative | Released/Consumed | Intra Not Significant + CoRe Significant Negative_Released/Consumed      | None                              | None                              |
-| Not Significant      | Significant Positive | Released/Consumed | Intra Not Significant + CoRe Significant Positive_Released/Consumed      | None                              | None                              |
-| Not Significant      | UP                   | Released/Consumed | Intra Not Significant + CoRe UP_Released/Consumed                        | CoRe_UP (Released/Consumed)       | CoRe_UP (Released/Consumed)       |
+| Intra | CoRe | Core_Direction | RG1_All | R2_Significant | RG3_Change |
+|:---|:---|:---|:---|:---|:---|
+| DOWN | DOWN | Released | Intra DOWN+ CoRe DOWN_Released | Both_DOWN (Released) | Both_DOWN (Released) |
+| DOWN | Not Detected | Not Detected | Intra DOWN+ CoRe Not Detected | None | None |
+| DOWN | Not Significant | Released | Intra DOWN+ CoRe Not Significant_Released | None | None |
+| DOWN | Significant Negative | Released | Intra DOWN+ CoRe Significant Negative_Released | Both_DOWN (Released) | None |
+| DOWN | Significant Positive | Released | Intra DOWN+ CoRe Significant Positive_Released | Opposite (Released UP) | None |
+| DOWN | UP | Released | Intra DOWN+ CoRe UP_Released | Opposite (Released UP) | Opposite (Released UP) |
+| UP | DOWN | Released | Intra UP+ CoRe DOWN_Released | Opposite (Released DOWN) | Opposite (Released DOWN) |
+| UP | Not Detected | Not Detected | Intra UP+ CoRe Not Detected | None | None |
+| UP | Not Significant | Released | Intra UP+ CoRe Not Significant_Released | None | None |
+| UP | Significant Negative | Released | Intra UP+ CoRe Significant Negative_Released | Opposite (Released UP) | None |
+| UP | Significant Positive | Released | Intra UP+ CoRe Significant Positive_Released | Both_UP (Released) | None |
+| UP | UP | Released | Intra UP+ CoRe UP_Released | Both_UP (Released) | Both_UP (Released) |
+| Not Detected | DOWN | Released | Intra Not Detected+ CoRe DOWN_Released | CoRe_DOWN (Released) | CoRe_DOWN (Released) |
+| Not Detected | Not Detected | Not Detected | Intra Not Detected+ CoRe Not Detected | None | None |
+| Not Detected | Not Significant | Released | Intra Not Detected+ CoRe Not Significant_Released | None | None |
+| Not Detected | Significant Negative | Released | Intra Not Detected+ CoRe Significant Negative_Released | None | None |
+| Not Detected | Significant Positive | Released | Intra Not Detected+ CoRe Significant Positive_Released | None | None |
+| Not Detected | UP | Released | Intra Not Detected+ CoRe UP_Released | CoRe_UP (Released) | CoRe_UP (Released) |
+| Significant Negative | DOWN | Released | Intra Significant Negative+ CoRe DOWN_Released | Both_DOWN (Released) | CoRe_DOWN (Released) |
+| Significant Negative | Not Detected | Not Detected | Intra Significant Negative+ CoRe Not Detected | None | None |
+| Significant Negative | Not Significant | Released | Intra Significant Negative+ CoRe Not Significant_Released | None | None |
+| Significant Negative | Significant Negative | Released | Intra Significant Negative+ CoRe Significant Negative_Released | None | None |
+| Significant Negative | Significant Positive | Released | Intra Significant Negative+ CoRe Significant Positive_Released | None | None |
+| Significant Negative | UP | Released | Intra Significant Negative+ CoRe UP_Released | Opposite (Released UP) | CoRe_UP (Released) |
+| Significant Positive | DOWN | Released | Intra Significant Positive+ CoRe DOWN_Released | Opposite (Released DOWN) | CoRe_DOWN (Released) |
+| Significant Positive | Not Detected | Not Detected | Intra Significant Positive+ CoRe Not Detected | None | None |
+| Significant Positive | Not Significant | Released | Intra Significant Positive+ CoRe Not Significant_Released | None | None |
+| Significant Positive | Significant Negative | Released | Intra Significant Positive+ CoRe Significant Negative_Released | None | None |
+| Significant Positive | Significant Positive | Released | Intra Significant Positive+ CoRe Significant Positive_Released | None | None |
+| Significant Positive | UP | Released | Intra Significant Positive+ CoRe UP_Released | Both_UP (Released) | CoRe_UP (Released) |
+| Not Significant | DOWN | Released | Intra Not Significant+ CoRe DOWN_Released | CoRe_DOWN (Released) | CoRe_DOWN (Released) |
+| Not Significant | Not Detected | Not Detected | Intra Not Significant+ CoRe Not Detected | None | None |
+| Not Significant | Not Significant | Released | Intra Not Significant+ CoRe Not Significant_Released | None | None |
+| Not Significant | Significant Negative | Released | Intra Not Significant+ CoRe Significant Negative_Released | None | None |
+| Not Significant | Significant Positive | Released | Intra Not Significant+ CoRe Significant Positive_Released | None | None |
+| Not Significant | UP | Released | Intra Not Significant+ CoRe UP_Released | CoRe_UP (Released) | CoRe_UP (Released) |
+| DOWN | DOWN | Consumed | Intra DOWN+ CoRe DOWN_Consumed | Both_DOWN (Consumed) | Both_DOWN (Consumed) |
+| DOWN | Not Detected | Not Detected | Intra DOWN+ CoRe Not Detected | None | None |
+| DOWN | Not Significant | Consumed | Intra DOWN+ CoRe Not Significant_Consumed | None | None |
+| DOWN | Significant Negative | Consumed | Intra DOWN+ CoRe Significant Negative_Consumed | Both_DOWN (Consumed) | None |
+| DOWN | Significant Positive | Consumed | Intra DOWN+ CoRe Significant Positive_Consumed | Opposite (Consumed UP) | None |
+| DOWN | UP | Consumed | Intra DOWN+ CoRe UP_Consumed | Opposite (Consumed UP) | Opposite (Consumed UP) |
+| UP | DOWN | Consumed | Intra UP+ CoRe DOWN_Consumed | Opposite (Consumed DOWN) | Opposite (Consumed DOWN) |
+| UP | Not Detected | Not Detected | Intra UP+ CoRe Not Detected | None | None |
+| UP | Not Significant | Consumed | Intra UP+ CoRe Not Significant_Consumed | None | None |
+| UP | Significant Negative | Consumed | Intra UP+ CoRe Significant Negative_Consumed | Opposite (Consumed UP) | None |
+| UP | Significant Positive | Consumed | Intra UP+ CoRe Significant Positive_Consumed | Both_UP (Consumed) | None |
+| UP | UP | Consumed | Intra UP+ CoRe UP_Consumed | Both_UP (Consumed) | Both_UP (Consumed) |
+| Not Detected | DOWN | Consumed | Intra Not Detected+ CoRe DOWN_Consumed | CoRe_DOWN (Consumed) | CoRe_DOWN (Consumed) |
+| Not Detected | Not Detected | Not Detected | Intra Not Detected+ CoRe Not Detected | None | None |
+| Not Detected | Not Significant | Consumed | Intra Not Detected+ CoRe Not Significant_Consumed | None | None |
+| Not Detected | Significant Negative | Consumed | Intra Not Detected+ CoRe Significant Negative_Consumed | None | None |
+| Not Detected | Significant Positive | Consumed | Intra Not Detected+ CoRe Significant Positive_Consumed | None | None |
+| Not Detected | UP | Consumed | Intra Not Detected+ CoRe UP_Consumed | CoRe_UP (Consumed) | CoRe_UP (Consumed) |
+| Significant Negative | DOWN | Consumed | Intra Significant Negative+ CoRe DOWN_Consumed | Both_DOWN (Consumed) | CoRe_DOWN (Consumed) |
+| Significant Negative | Not Detected | Not Detected | Intra Significant Negative+ CoRe Not Detected | None | None |
+| Significant Negative | Not Significant | Consumed | Intra Significant Negative+ CoRe Not Significant_Consumed | None | None |
+| Significant Negative | Significant Negative | Consumed | Intra Significant Negative+ CoRe Significant Negative_Consumed | None | None |
+| Significant Negative | Significant Positive | Consumed | Intra Significant Negative+ CoRe Significant Positive_Consumed | None | None |
+| Significant Negative | UP | Consumed | Intra Significant Negative+ CoRe UP_Consumed | Opposite (Consumed UP) | CoRe_UP (Consumed) |
+| Significant Positive | DOWN | Consumed | Intra Significant Positive+ CoRe DOWN_Consumed | Opposite (Consumed DOWN) | CoRe_DOWN (Consumed) |
+| Significant Positive | Not Detected | Not Detected | Intra Significant Positive+ CoRe Not Detected | None | None |
+| Significant Positive | Not Significant | Consumed | Intra Significant Positive+ CoRe Not Significant_Consumed | None | None |
+| Significant Positive | Significant Negative | Consumed | Intra Significant Positive+ CoRe Significant Negative_Consumed | None | None |
+| Significant Positive | Significant Positive | Consumed | Intra Significant Positive+ CoRe Significant Positive_Consumed | None | None |
+| Significant Positive | UP | Consumed | Intra Significant Positive+ CoRe UP_Consumed | Both_UP (Consumed) | CoRe_UP (Consumed) |
+| Not Significant | DOWN | Consumed | Intra Not Significant+ CoRe DOWN_Consumed | CoRe_DOWN (Consumed) | CoRe_DOWN (Consumed) |
+| Not Significant | Not Detected | Not Detected | Intra Not Significant+ CoRe Not Detected | None | None |
+| Not Significant | Not Significant | Consumed | Intra Not Significant+ CoRe Not Significant_Consumed | None | None |
+| Not Significant | Significant Negative | Consumed | Intra Not Significant+ CoRe Significant Negative_Consumed | None | None |
+| Not Significant | Significant Positive | Consumed | Intra Not Significant+ CoRe Significant Positive_Consumed | None | None |
+| Not Significant | UP | Consumed | Intra Not Significant+ CoRe UP_Consumed | CoRe_UP (Consumed) | CoRe_UP (Consumed) |
+| DOWN | DOWN | Released/Consumed | Intra DOWN + CoRe DOWN_Released/Consumed | Both_DOWN (Released/Consumed) | Both_DOWN (Released/Consumed) |
+| DOWN | Not Detected | Not Detected | Intra DOWN + CoRe Not Detected | None | None |
+| DOWN | Not Significant | Released/Consumed | Intra DOWN + CoRe Not Significant_Released/Consumed | None | None |
+| DOWN | Significant Negative | Released/Consumed | Intra DOWN + CoRe Significant Negative_Released/Consumed | Both_DOWN (Released/Consumed) | None |
+| DOWN | Significant Positive | Released/Consumed | Intra DOWN + CoRe Significant Positive_Released/Consumed | Opposite (Released/Consumed UP) | None |
+| DOWN | UP | Released/Consumed | Intra DOWN + CoRe UP_Released/Consumed | Opposite (Released/Consumed UP) | Opposite (Released/Consumed UP) |
+| UP | DOWN | Released/Consumed | Intra UP + CoRe DOWN_Released/Consumed | Opposite (Released/Consumed DOWN) | Opposite (Released/Consumed DOWN) |
+| UP | Not Detected | Not Detected | Intra UP + CoRe Not Detected | None | None |
+| UP | Not Significant | Released/Consumed | Intra UP + CoRe Not Significant_Released/Consumed | None | None |
+| UP | Significant Negative | Released/Consumed | Intra UP + CoRe Significant Negative_Released/Consumed | Opposite (Released/Consumed UP) | None |
+| UP | Significant Positive | Released/Consumed | Intra UP + CoRe Significant Positive_Released/Consumed | Both_UP (Released/Consumed) | None |
+| UP | UP | Released/Consumed | Intra UP + CoRe UP_Released/Consumed | Both_UP (Released/Consumed) | Both_UP (Released/Consumed) |
+| Not Detected | DOWN | Released/Consumed | Intra Not Detected + CoRe DOWN_Released/Consumed | CoRe_DOWN (Released/Consumed) | CoRe_DOWN (Released/Consumed) |
+| Not Detected | Not Detected | Not Detected | Intra Not Detected + CoRe Not Detected | None | None |
+| Not Detected | Not Significant | Released/Consumed | Intra Not Detected + CoRe Not Significant_Released/Consumed | None | None |
+| Not Detected | Significant Negative | Released/Consumed | Intra Not Detected + CoRe Significant Negative_Released/Consumed | None | None |
+| Not Detected | Significant Positive | Released/Consumed | Intra Not Detected + CoRe Significant Positive_Released/Consumed | None | None |
+| Not Detected | UP | Released/Consumed | Intra Not Detected + CoRe UP_Released/Consumed | CoRe_UP (Released/Consumed) | CoRe_UP (Released/Consumed) |
+| Significant Negative | DOWN | Released/Consumed | Intra Significant Negative + CoRe DOWN_Released/Consumed | Both_DOWN (Released/Consumed) | CoRe_DOWN (Released/Consumed) |
+| Significant Negative | Not Detected | Not Detected | Intra Significant Negative + CoRe Not Detected | None | None |
+| Significant Negative | Not Significant | Released/Consumed | Intra Significant Negative + CoRe Not Significant_Released/Consumed | None | None |
+| Significant Negative | Significant Negative | Released/Consumed | Intra Significant Negative + CoRe Significant Negative_Released/Consumed | None | None |
+| Significant Negative | Significant Positive | Released/Consumed | Intra Significant Negative + CoRe Significant Positive_Released/Consumed | None | None |
+| Significant Negative | UP | Released/Consumed | Intra Significant Negative + CoRe UP_Released/Consumed | Opposite (Released/Consumed UP) | CoRe_UP (Released/Consumed) |
+| Significant Positive | DOWN | Released/Consumed | Intra Significant Positive + CoRe DOWN_Released/Consumed | Opposite (Released/Consumed DOWN) | CoRe_DOWN (Released/Consumed) |
+| Significant Positive | Not Detected | Not Detected | Intra Significant Positive + CoRe Not Detected | None | None |
+| Significant Positive | Not Significant | Released/Consumed | Intra Significant Positive + CoRe Not Significant_Released/Consumed | None | None |
+| Significant Positive | Significant Negative | Released/Consumed | Intra Significant Positive + CoRe Significant Negative_Released/Consumed | None | None |
+| Significant Positive | Significant Positive | Released/Consumed | Intra Significant Positive + CoRe Significant Positive_Released/Consumed | None | None |
+| Significant Positive | UP | Released/Consumed | Intra Significant Positive + CoRe UP_Released/Consumed | Both_UP (Released/Consumed) | CoRe_UP (Released/Consumed) |
+| Not Significant | DOWN | Released/Consumed | Intra Not Significant + CoRe DOWN_Released/Consumed | CoRe_DOWN (Released/Consumed) | CoRe_DOWN (Released/Consumed) |
+| Not Significant | Not Detected | Not Detected | Intra Not Significant + CoRe Not Detected | None | None |
+| Not Significant | Not Significant | Released/Consumed | Intra Not Significant + CoRe Not Significant_Released/Consumed | None | None |
+| Not Significant | Significant Negative | Released/Consumed | Intra Not Significant + CoRe Significant Negative_Released/Consumed | None | None |
+| Not Significant | Significant Positive | Released/Consumed | Intra Not Significant + CoRe Significant Positive_Released/Consumed | None | None |
+| Not Significant | UP | Released/Consumed | Intra Not Significant + CoRe UP_Released/Consumed | CoRe_UP (Released/Consumed) | CoRe_UP (Released/Consumed) |
 
-Metabolite Clustering Analysis: core.
+Metabolite Clustering Analysis: core. {.table .lightable-classic
+style="font-size: 12px; font-family: Cambria; width: auto !important; margin-left: auto; margin-right: auto;"}
 
   
   
   
 
-For a detailed example of the [`mca_core()`](../reference/mca_core.md)
+For a detailed example of the
+[`mca_core()`](https://saezlab.github.io/MetaProViz/reference/mca_core.md)
 function visit the extended vignette [Consumption-Release (CoRe)
 metabolomics data from cell culture
-media](https://saezlab.github.io/MetaProViz/articles/core-metabolomics.html#mca).
+media](https://saezlab.github.io/MetaProViz/articles/pkgdown/core-metabolomics.html#mca).
 
 ### ORA on each metabolite cluster
 
@@ -984,15 +970,16 @@ exact test it is perfect to test if a set of features (=metabolic
 pathways) are over-represented in the selection of features (= clusters
 of metabolites) from the data in comparison to all measured features
 (all metabolites). In detail,
-[`cluster_ora()`](../reference/cluster_ora.md) will perform ORA on each
-of the metabolite clusters we got as a result of performing `mca_2cond`
-or `mca_core` using all metabolites as the background. For a detailed
-example of the [`cluster_ora()`](../reference/cluster_ora.md) function
-visit the extended vignette [Consumption-Release (CoRe) metabolomics
-data from cell culture
-media](https://saezlab.github.io/MetaProViz/articles/core-metabolomics.html#ora-on-each-metabolite-cluster)
+[`cluster_ora()`](https://saezlab.github.io/MetaProViz/reference/cluster_ora.md)
+will perform ORA on each of the metabolite clusters we got as a result
+of performing `mca_2cond` or `mca_core` using all metabolites as the
+background. For a detailed example of the
+[`cluster_ora()`](https://saezlab.github.io/MetaProViz/reference/cluster_ora.md)
+function visit the extended vignette [Consumption-Release (CoRe)
+metabolomics data from cell culture
+media](https://saezlab.github.io/MetaProViz/articles/pkgdown/core-metabolomics.html#ora-on-each-metabolite-cluster)
 or [Standard metabolomics
-data](https://saezlab.github.io/MetaProViz/articles/standard-metabolomics.html#ora-on-each-metabolite-cluster).
+data](https://saezlab.github.io/MetaProViz/articles/pkgdown/standard-metabolomics.html#ora-on-each-metabolite-cluster).
 
 ## Viz
 
@@ -1006,21 +993,20 @@ title. In this way, there is no need for many adjustments and the
 figures can just be dropped into the presentation or paper and are all
 in the same style.  
   
-All the `VizPlotName()` functions are constructed in the same way.
-Indeed, with the parameter `Plot_metadata_info` the user can pass a
-named vector with information about the metadata column that should be
-used to customize the plot by colour, shape or creating individual
-plots, which will all be showcased for the different plot types. Via the
-parameter `Plot_SettingsFile` the user can pass the metadata DF, which
-can be dependent on the plot type for the samples and/or the features
-(=metabolites). In case of both the parameter is named
-`Plot_metadata_sample` and `Plot_metadata_feature`.  
+All the `viz_*()` functions are constructed in the same way. Indeed,
+with the parameter `metadata_info` the user can pass a named vector with
+information about the metadata column that should be used to customize
+the plot by colour, shape or creating individual plots, which will all
+be showcased for the different plot types. Via the parameters
+`metadata_sample` and `metadata_feature` the user can pass the metadata
+DF for the samples and/or the features (=metabolites), depending on the
+plot type.  
   
-In each of those Plot_Settings, the user can label color and/or shape
-based on additional information (e.g. Pathway information, Cluster
-information or other other demographics like gender). Moreover, we also
-enable to plot individual plots where applicable based on those MetaData
-(e.g. one plot for each metabolic pathway).  
+In each of those plots, the user can label color and/or shape based on
+additional information (e.g. Pathway information, Cluster information or
+other other demographics like gender). Moreover, we also enable to plot
+individual plots where applicable based on those MetaData (e.g. one plot
+for each metabolic pathway).  
   
 We support the plot types:  
 - PCA plot - Superplots (Bar, Box and Violin plots) - Heatmaps - Volcano
@@ -1028,17 +1014,15 @@ Plots
 
 For a detailed example of the visualisation functions visit the extended
 vignette [Consumption-Release (CoRe) metabolomics data from cell culture
-media](https://saezlab.github.io/MetaProViz/articles/core-metabolomics.html#run-metaproviz-visualisation)
+media](https://saezlab.github.io/MetaProViz/articles/pkgdown/core-metabolomics.html#run-metaproviz-visualisation)
 or [Standard metabolomics
-data](https://saezlab.github.io/MetaProViz/articles/standard-metabolomics.html#run-metaproviz-visualisation).
-
-    <div class="progress-bar progress-bar-success" style="width: 100%"></div>
+data](https://saezlab.github.io/MetaProViz/articles/pkgdown/standard-metabolomics.html#run-metaproviz-visualisation).
 
 ## Session information
 
-    #> R version 4.5.2 (2025-10-31)
+    #> R version 4.6.1 (2026-06-24)
     #> Platform: x86_64-pc-linux-gnu
-    #> Running under: Ubuntu 24.04.3 LTS
+    #> Running under: Ubuntu 24.04.4 LTS
     #> 
     #> Matrix products: default
     #> BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3 
@@ -1056,53 +1040,51 @@ data](https://saezlab.github.io/MetaProViz/articles/standard-metabolomics.html#r
     #> [1] stats     graphics  grDevices utils     datasets  methods   base     
     #> 
     #> other attached packages:
-    #> [1] tibble_3.3.1       ggfortify_0.4.19   ggplot2_4.0.2      rlang_1.2.0        dplyr_1.2.1        magrittr_2.0.5    
-    #> [7] MetaProViz_3.99.53 BiocStyle_2.38.0  
+    #> [1] tibble_3.3.1      ggfortify_0.4.24  ggplot2_4.0.3     rlang_1.3.0       dplyr_1.2.1       magrittr_2.0.5   
+    #> [7] MetaProViz_4.99.0 BiocStyle_2.40.0 
     #> 
     #> loaded via a namespace (and not attached):
-    #>   [1] RColorBrewer_1.1-3          rstudioapi_0.18.0           jsonlite_2.0.0              ggbeeswarm_0.7.3           
-    #>   [5] farver_2.1.2                rmarkdown_2.31              fs_2.0.1                    ragg_1.5.2                 
-    #>   [9] vctrs_0.7.3                 memoise_2.0.1               rstatix_0.7.3               htmltools_0.5.9            
-    #>  [13] S4Arrays_1.10.1             progress_1.2.3              curl_7.0.0                  ComplexUpset_1.3.3         
-    #>  [17] decoupleR_2.16.0            broom_1.0.12                cellranger_1.1.0            SparseArray_1.10.10        
-    #>  [21] Formula_1.2-5               sass_0.4.10                 parallelly_1.46.1           bslib_0.10.0               
-    #>  [25] htmlwidgets_1.6.4           desc_1.4.3                  plyr_1.8.9                  httr2_1.2.2                
-    #>  [29] lubridate_1.9.5             cachem_1.1.0                igraph_2.2.3                lifecycle_1.0.5            
-    #>  [33] pkgconfig_2.0.3             Matrix_1.7-4                R6_2.6.1                    fastmap_1.2.0              
-    #>  [37] MatrixGenerics_1.22.0       digest_0.6.39               colorspace_2.1-2            patchwork_1.3.2            
-    #>  [41] S4Vectors_0.48.1            textshaping_1.0.5           GenomicRanges_1.62.1        RSQLite_2.4.6              
-    #>  [45] ggpubr_0.6.3                labeling_0.4.3              timechange_0.4.0            polyclip_1.10-7            
-    #>  [49] httr_1.4.8                  abind_1.4-8                 compiler_4.5.2              bit64_4.6.0-1              
-    #>  [53] withr_3.0.2                 S7_0.2.1                    backports_1.5.1             BiocParallel_1.44.0        
-    #>  [57] viridis_0.6.5               carData_3.0-6               DBI_1.3.0                   logger_0.4.1               
-    #>  [61] OmnipathR_3.19.12           ggforce_0.5.0               R.utils_2.13.0              ggsignif_0.6.4             
-    #>  [65] cosmosR_1.18.1              MASS_7.3-65                 rappdirs_0.3.4              DelayedArray_0.36.1        
-    #>  [69] sessioninfo_1.2.3           scatterplot3d_0.3-45        gtools_3.9.5                tools_4.5.2                
-    #>  [73] vipor_0.4.7                 otel_0.2.0                  qcc_2.7                     beeswarm_0.4.0             
-    #>  [77] zip_2.3.3                   R.oo_1.27.1                 glue_1.8.0                  grid_4.5.2                 
-    #>  [81] checkmate_2.3.4             reshape2_1.4.5              generics_0.1.4              gtable_0.3.6               
-    #>  [85] tzdb_0.5.0                  R.methodsS3_1.8.2           tidyr_1.3.2                 hms_1.1.4                  
-    #>  [89] tidygraph_1.3.1             xml2_1.5.2                  car_3.1-5                   XVector_0.50.0             
-    #>  [93] BiocGenerics_0.56.0         ggrepel_0.9.8               pillar_1.11.1               stringr_1.6.0              
-    #>  [97] vroom_1.7.1                 limma_3.66.0                later_1.4.8                 splines_4.5.2              
-    #> [101] tweenr_2.0.3                lattice_0.22-7              bit_4.6.0                   tidyselect_1.2.1           
-    #> [105] knitr_1.51                  gridExtra_2.3               bookdown_0.46               IRanges_2.44.0             
-    #> [109] Seqinfo_1.0.0               SummarizedExperiment_1.40.0 svglite_2.2.2               stats4_4.5.2               
-    #> [113] xfun_0.57                   graphlayouts_1.2.3          Biobase_2.70.0              statmod_1.5.1              
-    #> [117] factoextra_2.0.0            matrixStats_1.5.0           pheatmap_1.0.13             stringi_1.8.7              
-    #> [121] yaml_2.3.12                 kableExtra_1.4.0            evaluate_1.0.5              codetools_0.2-20           
-    #> [125] tcltk_4.5.2                 ggraph_2.2.2                qvalue_2.42.0               hash_2.2.6.4               
-    #> [129] BiocManager_1.30.27         Polychrome_1.5.4            cli_3.6.6                   systemfonts_1.3.2          
-    #> [133] jquerylib_0.1.4             EnhancedVolcano_1.29.1      Rcpp_1.1.1                  readxl_1.4.5               
-    #> [137] XML_3.99-0.23               parallel_4.5.2              pkgdown_2.2.0               readr_2.2.0                
-    #> [141] blob_1.3.0                  prettyunits_1.2.0           viridisLite_0.4.3           scales_1.4.0               
-    #> [145] writexl_1.5.4               inflection_1.3.7            purrr_1.2.2                 crayon_1.5.3               
-    #> [149] rvest_1.0.5
+    #>   [1] RColorBrewer_1.1-3          rstudioapi_0.19.0           jsonlite_2.0.0              ggbeeswarm_0.7.3           
+    #>   [5] farver_2.1.2                rmarkdown_2.32              fs_2.1.0                    ragg_1.5.2                 
+    #>   [9] vctrs_0.7.3                 memoise_2.0.1               rstatix_1.1.0               htmltools_0.5.9            
+    #>  [13] S4Arrays_1.12.1             progress_1.2.3              curl_8.0.0                  ComplexUpset_1.3.3         
+    #>  [17] decoupleR_2.17.0            broom_1.0.13                cellranger_1.1.0            SparseArray_1.12.3         
+    #>  [21] Formula_1.2-6               sass_0.4.10                 parallelly_1.48.0           bslib_0.12.0               
+    #>  [25] htmlwidgets_1.6.4           desc_1.4.3                  plyr_1.8.9                  httr2_1.3.0                
+    #>  [29] lubridate_1.9.5             cachem_1.1.0                igraph_2.3.4                lifecycle_1.0.5            
+    #>  [33] pkgconfig_2.0.3             Matrix_1.7-6                R6_2.6.1                    fastmap_1.2.0              
+    #>  [37] MatrixGenerics_1.24.0       digest_0.6.39               colorspace_2.1-3            patchwork_1.3.2            
+    #>  [41] S4Vectors_0.50.3            textshaping_1.0.5           GenomicRanges_1.64.0        RSQLite_3.53.3             
+    #>  [45] ggpubr_1.0.0                labeling_0.4.3              timechange_0.4.0            polyclip_1.10-7            
+    #>  [49] httr_1.4.9                  abind_1.4-8                 compiler_4.6.1              bit64_4.8.6                
+    #>  [53] withr_3.0.3                 S7_0.2.2                    backports_1.5.1             BiocParallel_1.46.0        
+    #>  [57] viridis_0.6.5               carData_3.0-6               DBI_1.3.0                   logger_0.4.3               
+    #>  [61] OmnipathR_4.1.0             ggforce_0.5.0               R.utils_2.13.0              ggsignif_0.6.4             
+    #>  [65] cosmosR_1.20.0              MASS_7.3-66                 rappdirs_0.3.4              DelayedArray_0.38.2        
+    #>  [69] sessioninfo_1.2.4           scatterplot3d_0.3-45        gtools_3.9.5                tools_4.6.1                
+    #>  [73] vipor_0.4.7                 otel_0.2.0                  beeswarm_0.4.0              zip_3.0.2                  
+    #>  [77] R.oo_1.27.1                 glue_1.8.1                  grid_4.6.1                  checkmate_2.3.4            
+    #>  [81] reshape2_1.4.5              generics_0.1.4              gtable_0.3.6                tzdb_0.5.0                 
+    #>  [85] R.methodsS3_1.8.2           tidyr_1.3.2                 hms_1.1.4                   tidygraph_1.3.1            
+    #>  [89] xml2_1.6.0                  car_3.1-5                   XVector_0.52.0              BiocGenerics_0.58.1        
+    #>  [93] ggrepel_0.9.8               pillar_1.11.1               stringr_1.6.0               vroom_1.7.1                
+    #>  [97] limma_3.68.5                later_1.4.8                 splines_4.6.1               tweenr_2.0.3               
+    #> [101] lattice_0.22-9              bit_4.6.0                   tidyselect_1.2.1            knitr_1.52                 
+    #> [105] gridExtra_2.3.1             bookdown_0.48               IRanges_2.46.0              Seqinfo_1.2.0              
+    #> [109] SummarizedExperiment_1.42.0 svglite_2.2.2               stats4_4.6.1                xfun_0.61                  
+    #> [113] graphlayouts_1.2.5          Biobase_2.72.0              statmod_1.5.2               factoextra_2.2.0           
+    #> [117] matrixStats_1.5.0           pheatmap_1.0.13             stringi_1.8.9               yaml_2.3.12                
+    #> [121] kableExtra_1.4.1            evaluate_1.0.5              codetools_0.2-20            tcltk_4.6.1                
+    #> [125] ggraph_2.2.2                qvalue_2.44.0               hash_2.2.6.4                BiocManager_1.30.27        
+    #> [129] Polychrome_1.6.2            cli_3.6.6                   systemfonts_1.3.2           jquerylib_0.1.4            
+    #> [133] EnhancedVolcano_1.31.0      Rcpp_1.1.2                  readxl_1.5.0.1              XML_3.99-0.25              
+    #> [137] parallel_4.6.1              pkgdown_2.2.1               readr_2.2.0                 blob_1.3.0                 
+    #> [141] prettyunits_1.2.0           viridisLite_0.4.3           scales_1.4.0                writexl_2.0.1              
+    #> [145] inflection_1.3.7            purrr_1.2.2                 crayon_1.5.3                rvest_1.0.5
 
 ## Bibliography
 
-Bijlsma, Sabina, Ivana Bobeldijk, Elwin R Verheij, Raymond Ramaker,
-Sunil Kochhar, Ian A Macdonald, Ben van Ommen, and Age K Smilde. 2006.
+Bijlsma, Sabina, Ivana Bobeldijk, Elwin R Verheij, et al. 2006.
 “Large-Scale Human Metabolomics Studies: A Strategy for Data (Pre-)
 Processing and Validation.” *Analytical Chemistry* 78 (2): 567–74.
 <https://doi.org/10.1021/ac051495j>.
@@ -1121,15 +1103,14 @@ Integration Reveals Mechanisms of Phenotype Regulation in Renal Cancer.”
 *Genome Medicine* 16 (1): 144.
 <https://doi.org/10.1186/s13073-024-01415-3>.
 
-Sciacovelli, Marco, Aurelien Dugourd, Lorea Valcarcel Jimenez, Ming
-Yang, Efterpi Nikitopoulou, Ana S H Costa, Laura Tronci, et al. 2022.
-“Dynamic Partitioning of Branched-Chain Amino Acids-Derived Nitrogen
-Supports Renal Cancer Progression.” *Nature Communications* 13 (1):
-7830. <https://doi.org/10.1038/s41467-022-35036-4>.
+Sciacovelli, Marco, Aurelien Dugourd, Lorea Valcarcel Jimenez, et al.
+2022. “Dynamic Partitioning of Branched-Chain Amino Acids-Derived
+Nitrogen Supports Renal Cancer Progression.” *Nature Communications* 13
+(1): 7830. <https://doi.org/10.1038/s41467-022-35036-4>.
 
-Wei, Runmin, Jingye Wang, Mingming Su, Erik Jia, Shaoqiu Chen, Tianlu
-Chen, and Yan Ni. 2018. “Missing Value Imputation Approach for Mass
-Spectrometry-Based Metabolomics Data.” *Scientific Reports* 8 (1): 663.
+Wei, Runmin, Jingye Wang, Mingming Su, et al. 2018. “Missing Value
+Imputation Approach for Mass Spectrometry-Based Metabolomics Data.”
+*Scientific Reports* 8 (1): 663.
 <https://doi.org/10.1038/s41598-017-19120-0>.
 
 Wulff, Jacob E., and Matthew W. Mitchell. 2018. “A Comparison of Various

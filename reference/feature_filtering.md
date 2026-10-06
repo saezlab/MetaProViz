@@ -1,0 +1,114 @@
+# Filter features
+
+Filter features
+
+## Usage
+
+``` r
+feature_filtering(
+  data,
+  metadata_sample,
+  metadata_info,
+  core = FALSE,
+  featurefilt = "Modified",
+  cutoff_featurefilt = 0.8,
+  metadata_feature = NULL
+)
+```
+
+## Arguments
+
+- data:
+
+  DF which contains unique sample identifiers as row names and
+  metabolite numerical values in columns with metabolite identifiers as
+  column names. Use NA for metabolites that were not detected and
+  consider converting any zeros to NA unless they are true zeros.
+
+- metadata_sample:
+
+  DF which contains information about the samples, which will be
+  combined with the input data based on the unique sample identifiers
+  used as rownames.
+
+- metadata_info:
+
+  Named vector containing the information about the names of the
+  experimental parameters. c(Conditions="ColumnName_Plot_SettingsFile",
+  Biological_Replicates="ColumnName_Plot_SettingsFile"). Column
+  "Conditions" with information about the sample conditions (e.g. "N"
+  and "T" or "Normal" and "Tumor"), can be used for feature filtering
+  and colour coding in the PCA. Column "BiologicalReplicates" including
+  numerical values. For core = TRUE add core_media =
+  "Columnname_Input_SettingsFile", which specifies the name of the media
+  controls in the Conditions.
+
+- core:
+
+  *Optional:* If TRUE, a consumption-release experiment has been
+  performed.Should not be normalised to media blank. Provide information
+  about control media sample names via metadata_info "core_media"
+  samples. **Default = FALSE**
+
+- featurefilt:
+
+  *Optional:* If NULL, no feature filtering is performed. If set to
+  "Standard" then it applies the 80%-filtering rule (Bijlsma S. et
+  al., 2006) on the metabolite features on the whole dataset. If is set
+  to "Modified",filtering is done based on the different conditions,
+  thus a column named "Conditions" must be provided in the
+  Input_SettingsFile input file including the individual conditions you
+  want to apply the filtering to (Yang, J et al., 2015). If set to
+  "Manual", the features to remove are taken directly from
+  metadata_feature instead of being computed from a cutoff. If the
+  expected column is missing from metadata_feature, a warning is raised
+  and "Modified" is used instead; if "Modified" itself cannot be used
+  because Conditions has fewer than 2 levels, a further warning is
+  raised and "Standard" is used. **Default = Modified**
+
+- cutoff_featurefilt:
+
+  *Optional:* percentage of feature filtering. Ignored if featurefilt =
+  "Manual". **Default = 0.8**
+
+- metadata_feature:
+
+  *Optional:* Only used if featurefilt = "Manual". Data frame with
+  feature identifiers matching the column names of data as row names,
+  and a logical TRUE/FALSE column (TRUE = remove this feature) named
+  "FilteredFeatures", or as configured via metadata_info. **Default =
+  NULL**
+
+## Value
+
+List with elements: DF (filtered matrix); FilteredFeatures (a data frame
+with one row per input feature, columns FeatureID and FilteredFeatures
+containing TRUE or FALSE; this column is always named "FilteredFeatures"
+regardless of what it was called in metadata_feature); featurefilt_used
+(the filtering method actually applied, which differs from featurefilt
+if a fallback was triggered); and, for SummarizedExperiment input, SE
+(the filtered data as a SummarizedExperiment).
+
+This function can be used as a standalone preprocessing step on raw
+input data with matching sample metadata.
+
+## Examples
+
+``` r
+data(intracell_raw)
+Intra <- intracell_raw %>% tibble::column_to_rownames("Code")
+Res <- feature_filtering(
+    data =
+        Intra[-c(49:58), -c(1:3)] %>%
+        dplyr::mutate_all(
+            ~ ifelse(grepl("^0*(\\.0*)?$", as.character(.)), NA, .)
+        ),
+    metadata_sample = Intra[-c(49:58), c(1:3)],
+    metadata_info = c(
+        Conditions = "Conditions",
+        Biological_Replicates = "Biological_Replicates"
+    )
+)
+#> feature_filtering: Here we apply the modified 80%-filtering rule that takes the class information (Column `Conditions`) into account, which additionally reduces the effect of missing values (REF: Yang et. al., (2015), doi: 10.3389/fmolb.2015.00004). Filtering value selected: 0.8
+#> 3 metabolites where removed: AICAR, FAICAR, SAICAR
+```

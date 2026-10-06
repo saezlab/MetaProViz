@@ -141,145 +141,81 @@ ResI <- dma(
 #> In `Numerator` 786-O, 786-M1A, 786-M2A, Pool, NA/0 values exist in 5 Metabolite(s). and in `denominator`HK2 2 Metabolite(s
 #>         ).. Those metabolite(s) might return p.val = NA, p.adj.= NA, t.val = NA. The Log2FC = Inf, if all replicates are 0/NA.
 #> Warning: There are NA's / 0s in the data. This can impact the output of the SHapiro-Wilk test for all metabolites that include NAs / 0s.
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 556 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 556 rows containing non-finite outside the scale range
 #> (`stat_density()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 461 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 461 rows containing non-finite outside the scale range
 #> (`stat_density()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 458 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 458 rows containing non-finite outside the scale range
 #> (`stat_density()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 614 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 614 rows containing non-finite outside the scale range
 #> (`stat_density()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 527 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 527 rows containing non-finite outside the scale range
 #> (`stat_density()`).
 #> For 9.89% of metabolites the group variances are equal.
 #> Warning: Partial NA coefficients for 1 probe(s)
-#> Warning: Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0.
-#> ℹ Please use `linewidth` instead.
-#> ℹ The deprecated feature was likely used in the EnhancedVolcano package.
-#>   Please report the issue to the authors.
 #> Warning: The `size` argument of `element_line()` is deprecated as of ggplot2 3.4.0.
 #> ℹ Please use the `linewidth` argument instead.
 #> ℹ The deprecated feature was likely used in the EnhancedVolcano package.
 #>   Please report the issue to the authors.
 #> Warning: Removed 556 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 556 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 #> Warning: Removed 556 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 556 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 #> Warning: Removed 461 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 461 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 
 #> Warning: Removed 461 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 461 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 #> Warning: Removed 458 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 458 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 
 #> Warning: Removed 458 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 458 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 #> Warning: Removed 614 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 614 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 
 #> Warning: Removed 614 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 614 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 #> Warning: Removed 527 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 527 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 
 #> Warning: Removed 527 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 527 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 #> Warning: The dot-dot notation (`..density..`) was deprecated in ggplot2 3.4.0.
 #> ℹ Please use `after_stat(density)` instead.
 #> ℹ The deprecated feature was likely used in the MetaProViz package.
@@ -305,111 +241,63 @@ ResI <- dma(
 #> In `Numerator` 786-O, 786-M1A, 786-M2A, NA/0 values exist in 5 Metabolite(s). and in `denominator`HK2 2 Metabolite(s
 #>         ).. Those metabolite(s) might return p.val = NA, p.adj.= NA, t.val = NA. The Log2FC = Inf, if all replicates are 0/NA.
 #> Warning: There are NA's / 0s in the data. This can impact the output of the SHapiro-Wilk test for all metabolites that include NAs / 0s.
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 556 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 556 rows containing non-finite outside the scale range
 #> (`stat_density()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 461 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 461 rows containing non-finite outside the scale range
 #> (`stat_density()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 458 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 458 rows containing non-finite outside the scale range
 #> (`stat_density()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 614 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 614 rows containing non-finite outside the scale range
 #> (`stat_density()`).
 #> For 32.97% of metabolites the group variances are equal.
 #> Warning: Partial NA coefficients for 1 probe(s)
 #> Warning: Removed 556 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 556 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 #> Warning: Removed 556 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 556 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 #> Warning: Removed 461 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 461 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 
 #> Warning: Removed 461 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 461 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 #> Warning: Removed 458 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 458 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 
 #> Warning: Removed 458 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 458 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 #> Warning: Removed 614 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 614 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 
 #> Warning: Removed 614 rows containing non-finite outside the scale range (`stat_bin()`).
-#> Warning: Computation failed in `stat_bin()`.
-#> Caused by error in `bin_breaks_width()`:
-#> ! The number of histogram bins must be less than 1,000,000.
-#> ℹ Did you make `binwidth` too small?
 #> Warning: Removed 614 rows containing non-finite outside the scale range
 #> (`stat_density()`).
+#> Warning: Removed 2 rows containing missing values or values outside the scale range
+#> (`geom_bar()`).
 #> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.
 
 #> `stat_bin()` using `bins = 30`. Pick better value `binwidth`.

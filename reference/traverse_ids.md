@@ -13,7 +13,9 @@ traverse_ids(
   delimiter = c(";", ","),
   save_table = "csv",
   path = NULL,
-  verbose = FALSE
+  verbose = FALSE,
+  run_compatibility_check = TRUE,
+  edge_table = NULL
 )
 ```
 
@@ -51,6 +53,21 @@ traverse_ids(
   Logical; if `TRUE`, prints pairwise mapping and edge construction
   diagnostics to the console.
 
+- run_compatibility_check:
+
+  Logical; if `TRUE`, run
+  [`seed_id_compatibility_check()`](https://saezlab.github.io/MetaProViz/reference/seed_id_compatibility_check.md)
+  on the input before traversal and warn about incompatible seed IDs.
+  Set to `FALSE` if the input has already been checked, e.g. within
+  [`id_processing()`](https://saezlab.github.io/MetaProViz/reference/id_processing.md).
+  **Default = TRUE**
+
+- edge_table:
+
+  Optional precomputed bidirectional edge table with columns `id1`,
+  `type1`, `id2`, `type2` (as returned in `ID_Edges_prior_knowledge`).
+  If `NULL`, it is built from RaMP. **Default = NULL**
+
 ## Value
 
 Named list with three data frames:
@@ -66,7 +83,8 @@ Named list with three data frames:
   Long-format table with one unique unordered seed-ID pair per input
   row. The first column `original_row_id` stores the original input row
   name. The table also includes `pair_compatible`, `compatibility_path`,
-  and `all_seed_ids_compatible`.
+  and `all_seed_ids_compatible`. Only returned if
+  `run_compatibility_check = TRUE`.
 
 - ID_Edges_prior_knowledge:
 
@@ -107,6 +125,10 @@ input_df <- data.frame(
 
 res <- traverse_ids(input_df)
 #> Warning: Selected ID column 'PUBCHEM' not found in data and was created as NA.
+#> seed_id_compatibility_check() ID-handling choices:
+#> - handle_partially_compatible: FALSE
+#> - handle_completely_incompatible: FALSE
+#> Automatic ID handling is disabled: results flag incompatibilities only; no automated processing was performed. To process affected features, rerun with handle_partially_compatible = TRUE and/or handle_completely_incompatible = TRUE.
 #> Warning: Detected incompatible seed IDs in 2 row(s) (row_id: 1, 2). Not all seed IDs in these rows are mutually reachable through ID_Edges_prior_knowledge, suggesting they may map to different molecules. This can overexpand the ID space during traversal. Please manually remove or correct incompatible seed IDs and rerun traverse_ids() freshly on a clean input table.
 
 df_translated <- res$ExpandedDF

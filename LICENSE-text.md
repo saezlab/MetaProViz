@@ -1,6 +1,6 @@
 # License
 
-    YEAR: 2023-2025
+    YEAR: 2023-2026
     COPYRIGHT HOLDER: Saez Lab, Heidelberg University, University Hospital
         Heidelberg, European Bioinformatics Institute (EMBL-EBI), University
         of Cologne

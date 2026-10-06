@@ -30,8 +30,9 @@
 
 ## MetaProViz 3.0.3 (2025-07-16)
 
-- Enhanced [`processing()`](../reference/processing.md) function to
-  accept any column name
+- Enhanced
+  [`processing()`](https://saezlab.github.io/MetaProViz/reference/processing.md)
+  function to accept any column name
 - Fixed bug in missing value imputation
 - Updated README links
 

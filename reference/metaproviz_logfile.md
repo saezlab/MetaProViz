@@ -15,12 +15,12 @@ available.
 
 ## See also
 
-[`metaproviz_log`](metaproviz_log.md)
+[`metaproviz_log`](https://saezlab.github.io/MetaProViz/reference/metaproviz_log.md)
 
 ## Examples
 
 ``` r
 metaproviz_logfile()
-#> [1] "/__w/MetaProViz/MetaProViz/docs/reference/metaproviz-log/metaproviz-20260415-1123.log"
+#> [1] "/__w/MetaProViz/MetaProViz/docs/reference/metaproviz-log/metaproviz-20261006-1447.log"
 # [1] "path/metaproviz/metaproviz-log/metaproviz-20210309-1642.log"
 ```

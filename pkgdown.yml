@@ -1,10 +1,17 @@
-pandoc: 3.1.11
-pkgdown: 2.2.0
+pandoc: 3.8.3
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   pkgdown/core-metabolomics: pkgdown/core-metabolomics.html
+  pkgdown/id-processing-workflow: pkgdown/id-processing-workflow.html
+  pkgdown/metsigdb: pkgdown/metsigdb.html
+  pkgdown/pk-networks: pkgdown/pk-networks.html
   pkgdown/prior-knowledge: pkgdown/prior-knowledge.html
   quick-start: quick-start.html
   pkgdown/sample-metadata: pkgdown/sample-metadata.html
   pkgdown/standard-metabolomics: pkgdown/standard-metabolomics.html
-last_built: 2026-04-15T11:23Z
+  pkgdown/tutorials: pkgdown/tutorials.html
+last_built: 2026-10-06T14:47Z
+urls:
+  reference: https://saezlab.github.io/MetaProViz/reference
+  article: https://saezlab.github.io/MetaProViz/articles

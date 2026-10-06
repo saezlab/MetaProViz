@@ -29,7 +29,10 @@ equivalent_id(
 - from:
 
   ID type that is present in your data. Choose between "kegg",
-  "pubchem", "chebi", "hmdb". **Default = "hmdb"**
+  "pubchem", "chebi", "hmdb". ChEBI and PubChem IDs can be given with or
+  without prefix ("CHEBI:16016" or "16016", "CID670" or "670"); if the
+  input is prefixed, the output IDs are prefixed as well. **Default =
+  "hmdb"**
 
 - save_table:
 

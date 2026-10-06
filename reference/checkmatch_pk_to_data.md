@@ -10,7 +10,8 @@ checkmatch_pk_to_data(
   input_pk,
   metadata_info = c(InputID = "HMDB", PriorID = "HMDB", grouping_variable = "term"),
   save_table = "csv",
-  path = NULL
+  path = NULL,
+  delimiter = ", "
 )
 ```
 
@@ -46,6 +47,14 @@ checkmatch_pk_to_data(
 
   Optional: Path to the folder the results should be saved at. **Default
   = NULL**
+
+- delimiter:
+
+  *Optional:* Character string separating multiple IDs within one cell
+  of the `InputID` column in `data`, e.g. `", "` or `";"`. Whitespace
+  after the delimiter is ignored. Only applies to `data`; multiple IDs
+  in `input_pk` are expected to be separated by `", "`. **Default = ",
+  "**
 
 ## Value
 

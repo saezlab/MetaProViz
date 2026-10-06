@@ -14,7 +14,7 @@ Returns `NULL`.
 
 ## See also
 
-[`metaproviz_logfile`](metaproviz_logfile.md)
+[`metaproviz_logfile`](https://saezlab.github.io/MetaProViz/reference/metaproviz_logfile.md)
 
 ## Examples
 

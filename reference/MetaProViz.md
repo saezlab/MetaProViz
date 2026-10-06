@@ -20,5 +20,6 @@ Useful links:
 ## Author
 
 Christina Schmidt \<\email{christina.schmidt@uni-heidelberg.de}\> and
-Denes Turei \<\email{turei.denes@gmail.com}\> and Dimitrios Prymidis and
-Macabe Daley and Julio Saez-Rodriguez and Christian Frezza
+Jannik Franken and Denes Turei \<\email{turei.denes@gmail.com}\> and
+Dimitrios Prymidis and Macabe Daley and Julio Saez-Rodriguez and
+Christian Frezza

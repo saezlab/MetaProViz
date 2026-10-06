@@ -27,10 +27,10 @@ head(intracell_raw_se)
 #> class: SummarizedExperiment 
 #> dim: 6 58 
 #> metadata(0):
-#> assays(1): counts
+#> assays(1): data
 #> rownames(6): valine-d8 hippuric acid-d5 ... 2-hydroxyglutarate
 #>   2-ketoglutarate
-#> rowData names(0):
+#> rowData names(4): HMDB KEGG.ID KEGGCompound Pathway
 #> colnames(58): MS55_01 MS55_02 ... POOL8 POOL9
 #> colData names(3): Conditions Analytical_Replicates
 #>   Biological_Replicates

@@ -15,7 +15,7 @@ cellular_meta
 ## Format
 
 An object of class `spec_tbl_df` (inherits from `tbl_df`, `tbl`,
-`data.frame`) with 199 rows and 5 columns.
+`data.frame`) with 200 rows and 5 columns.
 
 ## Examples
 
