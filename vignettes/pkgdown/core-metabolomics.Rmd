@@ -1197,11 +1197,11 @@ With the analyses above we have found metabolites that change between 786-M1A an
 `MetaProViz` offers two network plots for this, which work with any PK table in long format, such as the MetSigDB resources loaded by the `metsigdb_*()` functions:
 
 -   `viz_pk_network()` plots the measured metabolites together with the PK terms they are linked to (e.g. proteins, pathways or cancer types). It shows *which* terms connect the metabolites.
--   `viz_shared_pk_network()` only plots the metabolites and connects two metabolites if they are linked to the same terms. It shows *how similar* the metabolites are in the PK, and the edge weight can be the number of shared terms (`similarity = "shared"`), the Jaccard index (`"jaccard"`) or the overlap coefficient (`"overlap_coefficient"`).
+-   `viz_shared_pk_network()` only plots the metabolites and connects two metabolites if they are linked to the same terms. It shows *how similar* the metabolites are in the PK, and the edge weight can be the number of shared terms (`similarity = "shared"`) or the Jaccard index (`"jaccard"`) [@Jaccard1901]. Metabolites without any shared term are not plotted, but listed in the results.
 
 Both functions use the same `metadata_info`: `InputID` and `PriorID` name the ID columns used to match the metabolites in our data to the PK, `PriorTerm` the PK column that holds the terms and `InputLabel` the metabolite names. Further entries map columns to the node colours and sizes and the edge colours, line types, widths and directions (see `?viz_pk_network`). Hence, the same `metadata_info` can be passed to both functions.\
 \
-Here we use the metabolites that change significantly between 786-M1A and HK2 cells and colour them by their `Log2(Distance)`:
+Here we use the metabolites that change significantly between 786-M1A and HK2 cells and colour them by their `Log2(Distance)`. A positive `Log2(Distance)` means that the metabolite has a higher CoRe value in HK2 than in 786-M1A cells, i.e. 786-M1A cells consume more or release less of it, and a negative value means the opposite:
 ```{r pk-network-features}
 DMA_Significant <- DMA_HK2_vs_786M1A %>%
     filter(p.adj < 0.05)
@@ -1210,7 +1210,7 @@ DMA_Significant <- DMA_HK2_vs_786M1A %>%
 \
 
 ## Transporters of the changed metabolites (MetalinksDB)
-As we look at metabolites consumed from or released into the medium, transporters are the obvious proteins to start with. We select the transporter-metabolite interactions from the `MetaLinksDB_Select` table we created above. `metsigdb_metalinks()` provides the columns `interaction` (e.g. "Transport_In" or "Transport_Out") and `direction`, which we use to colour and orient the edges.
+As we look at metabolites consumed from or released into the medium, transporters are the obvious proteins to start with. We select the transporter-metabolite interactions of MetalinksDB [@Farr_Dimitrov2024] from the `MetaLinksDB_Select` table we created above. `metsigdb_metalinks()` provides the columns `interaction` (e.g. "Transport_In" or "Transport_Out") and `direction`, which we use to colour and orient the edges.
 ```{r pk-network-metalinks, fig.width=10, fig.height=8}
 MetaLinks_Transporters <- MetaLinksDB_Select %>%
     filter(interaction_family == "Transporter-metabolite")
@@ -1235,7 +1235,7 @@ Transporter_Network <- viz_pk_network(
 )
 ```
 
-The amino acids alanine, serine, asparagine, glutamine, threonine, methionine, phenylalanine and tyrosine form one dense cluster, as they are transported by the same solute carriers, such as SLC1A5 (ASCT2), SLC7A5 (LAT1) and SLC38A2 (SNAT2). The fatty acids palmitate and linoleic acid are linked to fatty acid transporters and binding proteins of the SLC27A and FABP families, and pyruvate to monocarboxylate transporters such as SLC16A1. Metabolites without an HMDB ID or without a transporter in MetalinksDB are listed in `Transporter_Network[["DF"]][["unmatched_features"]]`.
+The amino acids alanine, serine, asparagine, glutamine, threonine, methionine, phenylalanine and tyrosine form one dense cluster, as they are transported by the same solute carriers, such as SLC1A5 (ASCT2), SLC7A5 (LAT1) and SLC38A2 (SNAT2). The fatty acids palmitate and linoleic acid are linked to fatty acid transporters and binding proteins of the SLC27A and FABP families, and pyruvate to monocarboxylate transporters such as SLC16A1. Note that these links are prior knowledge and were not measured here: that the changed consumption and release of these metabolites is due to these transporters is a hypothesis, which needs to be supported by literature or experiments. Metabolites without an HMDB ID or without a transporter in MetalinksDB are listed in `Transporter_Network[["DF"]][["unmatched_features"]]`.
 
 With `viz_shared_pk_network()` we can summarise this network on the metabolite level: two metabolites are connected if they share transporters, and the edge label shows how many. The number beneath each metabolite is its total number of transporters.
 ```{r pk-network-metalinks-shared, fig.width=9, fig.height=7}
@@ -1250,12 +1250,12 @@ Transporter_Shared <- viz_shared_pk_network(
 )
 ```
 
-Alanine and serine share 31 transporters and asparagine and glutamine 26 of their 27 transporters, so these amino acids are hardly distinguishable by their transporters. Palmitate and linoleic acid share 18 transporters with each other, but only single ones with the amino acids. Pyruvate, succinate and hypoxanthine have transporters, but none in common with the other changed metabolites. Changes in the consumption or release of the amino acid cluster may hence point to a change in the activity of the same transporters.
+Alanine and serine share 31 transporters and asparagine and glutamine 26 of their 27 transporters, so these amino acids are hardly distinguishable by their transporters. Palmitate and linoleic acid share 18 transporters with each other, but only single ones with the amino acids. Pyruvate, succinate and hypoxanthine have transporters, but none in common with the other changed metabolites, and are therefore not shown. Changes in the consumption or release of the amino acid cluster may hence point to a change in the activity of the same transporters.
 
 \
 
 ## Metabolites behind the pathway enrichment (KEGG)
-In the ORA of the metabolites consumed by both cell lines above, many KEGG pathways have a similar, non-significant p-value. `viz_pk_network()` shows which metabolites these pathways are based on. We only plot the pathways with at least three metabolites in the cluster and use the ORA results as `term_metadata` to colour the pathways by their adjusted p-value and size them by the number of cluster metabolites. For this, the pathway column of the ORA results needs to have the same name as `PriorTerm`.
+In the ORA of the metabolites consumed by both cell lines above, many KEGG pathways [@Kanehisa2000] have a similar, non-significant p-value. `viz_pk_network()` shows which metabolites these pathways are based on. We only plot the pathways with at least three metabolites in the cluster and use the ORA results as `term_metadata` to colour the pathways by their adjusted p-value and size them by the number of cluster metabolites. For this, the pathway column of the ORA results needs to have the same name as `PriorTerm`.
 ```{r pk-network-kegg, fig.width=11, fig.height=8}
 ORA_Consumed <- MC_ORA_HK2_vs_786M1A_Consumed %>%
     dplyr::rename("term" = "ID") %>%
@@ -1312,7 +1312,7 @@ Note that this connects *metabolites* by the pathways they share. To connect *pa
 \
 
 ## Previous reports in kidney cancer (MACdb)
-MACdb collects metabolite-cancer associations reported in published studies and identifies metabolites by PubChem IDs. Our data has HMDB and KEGG IDs, so we first translate the KEGG IDs into PubChem IDs with `translate_id()`. One KEGG ID can map to several PubChem IDs, which are then separated by ", " in the `pubchem` column; `id_sep = ","` makes the network functions use all of them.
+MACdb [@Sun2023] collects metabolite-cancer associations reported in published studies and identifies metabolites by PubChem IDs. Our data has HMDB and KEGG IDs, so we first translate the KEGG IDs into PubChem IDs with `translate_id()`. One KEGG ID can map to several PubChem IDs, which are then separated by ", " in the `pubchem` column; `id_sep = ","` makes the network functions use all of them.
 ```{r pk-network-macdb-ids}
 DMA_Significant_PubChem <- translate_id(
     data = DMA_Significant %>% filter(!is.na(KEGG.ID)),

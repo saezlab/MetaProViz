@@ -720,7 +720,7 @@ metalinks_info <- c(
 
 Plot the metabolite-protein interaction network of the Biocrates amino acids and MetaLinksDB receptors:
 
-```{r}
+```{r, fig.width=12, fig.height=10}
 # receptor-network
 biocrates_metalinks_receptor <- viz_pk_network(
     feature_metadata = biocrates_amino_acids,
@@ -735,7 +735,7 @@ biocrates_metalinks_receptor <- viz_pk_network(
 
 While the network above shows the specific interactions of metabolites with proteins, `viz_shared_pk_network()` shows how the metabolites share interactions with the same proteins. It takes the same inputs:
 
-```{r}
+```{r, fig.width=12, fig.height=10}
 # receptor-sharing
 biocrates_metalinks_receptor_shared <- viz_shared_pk_network(
     feature_metadata = biocrates_amino_acids,
@@ -749,7 +749,7 @@ biocrates_metalinks_receptor_shared <- viz_shared_pk_network(
 
 Plot the metabolite-protein interaction network of the Biocrates amino acids and MetaLinksDB transporters, and how the amino acids share transporters:
 
-```{r}
+```{r, fig.width=12, fig.height=10}
 # transporter-network
 biocrates_metalinks_transporter <- viz_pk_network(
     feature_metadata = biocrates_amino_acids,
@@ -761,10 +761,16 @@ biocrates_metalinks_transporter <- viz_pk_network(
     save_plot = NULL
 )
 
+# Most amino acids share some transporters. To focus on the strongly
+# overlapping pairs we use the Jaccard index with a threshold and omit
+# the edge labels, as the edge width shows the Jaccard index as well:
 biocrates_metalinks_transporter_shared <- viz_shared_pk_network(
     feature_metadata = biocrates_amino_acids,
     input_pk = metalinks_transporter,
     metadata_info = metalinks_info,
+    similarity = "jaccard",
+    threshold = 0.5,
+    edge_labels = FALSE,
     id_sep = ",",
     plot_name = "biocrates_aminoacids_sharing_metalinks_transporters",
     save_plot = NULL
@@ -773,7 +779,7 @@ biocrates_metalinks_transporter_shared <- viz_shared_pk_network(
 
 Plot the metabolite-protein interaction network of the Biocrates amino acids and MetaLinksDB metabolic enzymes, and how the amino acids share metabolic enzymes:
 
-```{r}
+```{r, fig.width=12, fig.height=10}
 # metabolic-enzyme-network
 biocrates_metalinks_metabolic_enzyme <- viz_pk_network(
     feature_metadata = biocrates_amino_acids,
@@ -797,7 +803,7 @@ biocrates_metalinks_metabolic_enzyme_shared <- viz_shared_pk_network(
 
 In the sharing networks, the number beneath each metabolite is its total number of interacting proteins and the edge labels show the number of shared proteins.
 For example, in the receptor subset of MetaLinksDB, we observe many interactions for Glutamic acid (Glu) and Glycine (Gly). Indeed, the corresponding sharing plot shows that Gly and Glu share 6 proteins which they interact with. Additionally, we see that Glu and Asp (Aspartic acid) share 13 receptors, which are all 13 receptors of Asp, while Glu interacts with 29 receptors, hinting at a possibly higher receptor specificity of Aspartic acid in comparison to a more versatile interaction profile of Glutamic acid.
-As the raw number of shared proteins favours metabolites with many interactions, `viz_shared_pk_network()` can also use the Jaccard index or the overlap coefficient as edge weight (parameter `similarity`); examples are shown in the [CoRe Metabolomics vignette](https://saezlab.github.io/MetaProViz/articles/pkgdown/core-metabolomics.html).
+As the raw number of shared proteins favours metabolites with many interactions, `viz_shared_pk_network()` can also use the Jaccard index [@Jaccard1901] as edge weight (parameter `similarity`), as we did for the transporters above. More examples are shown in the [CoRe Metabolomics vignette](https://saezlab.github.io/MetaProViz/articles/pkgdown/core-metabolomics.html).
 Note, however, that metabolite-protein interactions have various interaction properties and binding mechanisms, and that prior knowledge resources are always biased towards well-studied small molecules and proteins. Therefore, the overlap graph hints at shared protein interactions, but does not show that two metabolites interact with those proteins in the same way.
 
 :::: {.progress .progress-striped .active}
