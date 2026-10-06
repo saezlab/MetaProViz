@@ -121,8 +121,8 @@
 #' @examples
 #' # Biocrates amino acids and the transporters they interact with
 #' data(biocrates_features)
-#' amino_acids <- biocrates_features |>
-#'     dplyr::filter(Class == "Aminoacids") |>
+#' amino_acids <- biocrates_features %>%
+#'     dplyr::filter(Class == "Aminoacids") %>%
 #'     dplyr::select(TrivialName, HMDB)
 #' aa_hmdb <- trimws(unlist(strsplit(amino_acids$HMDB, ",")))
 #'
@@ -130,7 +130,7 @@
 #'     hmdb_ids = aa_hmdb,
 #'     save_table = NULL,
 #'     exclude_metabolites = NULL
-#' ) |>
+#' ) %>%
 #'     dplyr::filter(interaction_family == "Transporter-metabolite")
 #'
 #' network <- viz_pk_network(
@@ -326,8 +326,8 @@ viz_pk_network <- function(
 #' @examples
 #' # Biocrates amino acids connected by the transporters they share
 #' data(biocrates_features)
-#' amino_acids <- biocrates_features |>
-#'     dplyr::filter(Class == "Aminoacids") |>
+#' amino_acids <- biocrates_features %>%
+#'     dplyr::filter(Class == "Aminoacids") %>%
 #'     dplyr::select(TrivialName, HMDB)
 #' aa_hmdb <- trimws(unlist(strsplit(amino_acids$HMDB, ",")))
 #'
@@ -335,7 +335,7 @@ viz_pk_network <- function(
 #'     hmdb_ids = aa_hmdb,
 #'     save_table = NULL,
 #'     exclude_metabolites = NULL
-#' ) |>
+#' ) %>%
 #'     dplyr::filter(interaction_family == "Transporter-metabolite")
 #'
 #' shared <- viz_shared_pk_network(
@@ -434,7 +434,7 @@ viz_shared_pk_network <- function(
         id_sep = id_sep
     )
 
-    associations <- matches$associations |>
+    associations <- matches$associations %>%
         dplyr::distinct(metabolite = .data$.metabolite, term = .data$.term)
 
     edges <- dplyr::tibble()
@@ -530,12 +530,12 @@ viz_shared_pk_network <- function(
     )]
     numeric_columns <- setdiff(edge_columns, group_columns)
 
-    edges <- associations |>
+    edges <- associations %>%
         dplyr::group_by(
             metabolite = .data$.metabolite,
             term = .data$.term,
             dplyr::across(dplyr::all_of(group_columns))
-        ) |>
+        ) %>%
         dplyr::summarise(
             dplyr::across(dplyr::all_of(numeric_columns), .summarise_attribute),
             n_pk_rows = dplyr::n(),
@@ -594,7 +594,7 @@ viz_shared_pk_network <- function(
 #'
 #' @noRd
 .add_metabolite_attributes <- function(nodes, matched_features, feature_metadata, metadata_info) {
-    features <- matched_features |>
+    features <- matched_features %>%
         dplyr::distinct(.data$.feature_row_id, .data$metabolite)
     for (key in intersect(c("MetaboliteColor", "MetaboliteSize"), names(metadata_info))) {
         column <- metadata_info[[key]]

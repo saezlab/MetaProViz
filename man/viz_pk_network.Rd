@@ -143,8 +143,8 @@ stay undirected. \code{\link[=metsigdb_metalinks]{metsigdb_metalinks()}} provide
 \examples{
 # Biocrates amino acids and the transporters they interact with
 data(biocrates_features)
-amino_acids <- biocrates_features |>
-    dplyr::filter(Class == "Aminoacids") |>
+amino_acids <- biocrates_features \%>\%
+    dplyr::filter(Class == "Aminoacids") \%>\%
     dplyr::select(TrivialName, HMDB)
 aa_hmdb <- trimws(unlist(strsplit(amino_acids$HMDB, ",")))
 
@@ -152,7 +152,7 @@ transporters <- metsigdb_metalinks(
     hmdb_ids = aa_hmdb,
     save_table = NULL,
     exclude_metabolites = NULL
-) |>
+) \%>\%
     dplyr::filter(interaction_family == "Transporter-metabolite")
 
 network <- viz_pk_network(

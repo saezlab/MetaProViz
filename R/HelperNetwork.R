@@ -107,8 +107,8 @@
             id_input = raw_ids[no_id],
             id_normalized = NA_character_
         )
-    ) |>
-        dplyr::distinct() |>
+    ) %>%
+        dplyr::distinct() %>%
         dplyr::arrange(.data$.feature_row_id)
 
     pk <- input_pk
@@ -116,14 +116,14 @@
     pk$.term <- as.character(pk[[prior_term]])
     pk <- pk[!is.na(pk$.matched_id) & !is.na(pk$.term) & pk$.term != "", , drop = FALSE]
 
-    associations <- expanded |>
-        dplyr::filter(!is.na(.data$id_normalized)) |>
+    associations <- expanded %>%
+        dplyr::filter(!is.na(.data$id_normalized)) %>%
         dplyr::transmute(
             .feature_row_id = .data$.feature_row_id,
             .metabolite = .data$metabolite,
             .matched_id = .data$id_normalized
-        ) |>
-        dplyr::distinct() |>
+        ) %>%
+        dplyr::distinct() %>%
         dplyr::inner_join(pk, by = ".matched_id", relationship = "many-to-many")
     associations <- dplyr::relocate(
         associations,
@@ -248,9 +248,9 @@
 #'
 #' @noRd
 .add_node_attribute <- function(nodes, source, key, column, target) {
-    values <- source |>
-        dplyr::filter(!is.na(.data[[key]])) |>
-        dplyr::group_by(name = as.character(.data[[key]])) |>
+    values <- source %>%
+        dplyr::filter(!is.na(.data[[key]])) %>%
+        dplyr::group_by(name = as.character(.data[[key]])) %>%
         dplyr::summarise(
             !!target := .summarise_attribute(.data[[column]]),
             .groups = "drop"

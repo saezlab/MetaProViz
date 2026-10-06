@@ -159,8 +159,8 @@ result and only uses the measured metabolites behind each term.
 \examples{
 # Biocrates amino acids connected by the transporters they share
 data(biocrates_features)
-amino_acids <- biocrates_features |>
-    dplyr::filter(Class == "Aminoacids") |>
+amino_acids <- biocrates_features \%>\%
+    dplyr::filter(Class == "Aminoacids") \%>\%
     dplyr::select(TrivialName, HMDB)
 aa_hmdb <- trimws(unlist(strsplit(amino_acids$HMDB, ",")))
 
@@ -168,7 +168,7 @@ transporters <- metsigdb_metalinks(
     hmdb_ids = aa_hmdb,
     save_table = NULL,
     exclude_metabolites = NULL
-) |>
+) \%>\%
     dplyr::filter(interaction_family == "Transporter-metabolite")
 
 shared <- viz_shared_pk_network(
