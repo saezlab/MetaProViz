@@ -278,9 +278,11 @@ viz_pk_network <- function(
 #'
 #' The raw number of shared terms favours metabolites with many terms. Use
 #' `similarity = "jaccard"` to compare the term profiles of two metabolites
-#' as a whole, or `similarity = "overlap_coefficient"` to see whether the
-#' terms of one metabolite are mostly contained in those of the other. The
-#' coefficients are calculated as in [cluster_pk()].
+#' as a whole. The Jaccard index is calculated as in [cluster_pk()].
+#'
+#' Metabolites that share no terms with any other plotted metabolite are left
+#' out of the plot unless `show_unconnected = TRUE`; they are still listed in
+#' the returned `nodes` table with a `degree` of 0.
 #'
 #' To connect terms by the metabolites they share instead, use
 #' [cluster_pk()]: with `input_format = "enrichment"` it takes an enrichment
@@ -288,13 +290,17 @@ viz_pk_network <- function(
 #'
 #' @inheritParams viz_pk_network
 #' @param similarity \emph{Optional: } Edge weight: `"shared"` (number of
-#'     shared terms), `"jaccard"` (shared terms divided by the terms of either
-#'     metabolite) or `"overlap_coefficient"` (shared terms divided by the
-#'     terms of the metabolite with fewer terms). \strong{Default = "shared"}
+#'     shared terms) or `"jaccard"` (shared terms divided by the terms of
+#'     either metabolite). \strong{Default = "shared"}
 #' @param threshold \emph{Optional: } Minimum `similarity` for two
 #'     metabolites to be connected, as in [cluster_pk()]. Metabolites without
 #'     shared terms are never connected. For `similarity = "shared"` this is
 #'     the minimum number of shared terms. \strong{Default = 0}
+#' @param show_unconnected \emph{Optional: } If TRUE, metabolites without any
+#'     connection are plotted as well. \strong{Default = FALSE}
+#' @param edge_labels \emph{Optional: } If TRUE, edges are labelled with their
+#'     weight. Set to FALSE for dense networks, where the edge width still
+#'     shows the weight. \strong{Default = TRUE}
 #' @param label_mode \emph{Optional: } `"all"` labels all metabolites;
 #'     `"reduced"` labels only metabolites connected to at least
 #'     `label_degree_min` other metabolites. \strong{Default = "all"}
@@ -303,13 +309,11 @@ viz_pk_network <- function(
 #' @param plot_name \emph{Optional: } Plot title and name of the saved files.
 #'     \strong{Default = "Shared_PK_Network"}
 #' @param layout \emph{Optional: } Graph layout passed to [ggraph::ggraph()],
-#'     e.g. "stress", "fr" (force-directed) or "kk". "stress" places
-#'     unconnected metabolites next to the network instead of far away.
-#'     \strong{Default = "stress"}
+#'     e.g. "stress", "fr" (force-directed) or "kk". \strong{Default = "stress"}
 #'
 #' @return A list with
 #'     \item{DF}{List of `edges` (one row per connected metabolite pair with
-#'     `shared`, `jaccard`, `overlap_coefficient`, the plotted `weight` and
+#'     `shared`, `jaccard`, the plotted `weight` and
 #'     the `shared_terms`), `nodes` (one row per metabolite with `n_terms`
 #'     and the mapped attributes), `associations` (the metabolite-term
 #'     pairs the network is based on), `matched_features` and
@@ -355,8 +359,10 @@ viz_shared_pk_network <- function(
     feature_metadata,
     input_pk,
     metadata_info,
-    similarity = c("shared", "jaccard", "overlap_coefficient"),
+    similarity = c("shared", "jaccard"),
     threshold = 0,
+    show_unconnected = FALSE,
+    edge_labels = TRUE,
     id_type = "HMDB",
     id_sep = ";",
     label_mode = c("all", "reduced"),
@@ -411,6 +417,12 @@ viz_shared_pk_network <- function(
         is.na(threshold) || threshold < 0) {
         stop("`threshold` must be a single number greater than or equal to 0.")
     }
+    if (!is.logical(show_unconnected) || length(show_unconnected) != 1L || is.na(show_unconnected)) {
+        stop("`show_unconnected` must be TRUE or FALSE.")
+    }
+    if (!is.logical(edge_labels) || length(edge_labels) != 1L || is.na(edge_labels)) {
+        stop("`edge_labels` must be TRUE or FALSE.")
+    }
 
     log_info("viz_shared_pk_network: Network of metabolites sharing prior knowledge terms")
 
@@ -460,6 +472,8 @@ viz_shared_pk_network <- function(
             edges = edges,
             metadata_info = metadata_info,
             similarity = similarity,
+            show_unconnected = show_unconnected,
+            edge_labels = edge_labels,
             plot_name = plot_name,
             label_repel = label_repel,
             seed = seed,
@@ -608,17 +622,15 @@ viz_shared_pk_network <- function(
 
     shared <- .set_similarity(sets, "shared")
     jaccard <- .set_similarity(sets, "jaccard")
-    overlap <- .set_similarity(sets, "overlap_coefficient")
 
-    weight <- list(shared = shared, jaccard = jaccard, overlap_coefficient = overlap)[[similarity]]
+    weight <- list(shared = shared, jaccard = jaccard)[[similarity]]
     pairs <- which(upper.tri(shared) & shared > 0 & weight >= threshold, arr.ind = TRUE)
     metabolites <- rownames(shared)
     edges <- dplyr::tibble(
         from = metabolites[pairs[, 1]],
         to = metabolites[pairs[, 2]],
         shared = as.integer(shared[pairs]),
-        jaccard = jaccard[pairs],
-        overlap_coefficient = overlap[pairs]
+        jaccard = jaccard[pairs]
     )
     edges$weight <- edges[[similarity]]
     edges$shared_terms <- vapply(
@@ -891,22 +903,27 @@ viz_shared_pk_network <- function(
     edges,
     metadata_info,
     similarity,
+    show_unconnected,
+    edge_labels,
     plot_name,
     label_repel,
     seed = NULL,
     layout = "stress"
 ) {
+    # Unconnected metabolites take up space without information; with a
+    # component layout such as "stress" they squeeze the network
+    n_hidden <- 0L
+    if (!show_unconnected && nrow(edges) > 0L) {
+        n_hidden <- sum(nodes$degree == 0L)
+        nodes <- nodes[nodes$degree > 0L, , drop = FALSE]
+    }
     metadata_info <- .drop_empty_mappings(
         metadata_info,
         tables = list(MetaboliteColor = nodes, MetaboliteSize = nodes)
     )
     graph <- igraph::graph_from_data_frame(edges, directed = FALSE, vertices = nodes)
 
-    weight_name <- c(
-        shared = "Shared terms",
-        jaccard = "Jaccard index",
-        overlap_coefficient = "Overlap coefficient"
-    )[[similarity]]
+    weight_name <- c(shared = "Shared terms", jaccard = "Jaccard index")[[similarity]]
     size_column <- if ("MetaboliteSize" %in% names(metadata_info)) metadata_info[["MetaboliteSize"]] else "n_terms"
     size_name <- if (size_column == "n_terms") "Terms per metabolite" else size_column
     fill_column <- if ("MetaboliteColor" %in% names(metadata_info)) metadata_info[["MetaboliteColor"]]
@@ -921,19 +938,26 @@ viz_shared_pk_network <- function(
 
     edge_layers <- list()
     if (nrow(edges) > 0L) {
-        edge_layers <- list(
-            ggraph::geom_edge_link(
-                ggplot2::aes(
-                    edge_width = .data$weight,
-                    label = if (similarity == "shared") .data$weight else round(.data$weight, 2)
-                ),
-                edge_colour = "grey45",
-                edge_alpha = 0.7,
+        edge_mapping <- list(edge_width = quote(.data$weight))
+        edge_args <- list(edge_colour = "grey45", edge_alpha = 0.7)
+        if (edge_labels) {
+            edge_mapping$label <- if (similarity == "shared") {
+                quote(.data$weight)
+            } else {
+                quote(round(.data$weight, 2))
+            }
+            edge_args <- c(edge_args, list(
                 label_colour = "black",
                 label_size = 3,
                 angle_calc = "along",
                 label_dodge = grid::unit(2, "mm"),
                 check_overlap = TRUE
+            ))
+        }
+        edge_layers <- list(
+            do.call(
+                ggraph::geom_edge_link,
+                c(list(mapping = do.call(ggplot2::aes, edge_mapping)), edge_args)
             ),
             ggraph::scale_edge_width_continuous(name = weight_name, range = c(0.5, 2.5))
         )
@@ -956,9 +980,12 @@ viz_shared_pk_network <- function(
         ggplot2::labs(
             title = plot_name,
             subtitle = paste0(
-                "Node label: metabolite (terms); edge label: ",
-                tolower(weight_name)
-            )
+                "Node label: metabolite (terms)",
+                if (edge_labels) paste0("; edge label: ", tolower(weight_name))
+            ),
+            caption = if (n_hidden > 0L) {
+                paste(n_hidden, "metabolite(s) without shared terms not shown")
+            }
         ) +
         .network_theme()
 }

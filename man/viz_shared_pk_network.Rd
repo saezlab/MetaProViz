@@ -8,8 +8,10 @@ viz_shared_pk_network(
   feature_metadata,
   input_pk,
   metadata_info,
-  similarity = c("shared", "jaccard", "overlap_coefficient"),
+  similarity = c("shared", "jaccard"),
   threshold = 0,
+  show_unconnected = FALSE,
+  edge_labels = TRUE,
   id_type = "HMDB",
   id_sep = ";",
   label_mode = c("all", "reduced"),
@@ -56,14 +58,20 @@ by default it is the number of \code{input_pk} rows behind an edge.}
 }}
 
 \item{similarity}{\emph{Optional: } Edge weight: \code{"shared"} (number of
-shared terms), \code{"jaccard"} (shared terms divided by the terms of either
-metabolite) or \code{"overlap_coefficient"} (shared terms divided by the
-terms of the metabolite with fewer terms). \strong{Default = "shared"}}
+shared terms) or \code{"jaccard"} (shared terms divided by the terms of
+either metabolite). \strong{Default = "shared"}}
 
 \item{threshold}{\emph{Optional: } Minimum \code{similarity} for two
 metabolites to be connected, as in \code{\link[=cluster_pk]{cluster_pk()}}. Metabolites without
 shared terms are never connected. For \code{similarity = "shared"} this is
 the minimum number of shared terms. \strong{Default = 0}}
+
+\item{show_unconnected}{\emph{Optional: } If TRUE, metabolites without any
+connection are plotted as well. \strong{Default = FALSE}}
+
+\item{edge_labels}{\emph{Optional: } If TRUE, edges are labelled with their
+weight. Set to FALSE for dense networks, where the edge width still
+shows the weight. \strong{Default = TRUE}}
 
 \item{id_type}{\emph{Optional: } \code{"HMDB"} to normalise HMDB IDs before
 matching. Any other value (e.g. "KEGG", "PubChem") matches IDs exactly.
@@ -90,9 +98,7 @@ each other. \strong{Default = TRUE}}
 changed. \strong{Default = NULL}}
 
 \item{layout}{\emph{Optional: } Graph layout passed to \code{\link[ggraph:ggraph]{ggraph::ggraph()}},
-e.g. "stress", "fr" (force-directed) or "kk". "stress" places
-unconnected metabolites next to the network instead of far away.
-\strong{Default = "stress"}}
+e.g. "stress", "fr" (force-directed) or "kk". \strong{Default = "stress"}}
 
 \item{plot_name}{\emph{Optional: } Plot title and name of the saved files.
 \strong{Default = "Shared_PK_Network"}}
@@ -115,7 +121,7 @@ plot. \strong{Default = 25 x 20 cm}}
 \value{
 A list with
 \item{DF}{List of \code{edges} (one row per connected metabolite pair with
-\code{shared}, \code{jaccard}, \code{overlap_coefficient}, the plotted \code{weight} and
+\code{shared}, \code{jaccard}, the plotted \code{weight} and
 the \code{shared_terms}), \code{nodes} (one row per metabolite with \code{n_terms}
 and the mapped attributes), \code{associations} (the metabolite-term
 pairs the network is based on), \code{matched_features} and
@@ -140,9 +146,11 @@ same \code{metadata_info} can be passed to both functions. Only \code{InputID},
 
 The raw number of shared terms favours metabolites with many terms. Use
 \code{similarity = "jaccard"} to compare the term profiles of two metabolites
-as a whole, or \code{similarity = "overlap_coefficient"} to see whether the
-terms of one metabolite are mostly contained in those of the other. The
-coefficients are calculated as in \code{\link[=cluster_pk]{cluster_pk()}}.
+as a whole. The Jaccard index is calculated as in \code{\link[=cluster_pk]{cluster_pk()}}.
+
+Metabolites that share no terms with any other plotted metabolite are left
+out of the plot unless \code{show_unconnected = TRUE}; they are still listed in
+the returned \code{nodes} table with a \code{degree} of 0.
 
 To connect terms by the metabolites they share instead, use
 \code{\link[=cluster_pk]{cluster_pk()}}: with \code{input_format = "enrichment"} it takes an enrichment

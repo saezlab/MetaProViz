@@ -338,6 +338,10 @@
 #'
 #' @noRd
 .network_layout <- function(graph, seed = NULL, layout = "fr") {
+    # graphlayouts' stress layout warns for graphs with two nodes
+    if (identical(layout, "stress") && igraph::vcount(graph) < 3L) {
+        layout <- "fr"
+    }
     if (is.null(seed)) {
         return(ggraph::ggraph(graph, layout = layout))
     }

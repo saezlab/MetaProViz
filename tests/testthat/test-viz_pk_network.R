@@ -299,7 +299,7 @@ test_that("viz_shared_pk_network connects metabolites sharing terms", {
     ab <- edges[edges$from == "A" & edges$to == "B", ]
     expect_equal(ab$shared, 2L)
     expect_equal(ab$jaccard, 2 / 3)
-    expect_equal(ab$overlap_coefficient, 1)
+    expect_false("overlap_coefficient" %in% colnames(edges))
     expect_equal(ab$weight, ab$jaccard)
     expect_equal(ab$shared_terms, "x; y")
 
@@ -308,6 +308,33 @@ test_that("viz_shared_pk_network connects metabolites sharing terms", {
     expect_equal(nodes$degree[nodes$name == "D"], 0L)
     expect_equal(nodes$Log2FC[nodes$name == "B"], -1)
     expect_silent(ggplot2::ggplot_build(res$Plot$shared_pk_network))
+
+    # D shares no terms: kept in the table, but only plotted on request
+    expect_setequal(res$Plot$shared_pk_network$data$name, c("A", "B", "C"))
+    expect_match(res$Plot$shared_pk_network$labels$caption, "1 metabolite")
+    res_all <- viz_shared_pk_network(
+        feature_metadata = feature_metadata,
+        input_pk = input_pk,
+        metadata_info = info[1:4],
+        show_unconnected = TRUE,
+        id_type = "other",
+        save_plot = NULL,
+        print_plot = FALSE
+    )
+    expect_setequal(res_all$Plot$shared_pk_network$data$name, c("A", "B", "C", "D"))
+
+    res_no_labels <- viz_shared_pk_network(
+        feature_metadata = feature_metadata,
+        input_pk = input_pk,
+        metadata_info = info[1:4],
+        edge_labels = FALSE,
+        id_type = "other",
+        save_plot = NULL,
+        print_plot = FALSE
+    )
+    edge_layer <- res_no_labels$Plot$shared_pk_network$layers[[1]]
+    expect_false("label" %in% names(edge_layer$mapping))
+    expect_true("label" %in% names(res$Plot$shared_pk_network$layers[[1]]$mapping))
 
     res_threshold <- viz_shared_pk_network(
         feature_metadata = feature_metadata,
