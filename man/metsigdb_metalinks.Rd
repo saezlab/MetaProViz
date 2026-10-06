@@ -75,7 +75,12 @@ Source fields are retained and additional annotations are included.
 \code{interaction_family} uses protein role (\code{protein_type} and
 \code{transport_direction}) before falling back to edge \code{type}, while
 \code{interaction_annotation_status} records mixed source annotations and
-edge-type-based inferences.
+edge-type-based inferences. \code{interaction} combines \code{transport_direction}
+and \code{type} into "Transport_In", "Transport_Out", "Ligand-Receptor",
+"Production-Degradation" or "Unknown", and \code{direction} gives the
+matching edge direction ("to_term", i.e. metabolite to protein, or
+"to_metabolite") for \code{metadata_info[["EdgeDirection"]]} in
+\code{\link[=viz_pk_network]{viz_pk_network()}}.
 }
 \description{
 Annotated metabolite-protein interactions from MetalinksDB

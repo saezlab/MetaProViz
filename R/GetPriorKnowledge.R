@@ -800,7 +800,12 @@ make_gene_metab_set <- function(
 #'     `interaction_family` uses protein role (`protein_type` and
 #'     `transport_direction`) before falling back to edge `type`, while
 #'     `interaction_annotation_status` records mixed source annotations and
-#'     edge-type-based inferences.
+#'     edge-type-based inferences. `interaction` combines `transport_direction`
+#'     and `type` into "Transport_In", "Transport_Out", "Ligand-Receptor",
+#'     "Production-Degradation" or "Unknown", and `direction` gives the
+#'     matching edge direction ("to_term", i.e. metabolite to protein, or
+#'     "to_metabolite") for `metadata_info[["EdgeDirection"]]` in
+#'     [viz_pk_network()].
 #'
 #' @examples
 #' metsigdb_metalinks()
@@ -1152,6 +1157,19 @@ metsigdb_metalinks <- function(
             interaction_family == "Receptor-metabolite" ~ paste0(ifelse(is.na(receptor_class), "Receptor", receptor_class), "; ", regulation_polarity),
             interaction_family == "Enzyme-metabolite" ~ paste0("Enzymatic link; ", regulation_polarity),
             TRUE ~ paste0("Other link; ", regulation_polarity)
+        ),
+        interaction = case_when(
+            !is.na(transport_direction) & transport_direction == "in" ~ "Transport_In",
+            !is.na(transport_direction) & transport_direction == "out" ~ "Transport_Out",
+            !is.na(type) & type == "Ligand-Receptor" ~ "Ligand-Receptor",
+            !is.na(type) & type == "Production-Degradation" ~ "Production-Degradation",
+            TRUE ~ "Unknown"
+        ),
+        # Edge direction between metabolite and protein for viz_pk_network():
+        direction = case_when(
+            interaction %in% c("Transport_In", "Production-Degradation") ~ "to_metabolite",
+            interaction %in% c("Transport_Out", "Ligand-Receptor") ~ "to_term",
+            TRUE ~ NA_character_
         )
     )
     # --------------------------------------------------------

@@ -47,6 +47,7 @@ Imports:
     factoextra,
     ggbeeswarm,
     ggfortify,
+    ggnewscale,
     ggplot2 (>= 3.3.5),
     ggpubr,
     ggrepel,
