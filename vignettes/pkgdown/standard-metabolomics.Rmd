@@ -859,7 +859,7 @@ viz_volcano(plot_types="Compare",
 
 ### **PathwayEnrichmentAnalysis**
 If you have performed Pathway Enrichment Analysis (PEA) such as ORA or GSEA, we can also plot the results and add the information into the Figure legends.\
-For this we need to prepare the correct input data including the pathways used to run the pathway analysis, the differential metabolite data used as input for the pathway analysis and the results of the pathway analysis:
+For this we need to prepare the correct input data including the pathways used to run the pathway analysis, the differential metabolite data used as input for the pathway analysis and the results of the pathway analysis. As one plot is made for each pathway, we only use the 10 pathways with the lowest adjusted p-value:
 ```{r data-prep-3}
 # Prepare the Input:
 # 1. data=Pathway analysis input: Must have features as column names. Those feature names need to match features in the pathway analysis file metadata_feature.
@@ -869,7 +869,8 @@ tibble::column_to_rownames("KEGGCompound")
 
 # 2. data2=Pathway analysis output: Must have same column names as metadata_feature for Pathway name
 InputPEA2 <- DM_ORA_786M1A_vs_HK2 %>%
-dplyr::rename("term"="ID")
+dplyr::rename("term"="ID") %>%
+dplyr::slice_min(p.adjust, n = 10, with_ties = FALSE) # top 10 pathways
 
 # 3. metadata_feature= Pathways used for pathway analysis: Must have same column names as metadata_feature for Pathway name and feature names need to match features in the data. PEA_Feature passes this column name!
 

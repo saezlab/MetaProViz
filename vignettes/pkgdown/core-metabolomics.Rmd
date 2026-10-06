@@ -1143,7 +1143,7 @@ subtitle= "Results of dma" )
 
 ### **PathwayEnrichmentAnalysis**
 If you have performed Pathway Enrichment Analysis (PEA) such as ORA or GSEA, we can also plot the results and add the information into the Figure legends.\
-Here we can for example use the results of the ORA we have performed on the differential expression results. Indeed for DMA_HK2_vs_786M1A we have performed ORA on each cluster (consumed, released, consumed/released). Here, I will plot the ORA results of the metabolites that are released in both conditions, HK2 and 786-M1A.
+Here we can for example use the results of the ORA we have performed on the differential expression results. Indeed for DMA_HK2_vs_786M1A we have performed ORA on each cluster (consumed, released, consumed/released). Here, I will plot the ORA results of the metabolites that are consumed in both conditions, HK2 and 786-M1A. As one plot is made for each pathway, we only use the 10 pathways with the lowest adjusted p-value.
 ```{r data-prep-3}
 # Prepare the Input:
 # 1. data=Pathway analysis input: Must have features as column names. Those feature names need to match features in the pathway analysis file metadata_feature.
@@ -1153,7 +1153,8 @@ column_to_rownames("KEGGCompound")
 
 # 2. data2=Pathway analysis output: Must have same column names as metadata_feature for Pathway name
 InputPEA2 <- MC_ORA_HK2_vs_786M1A_Consumed %>%
-dplyr::rename("term"="ID")
+dplyr::rename("term"="ID") %>%
+dplyr::slice_min(p.adjust, n = 10, with_ties = FALSE) # top 10 pathways
 
 # 3. metadata_feature= Pathways used for pathway analysis: Must have same column names as metadata_feature for Pathway name and feature names need to match features in the data. PEA_Feature passes this column name!
 
