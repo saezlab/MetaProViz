@@ -455,6 +455,48 @@ Clustersummary[-c(1:15),]%>%
 preview_table(caption ="summary of MCA: 2 Conditions.", row.names=FALSE)
 ```
 
+### MetalinksDB interactions of a metabolite cluster
+Metabolites of the same cluster change in the same way in both comparisons. To find out which proteins these metabolites interact with, we can use MetalinksDB [@Farr_Dimitrov2024], a resource of metabolite-protein interactions, and plot them with `viz_pk_network()`. Here, we load the interactions of metabolites that are present in the kidney and remove duplicated metabolite-protein pairs that originate from different resources:
+```{r metsigdb-metalinks, message=FALSE, warning=FALSE}
+MetaLinksDB <- metsigdb_metalinks(
+    tissue_location = c("Kidney", "All Tissues"),
+    save_table = NULL
+)
+
+MetaLinksDB_Select <- MetaLinksDB %>%
+    tidyr::unite("UniquePair", c("hmdb", "gene_symbol"), sep = "_", remove = FALSE) %>%
+    distinct(UniquePair, .keep_all = TRUE)
+```
+
+Now we plot the metabolites of the cluster `core_UP`, which are increased in both 786-O and 786-M1A compared to HK2 cells. Via `metadata_info` we tell the function which columns hold the metabolite IDs and names in our data and the IDs and proteins in MetalinksDB, colour the edges by the interaction type, use the line type for the mode of regulation and draw the edges in the direction provided by `metsigdb_metalinks()`:
+```{r metalinks-network, fig.width=8, fig.height=7}
+MetaLinks_Features <- MCAres[["MCA_2Cond_Results"]] %>%
+    filter(RG2_Significant == "core_UP") %>%
+    filter(!is.na(Cond1_DF_HMDB)) %>%
+    distinct(Metabolite, Cond1_DF_HMDB)
+
+MetaLinks_Network <- viz_pk_network(
+    feature_metadata = MetaLinks_Features,
+    input_pk = MetaLinksDB_Select,
+    metadata_info = c(
+        InputID = "Cond1_DF_HMDB",
+        InputLabel = "Metabolite",
+        PriorID = "hmdb",
+        PriorTerm = "gene_symbol",
+        EdgeColor = "interaction",
+        EdgeLinetype = "mode_of_regulation",
+        EdgeDirection = "direction"
+    ),
+    save_plot = NULL,
+    print_plot = TRUE,
+    label_mode = "all",
+    seed = 123
+)
+```
+
+Of the metabolites in this cluster, only myo-inositol and taurine have interactions in MetalinksDB: mainly with enzymes that produce or degrade them, e.g. the inositol monophosphatases IMPA1 and IMPA2 for myo-inositol, and with transporters such as SLC5A3 for myo-inositol and SLC6A6 for taurine.\
+This is only one example of how prior knowledge networks help to investigate specific results. In the [Prior Knowledge Networks vignette](https://saezlab.github.io/MetaProViz/articles/pkgdown/pk-networks.html) we show many more, e.g. which transporters the changed metabolites share, which metabolites drive the enriched pathways and in which cancers the metabolites have been reported before.
+
 ### ORA on each metabolite cluster
 As explained in detail above, Over Representation Analysis (ORA) is a pathway enrichment analysis (PEA) method. As ORA is based on the Fishers exact test it is perfect to test if a set of features (=metabolic pathways) are over-represented in the selection of features (= clusters of metabolites) from the data in comparison to all measured features (all metabolites). In detail, `cluster_ora()` will perform ORA on each of the metabolite clusters using all metabolites as the background.
 ```{r code-11, echo=FALSE}

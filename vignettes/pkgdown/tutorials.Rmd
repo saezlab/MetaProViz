@@ -7,6 +7,7 @@ resource_files:
   - figures/thumbs/standard-metabolomics.png
   - figures/thumbs/core-metabolomics.png
   - figures/thumbs/sample-metadata.png
+  - figures/thumbs/pk-networks.png
   - figures/thumbs/prior-knowledge.png
   - figures/thumbs/id-processing-workflow.png
   - figures/thumbs/metsigdb.png
@@ -86,6 +87,16 @@ All tutorials use example data that ship with **MetaProViz**, so you can run eve
       <div class="card-body">
         <h5 class="card-title"><a href="sample-metadata.html" class="stretched-link">Sample Metadata Analysis</a></h5>
         <p class="card-text">Tumour and normal tissue of kidney cancer patients: find the metabolites that separate patient groups, compare patient subsets and improve metabolite IDs before enrichment analysis.</p>
+      </div>
+      <div class="card-footer"><span class="badge bg-secondary">Website tutorial</span></div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card h-100 tutorial-card">
+      <img src="figures/thumbs/pk-networks.png" class="card-img-top" alt="Network of metabolites and the KEGG pathways they share">
+      <div class="card-body">
+        <h5 class="card-title"><a href="pk-networks.html" class="stretched-link">Prior Knowledge Networks</a></h5>
+        <p class="card-text">Investigate differential analysis results with networks: which transporters the changed metabolites share, which metabolites drive enriched pathways and in which cancers they were reported before.</p>
       </div>
       <div class="card-footer"><span class="badge bg-secondary">Website tutorial</span></div>
     </div>

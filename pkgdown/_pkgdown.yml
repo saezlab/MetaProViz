@@ -40,6 +40,8 @@ navbar:
           href: articles/pkgdown/core-metabolomics.html
         - text: "Sample Metadata Analysis"
           href: articles/pkgdown/sample-metadata.html
+        - text: "Prior Knowledge Networks"
+          href: articles/pkgdown/pk-networks.html
         - text: -------
         - text: "Prior knowledge and metabolite IDs"
         - text: "Prior Knowledge - Access & Integration"
