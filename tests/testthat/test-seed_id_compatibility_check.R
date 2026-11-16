@@ -122,3 +122,19 @@ test_that("seed_id_compatibility_check respects custom complete handling priorit
   expect_identical(res$data_after_handling$KEGG[[4]], "C00003")
   expect_true(is.na(res$data_after_handling$CHEBI[[4]]))
 })
+
+test_that("seed_id_compatibility_check classifies rows with character row names", {
+  input <- make_input_data()
+  rownames(input) <- c("feat_a", "feat_b", "feat_c", "feat_d")
+
+  res <- seed_id_compatibility_check(
+    data = input,
+    edge_table = make_edge_table(),
+    delimiter = ";"
+  )
+
+  expect_identical(
+    res$feature_compatibility_summary$compatibility_class,
+    c("fully_compatible", "partially_compatible", "completely_incompatible", "completely_incompatible")
+  )
+})

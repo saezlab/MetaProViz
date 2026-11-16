@@ -4278,14 +4278,15 @@ summarize_feature_compatibility <- function(
     if (nrow(pair_tbl) == 0L) {
         pair_summary <- tibble::tibble(
             row_id = integer(),
-            original_row_id = character(),
             n_pairs = integer(),
             n_true = integer(),
             n_false = integer()
         )
     } else {
+        # Summarise by row_id only: original_row_id in pair_tbl comes from the
+        # input row names, which are not kept in data_with_compatibility.
         pair_summary <- pair_tbl %>%
-            dplyr::group_by(row_id, original_row_id) %>%
+            dplyr::group_by(row_id) %>%
             dplyr::summarise(
                 n_pairs = sum(!is.na(seed1_id) & !is.na(seed2_id)),
                 n_true = sum(pair_compatible %in% TRUE, na.rm = TRUE),
@@ -4324,15 +4325,18 @@ summarize_feature_compatibility <- function(
         n_seed_ids = seed_counts,
         all_seed_ids_compatible = data_with_compatibility$all_seed_ids_compatible
     ) %>%
-        dplyr::left_join(pair_summary, by = c("row_id", "original_row_id")) %>%
+        dplyr::left_join(pair_summary, by = "row_id") %>%
         dplyr::mutate(
             n_pairs = dplyr::coalesce(n_pairs, 0L),
             n_true = dplyr::coalesce(n_true, 0L),
             n_false = dplyr::coalesce(n_false, 0L),
+            # Rows flagged incompatible without incompatible pairs stay NA
+            # instead of silently becoming "fully_compatible".
             compatibility_class = dplyr::case_when(
                 all_seed_ids_compatible %in% TRUE ~ "fully_compatible",
                 all_seed_ids_compatible %in% FALSE & n_true > 0L & n_false > 0L ~ "partially_compatible",
                 all_seed_ids_compatible %in% FALSE & n_true == 0L & n_false > 0L ~ "completely_incompatible",
+                all_seed_ids_compatible %in% FALSE ~ NA_character_,
                 TRUE ~ "fully_compatible"
             )
         )
