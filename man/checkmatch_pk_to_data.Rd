@@ -54,29 +54,30 @@ detected IDs in long format. }
 features
 }
 \examples{
-\dontrun{
-data(cellular_meta)
-DetectedIDs <- cellular_meta \%>\%
-    dplyr::select("Metabolite", "HMDB") \%>\%
-    tidyr::drop_na()
-input_pathway <- translate_id(
-    data = metsigdb_kegg(),
-    metadata_info = c(
-        InputID = "MetaboliteID",
-        grouping_variable = "term"
-    ),
-    from = c("kegg"),
-    to = c("hmdb")
-)[["TranslatedDF"]] \%>\% tidyr::drop_na()
+# Detected metabolites (lactate has two HMDB IDs) and a small pathway set
+detected <- data.frame(
+    Metabolite = c("glucose", "pyruvate", "citrate", "lactate"),
+    HMDB = c(
+        "HMDB0000122", "HMDB0000243", "HMDB0000094",
+        "HMDB0000190, HMDB0001311"
+    )
+)
+pathways <- data.frame(
+    term = c(rep("Glycolysis", 3), rep("TCA cycle", 2)),
+    hmdb = c(
+        "HMDB0000122", "HMDB0000243", "HMDB0000190",
+        "HMDB0000243", "HMDB0000094"
+    )
+)
 Res <- checkmatch_pk_to_data(
-    data = DetectedIDs,
-    input_pk = input_pathway,
+    data = detected,
+    input_pk = pathways,
     metadata_info = c(
         InputID = "HMDB",
         PriorID = "hmdb",
         grouping_variable = "term"
-    )
+    ),
+    save_table = NULL
 )
-}
 
 }
