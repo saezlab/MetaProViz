@@ -50,24 +50,19 @@ to-to-from: 4. MappingIssues, 5. MappingIssues summary, 6. Long summary
 Create Mapping Ambiguities between two ID types
 }
 \examples{
-\dontrun{
-KEGG_Pathways <- metsigdb_kegg()
-InputDF <- translate_id(
-    data = KEGG_Pathways,
-    metadata_info = c(
-        InputID = "MetaboliteID",
-        grouping_variable = "term"
-    ),
-    from = c("kegg"),
-    to = c("pubchem")
-)[["TranslatedDF"]]
+# Pathways with KEGG IDs, translated to PubChem (one KEGG ID maps to two)
+pathways <- data.frame(
+    term = c("Glycolysis", "Glycolysis", "TCA cycle", "TCA cycle"),
+    MetaboliteID = c("C00031", "C00022", "C00022", "C00158"),
+    pubchem = c("5793, 64689", "1060", "1060", "311")
+)
 Res <- mapping_ambiguity(
-    data = InputDF,
+    data = pathways,
     from = "MetaboliteID",
     to = "pubchem",
     grouping_variable = "term",
-    summary = TRUE
+    summary = TRUE,
+    save_table = NULL
 )
-}
 
 }

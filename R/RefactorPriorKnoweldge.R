@@ -899,25 +899,20 @@ equivalent_id <- function(
 #'     (If summary=TRUE) & 7) Combined summary table (If summary=TRUE)
 #'
 #' @examples
-#' \dontrun{
-#' KEGG_Pathways <- metsigdb_kegg()
-#'InputDF <- translate_id(
-#'     data = KEGG_Pathways,
-#'     metadata_info = c(
-#'         InputID = "MetaboliteID",
-#'         grouping_variable = "term"
-#'     ),
-#'     from = c("kegg"),
-#'     to = c("pubchem")
-#' )[["TranslatedDF"]]
+#' # Pathways with KEGG IDs, translated to PubChem (one KEGG ID maps to two)
+#' pathways <- data.frame(
+#'     term = c("Glycolysis", "Glycolysis", "TCA cycle", "TCA cycle"),
+#'     MetaboliteID = c("C00031", "C00022", "C00022", "C00158"),
+#'     pubchem = c("5793, 64689", "1060", "1060", "311")
+#' )
 #' Res <- mapping_ambiguity(
-#'     data = InputDF,
+#'     data = pathways,
 #'     from = "MetaboliteID",
 #'     to = "pubchem",
 #'     grouping_variable = "term",
-#'     summary = TRUE
+#'     summary = TRUE,
+#'     save_table = NULL
 #' )
-#' }
 #'
 #' @importFrom dplyr mutate bind_cols bind_rows
 #' @importFrom rlang !!! !! := sym syms
@@ -1541,30 +1536,31 @@ path = NULL
 #'     detected IDs in long format. }
 #'
 #' @examples
-#' \dontrun{
-#' data(cellular_meta)
-#' DetectedIDs <- cellular_meta %>%
-#'     dplyr::select("Metabolite", "HMDB") %>%
-#'     tidyr::drop_na()
-#' input_pathway <- translate_id(
-#'     data = metsigdb_kegg(),
-#'     metadata_info = c(
-#'         InputID = "MetaboliteID",
-#'         grouping_variable = "term"
-#'     ),
-#'     from = c("kegg"),
-#'     to = c("hmdb")
-#' )[["TranslatedDF"]] %>% tidyr::drop_na()
+#' # Detected metabolites (lactate has two HMDB IDs) and a small pathway set
+#' detected <- data.frame(
+#'     Metabolite = c("glucose", "pyruvate", "citrate", "lactate"),
+#'     HMDB = c(
+#'         "HMDB0000122", "HMDB0000243", "HMDB0000094",
+#'         "HMDB0000190, HMDB0001311"
+#'     )
+#' )
+#' pathways <- data.frame(
+#'     term = c(rep("Glycolysis", 3), rep("TCA cycle", 2)),
+#'     hmdb = c(
+#'         "HMDB0000122", "HMDB0000243", "HMDB0000190",
+#'         "HMDB0000243", "HMDB0000094"
+#'     )
+#' )
 #' Res <- checkmatch_pk_to_data(
-#'     data = DetectedIDs,
-#'     input_pk = input_pathway,
+#'     data = detected,
+#'     input_pk = pathways,
 #'     metadata_info = c(
 #'         InputID = "HMDB",
 #'         PriorID = "hmdb",
 #'         grouping_variable = "term"
-#'     )
+#'     ),
+#'     save_table = NULL
 #' )
-#' }
 #'
 #' @importFrom dplyr cur_group_id filter mutate n_distinct row_number select
 #' @importFrom logger log_trace
