@@ -337,3 +337,70 @@ test_that("standalone core_norm supports SummarizedExperiment input", {
     rownames(result$DF$core_Norm)
   )
 })
+
+test_that("outlier_detection lists several zero-variance metabolites", {
+  se <- mpv_intracell_se_fixture()
+  SummarizedExperiment::assay(se, 1)[1:2, ] <- 5
+  metadata_info <- c(
+    Conditions = "Conditions",
+    Biological_Replicates = "Biological_Replicates"
+  )
+
+  res <- suppressWarnings(outlier_detection(
+    data = se,
+    metadata_info = metadata_info,
+    core = FALSE
+  ))
+
+  zero_var <- res$DF$Zero_variance_metabolites_core
+  expect_equal(nrow(zero_var), 2)
+  expect_equal(colnames(zero_var), c("Filtering round", "Metabolite"))
+  expect_setequal(zero_var$Metabolite, rownames(se)[1:2])
+  expect_equal(unique(as.character(zero_var[["Filtering round"]])), "1")
+  expect_false(any(rownames(se)[1:2] %in% res$DF$QC_PCA_loadings_Final[[1]]))
+})
+
+test_that("outlier_detection keeps all metabolites without zero variance", {
+  se <- mpv_intracell_se_fixture()
+  metadata_info <- c(
+    Conditions = "Conditions",
+    Biological_Replicates = "Biological_Replicates"
+  )
+
+  res <- suppressWarnings(outlier_detection(
+    data = se,
+    metadata_info = metadata_info,
+    core = FALSE
+  ))
+
+  zero_var <- res$DF$Zero_variance_metabolites_core
+  expect_equal(nrow(zero_var), 0)
+  expect_equal(colnames(zero_var), c("Filtering round", "Metabolite"))
+  expect_equal(nrow(res$DF$QC_PCA_loadings_Final), nrow(se))
+})
+
+test_that("outlier_detection stops when the scree plot suggests 0 components", {
+  se <- mpv_intracell_se_fixture()[1:10, c(1, 12, 24, 35, 47, 58)]
+  metadata_info <- c(Conditions = "Conditions")
+
+  expect_error(
+    suppressWarnings(outlier_detection(
+      data = se,
+      metadata_info = metadata_info,
+      core = FALSE
+    )),
+    "suggests 0 principal components"
+  )
+
+  data <- as.data.frame(t(SummarizedExperiment::assay(se)))
+  data$constant <- 5
+  expect_error(
+    suppressWarnings(outlier_detection(
+      data = data,
+      metadata_sample = as.data.frame(SummarizedExperiment::colData(se)),
+      metadata_info = metadata_info,
+      core = FALSE
+    )),
+    "after removing 1 metabolite"
+  )
+})

@@ -2343,6 +2343,19 @@ outlier_detection <- function(
         # Note: we subtract 1 components from the knee cause the root of the
         # knee is the PC that does not add something. npcs = 30
         npcs <- knee -1
+        if (npcs < 1) {
+            n_zero_var <- length(unlist(Filter(is.character, metabolite_zero_var_total_list)))
+            msg <- paste0(
+                "Outlier detection, filtering round ", loop, ": the scree plot of the PCA suggests 0 principal ",
+                "components for the Hotelling's T2 test. This can happen with very few samples or metabolites (",
+                ncol(data_norm), " metabolites and ", nrow(data_norm),
+                " samples are left in this round",
+                if (n_zero_var > 0) paste0(", after removing ", n_zero_var, if (n_zero_var == 1) " metabolite" else " metabolites", " with zero variance") else "",
+                ")."
+            )
+            log_trace("Error: ", msg, sep = "")
+            stop(msg, call. = FALSE)
+        }
 
         # Make a scree plot with the selected component cut-off for HotellingT2 test
         screeplot <-
@@ -2521,8 +2534,13 @@ outlier_detection <- function(
     }
 
     # # --  Print Zero variance metabolites
-    zero_var_metab_export_df <- data.frame(1, 2)
-    names(zero_var_metab_export_df) <- c("Filtering round", "Metabolite")
+    zero_var_metab_export_df <- data.frame(
+        `Filtering round` = character(0),
+        Metabolite = character(0),
+        check.names = FALSE
+    )
+    # All metabolites removed for zero variance, over all rounds (the table above only lists them)
+    zero_var_metabs_all <- unlist(Filter(is.character, metabolite_zero_var_total_list))
 
     if (zero_var_metab_warning) {
         message <- paste("Metabolites with zero variance have been identified in the data. As scaling in PCA cannot be applied when features have zero variace, these metabolites are not taken into account for the outlier detection and the PCA plots.")
@@ -2532,20 +2550,25 @@ outlier_detection <- function(
 
     count <- 1
     for (i in seq_along(metabolite_zero_var_total_list)) {
-        if (metabolite_zero_var_total_list[[i]] != 0) {
+        # A round without zero variance metabolites holds 0, otherwise the names (one or more)
+        zero_var_metabs <- metabolite_zero_var_total_list[[i]]
+        if (is.character(zero_var_metabs) && length(zero_var_metabs) > 0) {
             message <-
                 paste(
                     "Filtering round ",
                     i,
                     ". Zero variance metabolites identified: ",
-                    paste( metabolite_zero_var_total_list[[i]], " ")
+                    paste(paste(zero_var_metabs, " "), collapse = " ")
                 )
             log_info(message)
             message(message)
 
-            zero_var_metab_export_df[count, "Filtering round"] <- paste(i)
-            zero_var_metab_export_df[count, "Metabolite"] <- paste(metabolite_zero_var_total_list[[i]])
-            count <- count +1
+            # Write the metabolites of this round to the table, one row each
+            for (zero_var_metab in zero_var_metabs) {
+                zero_var_metab_export_df[count, "Filtering round"] <- paste(i)
+                zero_var_metab_export_df[count, "Metabolite"] <- paste(zero_var_metab)
+                count <- count +1
+            }
         }
     }
 
@@ -2600,7 +2623,7 @@ outlier_detection <- function(
     # 1. Shape Outliers
     if (length(sample_outliers)>0) {
         dev.new()
-        pca_QC <- invisible(viz_pca(data = as.data.frame(data) %>% dplyr::select(-zero_var_metab_export_df$Metabolite),
+        pca_QC <- invisible(viz_pca(data = as.data.frame(data) %>% dplyr::select(-dplyr::any_of(zero_var_metabs_all)),
                                     metadata_info = c(color = metadata_info[["Conditions"]], shape = "Outliers"),
                                     metadata_sample = Metadata_Sample,
                                     plot_name = "Quality Control PCA Condition clustering and outlier check",
@@ -2612,7 +2635,7 @@ outlier_detection <- function(
     # 2. Shape Biological replicates
     if ("Biological_Replicates" %in% names(metadata_info)) {
         dev.new()
-        pca_QC_repl <- invisible(viz_pca(data = as.data.frame(data) %>% dplyr::select(-zero_var_metab_export_df$Metabolite),
+        pca_QC_repl <- invisible(viz_pca(data = as.data.frame(data) %>% dplyr::select(-dplyr::any_of(zero_var_metabs_all)),
         metadata_info = c(color = metadata_info[["Conditions"]], shape = metadata_info[["Biological_Replicates"]]),
         metadata_sample = Metadata_Sample,
         plot_name = "Quality Control PCA replicate spread check",
@@ -2633,7 +2656,7 @@ outlier_detection <- function(
         log_info(na_message)
         message(na_message)
     }
-    qc_pca_final <- prcomp(as.data.frame(data_no_na) %>% dplyr::select(-zero_var_metab_export_df$Metabolite), center = TRUE, scale. = TRUE)
+    qc_pca_final <- prcomp(as.data.frame(data_no_na) %>% dplyr::select(-dplyr::any_of(zero_var_metabs_all)), center = TRUE, scale. = TRUE)
     DF_list[["QC_PCA_scores_Final"]] <- as.data.frame(qc_pca_final$x) %>% rownames_to_column("Sample")
     DF_list[["QC_PCA_loadings_Final"]] <- as.data.frame(qc_pca_final$rotation) %>% rownames_to_column("Metabolite")
     DF_list[["QC_PCA_variance_Final"]] <- data.frame(
